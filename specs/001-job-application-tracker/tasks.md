@@ -19,12 +19,12 @@
 
 **Purpose**: Project initialization with Next.js, TypeScript, Tailwind CSS, Jest
 
-- [ ] T001 Initialize Next.js 14 project with TypeScript, Tailwind CSS, and App Router in repository root
-- [ ] T002 [P] Configure TypeScript strict mode in tsconfig.json per quickstart.md
-- [ ] T003 [P] Configure ESLint with @typescript-eslint rules in .eslintrc.json
-- [ ] T004 [P] Configure Jest with React Testing Library per quickstart.md (jest.config.js, jest.setup.js)
-- [ ] T005 [P] Configure Tailwind CSS with status colors in tailwind.config.ts
-- [ ] T006 Create directory structure per plan.md (src/components/ui, src/components/applications, src/components/interviews, src/components/common, src/hooks, src/services, src/types, src/lib, src/assets/icons, tests/unit, tests/integration)
+- [x] T001 Initialize Next.js 14 project with TypeScript, Tailwind CSS, and App Router in repository root
+- [x] T002 [P] Configure TypeScript strict mode in tsconfig.json per quickstart.md
+- [x] T003 [P] Configure ESLint with @typescript-eslint rules in .eslintrc.json
+- [x] T004 [P] Configure Jest with React Testing Library per quickstart.md (jest.config.js, jest.setup.js)
+- [x] T005 [P] Configure Tailwind CSS with status colors in tailwind.config.ts
+- [x] T006 Create directory structure per plan.md (src/components/ui, src/components/applications, src/components/interviews, src/components/common, src/hooks, src/services, src/types, src/lib, src/assets/icons, tests/unit, tests/integration)
 
 **Checkpoint**: Project structure ready, all dev tooling configured
 
@@ -36,30 +36,30 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create TypeScript type definitions from data-model.md in src/types/application.ts (JobApplication, InterviewStage, ApplicationStatus, CompanyCategory, JobSource)
-- [ ] T008 [P] Create enum constants and default values in src/lib/constants.ts (DEFAULT_INTERVIEW_STAGES, status colors, category lists)
-- [ ] T009 [P] Create utility functions in src/lib/utils.ts (formatDate, generateId, isValidUrl)
-- [ ] T010 [P] Create validation service in src/services/validation.ts per contracts/storage-service.ts (validateApplication, validateInterviewStage)
-- [ ] T011 Implement localStorage storage service in src/services/storage.ts per contracts/storage-service.ts interface
-- [ ] T012 Create useLocalStorage hook in src/hooks/useLocalStorage.ts for localStorage sync with React state
-- [ ] T013 Create useApplications hook in src/hooks/useApplications.ts implementing UseApplicationsReturn interface from contracts
-- [ ] T014 [P] Create base UI components: Button in src/components/ui/Button.tsx
-- [ ] T015 [P] Create base UI components: Input in src/components/ui/Input.tsx
-- [ ] T016 [P] Create base UI components: Select in src/components/ui/Select.tsx
-- [ ] T017 [P] Create base UI components: Modal in src/components/ui/Modal.tsx
-- [ ] T018 [P] Create base UI components: Badge in src/components/ui/Badge.tsx
-- [ ] T019 [P] Create base UI components: Card in src/components/ui/Card.tsx
-- [ ] T020 Create Next.js root layout in src/app/layout.tsx with global styles
-- [ ] T021 Create global CSS with Tailwind imports in src/app/globals.css
-- [ ] T022 [P] Create EmptyState component in src/components/common/EmptyState.tsx
-- [ ] T023 [P] Create ConfirmDialog component in src/components/common/ConfirmDialog.tsx
-- [ ] T024 [P] Create Header component in src/components/common/Header.tsx
+- [x] T007 Create TypeScript type definitions from data-model.md in src/types/application.ts (JobApplication, InterviewStage, ApplicationStatus, CompanyCategory, JobSource)
+- [x] T008 [P] Create enum constants and default values in src/lib/constants.ts (DEFAULT_INTERVIEW_STAGES, status colors, category lists)
+- [x] T009 [P] Create utility functions in src/lib/utils.ts (formatDate, generateId, isValidUrl)
+- [x] T010 [P] Create validation service in src/services/validation.ts per contracts/storage-service.ts (validateApplication, validateInterviewStage)
+- [x] T011 Implement localStorage storage service in src/services/storage.ts per contracts/storage-service.ts interface
+- [x] T012 Create useLocalStorage hook in src/hooks/useLocalStorage.ts for localStorage sync with React state
+- [x] T013 Create useApplications hook in src/hooks/useApplications.ts implementing UseApplicationsReturn interface from contracts
+- [x] T014 [P] Create base UI components: Button in src/components/ui/Button.tsx
+- [x] T015 [P] Create base UI components: Input in src/components/ui/Input.tsx
+- [x] T016 [P] Create base UI components: Select in src/components/ui/Select.tsx
+- [x] T017 [P] Create base UI components: Modal in src/components/ui/Modal.tsx
+- [x] T018 [P] Create base UI components: Badge in src/components/ui/Badge.tsx
+- [x] T019 [P] Create base UI components: Card in src/components/ui/Card.tsx
+- [x] T020 Create Next.js root layout in src/app/layout.tsx with global styles
+- [x] T021 Create global CSS with Tailwind imports in src/app/globals.css
+- [x] T022 [P] Create EmptyState component in src/components/common/EmptyState.tsx
+- [x] T023 [P] Create ConfirmDialog component in src/components/common/ConfirmDialog.tsx
+- [x] T024 [P] Create Header component in src/components/common/Header.tsx
 
 ### Foundational Tests
 
-- [ ] T025 [P] Unit tests for storage service in tests/unit/services/storage.test.ts
-- [ ] T026 [P] Unit tests for validation service in tests/unit/services/validation.test.ts
-- [ ] T027 [P] Unit tests for useLocalStorage hook in tests/unit/hooks/useLocalStorage.test.ts
+- [x] T025 [P] Unit tests for storage service in tests/unit/services/storage.test.ts
+- [x] T026 [P] Unit tests for validation service in tests/unit/services/validation.test.ts
+- [x] T027 [P] Unit tests for useLocalStorage hook in tests/unit/hooks/useLocalStorage.test.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -78,11 +78,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T030 [P] [US1] Create SVG icons for add button in src/assets/icons/PlusIcon.tsx
-- [ ] T031 [US1] Create ApplicationForm component in src/components/applications/ApplicationForm.tsx (handles create with all fields from FR-001 through FR-028)
-- [ ] T032 [US1] Create ApplicationCard component in src/components/applications/ApplicationCard.tsx (displays application summary)
-- [ ] T033 [US1] Create ApplicationList component in src/components/applications/ApplicationList.tsx (renders list of ApplicationCards)
-- [ ] T034 [US1] Create main page in src/app/page.tsx with 'use client' directive, ApplicationList, and add application button
+- [x] T030 [P] [US1] Create SVG icons for add button in src/assets/icons/PlusIcon.tsx
+- [x] T031 [US1] Create ApplicationForm component in src/components/applications/ApplicationForm.tsx (handles create with all fields from FR-001 through FR-028)
+- [x] T032 [US1] Create ApplicationCard component in src/components/applications/ApplicationCard.tsx (displays application summary)
+- [x] T033 [US1] Create ApplicationList component in src/components/applications/ApplicationList.tsx (renders list of ApplicationCards)
+- [x] T034 [US1] Create main page in src/app/page.tsx with 'use client' directive, ApplicationList, and add application button
 
 **Checkpoint**: User Story 1 complete - users can add and view job applications
 
@@ -103,13 +103,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T039 [P] [US2] Create SVG icons for filter/sort in src/assets/icons/FilterIcon.tsx and src/assets/icons/SortIcon.tsx
-- [ ] T040 [US2] Create useFilters hook in src/hooks/useFilters.ts (status, category, skillsMatch, jobSource filters per FR-006, FR-026, FR-027, FR-029)
-- [ ] T041 [US2] Create useSorting hook in src/hooks/useSorting.ts (dateApplied, companyName sorting per FR-007)
-- [ ] T042 [US2] Create FilterBar component in src/components/applications/FilterBar.tsx
-- [ ] T043 [US2] Create SortControls component in src/components/applications/SortControls.tsx
-- [ ] T044 [US2] Integrate FilterBar and SortControls into ApplicationList in src/components/applications/ApplicationList.tsx
-- [ ] T045 [US2] Update main page to show filter/sort controls in src/app/page.tsx
+- [x] T039 [P] [US2] Create SVG icons for filter/sort in src/assets/icons/FilterIcon.tsx and src/assets/icons/SortIcon.tsx
+- [x] T040 [US2] Create useFilters hook in src/hooks/useFilters.ts (status, category, skillsMatch, jobSource filters per FR-006, FR-026, FR-027, FR-029)
+- [x] T041 [US2] Create useSorting hook in src/hooks/useSorting.ts (dateApplied, companyName sorting per FR-007)
+- [x] T042 [US2] Create FilterBar component in src/components/applications/FilterBar.tsx
+- [x] T043 [US2] Create SortControls component in src/components/applications/SortControls.tsx
+- [x] T044 [US2] Integrate FilterBar and SortControls into ApplicationList in src/components/applications/ApplicationList.tsx
+- [x] T045 [US2] Update main page to show filter/sort controls in src/app/page.tsx
 
 **Checkpoint**: User Stories 1 & 2 complete - core MVP functionality (add, view, filter, sort)
 
