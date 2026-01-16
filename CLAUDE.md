@@ -60,3 +60,10 @@ Template repository with Claude Code skills, commands, and configuration for Nod
 - **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`
 - **Validation Chain**: `build` → `lint` → `test` → `test:e2e`
 - **Parallel Execution**: 3+ items use Task tool subagents
+
+## Active Technologies
+- TypeScript 5.x (strict mode enabled) + React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling) (001-job-application-tracker)
+- localStorage (browser-based, no server-side persistence) (001-job-application-tracker)
+
+## Recent Changes
+- 001-job-application-tracker: Added TypeScript 5.x (strict mode enabled) + React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling)

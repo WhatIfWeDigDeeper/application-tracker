@@ -5,11 +5,32 @@
 **Status**: Draft
 **Input**: User description: "Build an application that can help track a user's job applications with details, interview stages, offer tracking, and filtering/sorting capabilities"
 
+- [Clarifications](#clarifications)
+  - [Session 2026-01-16](#session-2026-01-16)
+- [User Scenarios \& Testing *(mandatory)*](#user-scenarios--testing-mandatory)
+  - [User Story 1 - Add New Job Application (Priority: P1)](#user-story-1---add-new-job-application-priority-p1)
+  - [User Story 2 - View and Filter Applications List (Priority: P1)](#user-story-2---view-and-filter-applications-list-priority-p1)
+  - [User Story 3 - Track Interview Progress (Priority: P2)](#user-story-3---track-interview-progress-priority-p2)
+  - [User Story 4 - Manage Offers with Due Dates (Priority: P2)](#user-story-4---manage-offers-with-due-dates-priority-p2)
+  - [User Story 5 - Archive and Delete Applications (Priority: P3)](#user-story-5---archive-and-delete-applications-priority-p3)
+  - [User Story 6 - Responsive Mobile and Desktop Experience (Priority: P3)](#user-story-6---responsive-mobile-and-desktop-experience-priority-p3)
+  - [Edge Cases](#edge-cases)
+- [Requirements *(mandatory)*](#requirements-mandatory)
+  - [Functional Requirements](#functional-requirements)
+  - [Key Entities](#key-entities)
+- [Success Criteria *(mandatory)*](#success-criteria-mandatory)
+  - [Measurable Outcomes](#measurable-outcomes)
+- [Assumptions](#assumptions)
+
+
 ## Clarifications
 
 ### Session 2026-01-16
 
-- Q: What additional fields should each job application support? → A: Company URL, position URLs (job site and company posting), company category (Education/Health/Climate/AI/FinTech), skills match indicator (High/Medium/Low), cover letter required flag, special requirements field, optional salary range (min/max)
+- Q: What additional fields should each job application support? → A: Company URL, position URLs (job site and company posting), company category, skills match indicator (1-5 scale), cover letter required flag, special requirements field, optional salary range (min/max), job source
+- Q: What scale should skills match use? → A: 5-point scale (1-5) instead of High/Medium/Low
+- Q: What company categories should be available? → A: Education, Health, Climate, AI, Energy, Finance, Enterprise Software, Consumer Tech, E-commerce, Cybersecurity, Gaming, Media/Entertainment, Consulting, Government, Nonprofit, Retail, Restaurant, Hospitality, Other
+- Q: How should job source be tracked? → A: Predefined options: Recruiter, LinkedIn, Indeed, Friend, Colleague, Company Website, Other
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -19,14 +40,15 @@ As a job seeker, I want to add a new job application to my tracker so that I can
 
 **Why this priority**: This is the core functionality - without the ability to add applications, the entire system has no purpose. Users need to capture job applications as they submit them.
 
-**Independent Test**: Can be fully tested by adding a new job application with all required fields (company name, position) and optional fields (URLs, category, skills match, salary range, etc.) and verifying it appears in the applications list.
+**Independent Test**: Can be fully tested by adding a new job application with all required fields (company name, position) and optional fields (URLs, category, skills match, salary range, job source, etc.) and verifying it appears in the applications list.
 
 **Acceptance Scenarios**:
 
 1. **Given** I am on the application tracker, **When** I create a new job application with company name "Acme Corp", position "Software Engineer", date applied "2026-01-15", status "Applied", and notes "Found on LinkedIn", **Then** the application is saved and visible in my list of applications.
 2. **Given** I am adding a new application, **When** I leave required fields empty (company name or position), **Then** I receive validation feedback indicating which fields are required.
 3. **Given** I am adding a new application, **When** I select the date applied, **Then** I can choose any date (past, present, or future) to account for scheduled applications.
-4. **Given** I am adding a new application, **When** I enter optional fields like company URL, job posting URLs, company category, skills match level, cover letter requirement, special requirements, and salary range, **Then** all these details are saved with the application.
+4. **Given** I am adding a new application, **When** I enter optional fields like company URL, job posting URLs, company category, skills match rating (1-5), cover letter requirement, special requirements, salary range, and job source, **Then** all these details are saved with the application.
+5. **Given** I am adding a new application, **When** I select a job source, **Then** I can choose from Recruiter, LinkedIn, Indeed, Friend, Colleague, Company Website, or Other.
 
 ---
 
@@ -45,7 +67,8 @@ As a job seeker, I want to view all my job applications in a list and filter/sor
 3. **Given** I have multiple applications, **When** I sort by date applied (newest first), **Then** applications are ordered with most recent applications at the top.
 4. **Given** I have multiple applications, **When** I sort by company name, **Then** applications are ordered alphabetically by company.
 5. **Given** I have applications with different company categories, **When** I filter by category (e.g., "AI"), **Then** I only see applications for companies in that category.
-6. **Given** I have applications with different skills match levels, **When** I filter by skills match (e.g., "High"), **Then** I only see applications with that skills match level.
+6. **Given** I have applications with different skills match ratings, **When** I filter by skills match (e.g., rating 4 or higher), **Then** I only see applications meeting that threshold.
+7. **Given** I have applications from different sources, **When** I filter by source (e.g., "LinkedIn"), **Then** I only see applications found through that source.
 
 ---
 
@@ -135,17 +158,19 @@ As a job seeker, I want to access my job tracker on both my phone and computer s
 - **FR-004**: System MUST allow users to add free-form notes to any application
 - **FR-019**: System MUST allow users to add an optional company website URL
 - **FR-020**: System MUST allow users to add optional job posting URLs (job site URL such as LinkedIn, and company career page URL)
-- **FR-021**: System MUST allow users to select a company category from a predefined list: Education, Health, Climate, AI, FinTech, or Other
-- **FR-022**: System MUST allow users to indicate skills match level: High, Medium, or Low
+- **FR-021**: System MUST allow users to select a company category from a predefined list: Education, Health, Climate, AI, Energy, Finance, Enterprise Software, Consumer Tech, E-commerce, Cybersecurity, Gaming, Media/Entertainment, Consulting, Government, Nonprofit, Retail, Restaurant, Hospitality, Other
+- **FR-022**: System MUST allow users to rate skills match on a scale of 1-5 (1 = poor match, 5 = excellent match)
 - **FR-023**: System MUST allow users to mark whether a cover letter is required (yes/no)
 - **FR-024**: System MUST allow users to add special requirements notes (e.g., portfolio samples, code samples, assessments)
 - **FR-025**: System MUST allow users to enter an optional salary range with minimum and/or maximum values
+- **FR-028**: System MUST allow users to select a job source from: Recruiter, LinkedIn, Indeed, Friend, Company Website, or Other
 
 **List View & Navigation:**
 - **FR-005**: System MUST display all non-archived applications in a list view by default
 - **FR-006**: System MUST allow filtering applications by status
 - **FR-026**: System MUST allow filtering applications by company category
-- **FR-027**: System MUST allow filtering applications by skills match level
+- **FR-027**: System MUST allow filtering applications by skills match rating (e.g., 4 and above)
+- **FR-029**: System MUST allow filtering applications by job source
 - **FR-007**: System MUST allow sorting applications by date applied (ascending/descending) and company name (alphabetical)
 
 **Interview Tracking:**
@@ -172,7 +197,7 @@ As a job seeker, I want to access my job tracker on both my phone and computer s
 - **Job Application**: Represents a single job application. Contains:
   - Required: company name, position title
   - Auto-set: date applied (defaults to current date), current status
-  - Optional: company website URL, job posting URL (external job site), company career page URL, company category, skills match level, cover letter required flag, special requirements notes, salary range (min/max), general notes
+  - Optional: company website URL, job posting URL (external job site), company career page URL, company category, skills match rating (1-5), cover letter required flag, special requirements notes, salary range (min/max), job source, general notes
   - Related: interview stages (when applicable), offer details (when applicable)
   - State: active or archived
 
@@ -180,9 +205,11 @@ As a job seeker, I want to access my job tracker on both my phone and computer s
 
 - **Offer Details**: Contains offer due date (optional). Associated with Job Applications in "Offered" status.
 
-- **Company Category**: Enumeration of industry categories: Education, Health, Climate, AI, FinTech, Other.
+- **Company Category**: Enumeration of industry categories: Education, Health, Climate, AI, FinTech, Enterprise Software, Consumer Tech, E-commerce, Cybersecurity, Gaming, Media/Entertainment, Consulting, Government, Nonprofit, Other.
 
-- **Skills Match Level**: Enumeration of match indicators: High, Medium, Low.
+- **Skills Match Rating**: Integer scale from 1 to 5 (1 = poor match, 5 = excellent match).
+
+- **Job Source**: Enumeration of where the job was found: Recruiter, LinkedIn, Indeed, Friend, Company Website, Other.
 
 ## Success Criteria *(mandatory)*
 
@@ -204,6 +231,7 @@ As a job seeker, I want to access my job tracker on both my phone and computer s
 - The default interview stages are appropriate for most tech industry roles but can be customized
 - Users may track up to approximately 100 active applications (performance optimized for this scale)
 - Modern browser support is sufficient (last 2 major versions of Chrome, Firefox, Safari, Edge)
-- Company categories are limited to the predefined list plus "Other" for flexibility
+- Company categories list covers most common industries; "Other" provides flexibility for unlisted categories
 - Salary values are stored as numbers without currency specification (user's local currency assumed)
 - URL validation checks format only, not whether the URL is reachable
+- Skills match is a self-assessment by the applicant, not an objective measure

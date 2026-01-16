@@ -28,6 +28,8 @@ All code MUST meet quality standards before merge:
 
 - **Readability**: Code MUST be self-documenting with clear naming conventions;
   complex logic MUST include explanatory comments
+- **Naming Conventions**: Interface names MUST NOT use "I" prefix (use `StorageService`
+  not `IStorageService`); Hungarian notation MUST be avoided
 - **Maintainability**: Functions MUST have single responsibility; modules MUST have
   clear boundaries and minimal coupling
 - **Type Safety**: TypeScript strict mode MUST be enabled; `any` types MUST be
@@ -146,4 +148,4 @@ Compliance is verified through:
 
 See project documentation for runtime development guidance.
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-16 | **Last Amended**: 2026-01-16
+**Version**: 1.0.1 | **Ratified**: 2026-01-16 | **Last Amended**: 2026-01-16
