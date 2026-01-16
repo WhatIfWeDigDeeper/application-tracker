@@ -14,7 +14,10 @@
 /speckit.clarify each application should support the name of the company applied to, the url to the company website, the title of the position with urls to the job site (such as LinkedIn) and the post on the company site. The category of the company, such as Education, Health, Climate, AI, FinTech. An indicator of skills match, High Medium Low, whether the application requires a cover letter, any special things requested as part of the job application, like sample of portfolio, sample code, etc. We should support the optional salary range, max and/or min.
 ```
 
+Note: Manually edited spec to add more company categories, and change skill match to 1-5 rating.
 
 ```md
 /speckit.plan The application is written in Typescript and uses React, Docker, Node, NextJs, Vite, Jest, Tailwind CSS, SVGs for any images/icons.
 ```
+
+Note: had to add rule about not using prefix of "I" to interfaces. Chose to update the constitution.md file rather than CLAUDE.md for now.
