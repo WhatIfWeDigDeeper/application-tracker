@@ -8,7 +8,11 @@
     },
     "chat.tools.terminal.autoApprove": {
         ".specify/scripts/bash/": true,
-        ".specify/scripts/powershell/": true
+        ".specify/scripts/powershell/": true,
+        "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }
 
