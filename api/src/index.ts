@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { logger } from "./middleware/logger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import applicationsRouter from "./routes/applications.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -15,10 +16,8 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Placeholder for routes (will be added in subsequent tasks)
-app.use("/applications", (req, res) => {
-  res.status(501).json({ code: "not_implemented", message: "Coming soon" });
-});
+// Routes
+app.use("/applications", applicationsRouter);
 
 // Error handler (must be last)
 app.use(errorHandler);

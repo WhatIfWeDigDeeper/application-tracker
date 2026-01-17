@@ -65,6 +65,7 @@ export const CreateApplicationSchema = z.object({
 export const UpdateApplicationSchema = CreateApplicationSchema.extend({
   status: ApplicationStatusSchema.optional(),
   offerDueDate: z.string().datetime().optional(),
+  isArchived: z.boolean().optional(),
 });
 
 export const CreateInterviewStageSchema = z.object({
