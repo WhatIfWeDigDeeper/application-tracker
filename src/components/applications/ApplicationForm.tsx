@@ -343,17 +343,6 @@ export function ApplicationForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-            label="Minimum Salary"
-            name="salaryMin"
-            type="number"
-            value={formData.salaryMin ?? ''}
-            onChange={handleChange}
-            error={errors.salaryMin}
-            placeholder="e.g., 100000"
-            min={0}
-          />
-
-          <Input
             label="Maximum Salary"
             name="salaryMax"
             type="number"
@@ -361,6 +350,17 @@ export function ApplicationForm({
             onChange={handleChange}
             error={errors.salaryMax}
             placeholder="e.g., 150000"
+            min={0}
+          />
+
+          <Input
+            label="Minimum Salary"
+            name="salaryMin"
+            type="number"
+            value={formData.salaryMin ?? ''}
+            onChange={handleChange}
+            error={errors.salaryMin}
+            placeholder="e.g., 100000"
             min={0}
           />
         </div>
