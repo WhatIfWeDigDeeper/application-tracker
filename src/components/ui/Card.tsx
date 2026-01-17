@@ -8,9 +8,9 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
-  default: 'bg-white border border-gray-200',
-  outlined: 'bg-transparent border border-gray-300',
-  elevated: 'bg-white shadow-md',
+  default: 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700',
+  outlined: 'bg-transparent dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600',
+  elevated: 'bg-white dark:bg-slate-800 shadow-md dark:shadow-slate-900/50',
 };
 
 const paddingClasses: Record<NonNullable<CardProps['padding']>, string> = {

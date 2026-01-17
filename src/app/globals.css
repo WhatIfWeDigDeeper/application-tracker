@@ -2,7 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  :root.dark {
+    color-scheme: dark;
+  }
+}
+
+@layer components {
+  /* Smooth transitions for theme switching */
+  html,
+  html * {
+    @apply transition-colors duration-300;
+  }
+
+  /* Exceptions: Don't transition certain properties */
+  html input,
+  html textarea,
+  html select {
+    @apply transition-colors duration-300;
+  }
+}
+
 body {
   color: rgb(0, 0, 0);
   background: rgb(255, 255, 255);
+  @apply dark:bg-slate-950 dark:text-slate-50;
 }

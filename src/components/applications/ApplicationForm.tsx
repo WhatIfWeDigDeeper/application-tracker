@@ -142,7 +142,7 @@ export function ApplicationForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Required Fields */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-900 border-b pb-2">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-slate-50 border-b dark:border-slate-700 pb-2">
           Basic Information
         </h3>
 
@@ -180,7 +180,7 @@ export function ApplicationForm({
 
       {/* URLs */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-900 border-b pb-2">URLs</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-slate-50 border-b dark:border-slate-700 pb-2">URLs</h3>
 
         <Input
           label="Company Website"
@@ -217,7 +217,7 @@ export function ApplicationForm({
 
       {/* Classification */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-900 border-b pb-2">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-slate-50 border-b dark:border-slate-700 pb-2">
           Classification
         </h3>
 
@@ -259,7 +259,7 @@ export function ApplicationForm({
             onChange={handleChange}
             className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <label htmlFor="coverLetterRequired" className="text-sm text-gray-700">
+          <label htmlFor="coverLetterRequired" className="text-sm text-gray-700 dark:text-slate-200">
             Cover letter required
           </label>
         </div>
@@ -267,7 +267,7 @@ export function ApplicationForm({
 
       {/* Salary */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-900 border-b pb-2">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-slate-50 border-b dark:border-slate-700 pb-2">
           Compensation (Optional)
         </h3>
 
@@ -298,10 +298,10 @@ export function ApplicationForm({
 
       {/* Notes */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-900 border-b pb-2">Notes</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-slate-50 border-b dark:border-slate-700 pb-2">Notes</h3>
 
         <div>
-          <label htmlFor="specialRequirements" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="specialRequirements" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
             Special Requirements
           </label>
           <textarea
@@ -310,7 +310,7 @@ export function ApplicationForm({
             rows={2}
             value={formData.specialRequirements}
             onChange={handleChange}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 text-gray-900 bg-white"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:focus:border-blue-400 dark:focus:ring-blue-400 px-3 py-2 text-gray-900 bg-white dark:text-slate-100 dark:bg-slate-800 placeholder:text-gray-400 dark:placeholder:text-slate-500"
             placeholder="e.g., Portfolio required, code samples needed..."
           />
           {errors.specialRequirements && (
@@ -319,7 +319,7 @@ export function ApplicationForm({
         </div>
 
         <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
             General Notes
           </label>
           <textarea
@@ -328,7 +328,7 @@ export function ApplicationForm({
             rows={3}
             value={formData.notes}
             onChange={handleChange}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 text-gray-900 bg-white"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:focus:border-blue-400 dark:focus:ring-blue-400 px-3 py-2 text-gray-900 bg-white dark:text-slate-100 dark:bg-slate-800 placeholder:text-gray-400 dark:placeholder:text-slate-500"
             placeholder="Any additional notes about this application..."
           />
           {errors.notes && <p className="mt-1 text-sm text-red-600">{errors.notes}</p>}
@@ -336,7 +336,7 @@ export function ApplicationForm({
       </div>
 
       {/* Form Actions */}
-      <div className="flex justify-end gap-3 pt-4 border-t">
+      <div className="flex justify-end gap-3 pt-4 border-t dark:border-slate-700">
         <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>

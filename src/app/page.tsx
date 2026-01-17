@@ -129,7 +129,7 @@ export default function Home(): React.ReactElement {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       <Header>
         <Button onClick={handleAddNew}>
           <PlusIcon className="w-5 h-5 mr-2" />
@@ -139,8 +139,8 @@ export default function Home(): React.ReactElement {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="mb-4 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md">
+            <p className="text-sm text-red-600 dark:text-red-200">{error}</p>
           </div>
         )}
 
@@ -153,7 +153,7 @@ export default function Home(): React.ReactElement {
             hasActiveFilters={hasActiveFilters}
           />
           <div className="flex justify-between items-center mt-4">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-slate-400">
               {applications.length} application{applications.length !== 1 ? 's' : ''}
             </p>
             <SortControls sort={sort} onSortChange={setSort} />
