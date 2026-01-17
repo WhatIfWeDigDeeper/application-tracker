@@ -6,7 +6,19 @@
     "playwright@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
   },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "excludedCommands": ["docker"],
+    "network": {
+      "allowUnixSockets": [
+        "/var/run/docker.sock"
+      ],
+      "allowLocalBinding": true
+    }
+  },
   "permissions": {
+    "defaultMode": "acceptEdits",
     "deny": [
       "Read(.env*)",
       "Write(.env*)",
