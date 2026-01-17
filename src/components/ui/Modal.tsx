@@ -15,8 +15,8 @@ export interface ModalProps {
 const sizeClasses: Record<NonNullable<ModalProps['size']>, string> = {
   sm: 'max-w-sm',
   md: 'max-w-md',
-  lg: 'max-w-lg',
-  xl: 'max-w-xl',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
 };
 
 export function Modal({
@@ -174,7 +174,7 @@ export function Modal({
           </div>
 
           {/* Content */}
-          <div className="px-6 py-4">{children}</div>
+          <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">{children}</div>
         </div>
       </div>
     </div>

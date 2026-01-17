@@ -116,7 +116,7 @@ export function InterviewChecklist({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Interview Progress</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-50">Interview Progress</h3>
         {isEditable && (
           <div className="flex gap-2">
             {stages.length === 0 && (
@@ -135,13 +135,13 @@ export function InterviewChecklist({
       {/* Progress Bar */}
       {totalCount > 0 && (
         <div className="space-y-1">
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-sm text-gray-600 dark:text-slate-400">
             <span>
               {completedCount} of {totalCount} stages completed
             </span>
             <span>{Math.round(progressPercent)}%</span>
           </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-green-500 transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
@@ -163,7 +163,7 @@ export function InterviewChecklist({
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-gray-500 dark:text-slate-400">
           <p>No interview stages yet.</p>
           {isEditable && (
             <p className="mt-1 text-sm">

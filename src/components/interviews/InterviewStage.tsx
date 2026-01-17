@@ -23,7 +23,7 @@ function RatingStars({ rating }: { rating: number }): React.ReactElement {
           key={star}
           className={cn(
             'w-4 h-4',
-            star <= rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+            star <= rating ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-slate-600'
           )}
           viewBox="0 0 20 20"
           fill="currentColor"
@@ -47,14 +47,14 @@ export function InterviewStage({
       className={cn(
         'flex items-start gap-3 p-3 rounded-lg border transition-colors',
         stage.isCompleted
-          ? 'bg-green-50 border-green-200'
-          : 'bg-white border-gray-200 hover:border-gray-300'
+          ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+          : 'bg-white dark:bg-slate-700 border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
       )}
     >
       {isDraggable && (
         <div
           {...dragHandleProps}
-          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 mt-0.5"
+          className="cursor-grab active:cursor-grabbing text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-300 mt-0.5"
           aria-label="Drag to reorder"
         >
           <DragIcon className="w-5 h-5" />
@@ -81,13 +81,13 @@ export function InterviewStage({
             <h4
               className={cn(
                 'font-medium',
-                stage.isCompleted ? 'text-green-800' : 'text-gray-900'
+                stage.isCompleted ? 'text-green-800 dark:text-green-300' : 'text-gray-900 dark:text-slate-50'
               )}
             >
               {stage.name}
             </h4>
             {stage.isCompleted && stage.completedDate && (
-              <p className="text-sm text-green-600 flex items-center gap-1 mt-0.5">
+              <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1 mt-0.5">
                 <CheckCircleIcon className="w-4 h-4" />
                 Completed {formatDate(stage.completedDate)}
               </p>
@@ -110,7 +110,7 @@ export function InterviewStage({
         )}
 
         {stage.notes && (
-          <p className="mt-2 text-sm text-gray-600 whitespace-pre-wrap">{stage.notes}</p>
+          <p className="mt-2 text-sm text-gray-600 dark:text-slate-300 whitespace-pre-wrap">{stage.notes}</p>
         )}
       </div>
     </div>
