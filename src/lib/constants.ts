@@ -31,31 +31,34 @@ export const DEFAULT_INTERVIEW_STAGES: Omit<InterviewStage, 'id'>[] = [
 export const APPLICATION_STATUSES: ApplicationStatus[] = [
   'unsubmitted',
   'applied',
-  'interviewing',
-  'offered',
   'rejected',
-  'accepted',
-  'declined',
+  'interviewing',
+  'given offer',
+  'accepted offer',
+  'declined offer',
+  'no offer',
 ];
 
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   unsubmitted: 'Unsubmitted',
   applied: 'Applied',
-  interviewing: 'Interviewing',
-  offered: 'Offered',
   rejected: 'Rejected',
-  accepted: 'Accepted',
-  declined: 'Declined',
+  interviewing: 'Interviewing',
+  'given offer': 'Given Offer',
+  'accepted offer': 'Accepted Offer',
+  'declined offer': 'Declined Offer',
+  'no offer': 'No Offer',
 };
 
 export const STATUS_COLORS: Record<ApplicationStatus, string> = {
   unsubmitted: 'bg-status-unsubmitted text-white',
   applied: 'bg-status-applied text-white',
-  interviewing: 'bg-status-interviewing text-white',
-  offered: 'bg-status-offered text-white',
   rejected: 'bg-status-rejected text-white',
-  accepted: 'bg-status-accepted text-white',
-  declined: 'bg-status-declined text-white',
+  interviewing: 'bg-status-interviewing text-white',
+  'given offer': 'bg-status-offered text-white',
+  'accepted offer': 'bg-status-accepted text-white',
+  'declined offer': 'bg-status-declined text-white',
+  'no offer': 'bg-status-rejected text-white',
 };
 
 // ============================================================================

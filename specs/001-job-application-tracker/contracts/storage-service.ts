@@ -13,11 +13,12 @@
 
 export type ApplicationStatus =
   | 'applied'
-  | 'interviewing'
-  | 'offered'
   | 'rejected'
-  | 'accepted'
-  | 'declined';
+  | 'interviewing'
+  | 'given offer'
+  | 'accepted offer'
+  | 'declined offer'
+  | 'no offer';
 
 export type CompanyCategory =
   | 'education'

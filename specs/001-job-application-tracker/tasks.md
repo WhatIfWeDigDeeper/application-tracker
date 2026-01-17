@@ -142,9 +142,9 @@
 
 ## Phase 6: User Story 4 - Manage Offers with Due Dates (Priority: P2)
 
-**Goal**: Users can set offer due dates when status is "Offered" and see deadline countdown
+**Goal**: Users can set offer due dates when status is "Given Offer" and see deadline countdown
 
-**Independent Test**: Change application status to "Offered", set due date, verify deadline displays correctly
+**Independent Test**: Change application status to "Given Offer", set due date, verify deadline displays correctly
 
 ### Tests for User Story 4
 
@@ -153,7 +153,7 @@
 ### Implementation for User Story 4
 
 - [x] T056 [P] [US4] Create SVG icon for calendar/deadline in src/assets/icons/CalendarIcon.tsx
-- [x] T057 [US4] Add offerDueDate field handling to ApplicationDetail (status-based editing when "Offered" per FR-013)
+- [x] T057 [US4] Add offerDueDate field handling to ApplicationDetail (status-based editing when "Given Offer" per FR-013)
 - [x] T058 [US4] Add deadline display with days remaining to ApplicationCard in src/components/applications/ApplicationCard.tsx
 - [x] T059 [US4] Add deadline display with countdown to ApplicationDetail in src/components/applications/ApplicationDetail.tsx
 

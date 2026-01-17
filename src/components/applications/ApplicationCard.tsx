@@ -43,7 +43,7 @@ export function ApplicationCard({
   const totalStages = interviewStages.length;
   const salaryRange = formatSalaryRange(salaryMin, salaryMax);
   const daysRemaining = offerDueDate ? getDaysRemaining(offerDueDate) : null;
-  const isOffered = status === 'offered';
+  const isOffered = status === 'given offer';
 
   return (
     <Card

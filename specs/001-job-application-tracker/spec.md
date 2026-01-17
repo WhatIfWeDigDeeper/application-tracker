@@ -95,11 +95,11 @@ As a job seeker who has received an offer, I want to track offer details includi
 
 **Why this priority**: Offer management is time-sensitive and critical for users who reach this stage. Missing an offer deadline could have significant consequences.
 
-**Independent Test**: Can be fully tested by changing an application status to "Offered", setting a due date, and verifying the deadline is visible.
+**Independent Test**: Can be fully tested by changing an application status to "Given Offer", setting a due date, and verifying the deadline is visible.
 
 **Acceptance Scenarios**:
 
-1. **Given** I have an application, **When** I change its status to "Offered", **Then** I can optionally set an offer due date for when I need to respond.
+1. **Given** I have an application, **When** I change its status to "Given Offer", **Then** I can optionally set an offer due date for when I need to respond.
 2. **Given** I have an offer with a due date, **When** I view my applications list, **Then** I can see which offers have upcoming deadlines.
 3. **Given** I have an offer with a due date approaching, **When** I view that application, **Then** I can clearly see the deadline and how many days remain.
 
@@ -154,7 +154,7 @@ As a job seeker, I want to access my job tracker on both my phone and computer s
 **Core Application Fields:**
 - **FR-001**: System MUST allow users to create job applications with required fields: company name and position title
 - **FR-002**: System MUST allow users to set application date (defaults to current date)
-- **FR-003**: System MUST support these application statuses: Applied, Interviewing, Offered, Rejected, Archived
+- **FR-003**: System MUST support these application statuses: Applied, Rejected, Interviewing, Given Offer, Accepted Offer, Declined Offer, No Offer, Archived
 - **FR-004**: System MUST allow users to add free-form notes to any application
 - **FR-019**: System MUST allow users to add an optional company website URL
 - **FR-020**: System MUST allow users to add optional job posting URLs (job site URL such as LinkedIn, and company career page URL)
@@ -181,7 +181,7 @@ As a job seeker, I want to access my job tracker on both my phone and computer s
 - **FR-012**: System MUST allow users to customize interview stages (add, remove, reorder) for individual applications
 
 **Offer Management:**
-- **FR-013**: System MUST allow users to set an optional due date when status is "Offered"
+- **FR-013**: System MUST allow users to set an optional due date when status is "Given Offer"
 
 **Data Management:**
 - **FR-014**: System MUST allow users to archive applications (soft delete - hidden from default view)
@@ -203,7 +203,7 @@ As a job seeker, I want to access my job tracker on both my phone and computer s
 
 - **Interview Stage**: Represents one step in the interview process. Contains stage name/title, order position, completion status, completion date (when complete), optional notes, and optional performance rating (1-5). Belongs to a single Job Application.
 
-- **Offer Details**: Contains offer due date (optional). Associated with Job Applications in "Offered" status.
+- **Offer Details**: Contains offer due date (optional). Associated with Job Applications in "Given Offer" status.
 
 - **Company Category**: Enumeration of industry categories: Education, Health, Climate, AI, FinTech, Enterprise Software, Consumer Tech, E-commerce, Cybersecurity, Gaming, Media/Entertainment, Consulting, Government, Nonprofit, Other.
 

@@ -48,7 +48,7 @@ interface JobApplication {
 
   // Related data (embedded)
   interviewStages: InterviewStage[];   // Ordered array
-  offerDueDate?: string;               // ISO 8601 date string (when status = 'offered')
+  offerDueDate?: string;               // ISO 8601 date string (when status = 'given offer')
 
   // Soft delete
   isArchived: boolean;                 // false by default
@@ -86,12 +86,13 @@ interface InterviewStage {
 
 ```typescript
 type ApplicationStatus =
-  | 'applied'      // Initial state
-  | 'interviewing' // Active interview process
-  | 'offered'      // Received offer
-  | 'rejected'     // Application rejected
-  | 'accepted'     // Offer accepted (terminal)
-  | 'declined';    // Offer declined (terminal)
+  | 'applied'        // Initial state
+  | 'rejected'       // Application rejected
+  | 'interviewing'   // Active interview process
+  | 'given offer'    // Received offer
+  | 'accepted offer' // Offer accepted (terminal)
+  | 'declined offer' // Offer declined (terminal)
+  | 'no offer';      // No offer received
 ```
 
 ### CompanyCategory
@@ -204,35 +205,35 @@ function isValidUrl(url: string): boolean {
                            │
               ┌────────────┼────────────┐
               ▼            ▼            ▼
-       ┌────────────┐ ┌─────────┐ ┌──────────┐
-       │interviewing│ │ rejected│ │ archived │
-       └──────┬─────┘ └─────────┘ └──────────┘
+       ┌────────────┐ ┌──────────┐ ┌──────────┐
+       │interviewing│ │ rejected │ │ archived │
+       └──────┬─────┘ └──────────┘ └──────────┘
               │
-      ┌───────┼───────┐
-      ▼       ▼       ▼
-┌─────────┐ ┌───────┐ ┌────────┐
-│ offered │ │rejected│ │applied │ (revert)
-└────┬────┘ └───────┘ └────────┘
+      ┌───────┼────────────┐
+      ▼       ▼            ▼
+┌─────────────┐ ┌──────────┐ ┌────────┐
+│ given offer │ │ no offer │ │applied │ (revert)
+└────┬────────┘ └──────────┘ └────────┘
      │
-     ├───────────┬────────────┐
-     ▼           ▼            ▼
-┌──────────┐ ┌─────────┐ ┌────────────┐
-│ accepted │ │ declined│ │interviewing│ (if more rounds)
-└──────────┘ └─────────┘ └────────────┘
+     ├──────────────┬────────────┐
+     ▼              ▼            ▼
+┌──────────────┐ ┌──────────────┐ ┌────────────┐
+│accepted offer│ │declined offer│ │interviewing│ (if more rounds)
+└──────────────┘ └──────────────┘ └────────────┘
 ```
 
 ### Transition Rules
 
 | From | To | Conditions | Side Effects |
 |------|-----|------------|--------------|
-| applied | interviewing | None | Populate default interview stages |
 | applied | rejected | None | None |
-| interviewing | offered | None | None |
-| interviewing | rejected | None | Preserve interview data |
+| applied | interviewing | None | Populate default interview stages |
+| interviewing | given offer | None | None |
+| interviewing | no offer | None | Preserve interview data |
 | interviewing | applied | User action (revert) | Preserve interview data |
-| offered | accepted | None | Terminal state |
-| offered | declined | None | Terminal state |
-| offered | interviewing | User action (more rounds) | None |
+| given offer | accepted offer | None | Terminal state |
+| given offer | declined offer | None | Terminal state |
+| given offer | interviewing | User action (more rounds) | None |
 | any | archived | User action | Set isArchived = true |
 | archived | any | User action (restore) | Set isArchived = false |
 

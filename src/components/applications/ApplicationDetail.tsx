@@ -97,11 +97,11 @@ export function ApplicationDetail({
   const salaryRange = formatSalaryRange(application.salaryMin, application.salaryMax);
   const showInterviewSection =
     application.status === 'interviewing' ||
-    application.status === 'offered' ||
-    application.status === 'accepted' ||
+    application.status === 'given offer' ||
+    application.status === 'accepted offer' ||
     application.interviewStages.length > 0;
 
-  const isOffered = application.status === 'offered';
+  const isOffered = application.status === 'given offer';
   const daysRemaining = application.offerDueDate ? getDaysRemaining(application.offerDueDate) : null;
 
   return (

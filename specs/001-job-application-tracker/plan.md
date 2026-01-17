@@ -5,7 +5,7 @@
 
 ## Summary
 
-Build a single-user job application tracking web application that allows users to add, view, filter, and manage job applications through the entire application lifecycle (Applied → Interviewing → Offered/Rejected). The application will be built with Next.js and React, using local browser storage (localStorage) for persistence, with a responsive Tailwind CSS interface optimized for both mobile and desktop.
+Build a single-user job application tracking web application that allows users to add, view, filter, and manage job applications through the entire application lifecycle (Applied → Rejected → Interviewing → Given Offer/No Offer → Accepted Offer/Declined Offer). The application will be built with Next.js and React, using local browser storage (localStorage) for persistence, with a responsive Tailwind CSS interface optimized for both mobile and desktop.
 
 ## Technical Context
 
