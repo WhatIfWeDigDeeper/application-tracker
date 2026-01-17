@@ -129,12 +129,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T049 [P] [US3] Create SVG icons for interview tracking in src/assets/icons/CheckIcon.tsx, src/assets/icons/EditIcon.tsx, src/assets/icons/DragIcon.tsx
-- [ ] T050 [US3] Create InterviewStage component in src/components/interviews/InterviewStage.tsx (displays single stage with completion, notes, rating)
-- [ ] T051 [US3] Create StageForm component in src/components/interviews/StageForm.tsx (edit stage details, mark complete with date/notes/rating per FR-009, FR-010, FR-011)
-- [ ] T052 [US3] Create InterviewChecklist component in src/components/interviews/InterviewChecklist.tsx (renders ordered list of stages with add/remove/reorder per FR-008, FR-012)
-- [ ] T053 [US3] Create ApplicationDetail component in src/components/applications/ApplicationDetail.tsx (shows full application with interview checklist)
-- [ ] T054 [US3] Add detail view modal/page integration in src/app/page.tsx for viewing application details with interview progress
+- [x] T049 [P] [US3] Create SVG icons for interview tracking in src/assets/icons/CheckIcon.tsx, src/assets/icons/EditIcon.tsx, src/assets/icons/DragIcon.tsx
+- [x] T050 [US3] Create InterviewStage component in src/components/interviews/InterviewStage.tsx (displays single stage with completion, notes, rating)
+- [x] T051 [US3] Create StageForm component in src/components/interviews/StageForm.tsx (edit stage details, mark complete with date/notes/rating per FR-009, FR-010, FR-011)
+- [x] T052 [US3] Create InterviewChecklist component in src/components/interviews/InterviewChecklist.tsx (renders ordered list of stages with add/remove/reorder per FR-008, FR-012)
+- [x] T053 [US3] Create ApplicationDetail component in src/components/applications/ApplicationDetail.tsx (shows full application with interview checklist)
+- [x] T054 [US3] Add detail view modal/page integration in src/app/page.tsx for viewing application details with interview progress
 
 **Checkpoint**: User Story 3 complete - interview tracking fully functional
 
@@ -152,10 +152,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T056 [P] [US4] Create SVG icon for calendar/deadline in src/assets/icons/CalendarIcon.tsx
-- [ ] T057 [US4] Add offerDueDate field handling to ApplicationForm in src/components/applications/ApplicationForm.tsx (shown when status is "Offered" per FR-013)
-- [ ] T058 [US4] Add deadline display with days remaining to ApplicationCard in src/components/applications/ApplicationCard.tsx
-- [ ] T059 [US4] Add deadline display with countdown to ApplicationDetail in src/components/applications/ApplicationDetail.tsx
+- [x] T056 [P] [US4] Create SVG icon for calendar/deadline in src/assets/icons/CalendarIcon.tsx
+- [x] T057 [US4] Add offerDueDate field handling to ApplicationDetail (status-based editing when "Offered" per FR-013)
+- [x] T058 [US4] Add deadline display with days remaining to ApplicationCard in src/components/applications/ApplicationCard.tsx
+- [x] T059 [US4] Add deadline display with countdown to ApplicationDetail in src/components/applications/ApplicationDetail.tsx
 
 **Checkpoint**: User Story 4 complete - offer management with deadlines functional
 
@@ -174,11 +174,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T062 [P] [US5] Create SVG icons for archive/delete in src/assets/icons/ArchiveIcon.tsx, src/assets/icons/TrashIcon.tsx, src/assets/icons/RestoreIcon.tsx
-- [ ] T063 [US5] Add archive/delete buttons to ApplicationCard in src/components/applications/ApplicationCard.tsx per FR-014, FR-015
-- [ ] T064 [US5] Add confirmation dialog for delete action using ConfirmDialog component
-- [ ] T065 [US5] Add "Show Archived" toggle to FilterBar in src/components/applications/FilterBar.tsx per FR-016
-- [ ] T066 [US5] Add restore button for archived applications in ApplicationCard
+- [x] T062 [P] [US5] Create SVG icons for archive/delete in src/assets/icons/ArchiveIcon.tsx, src/assets/icons/TrashIcon.tsx, src/assets/icons/RestoreIcon.tsx
+- [x] T063 [US5] Add archive/delete buttons to ApplicationCard in src/components/applications/ApplicationCard.tsx per FR-014, FR-015
+- [x] T064 [US5] Add confirmation dialog for delete action using ConfirmDialog component
+- [x] T065 [US5] Add "Show Archived" toggle to FilterBar in src/components/applications/FilterBar.tsx per FR-016
+- [x] T066 [US5] Add restore button for archived applications in ApplicationCard
 
 **Checkpoint**: User Story 5 complete - data management (archive/delete) functional
 
@@ -196,12 +196,12 @@
 
 ### Implementation for User Story 6
 
-- [ ] T068 [US6] Add responsive Tailwind classes to ApplicationList for mobile/desktop layouts in src/components/applications/ApplicationList.tsx
-- [ ] T069 [US6] Add responsive Tailwind classes to ApplicationForm for mobile/desktop in src/components/applications/ApplicationForm.tsx
-- [ ] T070 [US6] Add responsive Tailwind classes to ApplicationDetail for mobile/desktop in src/components/applications/ApplicationDetail.tsx
-- [ ] T071 [US6] Add responsive Tailwind classes to FilterBar and SortControls for mobile collapse/expand
-- [ ] T072 [US6] Add touch-friendly button sizes and spacing throughout UI components (min 44px touch targets)
-- [ ] T073 [US6] Add mobile navigation/menu pattern in Header component in src/components/common/Header.tsx
+- [x] T068 [US6] Add responsive Tailwind classes to ApplicationList for mobile/desktop layouts in src/components/applications/ApplicationList.tsx
+- [x] T069 [US6] Add responsive Tailwind classes to ApplicationForm for mobile/desktop in src/components/applications/ApplicationForm.tsx
+- [x] T070 [US6] Add responsive Tailwind classes to ApplicationDetail for mobile/desktop in src/components/applications/ApplicationDetail.tsx
+- [x] T071 [US6] Add responsive Tailwind classes to FilterBar and SortControls for mobile collapse/expand
+- [x] T072 [US6] Add touch-friendly button sizes and spacing throughout UI components (min 44px touch targets)
+- [x] T073 [US6] Add mobile navigation/menu pattern in Header component in src/components/common/Header.tsx
 
 **Checkpoint**: User Story 6 complete - fully responsive experience
 
@@ -211,14 +211,14 @@
 
 **Purpose**: Final polish, performance optimization, accessibility compliance
 
-- [ ] T074 [P] Add ARIA labels and roles for accessibility compliance (WCAG 2.1 AA) across all components
-- [ ] T075 [P] Add keyboard navigation support to all interactive elements
-- [ ] T076 [P] Add focus trap to Modal component for accessibility
-- [ ] T077 Add error boundary for graceful error handling in src/app/layout.tsx
-- [ ] T078 [P] Add loading states for async operations (localStorage read on initial load)
-- [ ] T079 Run ESLint and fix any linting errors
-- [ ] T080 Run TypeScript compiler and fix any type errors
-- [ ] T081 Run all tests and ensure 100% pass rate
+- [x] T074 [P] Add ARIA labels and roles for accessibility compliance (WCAG 2.1 AA) across all components
+- [x] T075 [P] Add keyboard navigation support to all interactive elements
+- [x] T076 [P] Add focus trap to Modal component for accessibility
+- [x] T077 Add error boundary for graceful error handling in src/app/layout.tsx
+- [x] T078 [P] Add loading states for async operations (localStorage read on initial load)
+- [x] T079 Run ESLint and fix any linting errors
+- [x] T080 Run TypeScript compiler and fix any type errors
+- [x] T081 Run all tests and ensure 100% pass rate
 - [ ] T082 Manual testing following quickstart.md verification checklist
 - [ ] T083 Performance audit: verify page load <2s, filter/sort <100ms for 100 applications
 

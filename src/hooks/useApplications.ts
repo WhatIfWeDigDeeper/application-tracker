@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import type {
   JobApplication,
+  InterviewStage,
   CreateApplicationInput,
   UpdateApplicationInput,
   InterviewStageInput,
@@ -46,6 +47,7 @@ export interface UseApplicationsReturn {
     notes?: string,
     rating?: number
   ) => void;
+  setInterviewStages: (applicationId: string, stages: InterviewStage[]) => void;
 
   // Utility
   getApplicationById: (id: string) => JobApplication | null;
@@ -243,6 +245,20 @@ export function useApplications(): UseApplicationsReturn {
     [refreshApplications]
   );
 
+  const setInterviewStages = useCallback(
+    (applicationId: string, stages: InterviewStage[]): void => {
+      try {
+        storageService.setInterviewStages(applicationId, stages);
+        refreshApplications();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to set interview stages';
+        setError(message);
+        throw err;
+      }
+    },
+    [refreshApplications]
+  );
+
   // Utility
   const getApplicationById = useCallback((id: string): JobApplication | null => {
     return storageService.getApplicationById(id);
@@ -268,6 +284,7 @@ export function useApplications(): UseApplicationsReturn {
       removeInterviewStage,
       reorderInterviewStages,
       completeInterviewStage,
+      setInterviewStages,
       getApplicationById,
       refreshApplications,
     }),
@@ -287,6 +304,7 @@ export function useApplications(): UseApplicationsReturn {
       removeInterviewStage,
       reorderInterviewStages,
       completeInterviewStage,
+      setInterviewStages,
       getApplicationById,
       refreshApplications,
     ]

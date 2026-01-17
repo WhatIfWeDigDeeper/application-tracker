@@ -3,8 +3,9 @@
 import type { JobApplication } from '@/types/application';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge } from '@/components/ui/Badge';
-import { formatDate, formatSalaryRange, cn } from '@/lib/utils';
+import { formatDate, formatSalaryRange, getDaysRemaining, formatDaysRemaining, cn } from '@/lib/utils';
 import { CATEGORY_LABELS, SOURCE_LABELS } from '@/lib/constants';
+import { CalendarIcon } from '@/assets/icons/CalendarIcon';
 
 export interface ApplicationCardProps {
   application: JobApplication;
@@ -35,11 +36,14 @@ export function ApplicationCard({
     salaryMax,
     isArchived,
     interviewStages,
+    offerDueDate,
   } = application;
 
   const completedStages = interviewStages.filter((s) => s.isCompleted).length;
   const totalStages = interviewStages.length;
   const salaryRange = formatSalaryRange(salaryMin, salaryMax);
+  const daysRemaining = offerDueDate ? getDaysRemaining(offerDueDate) : null;
+  const isOffered = status === 'offered';
 
   return (
     <Card
@@ -96,6 +100,23 @@ export function ApplicationCard({
             </div>
           )}
 
+          {/* Offer Deadline */}
+          {isOffered && offerDueDate && daysRemaining !== null && (
+            <div
+              className={cn(
+                'mt-3 flex items-center gap-2 text-sm px-2 py-1 rounded',
+                daysRemaining < 0
+                  ? 'bg-red-100 text-red-700'
+                  : daysRemaining <= 3
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-green-100 text-green-700'
+              )}
+            >
+              <CalendarIcon className="w-4 h-4" />
+              <span className="font-medium">{formatDaysRemaining(daysRemaining)}</span>
+            </div>
+          )}
+
           {/* Salary Range */}
           {salaryRange && (
             <p className="mt-2 text-sm text-gray-600">{salaryRange}</p>
@@ -112,6 +133,7 @@ export function ApplicationCard({
               }}
               className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
               aria-label="Edit application"
+              title="Edit"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -132,6 +154,7 @@ export function ApplicationCard({
               }}
               className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
               aria-label="Archive application"
+              title="Archive"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -152,6 +175,7 @@ export function ApplicationCard({
               }}
               className="p-2 text-gray-400 hover:text-green-600 rounded-md hover:bg-gray-100"
               aria-label="Restore application"
+              title="Restore"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -172,6 +196,7 @@ export function ApplicationCard({
               }}
               className="p-2 text-gray-400 hover:text-red-600 rounded-md hover:bg-gray-100"
               aria-label="Delete application"
+              title="Delete"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path

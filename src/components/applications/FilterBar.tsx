@@ -79,20 +79,31 @@ export function FilterBar({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-      <div className="flex items-center justify-between">
+    <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4 mb-4">
+      <div className="flex items-center justify-between gap-2">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+          className="flex items-center gap-2 text-gray-700 hover:text-gray-900 min-h-[44px] px-2 -mx-2 rounded-md"
           aria-expanded={isExpanded}
         >
-          <FilterIcon className="w-5 h-5" />
+          <FilterIcon className="w-5 h-5 flex-shrink-0" />
           <span className="font-medium">Filters</span>
           {hasActiveFilters && (
             <Badge variant="info" size="sm">
               Active
             </Badge>
           )}
+          <svg
+            className={cn(
+              'w-4 h-4 transition-transform ml-1',
+              isExpanded && 'rotate-180'
+            )}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </button>
 
         {hasActiveFilters && (

@@ -310,7 +310,7 @@ export function ApplicationForm({
             rows={2}
             value={formData.specialRequirements}
             onChange={handleChange}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 text-gray-900 bg-white"
             placeholder="e.g., Portfolio required, code samples needed..."
           />
           {errors.specialRequirements && (
@@ -328,7 +328,7 @@ export function ApplicationForm({
             rows={3}
             value={formData.notes}
             onChange={handleChange}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 text-gray-900 bg-white"
             placeholder="Any additional notes about this application..."
           />
           {errors.notes && <p className="mt-1 text-sm text-red-600">{errors.notes}</p>}

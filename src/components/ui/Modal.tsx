@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode, useCallback } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface ModalProps {
@@ -29,28 +29,76 @@ export function Modal({
 }: ModalProps): ReactNode {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<Element | null>(null);
+  const onCloseRef = useRef(onClose);
+  const hasInitialFocus = useRef(false);
 
-  // Handle escape key
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    },
-    [onClose]
-  );
+  // Keep onClose ref updated
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
-  // Focus trap
+  // Reset initial focus flag when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      hasInitialFocus.current = false;
+    }
+  }, [isOpen]);
+
+  // Focus management and keyboard handling
   useEffect(() => {
     if (!isOpen) return;
 
-    // Store the previously focused element
-    previousActiveElement.current = document.activeElement;
+    // Store the previously focused element (only on first open)
+    if (!hasInitialFocus.current) {
+      previousActiveElement.current = document.activeElement;
 
-    // Focus the modal
-    modalRef.current?.focus();
+      // Focus the first focusable element in the modal after a short delay
+      // to allow the modal content to render
+      requestAnimationFrame(() => {
+        const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements && focusableElements.length > 0) {
+          focusableElements[0]?.focus();
+        } else {
+          modalRef.current?.focus();
+        }
+      });
+      hasInitialFocus.current = true;
+    }
 
-    // Add escape key listener
+    // Handle keyboard events
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') {
+        onCloseRef.current();
+        return;
+      }
+
+      // Focus trap - Tab key handling
+      if (event.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey) {
+          // Shift + Tab: if on first element, go to last
+          if (document.activeElement === firstElement) {
+            event.preventDefault();
+            lastElement?.focus();
+          }
+        } else {
+          // Tab: if on last element, go to first
+          if (document.activeElement === lastElement) {
+            event.preventDefault();
+            firstElement?.focus();
+          }
+        }
+      }
+    };
+
+    // Add keyboard listener
     document.addEventListener('keydown', handleKeyDown);
 
     // Prevent body scroll
@@ -65,7 +113,7 @@ export function Modal({
         previousActiveElement.current.focus();
       }
     };
-  }, [isOpen, handleKeyDown]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

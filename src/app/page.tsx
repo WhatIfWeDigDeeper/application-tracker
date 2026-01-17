@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import type { JobApplication, CreateApplicationInput, UpdateApplicationInput } from '@/types/application';
+import type { JobApplication, InterviewStage, CreateApplicationInput, UpdateApplicationInput } from '@/types/application';
 import { useApplications } from '@/hooks/useApplications';
 import { useFilters } from '@/hooks/useFilters';
 import { useSorting } from '@/hooks/useSorting';
 import { Header } from '@/components/common/Header';
 import { ApplicationList } from '@/components/applications/ApplicationList';
 import { ApplicationForm } from '@/components/applications/ApplicationForm';
+import { ApplicationDetail } from '@/components/applications/ApplicationDetail';
 import { FilterBar } from '@/components/applications/FilterBar';
 import { SortControls } from '@/components/applications/SortControls';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
@@ -27,6 +28,8 @@ export default function Home(): React.ReactElement {
     restoreApplication,
     setFilters: setHookFilters,
     setSort: setHookSort,
+    setInterviewStages,
+    getApplicationById,
   } = useApplications();
 
   const { filters, setFilters, clearFilters, hasActiveFilters } = useFilters();
@@ -44,6 +47,10 @@ export default function Home(): React.ReactElement {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingApplication, setEditingApplication] = useState<JobApplication | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null);
+
+  // Get the currently selected application (refreshed from storage)
+  const selectedApplication = selectedApplicationId ? getApplicationById(selectedApplicationId) : null;
 
   const handleAddNew = (): void => {
     setEditingApplication(null);
@@ -66,8 +73,35 @@ export default function Home(): React.ReactElement {
   };
 
   const handleSelectApplication = (application: JobApplication): void => {
-    // Will be implemented in Phase 5 to show ApplicationDetail view
-    console.warn('Application selected:', application.id);
+    setSelectedApplicationId(application.id);
+  };
+
+  const handleCloseDetail = (): void => {
+    setSelectedApplicationId(null);
+  };
+
+  const handleDetailUpdate = (id: string, data: UpdateApplicationInput): void => {
+    updateApplication(id, data);
+  };
+
+  const handleDetailStagesChange = (stages: InterviewStage[]): void => {
+    if (selectedApplication) {
+      // Update stages using the hook
+      setInterviewStages(selectedApplication.id, stages);
+
+      // Auto-transition to 'interviewing' status if adding stages while 'applied'
+      if (selectedApplication.status === 'applied' && stages.length > 0) {
+        updateApplication(selectedApplication.id, { status: 'interviewing' });
+      }
+    }
+  };
+
+  const handleEditFromDetail = (): void => {
+    if (selectedApplication) {
+      setEditingApplication(selectedApplication);
+      setIsFormOpen(true);
+      setSelectedApplicationId(null);
+    }
   };
 
   const handleEditApplication = (application: JobApplication): void => {
@@ -151,6 +185,24 @@ export default function Home(): React.ReactElement {
           onCancel={handleFormCancel}
           mode={editingApplication ? 'edit' : 'create'}
         />
+      </Modal>
+
+      {/* Application Detail Modal */}
+      <Modal
+        isOpen={selectedApplication !== null}
+        onClose={handleCloseDetail}
+        title="Application Details"
+        size="xl"
+      >
+        {selectedApplication && (
+          <ApplicationDetail
+            application={selectedApplication}
+            onUpdate={handleDetailUpdate}
+            onStagesChange={handleDetailStagesChange}
+            onEdit={handleEditFromDetail}
+            onClose={handleCloseDetail}
+          />
+        )}
       </Modal>
 
       {/* Delete Confirmation Dialog */}

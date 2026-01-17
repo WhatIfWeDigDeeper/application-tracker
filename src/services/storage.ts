@@ -432,6 +432,30 @@ export function completeInterviewStage(
   });
 }
 
+export function setInterviewStages(
+  applicationId: string,
+  stages: InterviewStage[]
+): InterviewStage[] {
+  const schema = loadStorage();
+  const appIndex = schema.applications.findIndex((app) => app.id === applicationId);
+
+  if (appIndex === -1) {
+    throw new Error(`Application with id ${applicationId} not found`);
+  }
+
+  const application = schema.applications[appIndex]!;
+  application.interviewStages = stages.map((stage, idx) => ({
+    ...stage,
+    order: idx,
+  }));
+  application.updatedAt = getCurrentDateTimeISO();
+
+  schema.applications[appIndex] = application;
+  saveStorage(schema);
+
+  return application.interviewStages;
+}
+
 // ============================================================================
 // Validation Wrappers
 // ============================================================================
