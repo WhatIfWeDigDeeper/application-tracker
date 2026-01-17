@@ -16,7 +16,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:seed": "node --loader ts-node/esm src/db/seed.ts",
+    "prisma:studio": "prisma studio",
+    "seed": "node --loader ts-node/esm src/db/seed.ts",
     "perf:test": "k6 run scripts/load-test.k6.js",
     "perf:check": "npm run perf:test"
   },

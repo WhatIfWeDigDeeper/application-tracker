@@ -30,4 +30,4 @@ COPY api/package.json .
 USER node
 
 EXPOSE 5000
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npm run prisma:migrate:deploy && npm run seed && node dist/index.js"]
