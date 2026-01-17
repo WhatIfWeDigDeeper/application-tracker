@@ -79,11 +79,11 @@ export function FilterBar({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4 mb-4">
+    <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4">
       <div className="flex items-center justify-between gap-2">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-2 text-gray-700 hover:text-gray-900 min-h-[44px] px-2 -mx-2 rounded-md"
+          className="flex items-center gap-2 text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100 min-h-[44px] px-2 -mx-2 rounded-md"
           aria-expanded={isExpanded}
         >
           <FilterIcon className="w-5 h-5 flex-shrink-0" />
@@ -117,7 +117,7 @@ export function FilterBar({
         <div className="mt-4 space-y-4">
           {/* Status Filter */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Status</h4>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Status</h4>
             <div className="flex flex-wrap gap-2">
               {APPLICATION_STATUSES.map((status) => (
                 <button
@@ -126,8 +126,8 @@ export function FilterBar({
                   className={cn(
                     'px-3 py-1 rounded-full text-sm border transition-colors',
                     filters.status?.includes(status)
-                      ? 'bg-blue-100 border-blue-300 text-blue-800'
-                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                      ? 'bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200'
+                      : 'bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600'
                   )}
                 >
                   {STATUS_LABELS[status]}
@@ -138,7 +138,7 @@ export function FilterBar({
 
           {/* Category Filter */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Category</h4>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Category</h4>
             <div className="flex flex-wrap gap-2">
               {COMPANY_CATEGORIES.slice(0, 12).map((category) => (
                 <button
@@ -147,15 +147,15 @@ export function FilterBar({
                   className={cn(
                     'px-3 py-1 rounded-full text-sm border transition-colors',
                     filters.companyCategory?.includes(category)
-                      ? 'bg-blue-100 border-blue-300 text-blue-800'
-                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                      ? 'bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200'
+                      : 'bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600'
                   )}
                 >
                   {CATEGORY_LABELS[category]}
                 </button>
               ))}
               {COMPANY_CATEGORIES.length > 12 && (
-                <span className="text-sm text-gray-400 py-1">
+                <span className="text-sm text-gray-400 dark:text-slate-500 py-1">
                   +{COMPANY_CATEGORIES.length - 12} more
                 </span>
               )}
@@ -164,7 +164,7 @@ export function FilterBar({
 
           {/* Job Source Filter */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Source</h4>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Source</h4>
             <div className="flex flex-wrap gap-2">
               {JOB_SOURCES.map((source) => (
                 <button
@@ -173,8 +173,8 @@ export function FilterBar({
                   className={cn(
                     'px-3 py-1 rounded-full text-sm border transition-colors',
                     filters.jobSource?.includes(source)
-                      ? 'bg-blue-100 border-blue-300 text-blue-800'
-                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                      ? 'bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200'
+                      : 'bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600'
                   )}
                 >
                   {SOURCE_LABELS[source]}
@@ -185,11 +185,11 @@ export function FilterBar({
 
           {/* Skills Match Min Filter */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Minimum Skills Match</h4>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Minimum Skills Match</h4>
             <select
               value={filters.skillsMatchMin ?? ''}
               onChange={(e) => setSkillsMatchMin(e.target.value)}
-              className="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+              className="block w-full max-w-xs rounded-md border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
             >
               <option value="">Any</option>
               <option value="1">1+ (Poor or better)</option>
@@ -207,9 +207,9 @@ export function FilterBar({
               id="includeArchived"
               checked={filters.includeArchived ?? false}
               onChange={toggleIncludeArchived}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-blue-600 focus:ring-blue-500"
             />
-            <label htmlFor="includeArchived" className="text-sm text-gray-700">
+            <label htmlFor="includeArchived" className="text-sm text-gray-700 dark:text-slate-300">
               Show archived applications
             </label>
           </div>
