@@ -16,8 +16,75 @@
 
 Note: Manually edited spec to add more company categories, and change skill match to 1-5 rating.
 
-```md
+```markdown
 /speckit.plan The application is written in Typescript and uses React, Docker, Node, NextJs, Vite, Jest, Tailwind CSS, SVGs for any images/icons.
 ```
 
 Note: had to add rule about not using prefix of "I" to interfaces. Chose to update the constitution.md file rather than CLAUDE.md for now.
+
+## Add API
+
+```md
+/speckit.plan "Scaffold Express API with Prisma (Postgres) and reorganize UI for application-tracker
+
+## Context
+- Repository: application-tracker
+- Target branch: api
+- Deployment: Local Docker (api, ui, Postgres)
+- DB: Postgres with Prisma ORM
+- Goal: Move existing Next.js app under /ui, add /api Express server with Prisma
+
+## Deliverables
+1. Reorganize existing UI:
+   - Move /src → /ui/src
+   - Move /public → /ui/public
+   - Move root Next.js configs (package.json, tsconfig.json, next.config.js, .eslintrc*) → /ui/
+   - Move .env.local → /ui/.env.example
+   - Update import paths if needed
+
+2. API scaffold (TypeScript Express):
+   - /api/src/index.ts (server bootstrap, port 5000)
+   - /api/src/routes/applications.ts (CRUD)
+   - /api/src/routes/interview-stages.ts (CRUD, linked to applications)
+   - /api/src/middleware/errorHandler.ts, /api/src/middleware/logger.ts
+   - /api/src/services/ (business logic using Prisma Client)
+   - /api/src/types/ (DTOs aligned with UI types)
+   - /api/package.json (express, zod, prisma, @prisma/client, pg, typescript, ts-node-dev)
+   - /api/tsconfig.json
+   - /api/.env.example (DATABASE_URL=postgres://user:pass@postgres:5432/app_tracker)
+
+3. Prisma setup:
+   - /api/prisma/schema.prisma (provider: postgresql; models: Application, InterviewStage; relation 1:N)
+   - Configure env var: DATABASE_URL
+   - Add scripts: prisma generate, migrate, seed
+   - /api/src/db/seed.ts (optional sample data)
+
+4. Database and Docker:
+   - Root docker-compose.yml with services:
+     - postgres (5432, volume, healthcheck)
+     - api (depends_on postgres, runs migrations on start)
+     - ui (Next.js dev server)
+   - /api/Dockerfile (multi-stage: build, run with node:18-alpine)
+   - /ui/Dockerfile (multi-stage Next.js)
+   - Root .gitignore updates if needed (node_modules, .next, prisma migrations)
+
+5. Dependabot and CI:
+   - Update .github/dependabot.yml to track /ui and /api npm, and root docker
+   - Add .github/workflows for:
+     - ui: install, lint, build, test
+     - api: install, prisma generate, lint, build, test
+     - optional compose build checks
+
+## Constraints
+- TypeScript everywhere
+- Prisma with Postgres only (no MongoDB)
+- RESTful routes, validation via zod
+- Ports: ui 3000, api 5000, db 5432
+- Ready for docker-compose up local dev
+
+## Acceptance
+- docker-compose up starts postgres, api, ui successfully
+- prisma migrate runs and tables exist
+- /api/health returns 200
+- UI can call API endpoints for applications and interview stages"
+```
