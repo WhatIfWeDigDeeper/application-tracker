@@ -42,6 +42,15 @@ npm run prisma:seed # optional
 curl http://localhost:5000/health
 ```
 
+## Performance Testing
+
+```bash
+cd api
+k6 run scripts/load-test.k6.js
+```
+
+Outputs p95/p99 metrics and fails if thresholds exceeded (p95 read ≤ 200ms, write ≤ 500ms).
+
 ## Development
 
 ```bash

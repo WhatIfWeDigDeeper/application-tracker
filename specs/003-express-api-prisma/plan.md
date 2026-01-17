@@ -35,7 +35,7 @@ Quality gates to satisfy:
 - Performance Gate: Endpoint p95 targets as above
 - Accessibility Gate: N/A for backend; unchanged for UI
 
-Initial evaluation: PASSABLE with planned tests and strict TS; performance validated post-implementation. No gate violations planned.
+Initial evaluation: PASSABLE with planned tests and strict TS; performance validated via `perf:check` (k6 with thresholds) in CI. No gate violations planned.
 
 ## Project Structure
 

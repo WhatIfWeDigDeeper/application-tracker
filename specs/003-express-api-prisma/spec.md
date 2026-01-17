@@ -15,8 +15,8 @@
 ## Functional Requirements
 - Applications CRUD
   - List, create, read, update, delete job applications
-  - Support optional filters (status, category, source) [NEEDS CLARIFICATION]
-  - Pagination for listing [NEEDS CLARIFICATION]
+  - Support optional filters: `status`, `companyCategory`, `jobSource`, `includeArchived` (default false)
+  - Pagination: `page` (default 1), `limit` (default 20, max 100); responses return envelope `{ items, page, limit, total }`
 - Interview Stages
   - Attach multiple stages to an application
   - Create/update/delete stages; mark completion with date and rating
@@ -29,6 +29,7 @@
 - Prisma migrations + seed for local dev
 - API performance targets: p95 ≤ 200ms read; ≤ 500ms write
 - Lint and test gates must pass in CI
+ - Standardized error format: `{ code, message, details[]? }` across all endpoints
 
 ## Deliverables
 - `ui/` reorg: move current app files into `ui/` directory with configs
@@ -42,3 +43,9 @@
 - `prisma migrate deploy` creates tables; seed runs successfully
 - UI can read/write applications and interview stages via the API
 - Tests pass for API basic CRUD
+ - Performance gate validated: `npm run perf:check` passes (p95 read ≤ 200ms, write ≤ 500ms)
+ - Error responses follow standardized schema for validation/not-found/internal errors
+
+## Security & Auth
+- Local development only: no authentication required
+- Future work: add auth if deployment scope expands (out of current MVP)

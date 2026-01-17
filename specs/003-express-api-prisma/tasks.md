@@ -41,6 +41,8 @@ description: "Task list for Express API with Prisma (Postgres) and UI reorganiza
 - [ ] T016 [P] Add `api/src/db/seed.ts` with sample data for local dev
 - [ ] T017 [P] Add zod validation schemas in `api/src/types` for request DTOs
 - [ ] T018 Ensure TypeScript strict mode and ESLint/Prettier config for `api/`
+- [ ] T050 [P] Implement standardized error responses via global middleware in `api/src/middleware/errorHandler.ts`
+- [ ] T051 [P] Update routes to use error codes/messages (`validation_error`, `not_found`, `internal_error`)
 
 **Checkpoint**: Foundation ready — user stories can start in parallel
 
@@ -65,6 +67,9 @@ description: "Task list for Express API with Prisma (Postgres) and UI reorganiza
 - [ ] T024 [US1] Wire routes in `api/src/index.ts` under `/applications`
 - [ ] T025 [US1] Error handling and validation integration for applications routes
 - [ ] T026 [US1] Seed sample applications in `api/src/db/seed.ts`
+- [ ] T052 [US1] Implement filters and pagination in `api/src/services/applications.service.ts` (`status`, `companyCategory`, `jobSource`, `includeArchived`; `page`, `limit` with defaults)
+- [ ] T053 [P] [US1] Extend contract tests to assert filters/pagination behavior in `api/tests/contract/applications.contract.test.ts`
+- [ ] T054 [US1] Update OpenAPI to use response envelope `{ items, page, limit, total }` for `GET /applications`
 
 **Checkpoint**: Applications CRUD independently functional; tests passing
 
@@ -121,6 +126,27 @@ description: "Task list for Express API with Prisma (Postgres) and UI reorganiza
 - [ ] T041 [P] Additional unit tests in `api/tests/unit/`
 - [ ] T042 Security hardening (rate limiting, input sanitization)
 - [ ] T043 Validate quickstart by running end-to-end with Docker Compose
+- [ ] T044 [P] Add `api/scripts/load-test.k6.js` using k6 with thresholds for p95 read ≤ 200ms and write ≤ 500ms
+- [ ] T045 [P] Configure k6 thresholds to fail test if performance budgets exceeded
+- [ ] T046 Integrate `npm run perf:check` in `api/package.json` to run k6 script and validate gates
+- [ ] T047 Add CI step to run `npm run perf:check` against compose stack in `.github/workflows/api.yml`
+- [ ] T048 Document performance budgets and usage in `specs/003-express-api-prisma/quickstart.md`
+- [ ] T049 Note in `specs/003-express-api-prisma/plan.md` Constitution Check: Performance Gate validated via perf:check
+
+---
+
+## Test & Tooling Setup (API)
+
+- [ ] T055 [P] Create `api/jest.config.ts` and `api/jest.setup.ts` (ts-jest, test env)
+- [ ] T056 [P] Scaffold `api/tests/contract/`, `api/tests/integration/`, and `api/tests/utils/server.ts` (Supertest)
+- [ ] T057 Update `api/package.json` test scripts and devDependencies (jest, ts-jest, supertest, @types/jest)
+
+---
+
+## Serialization Consistency
+
+- [ ] T058 [P] Normalize DateTime fields to ISO 8601 strings in API response mappers (createdAt, updatedAt, dateApplied, offerDueDate, completedDate)
+- [ ] T059 [P] Ensure OpenAPI marks date fields with `format: date-time` and document ISO serialization in spec
 
 ---
 

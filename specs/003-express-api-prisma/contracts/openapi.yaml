@@ -16,6 +16,11 @@ paths:
       summary: List applications
       parameters:
         - in: query
+          name: includeArchived
+          schema:
+            type: boolean
+            default: false
+        - in: query
           name: status
           schema:
             type: string
@@ -39,13 +44,23 @@ paths:
             default: 20
       responses:
         '200':
-          description: List of applications
+          description: Paginated list of applications
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/JobApplication'
+                $ref: '#/components/schemas/PaginatedApplications'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       summary: Create application
       requestBody:
@@ -61,6 +76,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobApplication'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /applications/{id}:
     get:
       summary: Get application by id
@@ -77,6 +104,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobApplication'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     patch:
       summary: Update application
       parameters:
@@ -98,6 +137,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobApplication'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: Delete application
       parameters:
@@ -109,6 +166,18 @@ paths:
       responses:
         '204':
           description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /applications/{id}/interview-stages:
     post:
       summary: Add interview stage
@@ -131,6 +200,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InterviewStage'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /applications/{id}/interview-stages/{stageId}:
     patch:
       summary: Update interview stage
@@ -158,6 +245,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InterviewStage'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: Delete interview stage
       parameters:
@@ -174,9 +279,50 @@ paths:
       responses:
         '204':
           description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    PaginatedApplications:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobApplication'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
     JobApplication:
       type: object
       properties:
