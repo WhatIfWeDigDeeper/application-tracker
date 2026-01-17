@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type FormEvent, type ChangeEvent } from 'react';
-import type { CreateApplicationInput, UpdateApplicationInput } from '@/types/application';
+import type { CreateApplicationInput, UpdateApplicationInput, ApplicationStatus } from '@/types/application';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select, type SelectOption } from '@/components/ui/Select';
@@ -12,11 +12,13 @@ import {
   JOB_SOURCES,
   SOURCE_LABELS,
   SKILLS_MATCH_LABELS,
+  APPLICATION_STATUSES,
+  STATUS_LABELS,
 } from '@/lib/constants';
 import { getCurrentDateISO } from '@/lib/utils';
 
 export interface ApplicationFormProps {
-  initialData?: Partial<CreateApplicationInput>;
+  initialData?: Partial<CreateApplicationInput & { status?: string; offerDueDate?: string }>;
   onSubmit: (data: CreateApplicationInput | UpdateApplicationInput) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -47,6 +49,11 @@ const skillsMatchOptions: SelectOption[] = [
   })),
 ];
 
+const statusOptions: SelectOption[] = APPLICATION_STATUSES.map((status) => ({
+  value: status,
+  label: STATUS_LABELS[status],
+}));
+
 export function ApplicationForm({
   initialData,
   onSubmit,
@@ -54,7 +61,7 @@ export function ApplicationForm({
   isLoading = false,
   mode = 'create',
 }: ApplicationFormProps): React.ReactElement {
-  const [formData, setFormData] = useState<CreateApplicationInput>({
+  const [formData, setFormData] = useState<CreateApplicationInput & { status?: string; offerDueDate?: string }>({
     companyName: initialData?.companyName ?? '',
     positionTitle: initialData?.positionTitle ?? '',
     dateApplied: initialData?.dateApplied ?? getCurrentDateISO(),
@@ -69,6 +76,8 @@ export function ApplicationForm({
     salaryMin: initialData?.salaryMin,
     salaryMax: initialData?.salaryMax,
     notes: initialData?.notes ?? '',
+    status: initialData?.status,
+    offerDueDate: initialData?.offerDueDate,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -118,7 +127,7 @@ export function ApplicationForm({
     }
 
     // Clean up empty optional fields
-    const cleanData: CreateApplicationInput = {
+    const baseData: CreateApplicationInput = {
       companyName: formData.companyName,
       positionTitle: formData.positionTitle,
       dateApplied: formData.dateApplied || undefined,
@@ -135,7 +144,17 @@ export function ApplicationForm({
       notes: formData.notes || undefined,
     };
 
-    onSubmit(cleanData);
+    // For edit mode, include status and offerDueDate if provided
+    if (mode === 'edit') {
+      const cleanData: UpdateApplicationInput = {
+        ...baseData,
+        status: formData.status ? (formData.status as ApplicationStatus) : undefined,
+        offerDueDate: formData.offerDueDate || undefined,
+      };
+      onSubmit(cleanData);
+    } else {
+      onSubmit(baseData);
+    }
   };
 
   return (
@@ -176,6 +195,31 @@ export function ApplicationForm({
           onChange={handleChange}
           error={errors.dateApplied}
         />
+
+        {mode === 'edit' && (
+          <>
+            <Select
+              label="Status"
+              name="status"
+              value={formData.status ?? ''}
+              onChange={handleChange}
+              options={statusOptions}
+              error={errors.status}
+            />
+
+            {formData.status === 'offered' && (
+              <Input
+                label="Offer Due Date"
+                name="offerDueDate"
+                type="date"
+                value={formData.offerDueDate ?? ''}
+                onChange={handleChange}
+                error={errors.offerDueDate}
+                placeholder="When is the decision deadline?"
+              />
+            )}
+          </>
+        )}
       </div>
 
       {/* URLs */}

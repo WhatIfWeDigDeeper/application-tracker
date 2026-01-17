@@ -8,6 +8,7 @@
 // ============================================================================
 
 export type ApplicationStatus =
+  | 'unsubmitted'
   | 'applied'
   | 'interviewing'
   | 'offered'
