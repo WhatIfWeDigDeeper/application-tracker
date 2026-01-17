@@ -58,16 +58,16 @@ export function ApplicationCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-3">
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-50 truncate">
                 {companyName}
               </h3>
-              <p className="text-gray-600 truncate">{positionTitle}</p>
+              <p className="text-gray-600 dark:text-slate-400 truncate">{positionTitle}</p>
             </div>
             <StatusBadge status={status} size="sm" />
           </div>
 
           {/* Meta Info */}
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-slate-400">
             <span>Applied: {formatDate(dateApplied)}</span>
 
             {companyCategory && (
@@ -87,11 +87,11 @@ export function ApplicationCard({
           {status === 'interviewing' && totalStages > 0 && (
             <div className="mt-3">
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-slate-400">
                   Interview Progress: {completedStages}/{totalStages}
                 </span>
               </div>
-              <div className="mt-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="mt-1 h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-status-interviewing transition-all"
                   style={{ width: `${(completedStages / totalStages) * 100}%` }}
@@ -106,10 +106,10 @@ export function ApplicationCard({
               className={cn(
                 'mt-3 flex items-center gap-2 text-sm px-2 py-1 rounded',
                 daysRemaining < 0
-                  ? 'bg-red-100 text-red-700'
+                  ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-200'
                   : daysRemaining <= 3
-                    ? 'bg-amber-100 text-amber-700'
-                    : 'bg-green-100 text-green-700'
+                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-200'
+                    : 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-200'
               )}
             >
               <CalendarIcon className="w-4 h-4" />
@@ -119,7 +119,7 @@ export function ApplicationCard({
 
           {/* Salary Range */}
           {salaryRange && (
-            <p className="mt-2 text-sm text-gray-600">{salaryRange}</p>
+            <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">{salaryRange}</p>
           )}
         </div>
 
@@ -131,7 +131,7 @@ export function ApplicationCard({
                 e.stopPropagation();
                 onEdit();
               }}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
+              className="p-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
               aria-label="Edit application"
               title="Edit"
             >

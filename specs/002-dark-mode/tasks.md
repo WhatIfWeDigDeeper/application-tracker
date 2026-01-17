@@ -36,10 +36,10 @@ description: "Task list for Dark Mode feature implementation"
 
 **Purpose**: Project initialization and configuration for dark mode support
 
-- [ ] T001 Configure Tailwind CSS dark mode in `tailwind.config.ts` with `darkMode: 'class'`
-- [ ] T002 Review and document color schemes for light/dark modes in `CLAUDE.md`
-- [ ] T003 [P] Create type definitions for theme context in `src/types/theme.ts`
-- [ ] T004 [P] Setup theme context provider structure plan (no implementation yet)
+- [x] T001 Configure Tailwind CSS dark mode in `tailwind.config.ts` with `darkMode: 'class'`
+- [x] T002 Review and document color schemes for light/dark modes in `CLAUDE.md`
+- [x] T003 [P] Create type definitions for theme context in `src/types/theme.ts`
+- [x] T004 [P] Setup theme context provider structure plan (no implementation yet)
 
 ---
 
@@ -49,11 +49,11 @@ description: "Task list for Dark Mode feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create ThemeContext in `src/hooks/useTheme.ts` with state management (theme, setTheme)
-- [ ] T006 Create ThemeProvider component in `src/components/ThemeProvider.tsx` to wrap app
-- [ ] T007 Update root layout in `src/app/layout.tsx` to include ThemeProvider
-- [ ] T008 [P] Create theme utilities in `src/lib/theme.ts` (getSystemTheme, validateTheme, etc.)
-- [ ] T009 [P] Add CSS transition utilities in `src/app/globals.css` for smooth theme switching
+- [x] T005 Create ThemeContext in `src/hooks/useTheme.ts` with state management (theme, setTheme)
+- [x] T006 Create ThemeProvider component in `src/components/ThemeProvider.tsx` to wrap app
+- [x] T007 Update root layout in `src/app/layout.tsx` to include ThemeProvider
+- [x] T008 [P] Create theme utilities in `src/lib/theme.ts` (getSystemTheme, validateTheme, etc.)
+- [x] T009 [P] Add CSS transition utilities in `src/app/globals.css` for smooth theme switching
 - [ ] T010 Configure `next.config.mjs` to support required dark mode features if needed
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
@@ -68,11 +68,11 @@ description: "Task list for Dark Mode feature implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Create ThemeToggle component in `src/components/ThemeToggle.tsx` with button/switch UI
-- [ ] T012 [US1] Implement click handler in ThemeToggle to toggle theme state from context
-- [ ] T013 [US1] Add visual indicator in ThemeToggle showing current theme (icon/text)
-- [ ] T014 [US1] Add ThemeToggle to header/navigation in `src/components/Header.tsx` or similar
-- [ ] T015 [US1] Ensure toggle is visible on all pages and persists visual state
+- [x] T011 [P] [US1] Create ThemeToggle component in `src/components/ThemeToggle.tsx` with button/switch UI
+- [x] T012 [US1] Implement click handler in ThemeToggle to toggle theme state from context
+- [x] T013 [US1] Add visual indicator in ThemeToggle showing current theme (icon/text)
+- [x] T014 [US1] Add ThemeToggle to header/navigation in `src/components/Header.tsx` or similar
+- [x] T015 [US1] Ensure toggle is visible on all pages and persists visual state
 - [ ] T016 [US1] Test toggle responsiveness on mobile and desktop layouts
 
 **Checkpoint**: User Story 1 complete - theme toggle functional on all pages
@@ -112,11 +112,11 @@ description: "Task list for Dark Mode feature implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T029 [P] [US3] Update ThemeProvider in `src/components/ThemeProvider.tsx` to load theme from localStorage on mount
-- [ ] T030 [P] [US3] Add localStorage write functionality when theme state changes in `src/hooks/useTheme.ts`
-- [ ] T031 [US3] Add localStorage key constant in `src/lib/theme.ts` (e.g., 'app-theme')
-- [ ] T032 [US3] Handle invalid/corrupted localStorage values with fallback logic
-- [ ] T033 [US3] Ensure theme loads before first render to prevent flashing (use SSR-safe approach)
+- [x] T029 [P] [US3] Update ThemeProvider in `src/components/ThemeProvider.tsx` to load theme from localStorage on mount
+- [x] T030 [P] [US3] Add localStorage write functionality when theme state changes in `src/hooks/useTheme.ts`
+- [x] T031 [US3] Add localStorage key constant in `src/lib/theme.ts` (e.g., 'app-theme')
+- [x] T032 [US3] Handle invalid/corrupted localStorage values with fallback logic
+- [x] T033 [US3] Ensure theme loads before first render to prevent flashing (use SSR-safe approach)
 - [ ] T034 [US3] Test persistence by setting theme, refreshing page, and verifying it loads
 - [ ] T035 [US3] Test persistence by closing browser and reopening application
 - [ ] T036 [US3] Test that clearing localStorage reverts to system default
@@ -133,10 +133,10 @@ description: "Task list for Dark Mode feature implementation"
 
 ### Implementation for User Story 4
 
-- [ ] T037 [P] [US4] Implement `getSystemTheme()` function in `src/lib/theme.ts` using `prefers-color-scheme` media query
-- [ ] T038 [P] [US4] Add system preference detection to ThemeProvider initialization logic
-- [ ] T039 [US4] Listen for `prefers-color-scheme` media query changes using `matchMedia()` listener
-- [ ] T040 [US4] Update theme automatically when system preference changes (if no explicit preference set)
+- [x] T037 [P] [US4] Implement `getSystemTheme()` function in `src/lib/theme.ts` using `prefers-color-scheme` media query
+- [x] T038 [P] [US4] Add system preference detection to ThemeProvider initialization logic
+- [x] T039 [US4] Listen for `prefers-color-scheme` media query changes using `matchMedia()` listener
+- [x] T040 [US4] Update theme automatically when system preference changes (if no explicit preference set)
 - [ ] T041 [US4] Test with system in light mode (verify app loads in light mode when no preference set)
 - [ ] T042 [US4] Test with system in dark mode (verify app loads in dark mode when no preference set)
 - [ ] T043 [US4] Test that explicit user preference overrides system preference

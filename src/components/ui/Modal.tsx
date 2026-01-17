@@ -126,7 +126,7 @@ export function Modal({
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -137,22 +137,22 @@ export function Modal({
           ref={modalRef}
           tabIndex={-1}
           className={cn(
-            'relative w-full bg-white rounded-lg shadow-xl',
+            'relative w-full bg-white dark:bg-slate-800 rounded-lg shadow-xl dark:shadow-slate-900/50',
             'transform transition-all',
             sizeClasses[size]
           )}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            <h2 id="modal-title" className="text-lg font-semibold text-gray-900">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+            <h2 id="modal-title" className="text-lg font-semibold text-gray-900 dark:text-slate-50">
               {title}
             </h2>
             {showCloseButton && (
               <button
                 type="button"
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-1"
+                className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 rounded-md p-1 transition-colors"
                 aria-label="Close modal"
               >
                 <svg
