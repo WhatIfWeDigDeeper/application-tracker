@@ -138,7 +138,7 @@ export function ApplicationDetail({
       </div>
 
       {/* Details Section */}
-      <div className="bg-gray-50 rounded-lg p-4">
+      <div className="bg-gray-50 rounded-lg p-4 sticky top-0 z-10">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Application Details</h3>
         <dl className="divide-y divide-gray-200">
           <DetailRow label="Date Applied" value={formatDate(application.dateApplied)} />
