@@ -1,0 +1,35 @@
+name: Verify PR
+
+on:
+  pull_request:
+    branches: [main]
+
+
+jobs:
+  build:
+    name: verify-pr
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js from .node-version
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.node-version'
+
+      - name: Run Security Audit
+        run: npm run audit:ci
+
+      - name: Install npm packages
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Compile
+        run: npm run compile
+
+      - name: Test
+        run: npm test
