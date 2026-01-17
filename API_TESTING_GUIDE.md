@@ -226,7 +226,7 @@ npm run build
 1. **Acme Corp** - Senior Backend Engineer
    - Status: interviewing
    - 2 interview stages: Initial Phone Screen (completed), Technical Assessment (pending)
-   
+
 2. **Tech Startup** - Frontend Engineer
    - Status: applied
    - 1 interview stage: First Round (pending)

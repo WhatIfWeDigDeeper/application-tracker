@@ -1,7 +1,7 @@
 import request from "supertest";
 import express, { Express } from "express";
-import { logger } from "../../src/middleware/logger.js";
-import { errorHandler } from "../../src/middleware/errorHandler.js";
+import { logger } from "../../src/middleware/logger";
+import { errorHandler } from "../../src/middleware/errorHandler";
 
 export function createTestApp(): Express {
   const app = express();
@@ -24,6 +24,17 @@ export function createTestApp(): Express {
   });
 
   app.post("/applications", (req, res) => {
+    // Validate required fields
+    if (!req.body.companyName || !req.body.positionTitle) {
+      return res.status(400).json({
+        code: "validation_error",
+        message: "Missing required fields",
+        details: [
+          !req.body.companyName && { field: "companyName", message: "Required" },
+          !req.body.positionTitle && { field: "positionTitle", message: "Required" },
+        ].filter(Boolean),
+      });
+    }
     res.status(201).json({
       id: "test-id",
       ...req.body,

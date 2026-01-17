@@ -1,4 +1,4 @@
-import { createTestApp, getRequest } from "../utils/server.js";
+import { createTestApp, getRequest } from "../utils/server";
 
 describe("Interview Stages Contract Tests", () => {
   describe("POST /applications/{id}/interview-stages", () => {

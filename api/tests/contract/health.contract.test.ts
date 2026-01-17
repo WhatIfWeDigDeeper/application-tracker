@@ -1,4 +1,4 @@
-import { createTestApp, getRequest } from "../utils/server.js";
+import { createTestApp, getRequest } from "../utils/server";
 
 describe("Health Endpoint", () => {
   it("should return 200 status", async () => {

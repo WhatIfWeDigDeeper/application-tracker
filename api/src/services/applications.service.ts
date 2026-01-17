@@ -79,11 +79,27 @@ export class ApplicationService {
   }
 
   async archiveApplication(id: string) {
-    return this.updateApplication(id, { isArchived: true });
+    const existing = await prisma.application.findUnique({ where: { id } });
+    if (!existing) {
+      throw new AppError("not_found", 404, `Application ${id} not found`);
+    }
+    return prisma.application.update({
+      where: { id },
+      data: { isArchived: true },
+      include: { interviewStages: true },
+    });
   }
 
   async restoreApplication(id: string) {
-    return this.updateApplication(id, { isArchived: false });
+    const existing = await prisma.application.findUnique({ where: { id } });
+    if (!existing) {
+      throw new AppError("not_found", 404, `Application ${id} not found`);
+    }
+    return prisma.application.update({
+      where: { id },
+      data: { isArchived: false },
+      include: { interviewStages: true },
+    });
   }
 }
 
