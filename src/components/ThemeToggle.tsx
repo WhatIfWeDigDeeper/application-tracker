@@ -24,7 +24,9 @@ export function ThemeToggle(): React.ReactElement {
   // Don't render anything until mounted (avoids hydration mismatch)
   if (!mounted || !context) {
     return (
-      <div className="relative inline-flex items-center justify-center p-2 rounded-lg bg-gray-100 dark:bg-slate-800 w-20 h-9" />
+      <div className="relative inline-flex items-center justify-center p-2 rounded-lg bg-gray-200 dark:bg-slate-700 h-10 w-20">
+        <span className="text-xs text-gray-400">...</span>
+      </div>
     );
   }
 

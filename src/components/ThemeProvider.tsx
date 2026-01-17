@@ -98,11 +98,6 @@ export function ThemeProvider({ children }: ThemeProviderProps): React.ReactElem
     toggleTheme,
   };
 
-  // Don't render children until mounted to avoid hydration mismatch
-  if (!mounted) {
-    return <>{children}</>;
-  }
-
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
