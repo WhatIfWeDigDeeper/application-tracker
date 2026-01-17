@@ -12,7 +12,8 @@
         "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json 2>&1$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "npx tsc": true
     }
 }
 

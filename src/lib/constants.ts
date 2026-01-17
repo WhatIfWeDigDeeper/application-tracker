@@ -29,6 +29,7 @@ export const DEFAULT_INTERVIEW_STAGES: Omit<InterviewStage, 'id'>[] = [
 // ============================================================================
 
 export const APPLICATION_STATUSES: ApplicationStatus[] = [
+  'unsubmitted',
   'applied',
   'interviewing',
   'offered',
@@ -38,6 +39,7 @@ export const APPLICATION_STATUSES: ApplicationStatus[] = [
 ];
 
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
+  unsubmitted: 'Unsubmitted',
   applied: 'Applied',
   interviewing: 'Interviewing',
   offered: 'Offered',
@@ -47,6 +49,7 @@ export const STATUS_LABELS: Record<ApplicationStatus, string> = {
 };
 
 export const STATUS_COLORS: Record<ApplicationStatus, string> = {
+  unsubmitted: 'bg-status-unsubmitted text-white',
   applied: 'bg-status-applied text-white',
   interviewing: 'bg-status-interviewing text-white',
   offered: 'bg-status-offered text-white',
