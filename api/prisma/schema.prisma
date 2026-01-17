@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id                 String           @id @default(uuid())
+  companyName        String
+  positionTitle      String
+  dateApplied        DateTime?
+  status             String           @default("unsubmitted")
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  companyUrl         String?
+  jobPostingUrl      String?
+  companyCareerUrl   String?
+  companyCategory    String?
+  skillsMatch        Int?
+  jobSource          String?
+  coverLetterRequired Boolean?
+  specialRequirements String?
+  salaryMin          Int?
+  salaryMax          Int?
+  notes              String?
+  offerDueDate       DateTime?
+  isArchived         Boolean          @default(false)
+
+  interviewStages    InterviewStage[]
+
+  @@index([status])
+  @@index([isArchived])
+}
+
+model InterviewStage {
+  id               String   @id @default(uuid())
+  applicationId    String
+  name             String
+  order            Int      @default(0)
+  isCompleted      Boolean  @default(false)
+  completedDate    DateTime?
+  notes            String?
+  performanceRating Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  application      Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}

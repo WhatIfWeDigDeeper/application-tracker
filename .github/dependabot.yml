@@ -1,6 +1,16 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
+    directory: "/ui"
+    schedule:
+      interval: "weekly"
+  
+  - package-ecosystem: "npm"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+  
+  - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
