@@ -64,7 +64,7 @@ export function ApplicationForm({
   const [formData, setFormData] = useState<CreateApplicationInput & { status?: string; offerDueDate?: string }>({
     companyName: initialData?.companyName ?? '',
     positionTitle: initialData?.positionTitle ?? '',
-    dateApplied: initialData?.dateApplied ?? getCurrentDateISO(),
+    dateApplied: initialData?.dateApplied ?? '',
     companyUrl: initialData?.companyUrl ?? '',
     jobPostingUrl: initialData?.jobPostingUrl ?? '',
     companyCareerUrl: initialData?.companyCareerUrl ?? '',
@@ -97,10 +97,24 @@ export function ApplicationForm({
       parsedValue = value === '' ? undefined : Number(value);
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: parsedValue,
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: parsedValue,
+      };
+
+      // Auto-populate Date Applied when changing status from Unsubmitted to Applied
+      if (name === 'status' && value === 'applied' && !prev.dateApplied) {
+        updated.dateApplied = getCurrentDateISO();
+      }
+
+      // Clear Date Applied when changing status to Unsubmitted
+      if (name === 'status' && value === 'unsubmitted') {
+        updated.dateApplied = '';
+      }
+
+      return updated;
+    });
 
     // Clear error for this field when user starts typing
     if (errors[name]) {
@@ -187,17 +201,8 @@ export function ApplicationForm({
           />
         </div>
 
-        <Input
-          label="Date Applied"
-          name="dateApplied"
-          type="date"
-          value={formData.dateApplied}
-          onChange={handleChange}
-          error={errors.dateApplied}
-        />
-
         {mode === 'edit' && (
-          <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
               label="Status"
               name="status"
@@ -207,18 +212,39 @@ export function ApplicationForm({
               error={errors.status}
             />
 
-            {formData.status === 'offered' && (
-              <Input
-                label="Offer Due Date"
-                name="offerDueDate"
-                type="date"
-                value={formData.offerDueDate ?? ''}
-                onChange={handleChange}
-                error={errors.offerDueDate}
-                placeholder="When is the decision deadline?"
-              />
-            )}
-          </>
+            <Input
+              label="Date Applied"
+              name="dateApplied"
+              type="date"
+              value={formData.dateApplied}
+              onChange={handleChange}
+              error={errors.dateApplied}
+              disabled={formData.status === 'unsubmitted'}
+            />
+          </div>
+        )}
+
+        {mode === 'create' && (
+          <Input
+            label="Date Applied"
+            name="dateApplied"
+            type="date"
+            value={formData.dateApplied}
+            onChange={handleChange}
+            error={errors.dateApplied}
+          />
+        )}
+
+        {mode === 'edit' && formData.status === 'offered' && (
+          <Input
+            label="Offer Due Date"
+            name="offerDueDate"
+            type="date"
+            value={formData.offerDueDate ?? ''}
+            onChange={handleChange}
+            error={errors.offerDueDate}
+            placeholder="When is the decision deadline?"
+          />
         )}
       </div>
 
