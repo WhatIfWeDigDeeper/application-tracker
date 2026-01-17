@@ -235,7 +235,7 @@ export function ApplicationForm({
           />
         )}
 
-        {mode === 'edit' && formData.status === 'offered' && (
+        {mode === 'edit' && formData.status === 'given offer' && (
           <Input
             label="Offer Due Date"
             name="offerDueDate"

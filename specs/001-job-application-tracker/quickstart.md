@@ -125,12 +125,13 @@ const config: Config = {
       colors: {
         // Custom colors for status badges
         status: {
-          applied: '#3B82F6',      // blue-500
-          interviewing: '#F59E0B', // amber-500
-          offered: '#10B981',      // emerald-500
-          rejected: '#EF4444',     // red-500
-          accepted: '#22C55E',     // green-500
-          declined: '#6B7280',     // gray-500
+          applied: '#3B82F6',           // blue-500
+          rejected: '#EF4444',          // red-500
+          interviewing: '#F59E0B',      // amber-500
+          'given offer': '#10B981',     // emerald-500
+          'accepted offer': '#22C55E',  // green-500
+          'declined offer': '#6B7280',  // gray-500
+          'no offer': '#EF4444',        // red-500
         },
       },
     },
