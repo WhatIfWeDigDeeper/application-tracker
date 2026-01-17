@@ -44,14 +44,14 @@ function DetailRow({
 
   return (
     <div className="py-2 flex justify-between items-start gap-4">
-      <dt className="text-sm font-medium text-gray-500 flex-shrink-0">{label}</dt>
-      <dd className="text-sm text-gray-900 text-right">
+      <dt className="text-sm font-medium text-gray-500 dark:text-slate-400 flex-shrink-0">{label}</dt>
+      <dd className="text-sm text-gray-900 dark:text-slate-100 text-right">
         {isLink && typeof value === 'string' ? (
           <a
             href={value}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 hover:underline break-all"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline break-all"
           >
             {value}
           </a>
@@ -109,8 +109,8 @@ export function ApplicationDetail({
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <h2 className="text-xl font-semibold text-gray-900">{application.positionTitle}</h2>
-          <p className="text-lg text-gray-600">{application.companyName}</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">{application.positionTitle}</h2>
+          <p className="text-lg text-gray-600 dark:text-slate-300">{application.companyName}</p>
         </div>
         <div className="flex items-center gap-2">
           {isStatusChanging ? (
@@ -138,9 +138,9 @@ export function ApplicationDetail({
       </div>
 
       {/* Details Section */}
-      <div className="bg-gray-50 rounded-lg p-4 sticky top-0 z-10">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Application Details</h3>
-        <dl className="divide-y divide-gray-200">
+      <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-4 sticky top-0 z-10">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50 mb-3">Application Details</h3>
+        <dl className="divide-y divide-gray-200 dark:divide-slate-600">
           <DetailRow label="Date Applied" value={formatDate(application.dateApplied)} />
           <DetailRow
             label="Category"
@@ -172,9 +172,9 @@ export function ApplicationDetail({
 
       {/* URLs Section */}
       {(application.companyUrl || application.jobPostingUrl || application.companyCareerUrl) && (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Links</h3>
-          <dl className="divide-y divide-gray-200">
+        <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50 mb-3">Links</h3>
+          <dl className="divide-y divide-gray-200 dark:divide-slate-600">
             <DetailRow label="Company Website" value={application.companyUrl} isLink />
             <DetailRow label="Job Posting" value={application.jobPostingUrl} isLink />
             <DetailRow label="Career Page" value={application.companyCareerUrl} isLink />
@@ -184,20 +184,20 @@ export function ApplicationDetail({
 
       {/* Notes Section */}
       {(application.specialRequirements || application.notes) && (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Notes</h3>
+        <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50 mb-3">Notes</h3>
           {application.specialRequirements && (
             <div className="mb-3">
-              <p className="text-xs font-medium text-gray-500 mb-1">Special Requirements</p>
-              <p className="text-sm text-gray-900 whitespace-pre-wrap">
+              <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Special Requirements</p>
+              <p className="text-sm text-gray-900 dark:text-slate-100 whitespace-pre-wrap">
                 {application.specialRequirements}
               </p>
             </div>
           )}
           {application.notes && (
             <div>
-              <p className="text-xs font-medium text-gray-500 mb-1">General Notes</p>
-              <p className="text-sm text-gray-900 whitespace-pre-wrap">{application.notes}</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">General Notes</p>
+              <p className="text-sm text-gray-900 dark:text-slate-100 whitespace-pre-wrap">{application.notes}</p>
             </div>
           )}
         </div>
@@ -205,11 +205,11 @@ export function ApplicationDetail({
 
       {/* Offer Due Date Section */}
       {isOffered && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-amber-600" />
-              <h3 className="text-sm font-semibold text-amber-900">Offer Decision Deadline</h3>
+              <CalendarIcon className="w-5 h-5 text-amber-600 dark:text-amber-500" />
+              <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-300">Offer Decision Deadline</h3>
             </div>
             {!isEditingDueDate && (
               <Button
@@ -241,7 +241,7 @@ export function ApplicationDetail({
             </div>
           ) : application.offerDueDate ? (
             <div className="mt-2">
-              <p className="text-sm text-amber-800">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
                 <span className="font-medium">Due: </span>
                 {formatDate(application.offerDueDate)}
               </p>
@@ -250,10 +250,10 @@ export function ApplicationDetail({
                   className={cn(
                     'text-sm font-medium mt-1',
                     daysRemaining < 0
-                      ? 'text-red-600'
+                      ? 'text-red-600 dark:text-red-400'
                       : daysRemaining <= 3
-                        ? 'text-amber-600'
-                        : 'text-green-600'
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-green-600 dark:text-green-400'
                   )}
                 >
                   {formatDaysRemaining(daysRemaining)}
@@ -261,7 +261,7 @@ export function ApplicationDetail({
               )}
             </div>
           ) : (
-            <p className="mt-2 text-sm text-amber-700">
+            <p className="mt-2 text-sm text-amber-700 dark:text-amber-300">
               No deadline set. Click &quot;Set Deadline&quot; to add one.
             </p>
           )}
@@ -270,7 +270,7 @@ export function ApplicationDetail({
 
       {/* Interview Progress Section */}
       {showInterviewSection && (
-        <div className="border-t pt-6">
+        <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
           <InterviewChecklist
             stages={application.interviewStages}
             onStagesChange={handleInterviewStagesChange}
