@@ -59,10 +59,5 @@ networks:
   app_tracker_network:
     driver: bridge
       - ./ui/src:/app/src
-
-volumes:
-  postgres_data:
-
-networks:
   default:
     name: app-tracker-network

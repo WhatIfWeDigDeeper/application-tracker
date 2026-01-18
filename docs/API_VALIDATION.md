@@ -2,8 +2,8 @@
 
 ## Current Environment Status
 
-✅ **Available**: Docker, Node.js 18+, npm  
-❌ **Not Available**: Local PostgreSQL, docker-compose command  
+✅ **Available**: Docker, Node.js 18+, npm
+❌ **Not Available**: Local PostgreSQL, docker-compose command
 ❌ **Not Tested Yet**: Real database integration
 
 This guide provides multiple approaches to validate the API implementation.

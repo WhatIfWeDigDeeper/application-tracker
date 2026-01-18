@@ -11,6 +11,7 @@ RUN npm ci
 # Build stage
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
+COPY api/package.json .
 COPY api/src ./src
 COPY api/tsconfig.json .
 COPY api/prisma ./prisma
@@ -20,7 +21,7 @@ RUN npm run build
 FROM base AS runner
 ENV NODE_ENV=production
 
-RUN addgroup -g 1001 -S nodejs && adduser -S node -u 1001
+RUN addgroup -g 1001 -S nodejs 2>/dev/null || true && adduser -S node -u 1001 2>/dev/null || true
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type {
   JobApplication,
   InterviewStage,
@@ -10,7 +10,7 @@ import type {
   ApplicationFilters,
   SortOptions,
 } from '@/types/application';
-import * as storageService from '@/services/storage';
+import { applicationsApi, stagesApi } from '@/services/api';
 
 /**
  * Return type for the useApplications hook
@@ -23,11 +23,11 @@ export interface UseApplicationsReturn {
   error: string | null;
 
   // CRUD Operations
-  addApplication: (input: CreateApplicationInput) => JobApplication;
-  updateApplication: (id: string, input: UpdateApplicationInput) => JobApplication;
-  deleteApplication: (id: string) => void;
-  archiveApplication: (id: string) => void;
-  restoreApplication: (id: string) => void;
+  addApplication: (input: CreateApplicationInput) => Promise<JobApplication>;
+  updateApplication: (id: string, input: UpdateApplicationInput) => Promise<JobApplication>;
+  deleteApplication: (id: string) => Promise<void>;
+  archiveApplication: (id: string) => Promise<void>;
+  restoreApplication: (id: string) => Promise<void>;
 
   // Filtering & Sorting
   filters: ApplicationFilters;
@@ -36,22 +36,22 @@ export interface UseApplicationsReturn {
   setSort: (sort: SortOptions) => void;
 
   // Interview Operations
-  addInterviewStage: (applicationId: string, stage: InterviewStageInput) => void;
-  updateInterviewStage: (applicationId: string, stageId: string, input: InterviewStageInput) => void;
-  removeInterviewStage: (applicationId: string, stageId: string) => void;
-  reorderInterviewStages: (applicationId: string, stageIds: string[]) => void;
+  addInterviewStage: (applicationId: string, stage: InterviewStageInput) => Promise<void>;
+  updateInterviewStage: (applicationId: string, stageId: string, input: InterviewStageInput) => Promise<void>;
+  removeInterviewStage: (applicationId: string, stageId: string) => Promise<void>;
+  reorderInterviewStages: (applicationId: string, stageIds: string[]) => Promise<void>;
   completeInterviewStage: (
     applicationId: string,
     stageId: string,
     completedDate: string,
     notes?: string,
     rating?: number
-  ) => void;
-  setInterviewStages: (applicationId: string, stages: InterviewStage[]) => void;
+  ) => Promise<void>;
+  setInterviewStages: (applicationId: string, stages: InterviewStage[]) => Promise<void>;
 
   // Utility
   getApplicationById: (id: string) => JobApplication | null;
-  refreshApplications: () => void;
+  refreshApplications: () => Promise<void>;
 }
 
 const DEFAULT_SORT: SortOptions = {
@@ -65,7 +65,7 @@ const DEFAULT_FILTERS: ApplicationFilters = {
 
 /**
  * Custom hook for managing job applications state
- * Provides CRUD operations, filtering, sorting, and interview management
+ * Provides CRUD operations, filtering, sorting, and interview management via API
  */
 export function useApplications(): UseApplicationsReturn {
   const [applications, setApplications] = useState<JobApplication[]>([]);
@@ -74,15 +74,35 @@ export function useApplications(): UseApplicationsReturn {
   const [filters, setFilters] = useState<ApplicationFilters>(DEFAULT_FILTERS);
   const [sort, setSort] = useState<SortOptions>(DEFAULT_SORT);
 
-  // Load applications from localStorage on mount
-  const refreshApplications = useCallback((): void => {
+  // Load applications from API on mount
+  const refreshApplications = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const apps = storageService.getApplications(filters, sort);
+      const result = await applicationsApi.list();
+      let apps = Array.isArray(result) ? result : ((result as { items: JobApplication[] })?.items || []);
+
+      // Apply filters
+      if (!filters.includeArchived) {
+        apps = apps.filter((app: JobApplication) => !app.isArchived);
+      }
+
+      // Apply sorting
+      apps.sort((a: JobApplication, b: JobApplication): number => {
+        const aVal = a[sort.field as keyof JobApplication];
+        const bVal = b[sort.field as keyof JobApplication];
+
+        if (aVal === null || aVal === undefined) return 1;
+        if (bVal === null || bVal === undefined) return -1;
+
+        if (aVal < bVal) return sort.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sort.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+
       setApplications(apps);
-    } catch (err) {
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load applications';
       setError(message);
       console.error('Error loading applications:', err);
@@ -93,18 +113,16 @@ export function useApplications(): UseApplicationsReturn {
 
   // Initial load and reload when filters/sort change
   useEffect(() => {
-    // Only run on client side
-    if (typeof window === 'undefined') return;
     refreshApplications();
   }, [refreshApplications]);
 
   // CRUD Operations
-  const addApplication = useCallback((input: CreateApplicationInput): JobApplication => {
+  const addApplication = useCallback(async (input: CreateApplicationInput): Promise<JobApplication> => {
     try {
-      const newApp = storageService.createApplication(input);
-      refreshApplications();
+      const newApp = await applicationsApi.create(input);
+      await refreshApplications();
       return newApp;
-    } catch (err) {
+    } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to add application';
       setError(message);
       throw err;
@@ -112,12 +130,12 @@ export function useApplications(): UseApplicationsReturn {
   }, [refreshApplications]);
 
   const updateApplication = useCallback(
-    (id: string, input: UpdateApplicationInput): JobApplication => {
+    async (id: string, input: UpdateApplicationInput): Promise<JobApplication> => {
       try {
-        const updatedApp = storageService.updateApplication(id, input);
-        refreshApplications();
+        const updatedApp = await applicationsApi.update(id, input);
+        await refreshApplications();
         return updatedApp;
-      } catch (err) {
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to update application';
         setError(message);
         throw err;
@@ -127,11 +145,11 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const deleteApplication = useCallback(
-    (id: string): void => {
+    async (id: string): Promise<void> => {
       try {
-        storageService.deleteApplication(id);
-        refreshApplications();
-      } catch (err) {
+        await applicationsApi.delete(id);
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to delete application';
         setError(message);
         throw err;
@@ -141,11 +159,11 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const archiveApplication = useCallback(
-    (id: string): void => {
+    async (id: string): Promise<void> => {
       try {
-        storageService.archiveApplicationById(id);
-        refreshApplications();
-      } catch (err) {
+        await applicationsApi.archive(id);
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to archive application';
         setError(message);
         throw err;
@@ -155,11 +173,11 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const restoreApplication = useCallback(
-    (id: string): void => {
+    async (id: string): Promise<void> => {
       try {
-        storageService.restoreApplication(id);
-        refreshApplications();
-      } catch (err) {
+        await applicationsApi.restore(id);
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to restore application';
         setError(message);
         throw err;
@@ -168,13 +186,13 @@ export function useApplications(): UseApplicationsReturn {
     [refreshApplications]
   );
 
-  // Interview Operations
+  // Interview Stage Operations
   const addInterviewStage = useCallback(
-    (applicationId: string, stage: InterviewStageInput): void => {
+    async (applicationId: string, stage: InterviewStageInput): Promise<void> => {
       try {
-        storageService.addInterviewStage(applicationId, stage);
-        refreshApplications();
-      } catch (err) {
+        await stagesApi.create(applicationId, stage);
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to add interview stage';
         setError(message);
         throw err;
@@ -184,11 +202,11 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const updateInterviewStage = useCallback(
-    (applicationId: string, stageId: string, input: InterviewStageInput): void => {
+    async (applicationId: string, stageId: string, input: InterviewStageInput): Promise<void> => {
       try {
-        storageService.updateInterviewStage(applicationId, stageId, input);
-        refreshApplications();
-      } catch (err) {
+        await stagesApi.update(applicationId, stageId, input);
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to update interview stage';
         setError(message);
         throw err;
@@ -198,11 +216,11 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const removeInterviewStage = useCallback(
-    (applicationId: string, stageId: string): void => {
+    async (applicationId: string, stageId: string): Promise<void> => {
       try {
-        storageService.removeInterviewStage(applicationId, stageId);
-        refreshApplications();
-      } catch (err) {
+        await stagesApi.delete(applicationId, stageId);
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to remove interview stage';
         setError(message);
         throw err;
@@ -212,11 +230,17 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const reorderInterviewStages = useCallback(
-    (applicationId: string, stageIds: string[]): void => {
+    async (applicationId: string, stageIds: string[]): Promise<void> => {
       try {
-        storageService.reorderInterviewStages(applicationId, stageIds);
-        refreshApplications();
-      } catch (err) {
+        // Update order for each stage
+        for (let i = 0; i < stageIds.length; i++) {
+          const stageId = stageIds[i];
+          if (stageId) {
+            await stagesApi.update(applicationId, stageId, { order: i });
+          }
+        }
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to reorder interview stages';
         setError(message);
         throw err;
@@ -226,17 +250,22 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const completeInterviewStage = useCallback(
-    (
+    async (
       applicationId: string,
       stageId: string,
       completedDate: string,
       notes?: string,
       rating?: number
-    ): void => {
+    ): Promise<void> => {
       try {
-        storageService.completeInterviewStage(applicationId, stageId, completedDate, notes, rating);
-        refreshApplications();
-      } catch (err) {
+        await stagesApi.update(applicationId, stageId, {
+          isCompleted: true,
+          completedDate,
+          notes,
+          performanceRating: rating,
+        });
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to complete interview stage';
         setError(message);
         throw err;
@@ -246,67 +275,59 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const setInterviewStages = useCallback(
-    (applicationId: string, stages: InterviewStage[]): void => {
+    async (applicationId: string, stages: InterviewStage[]): Promise<void> => {
       try {
-        storageService.setInterviewStages(applicationId, stages);
-        refreshApplications();
-      } catch (err) {
+        // Delete all existing stages
+        const app = applications.find((a) => a.id === applicationId);
+        if (app?.interviewStages) {
+          for (const stage of app.interviewStages) {
+            await stagesApi.delete(applicationId, stage.id);
+          }
+        }
+
+        // Create new stages
+        for (const stage of stages) {
+          await stagesApi.create(applicationId, stage);
+        }
+
+        await refreshApplications();
+      } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to set interview stages';
         setError(message);
         throw err;
       }
     },
-    [refreshApplications]
+    [applications, refreshApplications]
   );
 
   // Utility
-  const getApplicationById = useCallback((id: string): JobApplication | null => {
-    return storageService.getApplicationById(id);
-  }, []);
-
-  // Memoize the return value to prevent unnecessary re-renders
-  return useMemo(
-    () => ({
-      applications,
-      isLoading,
-      error,
-      addApplication,
-      updateApplication,
-      deleteApplication,
-      archiveApplication,
-      restoreApplication,
-      filters,
-      setFilters,
-      sort,
-      setSort,
-      addInterviewStage,
-      updateInterviewStage,
-      removeInterviewStage,
-      reorderInterviewStages,
-      completeInterviewStage,
-      setInterviewStages,
-      getApplicationById,
-      refreshApplications,
-    }),
-    [
-      applications,
-      isLoading,
-      error,
-      addApplication,
-      updateApplication,
-      deleteApplication,
-      archiveApplication,
-      restoreApplication,
-      filters,
-      sort,
-      addInterviewStage,
-      updateInterviewStage,
-      removeInterviewStage,
-      reorderInterviewStages,
-      completeInterviewStage,
-      setInterviewStages,
-      getApplicationById,
-      refreshApplications,
-    ]
+  const getApplicationById = useCallback(
+    (id: string): JobApplication | null => {
+      return applications.find((app) => app.id === id) || null;
+    },
+    [applications]
   );
+
+  return {
+    applications,
+    isLoading,
+    error,
+    addApplication,
+    updateApplication,
+    deleteApplication,
+    archiveApplication,
+    restoreApplication,
+    filters,
+    setFilters,
+    sort,
+    setSort,
+    addInterviewStage,
+    updateInterviewStage,
+    removeInterviewStage,
+    reorderInterviewStages,
+    completeInterviewStage,
+    setInterviewStages,
+    getApplicationById,
+    refreshApplications,
+  };
 }

@@ -1,28 +1,25 @@
--- CreateEnum
-CREATE TYPE "ApplicationStatus" AS ENUM ('unsubmitted', 'applied', 'interviewing', 'offered', 'rejected', 'accepted');
-
--- CreateEnum
-CREATE TYPE "CompanyCategory" AS ENUM ('startup', 'scale_up', 'mid_market', 'enterprise', 'other');
-
--- CreateEnum
-CREATE TYPE "JobSource" AS ENUM ('referral', 'job_board', 'company_website', 'recruiter', 'other');
-
 -- CreateTable
 CREATE TABLE "Application" (
     "id" TEXT NOT NULL,
     "companyName" TEXT NOT NULL,
     "positionTitle" TEXT NOT NULL,
-    "dateApplied" TIMESTAMP(3) NOT NULL,
-    "status" "ApplicationStatus" NOT NULL DEFAULT 'unsubmitted',
-    "interviewUrl" TEXT,
-    "onsite" BOOLEAN,
-    "salary" INTEGER,
-    "companyCategory" "CompanyCategory",
-    "jobSource" "JobSource",
-    "notes" TEXT,
-    "isArchived" BOOLEAN NOT NULL DEFAULT false,
+    "dateApplied" TIMESTAMP(3),
+    "status" TEXT NOT NULL DEFAULT 'unsubmitted',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "companyUrl" TEXT,
+    "jobPostingUrl" TEXT,
+    "companyCareerUrl" TEXT,
+    "companyCategory" TEXT,
+    "skillsMatch" INTEGER,
+    "jobSource" TEXT,
+    "coverLetterRequired" BOOLEAN,
+    "specialRequirements" TEXT,
+    "salaryMin" INTEGER,
+    "salaryMax" INTEGER,
+    "notes" TEXT,
+    "offerDueDate" TIMESTAMP(3),
+    "isArchived" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Application_pkey" PRIMARY KEY ("id")
 );
