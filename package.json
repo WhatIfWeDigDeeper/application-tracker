@@ -22,7 +22,9 @@
     "prisma:migrate:dev": "cd api && npm run prisma:migrate:dev",
     "prisma:studio": "cd api && npm run prisma:studio",
     "seed": "cd api && npm run seed",
-    "test:e2e": "cd ui && npm run test:e2e",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:debug": "npx playwright test --debug",
     "clean": "rm -rf node_modules api/node_modules ui/node_modules api/dist ui/.next"
   },
   "keywords": [],

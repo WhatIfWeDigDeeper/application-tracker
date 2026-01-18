@@ -2,10 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Modal Input Fields', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear localStorage before each test
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
   });
 
   test('should be able to type into Company Name input field', async ({ page }) => {
