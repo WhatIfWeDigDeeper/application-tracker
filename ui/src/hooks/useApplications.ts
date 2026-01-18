@@ -84,9 +84,42 @@ export function useApplications(): UseApplicationsReturn {
       let apps = Array.isArray(result) ? result : ((result as { items: JobApplication[] })?.items || []);
 
       // Apply filters
-      if (!filters.includeArchived) {
-        apps = apps.filter((app: JobApplication) => !app.isArchived);
-      }
+      apps = apps.filter((app: JobApplication) => {
+        // Archive filter
+        if (!filters.includeArchived && app.isArchived) {
+          return false;
+        }
+
+        // Status filter
+        if (filters.status && filters.status.length > 0) {
+          if (!filters.status.includes(app.status)) {
+            return false;
+          }
+        }
+
+        // Company category filter
+        if (filters.companyCategory && filters.companyCategory.length > 0) {
+          if (!app.companyCategory || !filters.companyCategory.includes(app.companyCategory)) {
+            return false;
+          }
+        }
+
+        // Job source filter
+        if (filters.jobSource && filters.jobSource.length > 0) {
+          if (!app.jobSource || !filters.jobSource.includes(app.jobSource)) {
+            return false;
+          }
+        }
+
+        // Skills match minimum filter
+        if (filters.skillsMatchMin !== undefined && filters.skillsMatchMin > 0) {
+          if (!app.skillsMatch || app.skillsMatch < filters.skillsMatchMin) {
+            return false;
+          }
+        }
+
+        return true;
+      });
 
       // Apply sorting
       apps.sort((a: JobApplication, b: JobApplication): number => {
