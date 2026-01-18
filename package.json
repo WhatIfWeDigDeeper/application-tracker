@@ -1,0 +1,31 @@
+{
+  "name": "application-tracker-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Application Tracker - Monorepo root",
+  "scripts": {
+    "dev:api": "cd api && npm run dev",
+    "dev:ui": "cd ui && npm run dev",
+    "dev": "npm run dev:api & npm run dev:ui",
+    "build:api": "cd api && npm run build",
+    "build:ui": "cd ui && npm run build",
+    "build": "npm run build:api && npm run build:ui",
+    "test:api": "cd api && npm test",
+    "test:ui": "cd ui && npm test",
+    "test": "npm run test:api && npm run test:ui",
+    "test:coverage": "npm run test:api -- --coverage && npm run test:ui -- --coverage",
+    "lint:api": "cd api && npm run lint",
+    "lint:ui": "cd ui && npm run lint",
+    "lint": "npm run lint:api && npm run lint:ui",
+    "install:all": "npm install && cd api && npm install && cd ../ui && npm install",
+    "prisma:generate": "cd api && npm run prisma:generate",
+    "prisma:migrate:dev": "cd api && npm run prisma:migrate:dev",
+    "prisma:studio": "cd api && npm run prisma:studio",
+    "seed": "cd api && npm run seed",
+    "test:e2e": "cd ui && npm run test:e2e",
+    "clean": "rm -rf node_modules api/node_modules ui/node_modules api/dist ui/.next"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
