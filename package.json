@@ -25,7 +25,8 @@
     "test:e2e": "npx playwright test",
     "test:e2e:ui": "npx playwright test --ui",
     "test:e2e:debug": "npx playwright test --debug",
-    "clean": "rm -rf node_modules api/node_modules ui/node_modules api/dist ui/.next"
+    "clean": "rm -rf node_modules api/node_modules ui/node_modules api/dist ui/.next",
+    "kill:all-next-dev": "pkill -f \"next dev\""
   },
   "keywords": [],
   "author": "",
