@@ -120,11 +120,14 @@ export function formatSalary(amount: number): string {
  * Format salary range
  */
 export function formatSalaryRange(min?: number, max?: number): string {
-  if (min !== undefined && max !== undefined) {
+  const hasMin = min !== undefined && min > 0;
+  const hasMax = max !== undefined && max > 0;
+
+  if (hasMin && hasMax) {
     return `$${formatSalary(min)} - $${formatSalary(max)}`;
-  } else if (min !== undefined) {
+  } else if (hasMin) {
     return `$${formatSalary(min)}+`;
-  } else if (max !== undefined) {
+  } else if (hasMax) {
     return `Up to $${formatSalary(max)}`;
   }
   return '';
