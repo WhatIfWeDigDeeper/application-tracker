@@ -72,8 +72,8 @@ export const CreateInterviewStageSchema = z.object({
   name: z.string().min(1, "Stage name is required"),
   isCompleted: z.boolean().default(false),
   completedDate: z.string().date().optional(),
-  notes: z.string().optional(),
-  performanceRating: z.number().int().min(0).max(10).optional(),
+  notes: z.string().nullable().optional(),
+  performanceRating: z.number().int().min(0).max(10).nullable().optional(),
 });
 
 export const UpdateInterviewStageSchema = CreateInterviewStageSchema.partial();
