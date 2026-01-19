@@ -48,7 +48,7 @@ export const JobSourceSchema = z.enum([
 export const CreateApplicationSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
   positionTitle: z.string().min(1, "Position title is required"),
-  dateApplied: z.string().datetime().optional(),
+  dateApplied: z.string().date().optional(),
   companyUrl: z.string().url().optional().or(z.literal("")),
   jobPostingUrl: z.string().url().optional().or(z.literal("")),
   companyCareerUrl: z.string().url().optional().or(z.literal("")),
@@ -64,14 +64,14 @@ export const CreateApplicationSchema = z.object({
 
 export const UpdateApplicationSchema = CreateApplicationSchema.extend({
   status: ApplicationStatusSchema.optional(),
-  offerDueDate: z.string().datetime().optional(),
+  offerDueDate: z.string().date().optional(),
   isArchived: z.boolean().optional(),
 });
 
 export const CreateInterviewStageSchema = z.object({
   name: z.string().min(1, "Stage name is required"),
   isCompleted: z.boolean().default(false),
-  completedDate: z.string().datetime().optional(),
+  completedDate: z.string().date().optional(),
   notes: z.string().optional(),
   performanceRating: z.number().int().min(0).max(10).optional(),
 });
