@@ -1,6 +1,7 @@
 import { prisma } from "./client";
 
-const seed = async () => {
+const seed = async (): Promise<void> => {
+  // eslint-disable-next-line no-console
   console.log("🌱 Seeding database...");
 
   // Clear existing data
@@ -17,7 +18,7 @@ const seed = async () => {
       companyUrl: "https://acme.com",
       jobPostingUrl: "https://acme.com/jobs/123",
       companyCategory: "enterprise-software",
-      skillsMatch: 85,
+      skillsMatch: 5,
       jobSource: "linkedin",
       salaryMin: 120000,
       salaryMax: 160000,
@@ -34,7 +35,7 @@ const seed = async () => {
       status: "applied",
       jobPostingUrl: "https://startup.com/jobs/456",
       companyCategory: "consumer-tech",
-      skillsMatch: 90,
+      skillsMatch: 4,
       jobSource: "company-website",
       salaryMin: 100000,
       salaryMax: 140000,
@@ -51,7 +52,7 @@ const seed = async () => {
       order: 1,
       isCompleted: true,
       completedDate: new Date("2026-01-12"),
-      performanceRating: 8,
+      performanceRating: 4,
       notes: "Went well, recruiter seemed pleased",
     },
   });
@@ -65,12 +66,13 @@ const seed = async () => {
       notes: "Scheduled for 2026-01-20",
     },
   });
-
+  // eslint-disable-next-line no-console
   console.log("✅ Seed complete!");
 };
 
 seed()
   .catch((e) => {
+    // eslint-disable-next-line no-console
     console.error("❌ Seed failed:", e);
     process.exit(1);
   })

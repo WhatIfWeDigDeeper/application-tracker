@@ -53,7 +53,7 @@ export const CreateApplicationSchema = z.object({
   jobPostingUrl: z.string().url().optional().or(z.literal("")),
   companyCareerUrl: z.string().url().optional().or(z.literal("")),
   companyCategory: CompanyCategorySchema.optional(),
-  skillsMatch: z.number().int().min(0).max(100).optional(),
+  skillsMatch: z.number().int().min(1).max(5).optional(),
   jobSource: JobSourceSchema.optional(),
   coverLetterRequired: z.boolean().optional(),
   specialRequirements: z.string().optional(),
@@ -73,7 +73,7 @@ export const CreateInterviewStageSchema = z.object({
   isCompleted: z.boolean().default(false),
   completedDate: z.string().date().optional(),
   notes: z.string().nullable().optional(),
-  performanceRating: z.number().int().min(0).max(10).nullable().optional(),
+  performanceRating: z.number().int().min(1).max(5).nullable().optional(),
 });
 
 export const UpdateInterviewStageSchema = CreateInterviewStageSchema.partial();
