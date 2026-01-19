@@ -9,7 +9,7 @@
     "start": "next start",
     "compile": "tsc --noEmit",
     "lint": "next lint",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },
