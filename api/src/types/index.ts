@@ -62,7 +62,7 @@ export const CreateApplicationSchema = z.object({
   notes: z.string().optional(),
 });
 
-export const UpdateApplicationSchema = CreateApplicationSchema.extend({
+export const UpdateApplicationSchema = CreateApplicationSchema.partial().extend({
   status: ApplicationStatusSchema.optional(),
   offerDueDate: z.string().date().optional(),
   isArchived: z.boolean().optional(),

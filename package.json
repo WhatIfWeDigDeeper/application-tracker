@@ -22,6 +22,7 @@
     "prisma:migrate:dev": "cd api && npm run prisma:migrate:dev",
     "prisma:studio": "cd api && npm run prisma:studio",
     "seed": "cd api && npm run seed",
+    "test:api:opaque": "npx jest --config tests/jest.config.js --testPathPattern=tests/api",
     "test:e2e": "npx playwright test",
     "test:e2e:ui": "npx playwright test --ui",
     "test:e2e:debug": "npx playwright test --debug",
