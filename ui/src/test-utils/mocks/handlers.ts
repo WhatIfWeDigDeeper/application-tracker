@@ -22,11 +22,11 @@ export function createMockApplication(overrides: Partial<JobApplication> = {}): 
 // In-memory store for tests
 let mockApplications: JobApplication[] = [];
 
-export function resetMockApplications(apps: JobApplication[] = []) {
+export function resetMockApplications(apps: JobApplication[] = []): void {
   mockApplications = apps;
 }
 
-export function getMockApplications() {
+export function getMockApplications(): JobApplication[] {
   return mockApplications;
 }
 
@@ -68,19 +68,21 @@ export const handlers = [
   // Update application
   http.patch(`${API_URL}/applications/:id`, async ({ params, request }) => {
     const body = await request.json() as Partial<JobApplication>;
-    const index = mockApplications.findIndex((a) => a.id === params.id);
-    if (index === -1) {
+    const existing = mockApplications.find((a) => a.id === params.id);
+    if (!existing) {
       return HttpResponse.json(
         { error: 'not_found', message: 'Application not found' },
         { status: 404 }
       );
     }
-    mockApplications[index] = {
-      ...mockApplications[index],
+    const updated: JobApplication = {
+      ...existing,
       ...body,
       updatedAt: new Date().toISOString(),
     };
-    return HttpResponse.json(mockApplications[index]);
+    const index = mockApplications.indexOf(existing);
+    mockApplications[index] = updated;
+    return HttpResponse.json(updated);
   }),
 
   // Delete application
@@ -97,37 +99,41 @@ export const handlers = [
   }),
 
   // Archive application
-  http.patch(`${API_URL}/applications/:id/archive`, ({ params }) => {
-    const index = mockApplications.findIndex((a) => a.id === params.id);
-    if (index === -1) {
+  http.post(`${API_URL}/applications/:id/archive`, ({ params }) => {
+    const existing = mockApplications.find((a) => a.id === params.id);
+    if (!existing) {
       return HttpResponse.json(
         { error: 'not_found', message: 'Application not found' },
         { status: 404 }
       );
     }
-    mockApplications[index] = {
-      ...mockApplications[index],
+    const updated: JobApplication = {
+      ...existing,
       isArchived: true,
       updatedAt: new Date().toISOString(),
     };
-    return HttpResponse.json(mockApplications[index]);
+    const index = mockApplications.indexOf(existing);
+    mockApplications[index] = updated;
+    return HttpResponse.json(updated);
   }),
 
   // Restore application
-  http.patch(`${API_URL}/applications/:id/restore`, ({ params }) => {
-    const index = mockApplications.findIndex((a) => a.id === params.id);
-    if (index === -1) {
+  http.post(`${API_URL}/applications/:id/restore`, ({ params }) => {
+    const existing = mockApplications.find((a) => a.id === params.id);
+    if (!existing) {
       return HttpResponse.json(
         { error: 'not_found', message: 'Application not found' },
         { status: 404 }
       );
     }
-    mockApplications[index] = {
-      ...mockApplications[index],
+    const updated: JobApplication = {
+      ...existing,
       isArchived: false,
       updatedAt: new Date().toISOString(),
     };
-    return HttpResponse.json(mockApplications[index]);
+    const index = mockApplications.indexOf(existing);
+    mockApplications[index] = updated;
+    return HttpResponse.json(updated);
   }),
 
   // Interview stages

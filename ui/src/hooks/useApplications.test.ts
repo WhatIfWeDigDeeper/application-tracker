@@ -3,6 +3,8 @@
  * Requires MSW to be installed: npm install --save-dev msw
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 // Check if MSW is available - skip entire file if not
 let mswAvailable = false;
 try {
