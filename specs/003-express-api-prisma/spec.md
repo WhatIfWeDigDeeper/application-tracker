@@ -13,13 +13,13 @@
 4. Document contracts and quickstart for contributors
 
 ## Functional Requirements
-- Applications CRUD
   - List, create, read, update, delete job applications
   - Support optional filters: `status`, `companyCategory`, `jobSource`, `includeArchived` (default false)
   - Pagination: `page` (default 1), `limit` (default 20, max 100); responses return envelope `{ items, page, limit, total }`
-- Interview Stages
+  - **PATCH requests must be partial**: clients should send only changed fields; unspecified fields remain unchanged
   - Attach multiple stages to an application
   - Create/update/delete stages; mark completion with date and rating
+  - **PATCH requests must be partial**: send only fields to update for a stage
 - Health endpoint
   - `/health` returns 200 and status info
 

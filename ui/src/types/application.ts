@@ -143,6 +143,12 @@ export interface InterviewStageInput {
   performanceRating?: number;
 }
 
+// For PATCH updates, allow partial payloads and null to explicitly clear optional fields
+export type UpdateInterviewStageInput = Partial<InterviewStageInput> & {
+  notes?: string | null;
+  performanceRating?: number | null;
+};
+
 // ============================================================================
 // Filter & Sort Types
 // ============================================================================

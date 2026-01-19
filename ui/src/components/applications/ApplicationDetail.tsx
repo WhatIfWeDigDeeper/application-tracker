@@ -1,7 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import type { JobApplication, InterviewStage, UpdateApplicationInput } from '@/types/application';
+import type {
+  JobApplication,
+  InterviewStage,
+  UpdateApplicationInput,
+  UpdateInterviewStageInput,
+} from '@/types/application';
 import { InterviewChecklist } from '@/components/interviews/InterviewChecklist';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -22,7 +27,7 @@ export interface ApplicationDetailProps {
   application: JobApplication;
   onUpdate: (id: string, data: UpdateApplicationInput) => void;
   onAddStage: (stage: InterviewStage) => Promise<void>;
-  onUpdateStage: (stageId: string, stage: InterviewStage) => Promise<void>;
+  onUpdateStage: (stageId: string, stage: UpdateInterviewStageInput) => Promise<void>;
   onRemoveStage: (stageId: string) => Promise<void>;
   onEdit: () => void;
   onClose: () => void;

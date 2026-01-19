@@ -22,9 +22,9 @@ describe("Interview Stages Contract Tests", () => {
       const app = createTestApp();
       const appId = "test-app-id";
       const stageId = "test-stage-id";
+      // Partial payload: only send fields that changed
       const payload = {
         isCompleted: true,
-        completedDate: new Date().toISOString(),
       };
       const res = await getRequest(app)
         .patch(`/applications/${appId}/interview-stages/${stageId}`)

@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import type { JobApplication, InterviewStage, CreateApplicationInput, UpdateApplicationInput } from '@/types/application';
+import type {
+  JobApplication,
+  InterviewStage,
+  CreateApplicationInput,
+  UpdateApplicationInput,
+  UpdateInterviewStageInput,
+} from '@/types/application';
 import { useApplications } from '@/hooks/useApplications';
 import { useFilters } from '@/hooks/useFilters';
 import { useSorting } from '@/hooks/useSorting';
@@ -96,7 +102,10 @@ export default function Home(): React.ReactElement {
     }
   };
 
-  const handleUpdateStage = async (stageId: string, stage: InterviewStage): Promise<void> => {
+  const handleUpdateStage = async (
+    stageId: string,
+    stage: UpdateInterviewStageInput
+  ): Promise<void> => {
     if (selectedApplication) {
       await updateInterviewStage(selectedApplication.id, stageId, stage);
     }

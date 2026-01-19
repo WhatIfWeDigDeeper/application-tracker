@@ -71,13 +71,22 @@ curl -X POST http://localhost:5000/applications \
   }'
 ```
 
-### Update Application
+### Update Application (PATCH)
+Send only the fields you want to change; all other fields stay as-is.
+
 ```bash
+# Minimal update (recommended)
 curl -X PATCH http://localhost:5000/applications/{id} \
   -H "Content-Type: application/json" \
   -d '{
-    "status": "offered",
-    "notes": "Received offer"
+    "status": "offered"
+  }'
+
+# Add an offer due date without touching other fields
+curl -X PATCH http://localhost:5000/applications/{id} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "offerDueDate": "2026-03-15"
   }'
 ```
 
@@ -107,14 +116,23 @@ curl -X POST http://localhost:5000/applications/{id}/interview-stages \
   }'
 ```
 
-### Update Interview Stage
+### Update Interview Stage (PATCH)
+Send only the fields you want to change; all other fields stay as-is.
+
 ```bash
+# Minimal toggle (recommended)
 curl -X PATCH http://localhost:5000/applications/{id}/interview-stages/{stageId} \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Technical Round - Completed",
     "isCompleted": true,
-    "completedDate": "2024-01-17T14:00:00Z",
+    "completedDate": "2026-01-19"
+  }'
+
+# Update notes/rating without touching other fields
+curl -X PATCH http://localhost:5000/applications/{id}/interview-stages/{stageId} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "notes": "Great communication",
     "performanceRating": 4
   }'
 ```

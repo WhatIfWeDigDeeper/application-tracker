@@ -118,6 +118,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     patch:
       summary: Update application
+      description: |
+        Partial update. Send only the fields that changed. Unspecified fields remain unchanged.
       parameters:
         - in: path
           name: id
@@ -130,6 +132,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateApplicationInput'
+            examples:
+              statusOnly:
+                summary: Update status only
+                value:
+                  status: interviewing
+              addOfferDueDate:
+                summary: Set offer due date without touching other fields
+                value:
+                  offerDueDate: 2026-03-15
       responses:
         '200':
           description: Updated
@@ -221,6 +232,8 @@ paths:
   /applications/{id}/interview-stages/{stageId}:
     patch:
       summary: Update interview stage
+      description: |
+        Partial update. Send only the fields that changed. Unspecified fields remain unchanged.
       parameters:
         - in: path
           name: id
@@ -238,6 +251,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/InterviewStageInput'
+            examples:
+              minimalUpdate:
+                summary: Toggle completion only
+                value:
+                  isCompleted: true
+                  completedDate: 2026-01-19
+              withNotes:
+                summary: Update rating and notes without touching other fields
+                value:
+                  performanceRating: 4
+                  notes: "Great communication"
       responses:
         '200':
           description: Updated

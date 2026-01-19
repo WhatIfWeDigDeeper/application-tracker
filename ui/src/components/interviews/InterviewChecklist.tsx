@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import type { InterviewStage as InterviewStageType, InterviewStageInput } from '@/types/application';
+import type {
+  InterviewStage as InterviewStageType,
+  InterviewStageInput,
+  UpdateInterviewStageInput,
+} from '@/types/application';
 import { InterviewStage } from './InterviewStage';
 import { StageForm } from './StageForm';
 import { Button } from '@/components/ui/Button';
@@ -13,7 +17,7 @@ import { DEFAULT_INTERVIEW_STAGES } from '@/lib/constants';
 export interface InterviewChecklistProps {
   stages: InterviewStageType[];
   onAddStage: (stage: InterviewStageType) => Promise<void>;
-  onUpdateStage: (stageId: string, stage: InterviewStageType) => Promise<void>;
+  onUpdateStage: (stageId: string, stage: UpdateInterviewStageInput) => Promise<void>;
   onRemoveStage: (stageId: string) => Promise<void>;
   isEditable?: boolean;
 }
@@ -33,12 +37,16 @@ export function InterviewChecklist({
   const handleToggleComplete = (stageId: string): void => {
     const stage = stages.find((s) => s.id === stageId);
     if (stage) {
-      const updatedStage = {
-        ...stage,
-        isCompleted: !stage.isCompleted,
-        completedDate: !stage.isCompleted ? getCurrentDateISO() : undefined,
+      const isCompleted = !stage.isCompleted;
+      const update: UpdateInterviewStageInput = {
+        isCompleted,
       };
-      onUpdateStage(stageId, updatedStage);
+
+      if (isCompleted) {
+        update.completedDate = getCurrentDateISO();
+      }
+
+      onUpdateStage(stageId, update);
     }
   };
 
@@ -55,14 +63,38 @@ export function InterviewChecklist({
   const handleFormSubmit = (data: InterviewStageInput): void => {
     if (editingStage) {
       // Update existing stage
-      const updatedStage: InterviewStageType = {
-        ...editingStage,
-        name: data.name,
-        isCompleted: data.isCompleted ?? false,
-        completedDate: data.completedDate,
-        notes: data.notes,
-        performanceRating: data.performanceRating,
-      };
+      const updatedStage: UpdateInterviewStageInput = {};
+
+      if (data.name !== editingStage.name) {
+        updatedStage.name = data.name;
+      }
+
+      const incomingCompleted = data.isCompleted ?? false;
+      if (incomingCompleted !== (editingStage.isCompleted ?? false)) {
+        updatedStage.isCompleted = incomingCompleted;
+      }
+
+      if (data.completedDate !== editingStage.completedDate) {
+        if (data.completedDate !== undefined) {
+          updatedStage.completedDate = data.completedDate;
+        }
+      }
+
+      if (data.notes !== editingStage.notes) {
+        updatedStage.notes = data.notes ?? null;
+      }
+
+      if (data.performanceRating !== editingStage.performanceRating) {
+        updatedStage.performanceRating = data.performanceRating ?? null;
+      }
+
+      // If nothing changed, skip API call
+      if (Object.keys(updatedStage).length === 0) {
+        setIsFormOpen(false);
+        setEditingStage(null);
+        return;
+      }
+
       onUpdateStage(editingStage.id, updatedStage);
     } else {
       // Add new stage

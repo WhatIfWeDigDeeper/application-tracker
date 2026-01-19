@@ -100,7 +100,6 @@ describe('InterviewChecklist', () => {
       expect(props.onUpdateStage).toHaveBeenCalledWith(
         'stage-1',
         expect.objectContaining({
-          id: 'stage-1',
           name: 'Updated Phone Screen',
         })
       );
@@ -127,7 +126,6 @@ describe('InterviewChecklist', () => {
       expect(props.onUpdateStage).toHaveBeenCalledWith(
         'stage-1',
         expect.objectContaining({
-          id: 'stage-1',
           isCompleted: true,
           completedDate: '2026-01-15',
         })

@@ -7,6 +7,7 @@ import type {
   CreateApplicationInput,
   UpdateApplicationInput,
   InterviewStageInput,
+  UpdateInterviewStageInput,
   ApplicationFilters,
   SortOptions,
 } from '@/types/application';
@@ -37,7 +38,11 @@ export interface UseApplicationsReturn {
 
   // Interview Operations
   addInterviewStage: (applicationId: string, stage: InterviewStageInput) => Promise<void>;
-  updateInterviewStage: (applicationId: string, stageId: string, input: InterviewStageInput) => Promise<void>;
+  updateInterviewStage: (
+    applicationId: string,
+    stageId: string,
+    input: UpdateInterviewStageInput
+  ) => Promise<void>;
   removeInterviewStage: (applicationId: string, stageId: string) => Promise<void>;
   reorderInterviewStages: (applicationId: string, stageIds: string[]) => Promise<void>;
   completeInterviewStage: (
@@ -215,7 +220,11 @@ export function useApplications(): UseApplicationsReturn {
   );
 
   const updateInterviewStage = useCallback(
-    async (applicationId: string, stageId: string, input: InterviewStageInput): Promise<void> => {
+    async (
+      applicationId: string,
+      stageId: string,
+      input: UpdateInterviewStageInput
+    ): Promise<void> => {
       try {
         await stagesApi.update(applicationId, stageId, input);
         await refreshApplications();
