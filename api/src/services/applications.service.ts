@@ -20,6 +20,9 @@ function prepareDateFields<T extends Record<string, unknown>>(input: T): T {
   if ('offerDueDate' in result && typeof result.offerDueDate === 'string') {
     (result as Record<string, unknown>).offerDueDate = toISODateTime(result.offerDueDate as string);
   }
+  if ('completedDate' in result && typeof result.completedDate === 'string') {
+    (result as Record<string, unknown>).completedDate = toISODateTime(result.completedDate as string);
+  }
   return result;
 }
 

@@ -94,4 +94,64 @@ describe("Date Format Integration Tests", () => {
     const data = await response.json();
     expect(data.code).toBe("validation_error");
   });
+
+  it("should accept date-only format (YYYY-MM-DD) for completedDate on interview stage", async () => {
+    expect(createdApplicationId).not.toBeNull();
+
+    // First create an interview stage
+    const stageResponse = await fetch(`${API_BASE}/applications/${createdApplicationId}/interview-stages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Phone Screen",
+        isCompleted: true,
+        completedDate: "2026-01-09",
+        performanceRating: 5,
+      }),
+    });
+
+    expect(stageResponse.status).toBe(201);
+    const stageData = await stageResponse.json();
+
+    expect(stageData.name).toBe("Phone Screen");
+    expect(stageData.isCompleted).toBe(true);
+    // The API stores as full datetime but should preserve the date
+    expect(stageData.completedDate).toContain("2026-01-09");
+  });
+
+  it("should accept date-only format (YYYY-MM-DD) for completedDate on interview stage update", async () => {
+    expect(createdApplicationId).not.toBeNull();
+
+    // First create a stage
+    const stageResponse = await fetch(`${API_BASE}/applications/${createdApplicationId}/interview-stages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Technical Interview",
+        isCompleted: false,
+      }),
+    });
+
+    expect(stageResponse.status).toBe(201);
+    const stageData = await stageResponse.json();
+    const stageId = stageData.id;
+
+    // Now update it with a completed date
+    const updateResponse = await fetch(`${API_BASE}/applications/${createdApplicationId}/interview-stages/${stageId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        isCompleted: true,
+        completedDate: "2026-01-10",
+        performanceRating: 8,
+      }),
+    });
+
+    expect(updateResponse.status).toBe(200);
+    const updatedData = await updateResponse.json();
+
+    expect(updatedData.isCompleted).toBe(true);
+    expect(updatedData.completedDate).toContain("2026-01-10");
+    expect(updatedData.performanceRating).toBe(8);
+  });
 });
