@@ -16,7 +16,13 @@ jest.mock('@/lib/utils', () => ({
 }));
 
 describe('InterviewChecklist', () => {
-  const createMockProps = () => ({
+  const createMockProps = (): {
+    stages: InterviewStage[];
+    onAddStage: (stage: InterviewStage) => Promise<void>;
+    onUpdateStage: (id: string, updatedStage: Partial<InterviewStage>) => Promise<void>;
+    onRemoveStage: (id: string) => Promise<void>;
+    isEditable: boolean;
+  } => ({
     stages: [] as InterviewStage[],
     onAddStage: jest.fn().mockResolvedValue(undefined),
     onUpdateStage: jest.fn().mockResolvedValue(undefined),
