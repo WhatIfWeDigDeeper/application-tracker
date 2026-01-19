@@ -143,7 +143,7 @@ describe("Date Format Integration Tests", () => {
       body: JSON.stringify({
         isCompleted: true,
         completedDate: "2026-01-10",
-        performanceRating: 8,
+        performanceRating: 4,
       }),
     });
 
@@ -152,6 +152,6 @@ describe("Date Format Integration Tests", () => {
 
     expect(updatedData.isCompleted).toBe(true);
     expect(updatedData.completedDate).toContain("2026-01-10");
-    expect(updatedData.performanceRating).toBe(8);
+    expect(updatedData.performanceRating).toBe(4);
   });
 });

@@ -10,10 +10,6 @@
     "build:api": "cd api && npm run build",
     "build:ui": "cd ui && npm run build",
     "build": "npm run build:api && npm run build:ui",
-    "test:api": "cd api && npm test",
-    "test:ui": "cd ui && npm test",
-    "test": "npm run test:api && npm run test:ui",
-    "test:coverage": "npm run test:api -- --coverage && npm run test:ui -- --coverage",
     "lint:api": "cd api && npm run lint",
     "lint:ui": "cd ui && npm run lint",
     "lint": "npm run lint:api && npm run lint:ui",
@@ -22,14 +18,23 @@
     "prisma:migrate:dev": "cd api && npm run prisma:migrate:dev",
     "prisma:studio": "cd api && npm run prisma:studio",
     "seed": "cd api && npm run seed",
-    "test:api:opaque": "npx jest --config tests/jest.config.js --testPathPattern=tests/api",
-    "test:e2e": "npx playwright test",
-    "test:e2e:ui": "npx playwright test --ui",
-    "test:e2e:debug": "npx playwright test --debug",
+    "test:api": "cd api && npm test",
+    "test:ui": "cd ui && npm test",
+    "test": "npm run test:api && npm run test:ui",
+    "test:coverage": "npm run test:api -- --coverage && npm run test:ui -- --coverage",
+    "test:api:opaque": "npm_config_yes=true npx jest --config tests/jest.config.js --testPathPatterns=tests/api",
+    "test:e2e": "npm_config_yes=true npx playwright test",
+    "test:e2e:ui": "npm_config_yes=true npx playwright test --ui",
+    "test:e2e:debug": "npm_config_yes=true npx playwright test --debug",
     "clean": "rm -rf node_modules api/node_modules ui/node_modules api/dist ui/.next",
     "kill:all-next-dev": "pkill -f \"next dev\""
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.9"
+  }
 }

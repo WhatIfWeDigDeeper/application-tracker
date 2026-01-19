@@ -106,8 +106,10 @@ test.describe('Modal Input Fields', () => {
     // Modal should close after successful submission
     await expect(page.locator('[role="dialog"]')).not.toBeVisible();
 
-    // Application should appear in the list
-    await expect(page.getByText('Acme Corporation')).toBeVisible();
+    // Application should appear in the list (pick the first heading match)
+    await expect(
+      page.getByRole('heading', { name: 'Acme Corporation' }).first()
+    ).toBeVisible();
   });
 
   test('should close modal on Escape key', async ({ page }) => {
