@@ -27,7 +27,7 @@ const seed = async (): Promise<void> => {
     },
   });
 
-  const app2 = await prisma.application.create({
+  await prisma.application.create({
     data: {
       companyName: "Tech Startup",
       positionTitle: "Full Stack Developer",

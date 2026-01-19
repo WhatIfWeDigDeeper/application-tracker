@@ -81,11 +81,11 @@ export function InterviewChecklist({
       }
 
       if (data.notes !== editingStage.notes) {
-        updatedStage.notes = data.notes ?? null;
+        updatedStage.notes = data.notes;
       }
 
       if (data.performanceRating !== editingStage.performanceRating) {
-        updatedStage.performanceRating = data.performanceRating ?? null;
+        updatedStage.performanceRating = data.performanceRating;
       }
 
       // If nothing changed, skip API call

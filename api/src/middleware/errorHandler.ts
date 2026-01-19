@@ -25,7 +25,7 @@ export const errorHandler = (
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
-) => {
+): Response => {
   console.error("Error:", err.message, err.stack);
 
   if (err instanceof AppError) {
@@ -47,7 +47,7 @@ export const errorHandler = (
     } as ErrorResponse);
   }
 
-  res.status(500).json({
+  return res.status(500).json({
     code: "internal_error",
     message: "Internal server error",
   } as ErrorResponse);

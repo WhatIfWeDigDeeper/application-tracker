@@ -1,3 +1,4 @@
+import { InterviewStage } from "@prisma/client";
 import { prisma } from "../db/client.js";
 import {
   CreateInterviewStageInput,
@@ -20,7 +21,7 @@ function prepareDateFields<T extends Record<string, unknown>>(input: T): T {
 }
 
 export class InterviewStageService {
-  async createStage(applicationId: string, input: CreateInterviewStageInput) {
+  async createStage(applicationId: string, input: CreateInterviewStageInput): Promise<InterviewStage> {
     // Verify application exists
     const app = await prisma.application.findUnique({
       where: { id: applicationId },
@@ -45,7 +46,7 @@ export class InterviewStageService {
     });
   }
 
-  async updateStage(stageId: string, input: UpdateInterviewStageInput) {
+  async updateStage(stageId: string, input: UpdateInterviewStageInput): Promise<InterviewStage> {
     const stage = await prisma.interviewStage.findUnique({
       where: { id: stageId },
     });
@@ -59,7 +60,7 @@ export class InterviewStageService {
     });
   }
 
-  async deleteStage(stageId: string) {
+  async deleteStage(stageId: string): Promise<void> {
     const stage = await prisma.interviewStage.findUnique({
       where: { id: stageId },
     });
@@ -72,7 +73,7 @@ export class InterviewStageService {
     });
   }
 
-  async getStagesByApplicationId(applicationId: string) {
+  async getStagesByApplicationId(applicationId: string): Promise<InterviewStage[]> {
     return prisma.interviewStage.findMany({
       where: { applicationId },
       orderBy: { order: "asc" },

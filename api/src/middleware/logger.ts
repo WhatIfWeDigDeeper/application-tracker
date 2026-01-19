@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-export const logger = (req: Request, res: Response, next: NextFunction) => {
+export const logger = (req: Request, res: Response, next: NextFunction): void => {
   const startTime = Date.now();
 
   res.on("finish", () => {

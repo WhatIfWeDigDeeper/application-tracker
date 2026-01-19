@@ -6,7 +6,6 @@ import {
   UpdateApplicationSchema,
   ListApplicationsQuerySchema,
 } from "../types/index.js";
-import { AppError } from "../middleware/errorHandler.js";
 
 const router = Router();
 

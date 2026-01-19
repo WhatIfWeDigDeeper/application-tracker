@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../db/client.js";
 import {
   CreateApplicationInput,
@@ -5,6 +6,17 @@ import {
   ListApplicationsQuery,
 } from "../types/index.js";
 import { AppError } from "../middleware/errorHandler.js";
+
+type ApplicationWithStages = Prisma.ApplicationGetPayload<{
+  include: { interviewStages: true };
+}>;
+
+interface ListApplicationsResult {
+  items: ApplicationWithStages[];
+  page: number;
+  limit: number;
+  total: number;
+}
 
 // Convert date-only strings (YYYY-MM-DD) to ISO datetime for Prisma
 function toISODateTime(dateStr: string | undefined): Date | undefined {
@@ -27,7 +39,7 @@ function prepareDateFields<T extends Record<string, unknown>>(input: T): T {
 }
 
 export class ApplicationService {
-  async listApplications(query: ListApplicationsQuery) {
+  async listApplications(query: ListApplicationsQuery): Promise<ListApplicationsResult> {
     const { page = 1, limit = 20, status, companyCategory, jobSource, includeArchived = false } = query;
 
     const skip = (page - 1) * limit;
@@ -58,7 +70,7 @@ export class ApplicationService {
     return { items, page, limit, total };
   }
 
-  async getApplication(id: string) {
+  async getApplication(id: string): Promise<ApplicationWithStages> {
     const app = await prisma.application.findUnique({
       where: { id },
       include: { interviewStages: { orderBy: { order: "asc" } } },
@@ -71,7 +83,7 @@ export class ApplicationService {
     return app;
   }
 
-  async createApplication(input: CreateApplicationInput) {
+  async createApplication(input: CreateApplicationInput): Promise<ApplicationWithStages> {
     return prisma.application.create({
       data: {
         ...prepareDateFields(input),
@@ -81,7 +93,7 @@ export class ApplicationService {
     });
   }
 
-  async updateApplication(id: string, input: UpdateApplicationInput) {
+  async updateApplication(id: string, input: UpdateApplicationInput): Promise<ApplicationWithStages> {
     const app = await prisma.application.findUnique({ where: { id } });
     if (!app) {
       throw new AppError("not_found", 404, `Application ${id} not found`);
@@ -94,7 +106,7 @@ export class ApplicationService {
     });
   }
 
-  async deleteApplication(id: string) {
+  async deleteApplication(id: string): Promise<void> {
     const app = await prisma.application.findUnique({ where: { id } });
     if (!app) {
       throw new AppError("not_found", 404, `Application ${id} not found`);
@@ -103,7 +115,7 @@ export class ApplicationService {
     await prisma.application.delete({ where: { id } });
   }
 
-  async archiveApplication(id: string) {
+  async archiveApplication(id: string): Promise<ApplicationWithStages> {
     const existing = await prisma.application.findUnique({ where: { id } });
     if (!existing) {
       throw new AppError("not_found", 404, `Application ${id} not found`);
@@ -115,7 +127,7 @@ export class ApplicationService {
     });
   }
 
-  async restoreApplication(id: string) {
+  async restoreApplication(id: string): Promise<ApplicationWithStages> {
     const existing = await prisma.application.findUnique({ where: { id } });
     if (!existing) {
       throw new AppError("not_found", 404, `Application ${id} not found`);
