@@ -1,28 +1,24 @@
 /**
  * Tests for useApplications hook
- * Requires MSW to be installed: npm install --save-dev msw
+ * Requires MSW to be installed and fetch globals available
+ *
+ * Note: These tests require proper polyfills (TextEncoder, fetch, Response, etc.)
+ * If running in Jest, ensure jest.setup.js includes necessary polyfills.
  */
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-// Check if MSW is available - skip entire file if not
-let mswAvailable = false;
-try {
-  require('msw');
-  mswAvailable = true;
-} catch {
-  // MSW not installed
-}
+// Check if required globals are available for MSW
+const mswAvailable = typeof global.Response !== 'undefined' && typeof global.fetch !== 'undefined';
 
 if (!mswAvailable) {
   describe('useApplications', () => {
-    it.skip('requires MSW to be installed', () => {});
+    it.skip('requires fetch polyfills to be available (install undici or run in proper environment)', () => {});
   });
 } else {
-  // Only load dependencies if MSW is available
   const { renderHook, act, waitFor } = require('@testing-library/react');
   const { useApplications } = require('./useApplications');
-  const { resetMockApplications, createMockApplication } = require('../test-utils/mocks/handlers');
+  const { resetMockApplications, createMockApplication, createMockInterviewStage } = require('../test-utils/mocks/handlers');
   const { server } = require('../test-utils/mocks/server');
 
   describe('useApplications', () => {
@@ -410,6 +406,125 @@ if (!mswAvailable) {
 
         const found = result.current.getApplicationById('non-existent');
         expect(found).toBeNull();
+      });
+    });
+
+    describe('interview stage operations', () => {
+      it('adds an interview stage to an application', async () => {
+        const mockApp = createMockApplication({ companyName: 'Interview Co', status: 'interviewing' });
+        resetMockApplications([mockApp]);
+
+        const { result } = renderHook(() => useApplications());
+
+        await waitFor(() => {
+          expect(result.current.applications).toHaveLength(1);
+        });
+
+        await act(async () => {
+          await result.current.addInterviewStage(mockApp.id, {
+            name: 'Phone Screen',
+            isCompleted: false,
+          });
+        });
+
+        await waitFor(() => {
+          const app = result.current.getApplicationById(mockApp.id);
+          expect(app?.interviewStages).toHaveLength(1);
+          expect(app?.interviewStages[0]?.name).toBe('Phone Screen');
+        });
+      });
+
+      it('updates an interview stage', async () => {
+        const mockStage = createMockInterviewStage({ name: 'Phone Screen', isCompleted: false });
+        const mockApp = createMockApplication({
+          companyName: 'Interview Co',
+          status: 'interviewing',
+          interviewStages: [mockStage],
+        });
+        resetMockApplications([mockApp]);
+
+        const { result } = renderHook(() => useApplications());
+
+        await waitFor(() => {
+          expect(result.current.applications).toHaveLength(1);
+        });
+
+        await act(async () => {
+          await result.current.updateInterviewStage(mockApp.id, mockStage.id, {
+            name: 'Phone Screen',
+            isCompleted: true,
+            completedDate: '2026-01-15',
+          });
+        });
+
+        await waitFor(() => {
+          const app = result.current.getApplicationById(mockApp.id);
+          expect(app?.interviewStages[0]?.isCompleted).toBe(true);
+          expect(app?.interviewStages[0]?.completedDate).toBe('2026-01-15');
+        });
+      });
+
+      it('removes an interview stage', async () => {
+        const mockStage = createMockInterviewStage({ name: 'Phone Screen' });
+        const mockApp = createMockApplication({
+          companyName: 'Interview Co',
+          status: 'interviewing',
+          interviewStages: [mockStage],
+        });
+        resetMockApplications([mockApp]);
+
+        const { result } = renderHook(() => useApplications());
+
+        await waitFor(() => {
+          const app = result.current.getApplicationById(mockApp.id);
+          expect(app?.interviewStages).toHaveLength(1);
+        });
+
+        await act(async () => {
+          await result.current.removeInterviewStage(mockApp.id, mockStage.id);
+        });
+
+        await waitFor(() => {
+          const app = result.current.getApplicationById(mockApp.id);
+          expect(app?.interviewStages).toHaveLength(0);
+        });
+      });
+
+      it('adds multiple interview stages independently', async () => {
+        const mockApp = createMockApplication({ companyName: 'Interview Co', status: 'interviewing' });
+        resetMockApplications([mockApp]);
+
+        const { result } = renderHook(() => useApplications());
+
+        await waitFor(() => {
+          expect(result.current.applications).toHaveLength(1);
+        });
+
+        // Add first stage
+        await act(async () => {
+          await result.current.addInterviewStage(mockApp.id, {
+            name: 'Phone Screen',
+          });
+        });
+
+        await waitFor(() => {
+          const app = result.current.getApplicationById(mockApp.id);
+          expect(app?.interviewStages).toHaveLength(1);
+        });
+
+        // Add second stage - should NOT delete the first one
+        await act(async () => {
+          await result.current.addInterviewStage(mockApp.id, {
+            name: 'Technical Interview',
+          });
+        });
+
+        await waitFor(() => {
+          const app = result.current.getApplicationById(mockApp.id);
+          expect(app?.interviewStages).toHaveLength(2);
+          expect(app?.interviewStages[0]?.name).toBe('Phone Screen');
+          expect(app?.interviewStages[1]?.name).toBe('Technical Interview');
+        });
       });
     });
   });

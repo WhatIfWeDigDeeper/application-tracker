@@ -21,7 +21,9 @@ import { CalendarIcon } from '@/assets/icons/CalendarIcon';
 export interface ApplicationDetailProps {
   application: JobApplication;
   onUpdate: (id: string, data: UpdateApplicationInput) => void;
-  onStagesChange: (stages: InterviewStage[]) => void;
+  onAddStage: (stage: InterviewStage) => Promise<void>;
+  onUpdateStage: (stageId: string, stage: InterviewStage) => Promise<void>;
+  onRemoveStage: (stageId: string) => Promise<void>;
   onEdit: () => void;
   onClose: () => void;
 }
@@ -66,7 +68,9 @@ function DetailRow({
 export function ApplicationDetail({
   application,
   onUpdate,
-  onStagesChange,
+  onAddStage,
+  onUpdateStage,
+  onRemoveStage,
   onEdit,
   onClose,
 }: ApplicationDetailProps): React.ReactElement {
@@ -78,10 +82,6 @@ export function ApplicationDetail({
     const newStatus = e.target.value as JobApplication['status'];
     onUpdate(application.id, { status: newStatus });
     setIsStatusChanging(false);
-  };
-
-  const handleInterviewStagesChange = (stages: InterviewStage[]): void => {
-    onStagesChange(stages);
   };
 
   const handleDueDateSave = (): void => {
@@ -273,7 +273,9 @@ export function ApplicationDetail({
         <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
           <InterviewChecklist
             stages={application.interviewStages}
-            onStagesChange={handleInterviewStagesChange}
+            onAddStage={onAddStage}
+            onUpdateStage={onUpdateStage}
+            onRemoveStage={onRemoveStage}
             isEditable={application.status === 'interviewing'}
           />
         </div>

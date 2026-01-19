@@ -12,13 +12,17 @@ import { DEFAULT_INTERVIEW_STAGES } from '@/lib/constants';
 
 export interface InterviewChecklistProps {
   stages: InterviewStageType[];
-  onStagesChange: (stages: InterviewStageType[]) => void;
+  onAddStage: (stage: InterviewStageType) => Promise<void>;
+  onUpdateStage: (stageId: string, stage: InterviewStageType) => Promise<void>;
+  onRemoveStage: (stageId: string) => Promise<void>;
   isEditable?: boolean;
 }
 
 export function InterviewChecklist({
   stages,
-  onStagesChange,
+  onAddStage,
+  onUpdateStage,
+  onRemoveStage,
   isEditable = true,
 }: InterviewChecklistProps): React.ReactElement {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -27,17 +31,15 @@ export function InterviewChecklist({
   const sortedStages = [...stages].sort((a, b) => a.order - b.order);
 
   const handleToggleComplete = (stageId: string): void => {
-    const updatedStages = stages.map((stage) => {
-      if (stage.id === stageId) {
-        return {
-          ...stage,
-          isCompleted: !stage.isCompleted,
-          completedDate: !stage.isCompleted ? getCurrentDateISO() : undefined,
-        };
-      }
-      return stage;
-    });
-    onStagesChange(updatedStages);
+    const stage = stages.find((s) => s.id === stageId);
+    if (stage) {
+      const updatedStage = {
+        ...stage,
+        isCompleted: !stage.isCompleted,
+        completedDate: !stage.isCompleted ? getCurrentDateISO() : undefined,
+      };
+      onUpdateStage(stageId, updatedStage);
+    }
   };
 
   const handleEditStage = (stage: InterviewStageType): void => {
@@ -53,20 +55,15 @@ export function InterviewChecklist({
   const handleFormSubmit = (data: InterviewStageInput): void => {
     if (editingStage) {
       // Update existing stage
-      const updatedStages = stages.map((stage) => {
-        if (stage.id === editingStage.id) {
-          return {
-            ...stage,
-            name: data.name,
-            isCompleted: data.isCompleted ?? false,
-            completedDate: data.completedDate,
-            notes: data.notes,
-            performanceRating: data.performanceRating,
-          };
-        }
-        return stage;
-      });
-      onStagesChange(updatedStages);
+      const updatedStage: InterviewStageType = {
+        ...editingStage,
+        name: data.name,
+        isCompleted: data.isCompleted ?? false,
+        completedDate: data.completedDate,
+        notes: data.notes,
+        performanceRating: data.performanceRating,
+      };
+      onUpdateStage(editingStage.id, updatedStage);
     } else {
       // Add new stage
       const maxOrder = stages.length > 0 ? Math.max(...stages.map((s) => s.order)) : -1;
@@ -79,7 +76,7 @@ export function InterviewChecklist({
         notes: data.notes,
         performanceRating: data.performanceRating,
       };
-      onStagesChange([...stages, newStage]);
+      onAddStage(newStage);
     }
     setIsFormOpen(false);
     setEditingStage(null);
@@ -87,10 +84,7 @@ export function InterviewChecklist({
 
   const handleDeleteStage = (): void => {
     if (editingStage) {
-      const updatedStages = stages
-        .filter((stage) => stage.id !== editingStage.id)
-        .map((stage, index) => ({ ...stage, order: index }));
-      onStagesChange(updatedStages);
+      onRemoveStage(editingStage.id);
       setIsFormOpen(false);
       setEditingStage(null);
     }
@@ -101,12 +95,14 @@ export function InterviewChecklist({
     setEditingStage(null);
   };
 
-  const handleResetToDefault = (): void => {
+  const handleResetToDefault = async (): Promise<void> => {
     const defaultStages: InterviewStageType[] = DEFAULT_INTERVIEW_STAGES.map((stage) => ({
       ...stage,
       id: generateId(),
     }));
-    onStagesChange(defaultStages);
+    for (const stage of defaultStages) {
+      await onAddStage(stage);
+    }
   };
 
   const completedCount = stages.filter((s) => s.isCompleted).length;

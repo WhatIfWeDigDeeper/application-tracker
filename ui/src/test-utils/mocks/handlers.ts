@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { JobApplication } from '@/types/application';
+import type { JobApplication, InterviewStage, InterviewStageInput } from '@/types/application';
 
 const API_URL = 'http://localhost:3001';
 
@@ -15,6 +15,16 @@ export function createMockApplication(overrides: Partial<JobApplication> = {}): 
     interviewStages: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+export function createMockInterviewStage(overrides: Partial<InterviewStage> = {}): InterviewStage {
+  return {
+    id: `stage-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    name: 'Phone Screen',
+    order: 0,
+    isCompleted: false,
     ...overrides,
   };
 }
@@ -136,7 +146,7 @@ export const handlers = [
     return HttpResponse.json(updated);
   }),
 
-  // Interview stages
+  // Interview stages - List
   http.get(`${API_URL}/applications/:id/interview-stages`, ({ params }) => {
     const app = mockApplications.find((a) => a.id === params.id);
     if (!app) {
@@ -146,5 +156,80 @@ export const handlers = [
       );
     }
     return HttpResponse.json(app.interviewStages);
+  }),
+
+  // Interview stages - Create
+  http.post(`${API_URL}/applications/:appId/interview-stages`, async ({ params, request }) => {
+    const app = mockApplications.find((a) => a.id === params.appId);
+    if (!app) {
+      return HttpResponse.json(
+        { error: 'not_found', message: 'Application not found' },
+        { status: 404 }
+      );
+    }
+    const body = await request.json() as InterviewStageInput & { id?: string; order?: number };
+    const newStage: InterviewStage = {
+      id: body.id || `stage-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      name: body.name,
+      order: body.order ?? app.interviewStages.length,
+      isCompleted: body.isCompleted ?? false,
+      completedDate: body.completedDate,
+      notes: body.notes,
+      performanceRating: body.performanceRating,
+    };
+    app.interviewStages.push(newStage);
+    return HttpResponse.json(newStage, { status: 201 });
+  }),
+
+  // Interview stages - Update
+  http.patch(`${API_URL}/applications/:appId/interview-stages/:stageId`, async ({ params, request }) => {
+    const app = mockApplications.find((a) => a.id === params.appId);
+    if (!app) {
+      return HttpResponse.json(
+        { error: 'not_found', message: 'Application not found' },
+        { status: 404 }
+      );
+    }
+    const stageIndex = app.interviewStages.findIndex((s) => s.id === params.stageId);
+    if (stageIndex === -1) {
+      return HttpResponse.json(
+        { error: 'not_found', message: 'Interview stage not found' },
+        { status: 404 }
+      );
+    }
+    const body = await request.json() as Partial<InterviewStage>;
+    const existingStage = app.interviewStages[stageIndex];
+    if (existingStage) {
+      const updatedStage: InterviewStage = {
+        ...existingStage,
+        ...body,
+      };
+      app.interviewStages[stageIndex] = updatedStage;
+      return HttpResponse.json(updatedStage);
+    }
+    return HttpResponse.json(
+      { error: 'not_found', message: 'Interview stage not found' },
+      { status: 404 }
+    );
+  }),
+
+  // Interview stages - Delete
+  http.delete(`${API_URL}/applications/:appId/interview-stages/:stageId`, ({ params }) => {
+    const app = mockApplications.find((a) => a.id === params.appId);
+    if (!app) {
+      return HttpResponse.json(
+        { error: 'not_found', message: 'Application not found' },
+        { status: 404 }
+      );
+    }
+    const stageIndex = app.interviewStages.findIndex((s) => s.id === params.stageId);
+    if (stageIndex === -1) {
+      return HttpResponse.json(
+        { error: 'not_found', message: 'Interview stage not found' },
+        { status: 404 }
+      );
+    }
+    app.interviewStages.splice(stageIndex, 1);
+    return new HttpResponse(null, { status: 204 });
   }),
 ];

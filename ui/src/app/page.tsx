@@ -28,7 +28,9 @@ export default function Home(): React.ReactElement {
     restoreApplication,
     setFilters: setHookFilters,
     setSort: setHookSort,
-    setInterviewStages,
+    addInterviewStage,
+    updateInterviewStage,
+    removeInterviewStage,
     getApplicationById,
   } = useApplications();
 
@@ -84,15 +86,25 @@ export default function Home(): React.ReactElement {
     updateApplication(id, data);
   };
 
-  const handleDetailStagesChange = (stages: InterviewStage[]): void => {
+  const handleAddStage = async (stage: InterviewStage): Promise<void> => {
     if (selectedApplication) {
-      // Update stages using the hook
-      setInterviewStages(selectedApplication.id, stages);
-
+      await addInterviewStage(selectedApplication.id, stage);
       // Auto-transition to 'interviewing' status if adding stages while 'applied'
-      if (selectedApplication.status === 'applied' && stages.length > 0) {
+      if (selectedApplication.status === 'applied') {
         updateApplication(selectedApplication.id, { status: 'interviewing' });
       }
+    }
+  };
+
+  const handleUpdateStage = async (stageId: string, stage: InterviewStage): Promise<void> => {
+    if (selectedApplication) {
+      await updateInterviewStage(selectedApplication.id, stageId, stage);
+    }
+  };
+
+  const handleRemoveStage = async (stageId: string): Promise<void> => {
+    if (selectedApplication) {
+      await removeInterviewStage(selectedApplication.id, stageId);
     }
   };
 
@@ -198,7 +210,9 @@ export default function Home(): React.ReactElement {
           <ApplicationDetail
             application={selectedApplication}
             onUpdate={handleDetailUpdate}
-            onStagesChange={handleDetailStagesChange}
+            onAddStage={handleAddStage}
+            onUpdateStage={handleUpdateStage}
+            onRemoveStage={handleRemoveStage}
             onEdit={handleEditFromDetail}
             onClose={handleCloseDetail}
           />
