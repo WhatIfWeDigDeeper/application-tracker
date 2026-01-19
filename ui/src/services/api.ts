@@ -49,10 +49,46 @@ async function apiCall<T>(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ApiData = any;
 
+export interface ListApplicationsParams {
+  status?: string[];
+  companyCategory?: string[];
+  jobSource?: string[];
+  includeArchived?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+function buildQueryString(params: ListApplicationsParams): string {
+  const searchParams = new URLSearchParams();
+
+  // For array params, join with comma (server expects single string)
+  if (params.status && params.status.length > 0) {
+    searchParams.set('status', params.status.join(','));
+  }
+  if (params.companyCategory && params.companyCategory.length > 0) {
+    searchParams.set('companyCategory', params.companyCategory.join(','));
+  }
+  if (params.jobSource && params.jobSource.length > 0) {
+    searchParams.set('jobSource', params.jobSource.join(','));
+  }
+  if (params.includeArchived !== undefined) {
+    searchParams.set('includeArchived', String(params.includeArchived));
+  }
+  if (params.page !== undefined) {
+    searchParams.set('page', String(params.page));
+  }
+  if (params.limit !== undefined) {
+    searchParams.set('limit', String(params.limit));
+  }
+
+  const queryString = searchParams.toString();
+  return queryString ? `?${queryString}` : '';
+}
+
 // Applications endpoints
 export const applicationsApi = {
-  list: (): Promise<ApiData> =>
-    apiCall<ApiData>('/applications'),
+  list: (params?: ListApplicationsParams): Promise<ApiData> =>
+    apiCall<ApiData>(`/applications${params ? buildQueryString(params) : ''}`),
 
   get: (id: string): Promise<ApiData> =>
     apiCall<ApiData>(`/applications/${id}`),
@@ -76,12 +112,12 @@ export const applicationsApi = {
 
   archive: (id: string): Promise<ApiData> =>
     apiCall<ApiData>(`/applications/${id}/archive`, {
-      method: 'PATCH',
+      method: 'POST',
     }),
 
   restore: (id: string): Promise<ApiData> =>
     apiCall<ApiData>(`/applications/${id}/restore`, {
-      method: 'PATCH',
+      method: 'POST',
     }),
 };
 

@@ -80,38 +80,18 @@ export function useApplications(): UseApplicationsReturn {
     setError(null);
 
     try {
-      const result = await applicationsApi.list();
+      // Pass filters to API for server-side filtering
+      const result = await applicationsApi.list({
+        status: filters.status,
+        companyCategory: filters.companyCategory,
+        jobSource: filters.jobSource,
+        includeArchived: filters.includeArchived,
+      });
       let apps = Array.isArray(result) ? result : ((result as { items: JobApplication[] })?.items || []);
 
-      // Apply filters
+      // Apply client-side filters for fields not supported by API
       apps = apps.filter((app: JobApplication) => {
-        // Archive filter
-        if (!filters.includeArchived && app.isArchived) {
-          return false;
-        }
-
-        // Status filter
-        if (filters.status && filters.status.length > 0) {
-          if (!filters.status.includes(app.status)) {
-            return false;
-          }
-        }
-
-        // Company category filter
-        if (filters.companyCategory && filters.companyCategory.length > 0) {
-          if (!app.companyCategory || !filters.companyCategory.includes(app.companyCategory)) {
-            return false;
-          }
-        }
-
-        // Job source filter
-        if (filters.jobSource && filters.jobSource.length > 0) {
-          if (!app.jobSource || !filters.jobSource.includes(app.jobSource)) {
-            return false;
-          }
-        }
-
-        // Skills match minimum filter
+        // Skills match minimum filter (not supported by API)
         if (filters.skillsMatchMin !== undefined && filters.skillsMatchMin > 0) {
           if (!app.skillsMatch || app.skillsMatch < filters.skillsMatchMin) {
             return false;

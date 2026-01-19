@@ -23,9 +23,10 @@ export const errorHandler = (
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _next: NextFunction
 ) => {
-  console.error("Error:", err);
+  console.error("Error:", err.message, err.stack);
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({

@@ -12,10 +12,15 @@ export class ApplicationService {
 
     const skip = (page - 1) * limit;
 
+    // Parse comma-separated values into arrays for 'in' queries
+    const statusList = status ? status.split(',').filter(Boolean) : null;
+    const categoryList = companyCategory ? companyCategory.split(',').filter(Boolean) : null;
+    const sourceList = jobSource ? jobSource.split(',').filter(Boolean) : null;
+
     const where = {
-      ...(status && { status }),
-      ...(companyCategory && { companyCategory }),
-      ...(jobSource && { jobSource }),
+      ...(statusList && statusList.length > 0 && { status: { in: statusList } }),
+      ...(categoryList && categoryList.length > 0 && { companyCategory: { in: categoryList } }),
+      ...(sourceList && sourceList.length > 0 && { jobSource: { in: sourceList } }),
       ...(!includeArchived && { isArchived: false }),
     };
 
