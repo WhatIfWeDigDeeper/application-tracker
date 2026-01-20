@@ -1,0 +1,488 @@
+openapi: 3.0.3
+info:
+  title: Application Tracker API
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /applications:
+    get:
+      summary: List applications
+      parameters:
+        - in: query
+          name: includeArchived
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: companyCategory
+          schema:
+            type: string
+        - in: query
+          name: jobSource
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of applications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedApplications'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApplicationInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobApplication'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /applications/{id}:
+    get:
+      summary: Get application by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobApplication'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Update application
+      description: |
+        Partial update. Send only the fields that changed. Unspecified fields remain unchanged.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateApplicationInput'
+            examples:
+              statusOnly:
+                summary: Update status only
+                value:
+                  status: interviewing
+              addOfferDueDate:
+                summary: Set offer due date without touching other fields
+                value:
+                  offerDueDate: 2026-03-15
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobApplication'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete application
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /applications/{id}/interview-stages:
+    post:
+      summary: Add interview stage
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterviewStageInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterviewStage'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /applications/{id}/interview-stages/{stageId}:
+    patch:
+      summary: Update interview stage
+      description: |
+        Partial update. Send only the fields that changed. Unspecified fields remain unchanged.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: stageId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterviewStageInput'
+            examples:
+              minimalUpdate:
+                summary: Toggle completion only
+                value:
+                  isCompleted: true
+                  completedDate: 2026-01-19
+              withNotes:
+                summary: Update rating and notes without touching other fields
+                value:
+                  performanceRating: 4
+                  notes: "Great communication"
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterviewStage'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete interview stage
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: stageId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    PaginatedApplications:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobApplication'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+    JobApplication:
+      type: object
+      properties:
+        id:
+          type: string
+        companyName:
+          type: string
+        positionTitle:
+          type: string
+        dateApplied:
+          type: string
+          format: date-time
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        companyUrl:
+          type: string
+        jobPostingUrl:
+          type: string
+        companyCareerUrl:
+          type: string
+        companyCategory:
+          type: string
+        skillsMatch:
+          type: integer
+        jobSource:
+          type: string
+        coverLetterRequired:
+          type: boolean
+        specialRequirements:
+          type: string
+        salaryMin:
+          type: integer
+        salaryMax:
+          type: integer
+        notes:
+          type: string
+        offerDueDate:
+          type: string
+          format: date-time
+        isArchived:
+          type: boolean
+        interviewStages:
+          type: array
+          items:
+            $ref: '#/components/schemas/InterviewStage'
+    InterviewStage:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        order:
+          type: integer
+        isCompleted:
+          type: boolean
+        completedDate:
+          type: string
+          format: date-time
+        notes:
+          type: string
+        performanceRating:
+          type: integer
+    CreateApplicationInput:
+      type: object
+      required: [companyName, positionTitle]
+      properties:
+        companyName:
+          type: string
+        positionTitle:
+          type: string
+        dateApplied:
+          type: string
+          format: date-time
+        companyUrl:
+          type: string
+        jobPostingUrl:
+          type: string
+        companyCareerUrl:
+          type: string
+        companyCategory:
+          type: string
+        skillsMatch:
+          type: integer
+        jobSource:
+          type: string
+        coverLetterRequired:
+          type: boolean
+        specialRequirements:
+          type: string
+        salaryMin:
+          type: integer
+        salaryMax:
+          type: integer
+        notes:
+          type: string
+    UpdateApplicationInput:
+      type: object
+      properties:
+        companyName:
+          type: string
+        positionTitle:
+          type: string
+        dateApplied:
+          type: string
+          format: date-time
+        status:
+          type: string
+        companyUrl:
+          type: string
+        jobPostingUrl:
+          type: string
+        companyCareerUrl:
+          type: string
+        companyCategory:
+          type: string
+        skillsMatch:
+          type: integer
+        jobSource:
+          type: string
+        coverLetterRequired:
+          type: boolean
+        specialRequirements:
+          type: string
+        salaryMin:
+          type: integer
+        salaryMax:
+          type: integer
+        notes:
+          type: string
+        offerDueDate:
+          type: string
+          format: date-time

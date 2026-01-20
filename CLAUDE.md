@@ -65,5 +65,35 @@ Template repository with Claude Code skills, commands, and configuration for Nod
 - TypeScript 5.x (strict mode enabled) + React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling) (001-job-application-tracker)
 - localStorage (browser-based, no server-side persistence) (001-job-application-tracker)
 
+## API Design Patterns
+
+### Individual Operations Over Batch Replace
+When managing nested resources (e.g., interview stages within applications):
+- **Prefer individual CRUD operations** (`addStage`, `updateStage`, `removeStage`) over batch replace operations (`setStages`)
+- Batch replace typically deletes all existing items before creating new ones, causing unexpected DELETE calls
+- Individual operations are more predictable and efficient (only the intended HTTP method is called)
+
+### Callback Patterns for Components
+When components manage child resources:
+- Pass individual callbacks (`onAdd`, `onUpdate`, `onRemove`) instead of a single `onChange` with full state
+- This allows parent components to make targeted API calls without needing to diff arrays
+
+## Testing Patterns
+
+### MSW for API Mocking
+- MSW handlers are in `ui/src/test-utils/mocks/handlers.ts`
+- Server setup in `ui/src/test-utils/mocks/server.ts`
+- Requires fetch polyfills (TextEncoder, Response, etc.) in Jest environment
+
+### Component Tests with Modals
+- Use `cleanup()` after each test when testing components with portals/modals
+- Create fresh mock functions per test using factory pattern (`createMockProps()`)
+- Use `waitFor()` when interacting with modals to ensure they're rendered
+
+### Test File Organization
+- Hook tests: `src/hooks/*.test.ts`
+- Component tests: `src/components/**/*.test.tsx`
+- Service tests: `src/__tests__/services/*.test.ts`
+
 ## Recent Changes
 - 001-job-application-tracker: Added TypeScript 5.x (strict mode enabled) + React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling)

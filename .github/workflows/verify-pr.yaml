@@ -23,13 +23,13 @@ jobs:
         run: npm run audit:ci
 
       - name: Install npm packages
-        run: npm ci
+        run: npm run ci:all
 
       - name: Lint
         run: npm run lint
 
-      - name: Compile
-        run: npm run compile
+      - name: Build
+        run: npm run build
 
       - name: Test
         run: npm test

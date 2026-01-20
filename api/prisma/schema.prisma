@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id                      String   @id @default(uuid())
+  companyName             String
+  positionTitle           String
+  dateApplied             DateTime?
+  status                  String   @default("unsubmitted")
+  companyUrl              String?
+  jobPostingUrl           String?
+  companyCareerUrl        String?
+  companyCategory         String?
+  skillsMatch             Int?
+  jobSource               String?
+  coverLetterRequired     Boolean?
+  specialRequirements     String?
+  salaryMin               Int?
+  salaryMax               Int?
+  notes                   String?
+  offerDueDate            DateTime?
+  isArchived              Boolean  @default(false)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  interviewStages         InterviewStage[]
+
+  @@index([status])
+  @@index([isArchived])
+}
+
+model InterviewStage {
+  id                String      @id @default(uuid())
+  applicationId     String
+  name              String
+  order             Int
+  isCompleted       Boolean     @default(false)
+  completedDate     DateTime?
+  notes             String?
+  performanceRating Int?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  application       Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
+
+enum ApplicationStatus {
+  unsubmitted
+  applied
+  interviewing
+  offered
+  rejected
+  accepted
+}
+
+enum CompanyCategory {
+  startup
+  scale_up
+  mid_market
+  enterprise
+  other
+}
+
+enum JobSource {
+  referral
+  job_board
+  company_website
+  recruiter
+  other
+}
