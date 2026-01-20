@@ -88,3 +88,9 @@ Note: had to add rule about not using prefix of "I" to interfaces. Chose to upda
 - /api/health returns 200
 - UI can call API endpoints for applications and interview stages"
 ```
+
+## Make tech agnostic specs
+
+```text
+ want to have specs for the existing implementation such that Claude could look at the specs and create the application with different technology, such as Vue instead of React, and parse server instead of Express. I have used the speckit to create three specs. They have drifted as the code has been developed iteratively. Recommend an approach to be able to have sufficient specs on the app to then be able to run Claude agents in parallel to implement with different technology
+ ```
