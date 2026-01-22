@@ -12,7 +12,7 @@ export interface HeaderProps {
 }
 
 export function Header({
-  title = 'Job Application Tracker',
+  title = 'Job Application Tracker (React - Express - Prisma)',
   children,
   className,
   showThemeToggle = true,

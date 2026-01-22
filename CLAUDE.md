@@ -55,6 +55,10 @@ Template repository with Claude Code skills, commands, and configuration for Nod
 
 - `bash .claude/scripts/validate-markdown.sh` - Check markdown formatting
 
+## Documentation Guidelines
+
+- **NEVER create documentation at repository root** - use `/docs/` or `implementations/<name>/docs/`
+
 ## Key Patterns
 
 - **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`
@@ -64,6 +68,80 @@ Template repository with Claude Code skills, commands, and configuration for Nod
 ## Active Technologies
 - TypeScript 5.x (strict mode enabled) + React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling) (001-job-application-tracker)
 - localStorage (browser-based, no server-side persistence) (001-job-application-tracker)
+- PostgreSQL 18 (single database with multiple schemas for different implementations)
+
+## Database Architecture
+
+### Multi-Schema Organization
+All implementations share a single PostgreSQL database (`app_tracker`) but use separate schemas for isolation:
+
+- **express_prisma** - Root Express + Prisma implementation
+- **react_koa** - React + Koa + PostgreSQL (raw SQL) implementation
+- **svelte_hono** - Svelte + Hono + Drizzle ORM implementation
+- **vue_parse** - Vue + Parse Server implementation
+
+### Connection Strings
+Each implementation uses schema-aware connection strings:
+```
+postgresql://postgres:postgres@localhost:5432/app_tracker?schema=<schema_name>
+```
+
+### Schema Configuration by Implementation
+
+**Root (Express + Prisma):**
+- Schema defined in: `api/prisma/schema.prisma`
+- Uses `@@schema("express_prisma")` directive
+
+**React-Koa-PG:**
+- Schema defined in: `implementations/react-koa-pg/koa-api/src/db/schema.sql`
+- Creates `react_koa` schema at the top of the file
+- Uses `SET search_path TO react_koa;`
+
+**Svelte-Hono-Drizzle:**
+- Schema defined in: `implementations/svelte-hono-drizzle/hono-api/src/db/schema.ts`
+- Uses Drizzle's `pgSchema('svelte_hono')`
+- Config in: `drizzle.config.ts` with `schemaFilter: ['svelte_hono']`
+
+**Vue-Parse-Server:**
+- Parse Server manages schema automatically in `vue_parse` schema
+- Connection configured in: `implementations/vue-parse-server/parse-server-api/src/config/index.ts`
+
+### Benefits
+- **Resource efficiency**: Single PostgreSQL instance
+- **Data isolation**: Each implementation has its own namespace
+- **Easy comparison**: All data accessible from one database
+- **Independent operation**: Schemas don't interfere with each other
+
+## Code Quality Requirements
+
+### After Adding or Modifying Code
+**Always complete the validation chain** after making code changes:
+
+1. **Add tests** - Create or update tests for new functionality
+2. **Run tests** - Execute `npm test` to verify all tests pass
+3. **Run linting** - Execute `npm run lint` to check code style
+4. **Run build** - Execute `npm run build` to verify compilation
+
+**When to skip steps:**
+- Trivial changes (typo fixes, comment updates) - skip all
+- Test-only changes - skip step 1, run steps 2-4
+- Documentation-only changes - skip all
+
+**Note:** Skills like `add-component`, `add-api-route`, and `add-hook` already include these steps.
+
+## Dependency Management
+
+### Package Version Selection
+When installing **new packages**:
+- Always use the **latest stable version** unless there are breaking changes with existing dependencies
+- Check for compatibility issues with the project's Node.js version and other installed packages
+- Document any version constraints in comments if pinning is necessary
+- Use exact versions in package.json (no ^ or ~) for reproducibility
+- If the package does not contain Typescript types, check if there is an @types/{package name} and install if so
+
+When **updating existing packages**:
+- Use the `update-deps` skill for systematic updates with validation
+- Test the validation chain (`build` → `lint` → `test` → `test:e2e`) after updates
 
 ## API Design Patterns
 
