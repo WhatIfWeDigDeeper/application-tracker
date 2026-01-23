@@ -35,17 +35,10 @@ function handleMouseLeave() {
   hoverValue.value = null;
 }
 
-function handleKeyDown(event: KeyboardEvent) {
-  const currentValue = props.modelValue ?? 0;
-
-  if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+function handleKeyDown(event: KeyboardEvent, value: number) {
+  if (event.key === ' ' || event.key === 'Enter') {
     event.preventDefault();
-    const newValue = Math.min(currentValue + 1, maxStars);
-    emit('update:modelValue', newValue);
-  } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
-    event.preventDefault();
-    const newValue = Math.max(currentValue - 1, props.allowClear ? 0 : 1);
-    emit('update:modelValue', newValue || null);
+    handleClick(value);
   }
 }
 </script>
@@ -53,19 +46,20 @@ function handleKeyDown(event: KeyboardEvent) {
 <template>
   <div
     class="flex items-center"
-    role="slider"
-    :aria-valuenow="modelValue ?? 0"
-    :aria-valuemin="allowClear ? 0 : 1"
-    :aria-valuemax="5"
-    tabindex="0"
-    @keydown="handleKeyDown"
+    role="radiogroup"
+    aria-label="Rating"
   >
     <button
       v-for="i in maxStars"
       :key="i"
       type="button"
-      class="p-0.5 focus:outline-none"
+      role="radio"
+      class="p-0.5 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+      :tabindex="modelValue === i ? 0 : -1"
+      :aria-checked="modelValue === i"
+      :aria-label="`${i} stars`"
       @click="handleClick(i)"
+      @keydown="(e) => handleKeyDown(e, i)"
       @mouseenter="handleMouseEnter(i)"
       @mouseleave="handleMouseLeave"
     >
