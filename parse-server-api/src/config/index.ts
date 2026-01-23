@@ -19,7 +19,7 @@ try {
 }
 
 // Validate schema name to prevent SQL injection
-function validateSchemaName(schema: string): string {
+export function validateSchemaName(schema: string): string {
   if (!/^[a-z_][a-z0-9_]*$/i.test(schema)) {
     throw new Error(`Invalid schema name: ${schema}. Schema names must start with a letter or underscore and contain only alphanumeric characters and underscores.`);
   }
