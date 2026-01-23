@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, integer, boolean, date, timestamp, pgEnum, pgSchema } from 'drizzle-orm/pg-core';
+import { uuid, varchar, text, integer, boolean, date, timestamp, pgSchema } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Define the svelte_hono schema

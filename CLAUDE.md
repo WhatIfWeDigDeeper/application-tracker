@@ -93,18 +93,18 @@ postgresql://postgres:postgres@localhost:5432/app_tracker?schema=<schema_name>
 - Uses `@@schema("express_prisma")` directive
 
 **React-Koa-PG:**
-- Schema defined in: `implementations/react-koa-pg/koa-api/src/db/schema.sql`
+- Schema defined in: `koa-api/src/db/schema.sql`
 - Creates `react_koa` schema at the top of the file
 - Uses `SET search_path TO react_koa;`
 
 **Svelte-Hono-Drizzle:**
-- Schema defined in: `implementations/svelte-hono-drizzle/hono-api/src/db/schema.ts`
+- Schema defined in: `hono-api/src/db/schema.ts`
 - Uses Drizzle's `pgSchema('svelte_hono')`
 - Config in: `drizzle.config.ts` with `schemaFilter: ['svelte_hono']`
 
 **Vue-Parse-Server:**
 - Parse Server manages schema automatically in `vue_parse` schema
-- Connection configured in: `implementations/vue-parse-server/parse-server-api/src/config/index.ts`
+- Connection configured in: `parse-server-api/src/config/index.ts`
 
 ### Benefits
 - **Resource efficiency**: Single PostgreSQL instance
