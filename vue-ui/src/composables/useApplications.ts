@@ -141,6 +141,19 @@ export function useApplications() {
     }
   }
 
+  function setFilters(updates: Partial<FilterState>) {
+    // Batch update multiple filters at once to avoid triggering multiple fetches
+    const shouldResetPage = Object.keys(updates).some(key => key !== 'page');
+    
+    // Type-safe batch update using Object.assign
+    Object.assign(filters.value, updates);
+    
+    // Reset to page 1 when any filter other than page changes
+    if (shouldResetPage && !('page' in updates)) {
+      filters.value.page = 1;
+    }
+  }
+
   function resetFilters() {
     filters.value = { ...defaultFilters };
   }
@@ -193,6 +206,7 @@ export function useApplications() {
     archiveApplication,
     restoreApplication,
     setFilter,
+    setFilters,
     resetFilters,
     nextPage,
     prevPage,

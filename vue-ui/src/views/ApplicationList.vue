@@ -21,7 +21,7 @@ const {
   archiveApplication,
   restoreApplication,
   deleteApplication,
-  setFilter,
+  setFilters,
   resetFilters,
   goToPage,
 } = useApplications();
@@ -87,9 +87,7 @@ function handleCancelDelete() {
 }
 
 function handleFilterUpdate(updates: Partial<typeof filters.value>) {
-  Object.entries(updates).forEach(([key, value]) => {
-    setFilter(key as keyof typeof filters.value, value);
-  });
+  setFilters(updates);
 }
 
 function handlePageChange(page: number) {

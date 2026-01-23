@@ -24,13 +24,13 @@ export function formatSalaryRange(
   min: number | null,
   max: number | null
 ): string {
-  if (min && max) {
+  if (min != null && max != null) {
     return `${formatCurrency(min)} - ${formatCurrency(max)}`;
   }
-  if (min) {
+  if (min != null) {
     return `From ${formatCurrency(min)}`;
   }
-  if (max) {
+  if (max != null) {
     return `Up to ${formatCurrency(max)}`;
   }
   return "";
