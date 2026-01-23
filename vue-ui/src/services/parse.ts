@@ -1,4 +1,4 @@
-import Parse from 'parse';
+import Parse from '@/lib/parse';
 import type {
   Application,
   InterviewStage,

@@ -105,6 +105,7 @@ postgresql://postgres:postgres@localhost:5432/app_tracker?schema=<schema_name>
 **Vue-Parse-Server:**
 - Parse Server manages schema automatically in `vue_parse` schema
 - Connection configured in: `parse-server-api/src/config/index.ts`
+- **Vite Compatibility**: Parse SDK has a known issue with Vite due to LiveQuery's use of Node.js `events` module. The solution is a wrapper at `vue-ui/src/lib/parse.ts` that imports `parse/dist/parse.min.js` (which assigns Parse to `window.Parse`)
 
 ### Benefits
 - **Resource efficiency**: Single PostgreSQL instance
@@ -155,6 +156,26 @@ When managing nested resources (e.g., interview stages within applications):
 When components manage child resources:
 - Pass individual callbacks (`onAdd`, `onUpdate`, `onRemove`) instead of a single `onChange` with full state
 - This allows parent components to make targeted API calls without needing to diff arrays
+
+## Running E2E Tests
+
+### Prerequisites
+Before running e2e tests, ensure the required backend services are running:
+
+| Implementation | UI Port | API Port | Start API Command |
+|---------------|---------|----------|-------------------|
+| Next.js + Express | 3000 | 5000 | `cd api && npm run dev` |
+| React + Koa | 3010 | 5010 | `cd koa-api && npm run dev` |
+| Vue + Parse | 3020 | 5001 | `cd parse-server-api && npm run dev` |
+| Svelte + Hono | 3030 | 5030 | `cd hono-api && npm run dev` |
+
+### Running Tests
+```bash
+# For vue-ui (requires parse-server-api running on port 5001)
+cd vue-ui && npm run test:e2e
+
+# For other implementations, start their respective API first
+```
 
 ## Testing Patterns
 

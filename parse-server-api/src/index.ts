@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { ParseServer } from 'parse-server';
+import ParseServerModule from 'parse-server';
 import { config } from './config';
 import { Client } from 'pg';
 
@@ -21,10 +21,11 @@ app.get('/health', (_req, res) => {
 });
 
 // Create Parse Server instance
-const parseServer = new ParseServer({
+const parseServer = new (ParseServerModule as any)({
   databaseURI: config.databaseURI,
   appId: config.appId,
   masterKey: config.masterKey,
+  maintenanceKey: config.maintenanceKey,
   javascriptKey: config.javascriptKey,
   serverURL: config.serverURL,
   cloud: `${__dirname}/cloud/index`,

@@ -24,6 +24,7 @@ export const config = {
   schema: process.env.DATABASE_SCHEMA || 'vue_parse',
   appId: process.env.APP_ID || 'job-tracker-app',
   masterKey: process.env.MASTER_KEY || 'master-key-change-in-production',
+  maintenanceKey: process.env.MAINTENANCE_KEY || 'maintenance-key-change-in-production',
   javascriptKey: process.env.JS_KEY || 'js-key-change-in-production',
   serverURL: process.env.SERVER_URL || 'http://localhost:5001/parse',
   port: parseInt(process.env.PORT || '5001', 10),

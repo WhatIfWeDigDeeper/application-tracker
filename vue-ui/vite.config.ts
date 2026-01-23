@@ -7,7 +7,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      'parse': 'parse/dist/parse.min.js',
     },
   },
   server: {
