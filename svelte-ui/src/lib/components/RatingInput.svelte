@@ -33,7 +33,7 @@
       type="button"
       role="radio"
       class="focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
-      tabindex={value === star ? 0 : -1}
+      tabindex={value === star || (value === null && star === 1) ? 0 : -1}
       onclick={() => handleClick(star)}
       onkeydown={(e) => handleKeyDown(e, star)}
       onmouseenter={() => (hoverValue = star)}

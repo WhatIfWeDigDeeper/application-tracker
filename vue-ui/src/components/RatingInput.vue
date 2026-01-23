@@ -55,7 +55,7 @@ function handleKeyDown(event: KeyboardEvent, value: number) {
       type="button"
       role="radio"
       class="p-0.5 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
-      :tabindex="modelValue === i ? 0 : -1"
+      :tabindex="modelValue === i || (modelValue == null && i === 1) ? 0 : -1"
       :aria-checked="modelValue === i ? 'true' : 'false'"
       :aria-label="`${i} stars`"
       @click="handleClick(i)"

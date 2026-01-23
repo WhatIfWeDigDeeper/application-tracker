@@ -105,7 +105,7 @@ describe('RatingInput', () => {
       expect(fiveStarRadio.getAttribute('tabindex')).toBe('-1');
     });
 
-    it('all stars have tabindex="-1" when no rating is selected', () => {
+    it('first star has tabindex="0" when no rating is selected', () => {
       render(RatingInput, {
         props: {
           value: null,
@@ -113,9 +113,11 @@ describe('RatingInput', () => {
         },
       });
 
-      const radios = screen.getAllByRole('radio');
-      // When nothing is selected, all should have tabindex="-1"
-      radios.forEach((radio) => {
+      const firstStarRadio = screen.getByRole('radio', { name: '1 stars' });
+      const otherRadios = screen.getAllByRole('radio').slice(1);
+      
+      expect(firstStarRadio.getAttribute('tabindex')).toBe('0');
+      otherRadios.forEach((radio) => {
         expect(radio.getAttribute('tabindex')).toBe('-1');
       });
     });

@@ -105,10 +105,11 @@ describe('RatingInput', () => {
         },
       });
 
-      const radios = screen.getAllByRole('radio');
-      // When nothing is selected, none should have tabindex="0" in this implementation
-      // but all should be focusable via tabindex="-1"
-      radios.forEach((radio) => {
+      const firstStarRadio = screen.getByRole('radio', { name: '1 stars' });
+      const otherRadios = screen.getAllByRole('radio').slice(1);
+      
+      expect(firstStarRadio.getAttribute('tabindex')).toBe('0');
+      otherRadios.forEach((radio) => {
         expect(radio.getAttribute('tabindex')).toBe('-1');
       });
     });
