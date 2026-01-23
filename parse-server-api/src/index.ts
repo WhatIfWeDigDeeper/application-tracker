@@ -158,13 +158,13 @@ async function ensureSchemaSetup() {
   try {
     await client.connect();
 
-    // Ensure the schema exists
-    await client.query(`CREATE SCHEMA IF NOT EXISTS ${config.schema}`);
+    // Ensure the schema exists (using identifier to safely quote)
+    await client.query('CREATE SCHEMA IF NOT EXISTS ' + client.escapeIdentifier(config.schema));
     console.log(`Schema ${config.schema} is ready`);
 
     // Create tables directly using SQL to avoid Parse SDK caching issues
     await client.query(`
-      CREATE TABLE IF NOT EXISTS ${config.schema}."Application" (
+      CREATE TABLE IF NOT EXISTS ${client.escapeIdentifier(config.schema)}."Application" (
         "objectId" TEXT PRIMARY KEY,
         "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -189,14 +189,14 @@ async function ensureSchemaSetup() {
         "_wperm" TEXT[]
       );
 
-      CREATE INDEX IF NOT EXISTS "Application_status_idx" ON ${config.schema}."Application"("status");
-      CREATE INDEX IF NOT EXISTS "Application_isArchived_idx" ON ${config.schema}."Application"("isArchived");
-      CREATE INDEX IF NOT EXISTS "Application_dateApplied_idx" ON ${config.schema}."Application"("dateApplied");
+      CREATE INDEX IF NOT EXISTS "Application_status_idx" ON ${client.escapeIdentifier(config.schema)}."Application"("status");
+      CREATE INDEX IF NOT EXISTS "Application_isArchived_idx" ON ${client.escapeIdentifier(config.schema)}."Application"("isArchived");
+      CREATE INDEX IF NOT EXISTS "Application_dateApplied_idx" ON ${client.escapeIdentifier(config.schema)}."Application"("dateApplied");
     `);
     console.log('Application table created');
 
     await client.query(`
-      CREATE TABLE IF NOT EXISTS ${config.schema}."InterviewStage" (
+      CREATE TABLE IF NOT EXISTS ${client.escapeIdentifier(config.schema)}."InterviewStage" (
         "objectId" TEXT PRIMARY KEY,
         "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -211,8 +211,8 @@ async function ensureSchemaSetup() {
         "_wperm" TEXT[]
       );
 
-      CREATE INDEX IF NOT EXISTS "InterviewStage_applicationId_idx" ON ${config.schema}."InterviewStage"("applicationId");
-      CREATE INDEX IF NOT EXISTS "InterviewStage_app_order_idx" ON ${config.schema}."InterviewStage"("applicationId", "order");
+      CREATE INDEX IF NOT EXISTS "InterviewStage_applicationId_idx" ON ${client.escapeIdentifier(config.schema)}."InterviewStage"("applicationId");
+      CREATE INDEX IF NOT EXISTS "InterviewStage_app_order_idx" ON ${client.escapeIdentifier(config.schema)}."InterviewStage"("applicationId", "order");
     `);
     console.log('InterviewStage table created');
 
