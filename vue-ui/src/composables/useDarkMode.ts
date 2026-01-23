@@ -1,4 +1,4 @@
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 
 const DARK_MODE_KEY = 'job-tracker-dark-mode';
 
@@ -40,11 +40,19 @@ export function useDarkMode() {
     updateDarkClass();
 
     // Listen for system preference changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => {
       // Only update if user hasn't set a preference
       if (localStorage.getItem(DARK_MODE_KEY) === null) {
         isDark.value = e.matches;
       }
+    };
+    
+    mediaQuery.addEventListener('change', handler);
+
+    // Clean up listener on unmount
+    onUnmounted(() => {
+      mediaQuery.removeEventListener('change', handler);
     });
   });
 
