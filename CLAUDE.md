@@ -167,7 +167,7 @@ Before running e2e tests, ensure the required backend services are running:
 
 | Implementation | UI Port | API Port | Start API Command |
 |---------------|---------|----------|-------------------|
-| Next.js + Express | 3000 | 5000 | `cd api && npm run dev` |
+| Next.js + Express | 3000 | 3001 | `cd api && npm run dev` |
 | React + Koa | 3010 | 5010 | `cd koa-api && npm run dev` |
 | Vue + Parse | 3020 | 5001 | `cd parse-server-api && npm run dev` |
 | Svelte + Hono | 3030 | 5030 | `cd hono-api && npm run dev` |

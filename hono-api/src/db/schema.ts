@@ -49,7 +49,7 @@ export const jobSourceEnum = svelteHonoSchema.enum('job_source', [
 
 // Tables
 export const applications = svelteHonoSchema.table('applications', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   companyName: varchar('company_name', { length: 200 }).notNull(),
   positionTitle: varchar('position_title', { length: 200 }).notNull(),
   dateApplied: date('date_applied').notNull(),
@@ -72,7 +72,7 @@ export const applications = svelteHonoSchema.table('applications', {
 });
 
 export const interviewStages = svelteHonoSchema.table('interview_stages', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   applicationId: uuid('application_id')
     .notNull()
     .references(() => applications.id, { onDelete: 'cascade' }),

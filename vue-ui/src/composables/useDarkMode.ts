@@ -5,6 +5,8 @@ const DARK_MODE_KEY = 'job-tracker-dark-mode';
 export function useDarkMode() {
   const isDark = ref(false);
   const userHasSetPreference = ref(false);
+  let mediaQuery: MediaQueryList | null = null;
+  let handler: ((e: MediaQueryListEvent) => void) | null = null;
 
   function updateDarkClass() {
     if (isDark.value) {
@@ -46,8 +48,8 @@ export function useDarkMode() {
     updateDarkClass();
 
     // Listen for system preference changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e: MediaQueryListEvent) => {
+    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    handler = (e: MediaQueryListEvent) => {
       // Only update if user hasn't set a preference
       if (!userHasSetPreference.value) {
         isDark.value = e.matches;
@@ -55,11 +57,13 @@ export function useDarkMode() {
     };
     
     mediaQuery.addEventListener('change', handler);
+  });
 
-    // Clean up listener on unmount
-    onUnmounted(() => {
+  // Clean up listener on unmount
+  onUnmounted(() => {
+    if (mediaQuery && handler) {
       mediaQuery.removeEventListener('change', handler);
-    });
+    }
   });
 
   return {

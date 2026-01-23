@@ -8,7 +8,7 @@ import {
 const router = new Router({ prefix: "/applications/:id/interview-stages" });
 
 // Create interview stage
-router.post("/", async (ctx) => {
+router.post("/", async (ctx): Promise<void> => {
   const input = CreateInterviewStageSchema.parse(ctx.request.body);
   const stage = await interviewStageService.createStage(ctx.params.id, input);
   ctx.status = 201;
@@ -16,9 +16,10 @@ router.post("/", async (ctx) => {
 });
 
 // Update interview stage
-router.patch("/:stageId", async (ctx) => {
+router.patch("/:stageId", async (ctx): Promise<void> => {
   const input = UpdateInterviewStageSchema.parse(ctx.request.body);
   const stage = await interviewStageService.updateStage(
+    ctx.params.id,
     ctx.params.stageId,
     input
   );
@@ -26,8 +27,8 @@ router.patch("/:stageId", async (ctx) => {
 });
 
 // Delete interview stage
-router.delete("/:stageId", async (ctx) => {
-  await interviewStageService.deleteStage(ctx.params.stageId);
+router.delete("/:stageId", async (ctx): Promise<void> => {
+  await interviewStageService.deleteStage(ctx.params.id, ctx.params.stageId);
   ctx.status = 204;
 });
 
