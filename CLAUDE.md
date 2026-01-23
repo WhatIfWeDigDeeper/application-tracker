@@ -28,6 +28,9 @@ Template repository with Claude Code skills, commands, and configuration for Nod
 - `/integrate-parallel-work [features...]` - Merge parallel features into integration branch
 - `/parallel-agents [features...]` - Spawn subagents for parallel work
 
+**Learning:**
+- `/learn` - Extract lessons from conversation and persist to CLAUDE.md, skills, or commands
+
 ## Skills (Claude Can Suggest)
 
 **Building & Fixing:**
