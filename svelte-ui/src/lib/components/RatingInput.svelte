@@ -28,7 +28,7 @@
 </script>
 
 <div class="flex items-center gap-1" role="radiogroup" aria-label="Rating">
-  {#each stars as star, index}
+  {#each stars as star}
     <button
       type="button"
       role="radio"
@@ -39,7 +39,7 @@
       onmouseenter={() => (hoverValue = star)}
       onmouseleave={() => (hoverValue = null)}
       aria-label="{star} stars"
-      aria-checked={value === star}
+      aria-checked={value === star ? 'true' : 'false'}
     >
       <svg
         class="h-6 w-6 transition-colors {star <= displayValue
