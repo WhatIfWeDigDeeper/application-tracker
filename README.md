@@ -1,216 +1,116 @@
-# React + Koa + PostgreSQL Implementation Summary
+# Job Application Tracker
+
+A full-stack job application tracking system with multiple technology stack implementations.
 
 ## Overview
-This implementation provides a full-stack Job Application Tracker using:
-- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
-- **Backend**: Koa.js + TypeScript + raw pg (no ORM)
-- **Database**: PostgreSQL with raw SQL migrations
 
-## Directory Structure
-```
-implementations/react-koa-pg/
-├── koa-api/                    # Backend API
-│   ├── src/
-│   │   ├── index.ts           # Koa server entry point
-│   │   ├── db/
-│   │   │   ├── client.ts      # PostgreSQL connection pool
-│   │   │   ├── schema.sql     # Database schema
-│   │   │   ├── migrate.ts     # Migration runner
-│   │   │   └── seed.ts        # Seed data
-│   │   ├── middleware/
-│   │   │   ├── errorHandler.ts
-│   │   │   └── logger.ts
-│   │   ├── routes/
-│   │   │   ├── applications.ts
-│   │   │   └── interview-stages.ts
-│   │   ├── services/
-│   │   │   ├── applications.service.ts
-│   │   │   └── stages.service.ts
-│   │   └── types/
-│   │       └── index.ts       # Zod schemas and TypeScript types
-│   └── package.json
-│
-└── react-ui/                   # Frontend UI
-    ├── src/
-    │   ├── App.tsx            # Main application component
-    │   ├── main.tsx           # React entry point
-    │   ├── index.css          # Tailwind CSS imports
-    │   ├── vite-env.d.ts      # Vite type definitions
-    │   ├── components/
-    │   │   ├── ui/            # Reusable UI components
-    │   │   │   ├── Badge.tsx
-    │   │   │   ├── Button.tsx
-    │   │   │   ├── Card.tsx
-    │   │   │   ├── Checkbox.tsx
-    │   │   │   ├── EmptyState.tsx
-    │   │   │   ├── Input.tsx
-    │   │   │   ├── Modal.tsx
-    │   │   │   ├── Pagination.tsx
-    │   │   │   ├── Rating.tsx
-    │   │   │   ├── Select.tsx
-    │   │   │   └── index.ts
-    │   │   ├── applications/   # Application-specific components
-    │   │   │   ├── ApplicationCard.tsx
-    │   │   │   ├── ApplicationDetail.tsx
-    │   │   │   ├── ApplicationForm.tsx
-    │   │   │   ├── ApplicationList.tsx
-    │   │   │   ├── FilterBar.tsx
-    │   │   │   └── index.ts
-    │   │   ├── interviews/     # Interview stage components
-    │   │   │   ├── InterviewStageForm.tsx
-    │   │   │   ├── InterviewStageItem.tsx
-    │   │   │   ├── InterviewStageList.tsx
-    │   │   │   └── index.ts
-    │   │   └── common/         # Layout components
-    │   │       ├── Header.tsx
-    │   │       └── index.ts
-    │   ├── hooks/
-    │   │   ├── useApplications.ts
-    │   │   ├── useFilters.ts
-    │   │   └── useSorting.ts
-    │   ├── services/
-    │   │   └── api.ts         # API client functions
-    │   ├── lib/
-    │   │   ├── constants.ts   # App constants and enums
-    │   │   └── utils.ts       # Utility functions
-    │   └── types/
-    │       └── application.ts # TypeScript type definitions
-    ├── index.html
-    ├── tailwind.config.js
-    ├── vite.config.ts
-    └── package.json
-```
+This repository contains a complete job application tracker with multiple full-stack implementations, allowing you to choose your preferred technology stack while maintaining the same core functionality and user experience.
 
-## Features Implemented
+## Implementations
 
-### Backend (koa-api)
-- RESTful API endpoints for applications and interview stages
-- PostgreSQL database with:
-  - Applications table with full schema
-  - Interview stages table with foreign key to applications
-  - Custom enum types for status, category, source
-  - Indexes for common queries
-  - Auto-updating timestamps trigger
-- Input validation using Zod schemas
-- Error handling middleware
-- Request logging
-- CORS support
-- Health check endpoint
+### Root Implementation (Express + Prisma + Next.js)
+**Location**: Root directory (`/api` and `/ui`)
+**Stack**: Express.js + Prisma ORM + PostgreSQL + Next.js + React 18
 
-### Frontend (react-ui)
+See [API Documentation](api/README.md) and [UI Documentation](ui/README.md) for details.
+
+### Alternative Implementations
+
+Each implementation provides the same core features with different technology stacks:
+
+#### 1. React + Koa + PostgreSQL
+**Location**: [`implementations/react-koa-pg/`](implementations/react-koa-pg/)
+**Stack**:
+- Frontend: React 18 + TypeScript + Vite + Tailwind CSS
+- Backend: Koa.js + raw PostgreSQL (no ORM)
+- Database: PostgreSQL with SQL migrations
+
+[View README](implementations/react-koa-pg/README.md)
+
+#### 2. Svelte + Hono + Drizzle
+**Location**: [`implementations/svelte-hono-drizzle/`](implementations/svelte-hono-drizzle/)
+**Stack**:
+- Frontend: Svelte 5 + SvelteKit + Tailwind CSS
+- Backend: Hono (lightweight framework)
+- Database: Drizzle ORM + PostgreSQL
+
+[View README](implementations/svelte-hono-drizzle/README.md)
+
+#### 3. Vue + Parse Server
+**Location**: [`implementations/vue-parse-server/`](implementations/vue-parse-server/)
+**Stack**:
+- Frontend: Vue 3 + TypeScript + Tailwind CSS
+- Backend: Parse Server
+- Database: MongoDB
+
+[View README](implementations/vue-parse-server/README.md)
+
+## Core Features
+
+All implementations provide:
 - Full CRUD operations for job applications
-- Interview stage management (add, update, complete, delete)
-- Filtering by:
-  - Status
-  - Company category
-  - Job source
-  - Skills match rating
-  - Archived status
-- Sorting by date applied, company name, or last updated
-- Pagination support
-- Dark mode toggle with system preference detection
-- Responsive design:
-  - Desktop: side-by-side list and detail view
-  - Mobile: modal-based detail view
-- Empty states with helpful actions
-- Loading states and error handling
-- Form validation with inline errors
+- Interview stage tracking
+- Filtering by status, category, source, skills rating
+- Sorting and pagination
+- Archive/restore functionality
+- Dark mode support
+- Responsive design (desktop + mobile)
+- Input validation and error handling
 
-### UI Components
-- Button (primary, secondary, danger, ghost variants)
-- Card with header, content, footer sections
-- Badge for application status with color coding
-- Input and TextArea with labels and error states
-- Select dropdown
-- Checkbox
-- Rating display and input (1-5 stars)
-- Modal and ConfirmDialog
-- Pagination
-- EmptyState
+## Database Architecture
 
-## Running the Application
+All PostgreSQL implementations share a single database (`app_tracker`) with separate schemas:
+- `express_prisma` - Root Express + Prisma implementation
+- `react_koa` - React + Koa + PostgreSQL implementation
+- `svelte_hono` - Svelte + Hono + Drizzle implementation
 
-### Prerequisites
-- Node.js 20+
-- PostgreSQL 14+
+The Vue + Parse Server implementation uses MongoDB.
 
-### Database Setup
+See [CLAUDE.md](CLAUDE.md) for detailed database architecture documentation.
+
+## Quick Start
+
+### Root Implementation (Express + Prisma)
 ```bash
-# Create database
-createdb job_tracker
+# Install dependencies
+npm run ci:all
 
-# Run migrations
-cd implementations/react-koa-pg/koa-api
-npm run db:migrate
+# Set up database
+npm run prisma:migrate:dev
+npm run seed
 
-# (Optional) Seed sample data
-npm run db:seed
-```
-
-### Starting the API
-```bash
-cd implementations/react-koa-pg/koa-api
-npm install
+# Start API and UI
 npm run dev
-# API runs on http://localhost:5000
 ```
 
-### Starting the UI
-```bash
-cd implementations/react-koa-pg/react-ui
-npm install
-npm run dev
-# UI runs on http://localhost:3000
-# API requests are proxied to :5000
+### Alternative Implementations
+Each implementation has its own setup instructions in its respective README file.
+
+## Repository Structure
+
+```
+/
+├── api/                          # Express + Prisma API
+├── ui/                           # Next.js + React UI
+├── implementations/              # Alternative implementations
+│   ├── react-koa-pg/
+│   ├── svelte-hono-drizzle/
+│   └── vue-parse-server/
+├── .claude/                      # Claude Code skills and commands
+├── CLAUDE.md                     # Repository instructions for Claude Code
+└── docker-compose.yml            # Docker setup for root implementation
 ```
 
-### Building for Production
-```bash
-# Build API
-cd koa-api && npm run build
+## Development Tools
 
-# Build UI
-cd react-ui && npm run build
-# Output in react-ui/dist/
-```
+This repository includes Claude Code skills for common development tasks:
+- `/commit` - Generate commit messages
+- `/pr` - Create pull requests
+- `fix-build` - Fix build errors
+- `update-deps` - Update dependencies
 
-## API Endpoints
+See [.claude/](.claude/) for all available commands and skills.
 
-### Applications
-- `GET /applications` - List applications with filtering, sorting, pagination
-- `GET /applications/:id` - Get single application with stages
-- `POST /applications` - Create new application
-- `PATCH /applications/:id` - Update application
-- `DELETE /applications/:id` - Delete application
-- `POST /applications/:id/archive` - Archive application
-- `POST /applications/:id/restore` - Restore archived application
+## License
 
-### Interview Stages
-- `POST /applications/:id/interview-stages` - Add stage
-- `PATCH /applications/:id/interview-stages/:stageId` - Update stage
-- `DELETE /applications/:id/interview-stages/:stageId` - Delete stage
-
-### Health
-- `GET /health` - Health check endpoint
-
-## Configuration
-
-### API Environment Variables
-- `PORT` - Server port (default: 5000)
-- `DATABASE_URL` - PostgreSQL connection string
-- `NODE_ENV` - Environment (development/production)
-
-### UI Environment Variables
-- `VITE_API_URL` - API base URL (default: /api, proxied in dev)
-
-## Build Verification
-Both projects compile successfully with TypeScript strict mode:
-- koa-api: `npm run build` - compiles to dist/
-- react-ui: `npm run build` - bundles to dist/
-
-## Notes
-- The implementation follows the core specs in `/specs/core/`
-- Uses raw pg queries instead of an ORM for the backend
-- Vite proxy handles API requests in development
-- Tailwind CSS with custom primary color palette
-- Dark mode uses class-based switching with localStorage persistence
+MIT
