@@ -113,15 +113,9 @@ describe('validateSchemaName', () => {
 
   describe('Error messages', () => {
     it('provides descriptive error message', () => {
-      try {
-        validateSchemaName('invalid-name');
-        expect.fail('Should have thrown an error');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toContain('Invalid schema name: invalid-name');
-        expect((error as Error).message).toContain('must start with a letter or underscore');
-        expect((error as Error).message).toContain('contain only alphanumeric characters and underscores');
-      }
+      expect(() => validateSchemaName('invalid-name')).toThrow(/Invalid schema name: invalid-name/);
+      expect(() => validateSchemaName('invalid-name')).toThrow(/must start with a letter or underscore/);
+      expect(() => validateSchemaName('invalid-name')).toThrow(/contain only alphanumeric characters and underscores/);
     });
   });
 });
