@@ -138,6 +138,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Vite generated config files (compiled from .ts)
+vite.config.js
+vite.config.d.ts
+
 # Playwright
 test-results/
 playwright-report/
