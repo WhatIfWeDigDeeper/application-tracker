@@ -30,9 +30,11 @@ const schemaName = validateSchemaName(process.env.DATABASE_SCHEMA || 'vue_parse'
 const baseDbUri = process.env.DATABASE_URL || 'postgres://parse_user:parse_password@localhost:5432/app_tracker';
 
 // Add search_path option to ensure Parse Server uses the correct schema
+// URL-encode the schema name for safe inclusion in connection string
+const encodedSchema = encodeURIComponent(schemaName);
 const databaseURI = baseDbUri.includes('?')
-  ? `${baseDbUri}&options=-c search_path=${schemaName}`
-  : `${baseDbUri}?options=-c search_path=${schemaName}`;
+  ? `${baseDbUri}&options=-c search_path=${encodedSchema}`
+  : `${baseDbUri}?options=-c search_path=${encodedSchema}`;
 
 export const config = {
   databaseURI,
