@@ -18,18 +18,28 @@
       onchange(star);
     }
   }
+
+  function handleKeyDown(event: KeyboardEvent, star: number) {
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      handleClick(star);
+    }
+  }
 </script>
 
 <div class="flex items-center gap-1" role="radiogroup" aria-label="Rating">
   {#each stars as star}
     <button
       type="button"
+      role="radio"
       class="focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+      tabindex={value === star || (value === null && star === 1) ? 0 : -1}
       onclick={() => handleClick(star)}
+      onkeydown={(e) => handleKeyDown(e, star)}
       onmouseenter={() => (hoverValue = star)}
       onmouseleave={() => (hoverValue = null)}
       aria-label="{star} stars"
-      aria-checked={value === star}
+      aria-checked={value === star ? 'true' : 'false'}
     >
       <svg
         class="h-6 w-6 transition-colors {star <= displayValue
