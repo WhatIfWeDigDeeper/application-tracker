@@ -99,7 +99,7 @@ export interface CreateInterviewStageInput {
   name: string;
   order: number;
   isCompleted?: boolean;
-  completedDate?: string;
+  completedDate?: string | null;
   notes?: string;
   performanceRating?: number;
 }

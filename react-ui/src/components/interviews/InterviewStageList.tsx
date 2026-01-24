@@ -55,7 +55,7 @@ export function InterviewStageList({
   const handleToggleComplete = async (
     stage: InterviewStage,
     isCompleted: boolean,
-    completedDate?: string
+    completedDate?: string | null
   ) => {
     await onUpdate(stage.id, { isCompleted, completedDate });
   };

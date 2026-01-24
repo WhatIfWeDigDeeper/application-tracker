@@ -1,21 +1,9 @@
-// Load .env file manually
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+// Load environment variables from .env file in development
+import { config as loadEnv } from 'dotenv';
 
-try {
-  const envPath = resolve(process.cwd(), '.env');
-  const envFile = readFileSync(envPath, 'utf-8');
-  envFile.split('\n').forEach(line => {
-    const trimmed = line.trim();
-    if (trimmed && !trimmed.startsWith('#')) {
-      const [key, ...valueParts] = trimmed.split('=');
-      if (key && valueParts.length > 0) {
-        process.env[key.trim()] = valueParts.join('=').trim();
-      }
-    }
-  });
-} catch (error) {
-  // .env file is optional
+// Only load .env in development (production should use actual env vars)
+if (process.env.NODE_ENV !== 'production') {
+  loadEnv();
 }
 
 // Validate schema name to prevent SQL injection

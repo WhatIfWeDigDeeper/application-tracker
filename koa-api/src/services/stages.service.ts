@@ -87,17 +87,22 @@ export class InterviewStageService {
   }
 
   async updateStage(
+    applicationId: string,
     stageId: string,
     input: UpdateInterviewStageInput
   ): Promise<InterviewStage> {
-    // Check if stage exists
+    // Check if stage exists and belongs to the application
     const existingResult = await query<InterviewStageRow>(
-      `SELECT * FROM interview_stages WHERE id = $1`,
-      [stageId]
+      `SELECT * FROM interview_stages WHERE id = $1 AND application_id = $2`,
+      [stageId, applicationId]
     );
 
     if (existingResult.rows.length === 0) {
-      throw new AppError("not_found", 404, `Stage ${stageId} not found`);
+      throw new AppError(
+        "not_found",
+        404,
+        `Stage ${stageId} not found for application ${applicationId}`
+      );
     }
 
     // Build dynamic update query
@@ -151,18 +156,20 @@ export class InterviewStageService {
     return toInterviewStage(result.rows[0]);
   }
 
-  async deleteStage(stageId: string): Promise<void> {
-    // Get the stage first to get application_id
+  async deleteStage(applicationId: string, stageId: string): Promise<void> {
+    // Get the stage first to verify it belongs to the application
     const existingResult = await query<InterviewStageRow>(
-      `SELECT * FROM interview_stages WHERE id = $1`,
-      [stageId]
+      `SELECT * FROM interview_stages WHERE id = $1 AND application_id = $2`,
+      [stageId, applicationId]
     );
 
     if (existingResult.rows.length === 0) {
-      throw new AppError("not_found", 404, `Stage ${stageId} not found`);
+      throw new AppError(
+        "not_found",
+        404,
+        `Stage ${stageId} not found for application ${applicationId}`
+      );
     }
-
-    const applicationId = existingResult.rows[0].application_id;
 
     await query(`DELETE FROM interview_stages WHERE id = $1`, [stageId]);
 

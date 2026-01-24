@@ -53,8 +53,9 @@ test.describe('Parse SDK Initialization', () => {
       consoleErrors.forEach(error => console.log('  -', error));
     }
 
-    // The test should pass if there are no Parse-related errors
+    // The test should pass if there are no Parse-related errors and Parse is available
     expect(parseInitErrors, 'Parse SDK should initialize without errors').toHaveLength(0);
+    expect(parseAvailable, 'Parse should be available in the global scope').toBe(true);
   });
 
   test('should load the application list page', async ({ page }) => {

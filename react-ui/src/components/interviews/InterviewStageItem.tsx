@@ -6,7 +6,7 @@ import { cn } from "../../lib/utils";
 
 interface InterviewStageItemProps {
   stage: InterviewStage;
-  onToggleComplete: (isCompleted: boolean, completedDate?: string) => void;
+  onToggleComplete: (isCompleted: boolean, completedDate?: string | null) => void;
   onEdit: () => void;
   onDelete: () => void;
 }
@@ -25,8 +25,8 @@ export function InterviewStageItem({
       // Completing - set today's date
       onToggleComplete(true, getTodayDate());
     } else {
-      // Un-completing - clear the date
-      onToggleComplete(false);
+      // Un-completing - explicitly clear the date with null
+      onToggleComplete(false, null);
     }
   };
 
