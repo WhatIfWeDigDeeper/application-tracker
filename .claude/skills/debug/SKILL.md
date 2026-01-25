@@ -53,6 +53,20 @@ Common causes:
 - State not updated correctly
 - Wrong variable referenced
 
+### 4.5. Loop Prevention Check
+
+**STOP if you notice these red flags:**
+- You've edited the same file 3+ times without success
+- You're alternating between two approaches
+- You're trying variations without understanding why they fail
+
+**When stuck, take these steps:**
+1. **Read official documentation** - Not just Stack Overflow snippets
+2. **Search for known issues** - GitHub issues, release notes
+3. **Create a minimal reproduction** - Strip away complexity to isolate the problem
+4. **Ask the user** - They may have context or preferences you're missing
+5. **Checkpoint first** - `git stash` or commit before experimenting further
+
 ### 5. Develop Fix
 
 - Fix the root cause, not just symptoms
