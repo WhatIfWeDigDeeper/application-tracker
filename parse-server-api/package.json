@@ -1,0 +1,36 @@
+{
+  "name": "job-tracker-parse-server",
+  "version": "1.0.0",
+  "description": "Parse Server backend for Job Application Tracker",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "parse-server": "^9.1.1",
+    "pg": "^8.11.3",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/parse": "^3.0.9",
+    "@types/pg": "^8.16.0",
+    "@types/uuid": "^9.0.7",
+    "@vitest/ui": "^4.0.18",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^4.0.18"
+  }
+}

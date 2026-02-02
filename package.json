@@ -13,12 +13,19 @@
     "build:api": "cd api && npm run build",
     "build:ui": "cd ui && npm run build",
     "build": "npm run build:api && npm run build:ui",
+    "build:koa": "cd koa-api && npm run build && cd ../react-ui && npm run build",
+    "build:vue": "cd vue-ui && npm run build && cd ../parse-server-api && npm run build",
+    "build:svelte": "cd svelte-ui && npm run build && cd ../hono-api && npm run build",
+    "build:all": "npm run build && npm run build:koa && npm run build:vue && npm run build:svelte",
     "lint:api": "cd api && npm run lint",
     "lint:ui": "cd ui && npm run lint",
     "lint": "npm run lint:api && npm run lint:ui",
     "ci:api": "cd api && npm ci",
     "ci:ui": "cd ui && npm ci",
-    "ci:all": "npm ci && npm run ci:api && npm run ci:ui",
+    "ci:koa": "cd koa-api && npm ci && cd ../react-ui && npm ci",
+    "ci:vue": "cd vue-ui && npm ci && cd ../parse-server-api && npm ci",
+    "ci:svelte": "cd svelte-ui && npm ci && cd ../hono-api && npm ci",
+    "ci:all": "npm ci && npm run ci:api && npm run ci:ui && npm run ci:koa && npm run ci:vue && npm run ci:svelte",
     "prisma:generate": "cd api && npm run prisma:generate",
     "prisma:migrate:dev": "cd api && npm run prisma:migrate:dev",
     "prisma:studio": "cd api && npm run prisma:studio",
@@ -40,6 +47,7 @@
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.0.9"
+    "@types/node": "^25.0.9",
+    "typescript": "^5.9.3"
   }
 }

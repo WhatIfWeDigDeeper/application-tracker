@@ -6,8 +6,6 @@
  * If running in Jest, ensure jest.setup.js includes necessary polyfills.
  */
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 // Check if required globals are available for MSW
 const mswAvailable = typeof global.Response !== 'undefined' && typeof global.fetch !== 'undefined';
 

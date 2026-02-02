@@ -1,12 +1,12 @@
 ---
 skill: audit-and-fix
-description: Security audit with automatic fixes for vulnerabilities
+description: Security audit with automatic fixes for vulnerabilities across all package.json files
 arguments: package names, glob pattern, or '.' for all
 ---
 
 # Security Audit: $ARGUMENTS
 
-Scan for vulnerabilities and automatically fix them in an isolated worktree.
+Scan for vulnerabilities and automatically fix them across all package.json files in an isolated worktree.
 
 ## Process
 
@@ -19,60 +19,78 @@ git worktree add "$WORKTREE_PATH" -b "security-audit-$TIMESTAMP"
 cd "$WORKTREE_PATH"
 ```
 
-### 2. Run Security Audit
+### 2. Discover All package.json Files
 
+Find all package.json files excluding node_modules:
 ```bash
-npm audit --json > audit-report.json
+find . -name "package.json" -not -path "*/node_modules/*" -type f
 ```
 
-If no vulnerabilities, clean up and exit.
+Store results as an array of directories to audit.
 
-### 3. Categorize by Severity
+### 3. Run Security Audit on Each Directory
 
-Parse audit results:
+For each directory containing package.json:
+```bash
+cd <directory>
+npm audit --json > audit-report-<dir-name>.json
+```
+
+Collect all audit results into a consolidated report.
+
+### 4. Categorize by Severity
+
+Parse audit results for each directory:
 - **Critical**: Immediate action required
 - **High**: Serious risk, patch ASAP
 - **Moderate**: Should fix soon
 - **Low**: Fix when convenient
 
-### 4. Determine Strategy
+### 5. Determine Strategy
 
+Per directory:
 - **1-3 packages**: Update sequentially
 - **4+ packages**: Use parallel Task subagents (2 packages per agent)
 
-### 5. Update Packages
+If multiple directories have vulnerabilities, process them in parallel using separate agents.
 
-For each package:
+### 6. Update Packages
+
+For each vulnerable package in each directory:
 ```bash
+cd <directory>
 npm install <package>@latest
 ```
 
-Then validate:
+Then validate (if scripts exist):
 ```bash
 npm run build && npm run lint && npm test
 ```
 
 If validation fails, revert to previous version.
 
-### 6. Post-Audit Scan
+### 7. Post-Audit Scan
 
+For each directory:
 ```bash
+cd <directory>
 npm audit
 ```
 
-Compare before/after vulnerability counts.
+Compare before/after vulnerability counts per directory.
 
-### 7. Report and Prompt
+### 8. Report and Prompt
 
-Generate security report with:
-- Initial vs remaining vulnerabilities
-- Successfully updated packages
+Generate consolidated security report with:
+- Vulnerabilities per directory (initial vs remaining)
+- Successfully updated packages per directory
 - Failed updates with reasons
 - Recommendations for remaining issues
+- Overall project security status
 
 Prompt: merge fixes, keep for review, or discard.
 
-### 8. Cleanup
+### 9. Cleanup
 
 ```bash
 git worktree remove "$WORKTREE_PATH"
@@ -81,14 +99,54 @@ git branch -d "security-audit-$TIMESTAMP"
 
 ## Parallel Execution
 
-When >3 packages, split into groups and launch Task subagents:
+### Per-Directory Parallelization
+When multiple directories have vulnerabilities, launch separate Task subagents for each:
 
 ```
 Task({
   subagent_type: 'general-purpose',
-  prompt: 'Update packages X, Y with full validation...',
+  prompt: 'Audit and fix vulnerabilities in <directory>...',
+  run_in_background: true
+})
+```
+
+### Per-Package Parallelization
+Within a directory with >3 vulnerable packages, split into groups:
+
+```
+Task({
+  subagent_type: 'general-purpose',
+  prompt: 'Update packages X, Y in <directory> with full validation...',
   run_in_background: true
 })
 ```
 
 Collect results from all agents before generating final report.
+
+## Example Output
+
+```
+Security Audit Report
+=====================
+
+Scanned Directories: 5
+- /api (Express + Prisma)
+- /koa-api (Koa + PostgreSQL)
+- /hono-api (Hono + Drizzle)
+- /parse-server-api (Parse Server)
+- /ui (React UI)
+
+Results by Directory:
+---------------------
+
+/api: 2 vulnerabilities fixed
+  ✓ express 4.17.1 → 4.18.2 (moderate)
+  ✓ jsonwebtoken 8.5.1 → 9.0.0 (high)
+
+/ui: No vulnerabilities found
+
+/koa-api: 1 vulnerability (could not fix)
+  ✗ koa-router 10.0.0 (no fix available)
+
+Overall: 2/3 vulnerabilities fixed
+```
