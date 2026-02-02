@@ -20,7 +20,7 @@
     "lint:api": "cd api && npm run lint",
     "lint:ui": "cd ui && npm run lint",
     "lint": "npm run lint:api && npm run lint:ui",
-    "ci:api": "cd api && npm ci",
+    "ci:api": "cd api && npm ci && npm run prisma:generate",
     "ci:ui": "cd ui && npm ci",
     "ci:koa": "cd koa-api && npm ci && cd ../react-ui && npm ci",
     "ci:vue": "cd vue-ui && npm ci && cd ../parse-server-api && npm ci",
