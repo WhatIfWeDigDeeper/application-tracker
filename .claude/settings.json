@@ -5,7 +5,7 @@
       "Read(*)",
       "Glob(*)",
       "Grep(*)",
-      "mcp__plugin_playwright_playwright__browser_navigate"
+      "mcp__plugin_playwright_playwright__browser_*"
     ],
     "deny": [
       "Read(.env*)",
