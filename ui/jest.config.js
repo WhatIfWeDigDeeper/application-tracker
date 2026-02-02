@@ -18,4 +18,11 @@ const customJestConfig = {
   ],
 };
 
-module.exports = createJestConfig(customJestConfig);
+module.exports = async () => {
+  const jestConfig = await createJestConfig(customJestConfig)();
+  // Override transformIgnorePatterns to include uuid
+  jestConfig.transformIgnorePatterns = [
+    '/node_modules/(?!(uuid)/)',
+  ];
+  return jestConfig;
+};

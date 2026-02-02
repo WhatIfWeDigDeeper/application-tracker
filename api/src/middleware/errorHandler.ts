@@ -40,9 +40,9 @@ export const errorHandler = (
     return res.status(400).json({
       code: "validation_error",
       message: "Validation failed",
-      details: err.errors.map((e) => ({
-        field: e.path.join("."),
-        message: e.message,
+      details: err.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
       })),
     } as ErrorResponse);
   }

@@ -3,7 +3,7 @@
  * Verifies that individual stage operations (add, update, remove) are called correctly
  */
 
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, waitFor, cleanup, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { InterviewChecklist } from './InterviewChecklist';
 import type { InterviewStage } from '@/types/application';
@@ -54,12 +54,17 @@ describe('InterviewChecklist', () => {
       });
 
       const nameInput = screen.getByLabelText(/stage name/i);
-      await user.type(nameInput, 'Onsite');
+      fireEvent.change(nameInput, { target: { value: 'Onsite' } });
 
       // Submit the form
       const form = nameInput.closest('form');
       const submitButton = form?.querySelector('button[type="submit"]');
-      await user.click(submitButton!);
+      fireEvent.click(submitButton!);
+
+      // Wait for the modal to close (which means form submission completed)
+      await waitFor(() => {
+        expect(screen.queryByLabelText(/stage name/i)).not.toBeInTheDocument();
+      });
 
       // Verify onAddStage was called with correct order (max existing order + 1)
       await waitFor(() => {
@@ -95,11 +100,15 @@ describe('InterviewChecklist', () => {
 
       // Change the name
       const nameInput = screen.getByLabelText(/stage name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Updated Phone Screen');
+      fireEvent.change(nameInput, { target: { value: 'Updated Phone Screen' } });
 
       // Submit the form
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+      // Wait for the modal to close (which means form submission completed)
+      await waitFor(() => {
+        expect(screen.queryByLabelText(/stage name/i)).not.toBeInTheDocument();
+      });
 
       // Verify onUpdateStage was called
       expect(props.onUpdateStage).toHaveBeenCalledTimes(1);
