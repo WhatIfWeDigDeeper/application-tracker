@@ -1,12 +1,12 @@
 ---
 skill: update-deps
-description: Update npm packages to latest versions with validation in isolated worktree
+description: Update npm packages to latest versions with validation and create PR
 arguments: specific packages, glob pattern, or '.' for all
 ---
 
 # Update Dependencies: $ARGUMENTS
 
-Updates npm packages to their latest versions with automated testing and validation in an isolated worktree.
+Updates npm packages to their latest versions with automated testing and validation in an isolated worktree, then creates a pull request for review.
 
 ## Arguments
 
@@ -65,21 +65,49 @@ npm test
 
 **On success:**
 - Create commit with version changes
-- Use AskUserQuestion to prompt:
-  - "Yes, merge and clean up (Recommended)"
-  - "No, I'll review first"
-  - "Discard changes"
+- Push branch to remote:
+  ```bash
+  git push -u origin "$WORKTREE_NAME"
+  ```
+- Check for existing dependency update PRs:
+  ```bash
+  gh pr list --search "chore: Update npm dependencies" --state open
+  ```
+- Create PR using gh CLI:
+  ```bash
+  gh pr create --title "chore: Update npm dependencies" --body "$(cat <<'EOF'
+  ## Summary
+  - Updated packages: [list major version changes]
+  - Breaking changes fixed: [list code modifications]
+
+  ## Validation Results
+  | Check | Status |
+  |-------|--------|
+  | Build | ✅/❌ |
+  | Lint | ✅/❌ |
+  | Tests | ✅/❌ |
+  | Security Audit | X vulnerabilities |
+
+  ## Files Changed
+  - [list modified package.json files]
+
+  🤖 Generated with [Claude Code](https://claude.com/claude-code)
+  EOF
+  )"
+  ```
+- Return the PR URL to the user
 
 **On failure:**
 - Categorize errors (build/lint/test/audit)
 - Provide specific remediation steps
 - Offer options: isolate problem, revert specific updates, or abandon
+- If partially successful, still create PR with failing checks noted
 
 ### 7. Cleanup
 
 ```bash
 git worktree remove "$WORKTREE_PATH"
-git branch -D "$WORKTREE_NAME"
+# Note: Don't delete the branch - it's needed for the open PR
 ```
 
 ## Error Categories
