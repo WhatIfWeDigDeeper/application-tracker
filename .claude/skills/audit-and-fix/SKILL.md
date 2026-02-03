@@ -90,7 +90,37 @@ Generate consolidated security report with:
 
 Prompt: merge fixes, keep for review, or discard.
 
-### 9. Cleanup
+### 9. Update Documentation for Major Version Changes
+
+When security fixes require major version upgrades:
+
+1. **Identify major version changes** across all directories:
+   - Track packages that jumped major versions (e.g., 4.x → 5.x)
+
+2. **Search for version references**:
+   ```bash
+   grep -r "Express 4\|Prisma 5\|React 18" --include="*.md" .
+   ```
+
+3. **Update documentation files** (prioritized):
+   - `CLAUDE.md` - Active technologies
+   - `README.md` - Stack descriptions
+   - `docs/*.md` - Version tables and tech stack sections
+
+4. **Skip historical documents**:
+   - `specs/*/research.md`
+   - `specs/*/tasks.md`
+
+5. **Include in security report**:
+   ```
+   Documentation Updates
+   ---------------------
+   Updated version references in:
+   - CLAUDE.md (React 18 → 19)
+   - docs/API_IMPLEMENTATION_SUMMARY.md (Express 4.18 → 5.x)
+   ```
+
+### 10. Cleanup
 
 ```bash
 git worktree remove "$WORKTREE_PATH"
