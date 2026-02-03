@@ -21,6 +21,10 @@
     "pg": "^8.11.3",
     "uuid": "^9.0.0"
   },
+  "overrides": {
+    "fast-xml-parser": "5.3.4",
+    "lodash": "4.17.23"
+  },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",

@@ -10,7 +10,7 @@ This repository contains a complete job application tracker with multiple full-s
 
 ### Root Implementation (Express + Prisma + Next.js)
 **Location**: Root directory (`/api` and `/ui`)
-**Stack**: Express.js + Prisma ORM + PostgreSQL + Next.js + React 18
+**Stack**: Express.js + Prisma ORM + PostgreSQL + Next.js + React 19
 
 See [API Documentation](api/README.md) and [UI Documentation](ui/README.md) for details.
 
@@ -21,7 +21,7 @@ Each implementation provides the same core features with different technology st
 #### 1. React + Koa + PostgreSQL
 **Location**: [`implementations/react-koa-pg/`](implementations/react-koa-pg/)
 **Stack**:
-- Frontend: React 18 + TypeScript + Vite + Tailwind CSS
+- Frontend: React 19 + TypeScript + Vite + Tailwind CSS
 - Backend: Koa.js + raw PostgreSQL (no ORM)
 - Database: PostgreSQL with SQL migrations
 

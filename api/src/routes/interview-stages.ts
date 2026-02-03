@@ -10,8 +10,9 @@ const router = Router({ mergeParams: true });
 // Create interview stage
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const input = CreateInterviewStageSchema.parse(req.body);
-    const stage = await interviewStageService.createStage(req.params.id, input);
+    const stage = await interviewStageService.createStage(id, input);
     res.status(201).json(stage);
   } catch (err) {
     next(err);
@@ -21,8 +22,9 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 // Update interview stage
 router.patch("/:stageId", async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const stageId = Array.isArray(req.params.stageId) ? req.params.stageId[0] : req.params.stageId;
     const input = UpdateInterviewStageSchema.parse(req.body);
-    const stage = await interviewStageService.updateStage(req.params.stageId, input);
+    const stage = await interviewStageService.updateStage(stageId, input);
     res.json(stage);
   } catch (err) {
     next(err);
@@ -32,7 +34,8 @@ router.patch("/:stageId", async (req: Request, res: Response, next: NextFunction
 // Delete interview stage
 router.delete("/:stageId", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await interviewStageService.deleteStage(req.params.stageId);
+    const stageId = Array.isArray(req.params.stageId) ? req.params.stageId[0] : req.params.stageId;
+    await interviewStageService.deleteStage(stageId);
     res.status(204).send();
   } catch (err) {
     next(err);

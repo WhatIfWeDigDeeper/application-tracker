@@ -212,12 +212,12 @@ Time:        0.9s
 ## 🔧 Technology Stack
 
 - **Runtime**: Node.js 18+
-- **API Framework**: Express 4.18
-- **ORM**: Prisma 5.8
+- **API Framework**: Express 5.x
+- **ORM**: Prisma 7.x
 - **Database**: PostgreSQL 16
 - **Language**: TypeScript (strict mode)
-- **Validation**: Zod 3.22
-- **Testing**: Jest 29 + Supertest
+- **Validation**: Zod 4.x
+- **Testing**: Jest 30 + Supertest
 - **Performance**: k6 (thresholds defined)
 - **Container**: Docker + Docker Compose
 - **UI**: Next.js (placeholder, future integration)

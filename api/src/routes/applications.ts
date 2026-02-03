@@ -37,7 +37,8 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 // Get single application
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const app = await applicationService.getApplication(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const app = await applicationService.getApplication(id);
     res.json(app);
   } catch (err) {
     next(err);
@@ -47,8 +48,9 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 // Update application
 router.patch("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const input = UpdateApplicationSchema.parse(req.body);
-    const app = await applicationService.updateApplication(req.params.id, input);
+    const app = await applicationService.updateApplication(id, input);
     res.json(app);
   } catch (err) {
     next(err);
@@ -58,7 +60,8 @@ router.patch("/:id", async (req: Request, res: Response, next: NextFunction) => 
 // Delete application
 router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await applicationService.deleteApplication(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    await applicationService.deleteApplication(id);
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -68,7 +71,8 @@ router.delete("/:id", async (req: Request, res: Response, next: NextFunction) =>
 // Archive application
 router.post("/:id/archive", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const app = await applicationService.archiveApplication(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const app = await applicationService.archiveApplication(id);
     res.json(app);
   } catch (err) {
     next(err);
@@ -78,7 +82,8 @@ router.post("/:id/archive", async (req: Request, res: Response, next: NextFuncti
 // Restore application
 router.post("/:id/restore", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const app = await applicationService.restoreApplication(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const app = await applicationService.restoreApplication(id);
     res.json(app);
   } catch (err) {
     next(err);

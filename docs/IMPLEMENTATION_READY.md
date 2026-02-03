@@ -30,8 +30,8 @@ All core implementation tasks are finished. The Express API is production-ready 
 
 ### Technical Implementation
 ✅ TypeScript strict mode
-✅ Express 4.18 with middleware chain
-✅ Prisma 5.8 ORM with PostgreSQL
+✅ Express 5.x with middleware chain
+✅ Prisma 7.x ORM with PostgreSQL
 ✅ Jest + Supertest for testing
 ✅ Docker & Docker Compose configs
 ✅ k6 performance tests with thresholds
