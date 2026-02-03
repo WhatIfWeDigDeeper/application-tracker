@@ -10,7 +10,7 @@ Build a single-user job application tracking web application that allows users t
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x (strict mode enabled)
-**Primary Dependencies**: React 19, Next.js 16, Tailwind CSS 4.x, Vite (for dev tooling)
+**Primary Dependencies**: React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling)
 **Storage**: localStorage (browser-based, no server-side persistence)
 **Testing**: Jest with React Testing Library
 **Target Platform**: Web (modern browsers: Chrome, Firefox, Safari, Edge - last 2 versions)
