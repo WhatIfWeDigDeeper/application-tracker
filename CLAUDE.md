@@ -69,7 +69,7 @@ Template repository with Claude Code skills, commands, and configuration for Nod
 - **Parallel Execution**: 3+ items use Task tool subagents
 
 ## Active Technologies
-- TypeScript 5.x (strict mode enabled) + React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling) (001-job-application-tracker)
+- TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite (for dev tooling) (001-job-application-tracker)
 - localStorage (browser-based, no server-side persistence) (001-job-application-tracker)
 - PostgreSQL 18 (single database with multiple schemas for different implementations)
 
@@ -198,4 +198,4 @@ cd vue-ui && npm run test:e2e
 - Service tests: `src/__tests__/services/*.test.ts`
 
 ## Recent Changes
-- 001-job-application-tracker: Added TypeScript 5.x (strict mode enabled) + React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling)
+- 001-job-application-tracker: Added TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite (for dev tooling)
