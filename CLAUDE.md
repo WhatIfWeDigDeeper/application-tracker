@@ -197,5 +197,20 @@ cd vue-ui && npm run test:e2e
 - Component tests: `src/components/**/*.test.tsx`
 - Service tests: `src/__tests__/services/*.test.ts`
 
+## Version Documentation Files
+
+When updating packages with major version changes, update version references in these files:
+
+**Always update:**
+- `CLAUDE.md` - Active Technologies section
+- `README.md` - Stack descriptions
+- `docs/IMPLEMENTATION_READY.md` - Technology stack section
+- `docs/API_IMPLEMENTATION_SUMMARY.md` - Technology stack section
+- `specs/001-job-application-tracker/plan.md` - Technical Context section
+
+**Never update (historical records):**
+- `specs/*/research.md` - Original research notes
+- `specs/*/tasks.md` - Completed task records
+
 ## Recent Changes
 - 001-job-application-tracker: Added TypeScript 5.x (strict mode enabled) + React 18, Next.js 14, Tailwind CSS 3.x, Vite (for dev tooling)
