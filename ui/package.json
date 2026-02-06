@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "audit:ci": "npm_config_yes=true npx audit-ci --config .auditconfig.json",
+    "audit:ci": "npx -y audit-ci --config .auditconfig.json",
     "build": "next build",
     "dev": "next dev",
     "start": "next start",

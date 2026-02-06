@@ -29,7 +29,7 @@ git worktree add "$WORKTREE_PATH" -b "e2e-test-$TIMESTAMP"
 If not installed:
 ```bash
 npm install -D @playwright/test
-npx playwright install --with-deps
+npx -y playwright install --with-deps
 ```
 
 Create `playwright.config.ts` if missing with standard configuration.
