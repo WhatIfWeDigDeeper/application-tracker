@@ -30,7 +30,7 @@ function handleApplicationCreated() {
             class="flex items-center"
           >
             <h1 class="text-xl font-bold text-gray-900 dark:text-white">
-              Job Application Tracker (Vue - Parse Server)
+              Job Application Tracker (Vue - Nuxt)
             </h1>
           </router-link>
 

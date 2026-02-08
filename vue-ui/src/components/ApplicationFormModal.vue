@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 import type { Application, CreateApplicationInput, ApplicationStatus, CompanyCategory, JobSource } from '@/types';
 import { APPLICATION_STATUSES, COMPANY_CATEGORIES, JOB_SOURCES } from '@/types';
-import { applicationService } from '@/services/parse';
+import { applicationService } from '@/services/api';
 import RatingInput from './RatingInput.vue';
 import ConfirmDialog from './ConfirmDialog.vue';
 
@@ -185,8 +185,10 @@ function handleKeyDown(event: KeyboardEvent) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   initializeForm();
+  await nextTick();
+  isDirty.value = false;
   document.addEventListener('keydown', handleKeyDown);
   document.body.style.overflow = 'hidden';
 });
@@ -450,7 +452,7 @@ onUnmounted(() => {
                 <label
                   for="salaryMin"
                   class="label"
-                >Salary Min ($)</label>
+                >Minimum Salary</label>
                 <input
                   id="salaryMin"
                   v-model="salaryMin"
@@ -465,7 +467,7 @@ onUnmounted(() => {
                 <label
                   for="salaryMax"
                   class="label"
-                >Salary Max ($)</label>
+                >Maximum Salary</label>
                 <input
                   id="salaryMax"
                   v-model="salaryMax"
@@ -502,7 +504,7 @@ onUnmounted(() => {
               <label
                 for="notes"
                 class="label"
-              >Notes</label>
+              >General Notes</label>
               <textarea
                 id="notes"
                 v-model="notes"
@@ -530,7 +532,7 @@ onUnmounted(() => {
             :disabled="loading"
             @click="handleSubmit"
           >
-            {{ loading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Save Application') }}
+            {{ loading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Add Application') }}
           </button>
         </div>
       </div>

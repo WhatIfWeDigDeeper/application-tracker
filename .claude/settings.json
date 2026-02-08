@@ -2,10 +2,18 @@
   "permissions": {
     "allow": [
       "Bash",
+      "Fetch(*)",
+      "Write(*)",
+      "Edit(*)",
       "Read(*)",
       "Glob(*)",
       "Grep(*)",
-      "mcp__plugin_playwright_playwright__browser_*"
+      "mcp__plugin_playwright_playwright__browser_*",
+      "WebFetch(*)",
+      "Skill(playwright-cli)",
+      "Skill(playwright-cli:*)",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_navigate"
     ],
     "deny": [
       "Read(.env*)",

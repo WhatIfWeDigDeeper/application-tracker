@@ -5,7 +5,7 @@ import type {
   CreateInterviewStageInput,
   UpdateInterviewStageInput,
 } from '@/types';
-import { applicationService, interviewStageService } from '@/services/parse';
+import { applicationService, interviewStageService } from '@/services/api';
 
 export function useApplication() {
   const application = ref<Application | null>(null);
