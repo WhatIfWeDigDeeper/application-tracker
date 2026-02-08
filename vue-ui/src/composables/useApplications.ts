@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'vue';
 import type { Application, FilterState, PaginatedResponse } from '@/types';
-import { applicationService } from '@/services/parse';
+import { applicationService } from '@/services/api';
 
 // Default filter state
 const defaultFilters: FilterState = {

@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 import type { Application, CreateApplicationInput, ApplicationStatus, CompanyCategory, JobSource } from '@/types';
 import { APPLICATION_STATUSES, COMPANY_CATEGORIES, JOB_SOURCES } from '@/types';
-import { applicationService } from '@/services/parse';
+import { applicationService } from '@/services/api';
 import RatingInput from './RatingInput.vue';
 import ConfirmDialog from './ConfirmDialog.vue';
 
