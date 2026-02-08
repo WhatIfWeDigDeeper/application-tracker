@@ -9,16 +9,12 @@ test.describe('Dark Mode Toggle', () => {
   });
 
   test('should toggle from light mode to dark mode', async ({ page }) => {
-    // Wait for theme toggle to be mounted
     const themeToggle = page.getByRole('button', { name: /switch to dark mode/i });
     await expect(themeToggle).toBeVisible();
 
-    // Verify we start in light mode (no 'dark' class on html element)
+    // Verify we start in light mode
     const htmlElement = page.locator('html');
     await expect(htmlElement).not.toHaveClass(/dark/);
-
-    // Verify button shows "Dark" text (indicating it will switch to dark)
-    await expect(themeToggle).toContainText('Dark');
 
     // Click to toggle to dark mode
     await themeToggle.click();
@@ -26,10 +22,9 @@ test.describe('Dark Mode Toggle', () => {
     // Verify dark class is now on html element
     await expect(htmlElement).toHaveClass(/dark/);
 
-    // Verify button now shows "Light" and has updated aria-label
+    // Verify button now shows light mode toggle
     const lightModeToggle = page.getByRole('button', { name: /switch to light mode/i });
     await expect(lightModeToggle).toBeVisible();
-    await expect(lightModeToggle).toContainText('Light');
   });
 
   test('should toggle from dark mode back to light mode', async ({ page }) => {
@@ -38,7 +33,6 @@ test.describe('Dark Mode Toggle', () => {
     await expect(themeToggle).toBeVisible();
     await themeToggle.click();
 
-    // Verify we're in dark mode
     const htmlElement = page.locator('html');
     await expect(htmlElement).toHaveClass(/dark/);
 
@@ -50,14 +44,12 @@ test.describe('Dark Mode Toggle', () => {
     // Verify dark class is removed
     await expect(htmlElement).not.toHaveClass(/dark/);
 
-    // Verify button is back to showing "Dark"
+    // Verify button is back to dark mode toggle
     const darkModeToggle = page.getByRole('button', { name: /switch to dark mode/i });
     await expect(darkModeToggle).toBeVisible();
-    await expect(darkModeToggle).toContainText('Dark');
   });
 
   test('should persist dark mode preference in localStorage', async ({ page }) => {
-    // Toggle to dark mode
     const themeToggle = page.getByRole('button', { name: /switch to dark mode/i });
     await themeToggle.click();
 

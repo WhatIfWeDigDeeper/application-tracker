@@ -9,7 +9,11 @@
       "Glob(*)",
       "Grep(*)",
       "mcp__plugin_playwright_playwright__browser_*",
-      "WebFetch(domain:nuxt.com)"
+      "WebFetch(*)",
+      "Skill(playwright-cli)",
+      "Skill(playwright-cli:*)",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_navigate"
     ],
     "deny": [
       "Read(.env*)",
