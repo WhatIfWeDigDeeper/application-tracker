@@ -1,7 +1,12 @@
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
+import { enablePatches } from 'immer';
 import App from './App.vue';
 import './style.css';
+
+// Enable Immer patch generation for undo/redo
+enablePatches();
 
 // Routes
 const routes = [
@@ -23,6 +28,9 @@ const router = createRouter({
   routes,
 });
 
+const pinia = createPinia();
+
 const app = createApp(App);
+app.use(pinia);
 app.use(router);
 app.mount('#app');

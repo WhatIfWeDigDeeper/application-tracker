@@ -7,6 +7,10 @@ import type {
   UpdateInterviewStageInput,
   PaginatedResponse,
   FilterState,
+  ApplicationEvent,
+  ApplicationSnapshot,
+  ImmerPatch,
+  FieldChange,
 } from '@/types';
 
 const API_BASE = '/api';
@@ -80,6 +84,13 @@ export const applicationService = {
   async restore(id: string): Promise<Application> {
     return request<Application>(`/applications/${id}/restore`, { method: 'POST' });
   },
+
+  async recreate(application: Application): Promise<Application> {
+    return request<Application>('/applications/recreate', {
+      method: 'POST',
+      body: JSON.stringify(application),
+    });
+  },
 };
 
 // Interview Stage Service
@@ -106,6 +117,51 @@ export const interviewStageService = {
     return request<void>(`/applications/${applicationId}/interview-stages/${stageId}`, {
       method: 'DELETE',
     });
+  },
+};
+
+// Event Service
+export const eventService = {
+  async list(
+    applicationId: string,
+    page = 1,
+    limit = 50
+  ): Promise<{ events: ApplicationEvent[]; total: number; page: number; limit: number }> {
+    return request<{ events: ApplicationEvent[]; total: number; page: number; limit: number }>(
+      `/applications/${applicationId}/events?page=${page}&limit=${limit}`
+    );
+  },
+
+  async append(
+    applicationId: string,
+    data: {
+      description: string;
+      changes: FieldChange[];
+      patches: ImmerPatch[];
+      inversePatches: ImmerPatch[];
+    }
+  ): Promise<ApplicationEvent> {
+    return request<ApplicationEvent>(`/applications/${applicationId}/events`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async restore(applicationId: string, targetSequence: number): Promise<Application> {
+    return request<Application>(`/applications/${applicationId}/events/restore`, {
+      method: 'POST',
+      body: JSON.stringify({ targetSequence }),
+    });
+  },
+
+  async getLatestSnapshot(
+    applicationId: string,
+    beforeSequence?: number
+  ): Promise<ApplicationSnapshot | null> {
+    const params = beforeSequence !== undefined ? `?beforeSequence=${beforeSequence}` : '';
+    return request<ApplicationSnapshot | null>(
+      `/applications/${applicationId}/snapshots/latest${params}`
+    );
   },
 };
 

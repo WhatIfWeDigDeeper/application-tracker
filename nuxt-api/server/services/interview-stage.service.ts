@@ -39,17 +39,22 @@ export async function createInterviewStage(
 
   if (!app) return null;
 
+  const insertValues: typeof interviewStages.$inferInsert = {
+    applicationId,
+    name: input.name,
+    order: input.order,
+    isCompleted: input.isCompleted ?? false,
+    completedDate: input.completedDate || null,
+    notes: input.notes || null,
+    performanceRating: input.performanceRating || null,
+  };
+  if (input.id) {
+    insertValues.id = input.id;
+  }
+
   const [stage] = await db
     .insert(interviewStages)
-    .values({
-      applicationId,
-      name: input.name,
-      order: input.order,
-      isCompleted: input.isCompleted ?? false,
-      completedDate: input.completedDate || null,
-      notes: input.notes || null,
-      performanceRating: input.performanceRating || null,
-    })
+    .values(insertValues)
     .returning();
 
   // Update application's updatedAt

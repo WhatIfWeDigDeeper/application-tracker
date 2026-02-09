@@ -1,6 +1,8 @@
 import { ref, computed, watch } from 'vue';
+import { defineStore } from 'pinia';
 import type { Application, FilterState, PaginatedResponse } from '@/types';
-import { applicationService } from '@/services/api';
+import { applicationService, eventService } from '@/services/api';
+import { generateDescription } from '@/utils/eventDescriptions';
 
 // Default filter state
 const defaultFilters: FilterState = {
@@ -15,7 +17,7 @@ const defaultFilters: FilterState = {
   limit: 20,
 };
 
-export function useApplications() {
+export const useApplicationsListStore = defineStore('applicationsList', () => {
   const applications = ref<Application[]>([]);
   const total = ref(0);
   const loading = ref(false);
@@ -47,10 +49,24 @@ export function useApplications() {
     error.value = null;
 
     try {
-      const application = await applicationService.create(input);
+      const created = await applicationService.create(input);
+
+      // Record initial creation event
+      const description = generateDescription('create', created);
+      try {
+        await eventService.append(created.id, {
+          description,
+          changes: [],
+          patches: [],
+          inversePatches: [],
+        });
+      } catch (eventErr) {
+        console.error('Failed to record creation event:', eventErr);
+      }
+
       // Refresh the list to include the new application
       await fetchApplications();
-      return application;
+      return created;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to create application';
       throw err;
@@ -143,11 +159,11 @@ export function useApplications() {
 
   function setFilters(updates: Partial<FilterState>) {
     // Batch update multiple filters at once to avoid triggering multiple fetches
-    const shouldResetPage = Object.keys(updates).some(key => key !== 'page');
-    
+    const shouldResetPage = Object.keys(updates).some((key) => key !== 'page');
+
     // Type-safe batch update using Object.assign
     Object.assign(filters.value, updates);
-    
+
     // Reset to page 1 when any filter other than page changes
     if (shouldResetPage && !('page' in updates)) {
       filters.value.page = 1;
@@ -212,4 +228,4 @@ export function useApplications() {
     prevPage,
     goToPage,
   };
-}
+});

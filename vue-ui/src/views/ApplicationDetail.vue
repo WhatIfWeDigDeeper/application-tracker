@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, onUnmounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useApplication } from '@/composables/useApplication';
+import { storeToRefs } from 'pinia';
+import { useApplicationDetailStore } from '@/stores/applicationDetail';
+import { useHistoryStore } from '@/stores/history';
 import StatusBadge from '@/components/StatusBadge.vue';
 import RatingDisplay from '@/components/RatingDisplay.vue';
 import InterviewStageItem from '@/components/InterviewStageItem.vue';
 import InterviewStageForm from '@/components/InterviewStageForm.vue';
 import ApplicationFormModal from '@/components/ApplicationFormModal.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import UndoRedoBar from '@/components/UndoRedoBar.vue';
+import HistoryPanel from '@/components/HistoryPanel.vue';
 import {
   ArrowLeftIcon,
   PencilIcon,
@@ -20,6 +24,7 @@ import {
   CalendarIcon,
   TagIcon,
   ClipboardDocumentListIcon,
+  ClockIcon,
 } from '@heroicons/vue/24/outline';
 import type { InterviewStage, CreateInterviewStageInput, UpdateInterviewStageInput } from '@/types';
 import { COMPANY_CATEGORIES, JOB_SOURCES } from '@/types';
@@ -29,19 +34,9 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const {
-  application,
-  loading,
-  error,
-  fetchApplication,
-  deleteApplication,
-  archiveApplication,
-  restoreApplication,
-  addInterviewStage,
-  updateInterviewStage,
-  deleteInterviewStage,
-  toggleStageCompletion,
-} = useApplication();
+const detailStore = useApplicationDetailStore();
+const historyStore = useHistoryStore();
+const { application, loading, error } = storeToRefs(detailStore);
 
 // UI State
 const showEditModal = ref(false);
@@ -50,6 +45,7 @@ const showAddStageForm = ref(false);
 const editingStage = ref<{ id: string; stage: InterviewStage } | null>(null);
 const showDeleteStageConfirm = ref(false);
 const stageToDelete = ref<string | null>(null);
+const showHistoryPanel = ref(false);
 
 // Computed values
 const categoryLabel = computed(() => {
@@ -99,9 +95,27 @@ const sortedStages = computed(() => {
   return [...application.value.interviewStages].sort((a, b) => a.order - b.order);
 });
 
+// Keyboard shortcuts for undo/redo (F8)
+function handleKeyDown(e: KeyboardEvent) {
+  const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+  if (isCtrlOrCmd && e.key === 'z' && !e.shiftKey) {
+    e.preventDefault();
+    historyStore.undo(props.id);
+  } else if (isCtrlOrCmd && ((e.key === 'z' && e.shiftKey) || e.key === 'y')) {
+    e.preventDefault();
+    historyStore.redo(props.id);
+  }
+}
+
 // Lifecycle
-onMounted(() => {
-  fetchApplication(props.id);
+onMounted(async () => {
+  await detailStore.fetchApplication(props.id);
+  historyStore.loadHistory(props.id);
+  window.addEventListener('keydown', handleKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
 });
 
 // Methods
@@ -119,12 +133,12 @@ function goBack() {
 
 function handleEditSaved() {
   showEditModal.value = false;
-  // The application ref is already updated by the composable
+  // The application ref is already updated by the store
 }
 
 async function handleDelete() {
   try {
-    await deleteApplication();
+    await detailStore.deleteApplication();
     router.push('/');
   } catch (err) {
     console.error('Failed to delete application:', err);
@@ -134,7 +148,7 @@ async function handleDelete() {
 
 async function handleArchive() {
   try {
-    await archiveApplication();
+    await detailStore.archiveApplication();
   } catch (err) {
     console.error('Failed to archive application:', err);
   }
@@ -142,7 +156,7 @@ async function handleArchive() {
 
 async function handleRestore() {
   try {
-    await restoreApplication();
+    await detailStore.restoreApplication();
   } catch (err) {
     console.error('Failed to restore application:', err);
   }
@@ -151,7 +165,7 @@ async function handleRestore() {
 // Interview Stage handlers
 async function handleAddStage(input: CreateInterviewStageInput | UpdateInterviewStageInput) {
   try {
-    await addInterviewStage(input as CreateInterviewStageInput);
+    await detailStore.addInterviewStage(input as CreateInterviewStageInput);
     showAddStageForm.value = false;
   } catch (err) {
     console.error('Failed to add interview stage:', err);
@@ -160,7 +174,7 @@ async function handleAddStage(input: CreateInterviewStageInput | UpdateInterview
 
 async function handleUpdateStage(stageId: string, input: UpdateInterviewStageInput) {
   try {
-    await updateInterviewStage(stageId, input);
+    await detailStore.updateInterviewStage(stageId, input);
     editingStage.value = null;
   } catch (err) {
     console.error('Failed to update interview stage:', err);
@@ -182,7 +196,7 @@ function handleDeleteStageRequest(stageId: string) {
 async function handleConfirmDeleteStage() {
   if (stageToDelete.value) {
     try {
-      await deleteInterviewStage(stageToDelete.value);
+      await detailStore.deleteInterviewStage(stageToDelete.value);
     } catch (err) {
       console.error('Failed to delete interview stage:', err);
     }
@@ -193,7 +207,7 @@ async function handleConfirmDeleteStage() {
 
 async function handleToggleStageComplete(stageId: string) {
   try {
-    await toggleStageCompletion(stageId);
+    await detailStore.toggleStageCompletion(stageId);
   } catch (err) {
     console.error('Failed to toggle stage completion:', err);
   }
@@ -230,6 +244,19 @@ async function handleToggleStageComplete(stageId: string) {
       v-else-if="application"
       class="space-y-6"
     >
+      <!-- Undo/Redo Bar -->
+      <div class="flex items-center justify-between">
+        <UndoRedoBar :application-id="id" />
+        <button
+          type="button"
+          class="btn btn-secondary flex items-center"
+          @click="showHistoryPanel = !showHistoryPanel"
+        >
+          <ClockIcon class="h-4 w-4 mr-1" />
+          History
+        </button>
+      </div>
+
       <!-- Back Button and Actions -->
       <div class="flex items-center justify-between">
         <button
@@ -546,6 +573,13 @@ async function handleToggleStageComplete(stageId: string) {
       :is-destructive="true"
       @confirm="handleConfirmDeleteStage"
       @cancel="showDeleteStageConfirm = false; stageToDelete = null"
+    />
+
+    <!-- History Panel -->
+    <HistoryPanel
+      v-if="showHistoryPanel && application"
+      :application-id="id"
+      @close="showHistoryPanel = false"
     />
   </div>
 </template>

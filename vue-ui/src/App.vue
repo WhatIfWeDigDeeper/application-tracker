@@ -2,20 +2,18 @@
 import { RouterView } from 'vue-router';
 import { useDarkMode } from '@/composables/useDarkMode';
 import { SunIcon, MoonIcon, PlusIcon } from '@heroicons/vue/24/outline';
-import { ref, provide } from 'vue';
+import { ref } from 'vue';
 import ApplicationFormModal from '@/components/ApplicationFormModal.vue';
+import { useApplicationsListStore } from '@/stores/applicationsList';
 
 const { isDark, toggle } = useDarkMode();
 const showAddModal = ref(false);
-const refreshTrigger = ref(0);
-
-// Provide the refresh trigger for child components to watch
-provide('refreshTrigger', refreshTrigger);
+const listStore = useApplicationsListStore();
 
 function handleApplicationCreated() {
   showAddModal.value = false;
-  // Trigger refresh in ApplicationList by incrementing the trigger
-  refreshTrigger.value++;
+  // Refresh the list via the store
+  listStore.fetchApplications();
 }
 </script>
 

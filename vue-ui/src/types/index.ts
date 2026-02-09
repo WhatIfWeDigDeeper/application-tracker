@@ -11,6 +11,10 @@ export type {
   UpdateInterviewStageInput,
   PaginatedResponse,
   FilterState,
+  ImmerPatch,
+  FieldChange,
+  ApplicationEvent,
+  ApplicationSnapshot,
 } from '@shared/types';
 
 export {
