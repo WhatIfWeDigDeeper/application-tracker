@@ -1,0 +1,444 @@
+{
+  "id": "3370ce85-a670-479d-acb7-bf9deb5a3afe",
+  "prevId": "188245d2-775b-4c5e-81b0-c35db22a455b",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "vue_nuxt.application_events": {
+      "name": "application_events",
+      "schema": "vue_nuxt",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "changes": {
+          "name": "changes",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patches": {
+          "name": "patches",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inverse_patches": {
+          "name": "inverse_patches",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "application_events_application_id_applications_id_fk": {
+          "name": "application_events_application_id_applications_id_fk",
+          "tableFrom": "application_events",
+          "tableTo": "applications",
+          "schemaTo": "vue_nuxt",
+          "columnsFrom": [
+            "application_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "application_events_application_id_sequence_unique": {
+          "name": "application_events_application_id_sequence_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "application_id",
+            "sequence"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "vue_nuxt.application_snapshots": {
+      "name": "application_snapshots",
+      "schema": "vue_nuxt",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "at_sequence": {
+          "name": "at_sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "application_snapshots_application_id_applications_id_fk": {
+          "name": "application_snapshots_application_id_applications_id_fk",
+          "tableFrom": "application_snapshots",
+          "tableTo": "applications",
+          "schemaTo": "vue_nuxt",
+          "columnsFrom": [
+            "application_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "application_snapshots_application_id_at_sequence_unique": {
+          "name": "application_snapshots_application_id_at_sequence_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "application_id",
+            "at_sequence"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "vue_nuxt.applications": {
+      "name": "applications",
+      "schema": "vue_nuxt",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_title": {
+          "name": "position_title",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_applied": {
+          "name": "date_applied",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "application_status",
+          "typeSchema": "vue_nuxt",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'applied'"
+        },
+        "company_url": {
+          "name": "company_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "job_posting_url": {
+          "name": "job_posting_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_career_url": {
+          "name": "company_career_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_category": {
+          "name": "company_category",
+          "type": "company_category",
+          "typeSchema": "vue_nuxt",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "skills_match": {
+          "name": "skills_match",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "job_source": {
+          "name": "job_source",
+          "type": "job_source",
+          "typeSchema": "vue_nuxt",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_letter_required": {
+          "name": "cover_letter_required",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "special_requirements": {
+          "name": "special_requirements",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "salary_min": {
+          "name": "salary_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "salary_max": {
+          "name": "salary_max",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "offer_due_date": {
+          "name": "offer_due_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_archived": {
+          "name": "is_archived",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "vue_nuxt.interview_stages": {
+      "name": "interview_stages",
+      "schema": "vue_nuxt",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_completed": {
+          "name": "is_completed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "completed_date": {
+          "name": "completed_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "performance_rating": {
+          "name": "performance_rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "interview_stages_application_id_applications_id_fk": {
+          "name": "interview_stages_application_id_applications_id_fk",
+          "tableFrom": "interview_stages",
+          "tableTo": "applications",
+          "schemaTo": "vue_nuxt",
+          "columnsFrom": [
+            "application_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "vue_nuxt.application_status": {
+      "name": "application_status",
+      "schema": "vue_nuxt",
+      "values": [
+        "applied",
+        "rejected",
+        "interviewing",
+        "given offer",
+        "accepted offer",
+        "declined offer",
+        "no offer"
+      ]
+    },
+    "vue_nuxt.company_category": {
+      "name": "company_category",
+      "schema": "vue_nuxt",
+      "values": [
+        "education",
+        "health",
+        "climate",
+        "ai",
+        "energy",
+        "finance",
+        "enterprise-software",
+        "consumer-tech",
+        "e-commerce",
+        "cybersecurity",
+        "gaming",
+        "media-entertainment",
+        "consulting",
+        "government",
+        "nonprofit",
+        "retail",
+        "restaurant",
+        "hospitality",
+        "other"
+      ]
+    },
+    "vue_nuxt.job_source": {
+      "name": "job_source",
+      "schema": "vue_nuxt",
+      "values": [
+        "recruiter",
+        "linkedin",
+        "indeed",
+        "friend",
+        "colleague",
+        "company-website",
+        "other"
+      ]
+    }
+  },
+  "schemas": {
+    "vue_nuxt": "vue_nuxt"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

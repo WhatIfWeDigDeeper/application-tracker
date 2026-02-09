@@ -163,7 +163,7 @@ Scanned Directories: 5
 - /api (Express + Prisma)
 - /koa-api (Koa + PostgreSQL)
 - /hono-api (Hono + Drizzle)
-- /parse-server-api (Parse Server)
+- /nuxt-api (Nuxt + Drizzle)
 - /ui (React UI)
 
 Results by Directory:

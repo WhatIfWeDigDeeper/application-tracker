@@ -1,6 +1,6 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 
-const DARK_MODE_KEY = 'job-tracker-dark-mode';
+const DARK_MODE_KEY = 'app-theme';
 
 export function useDarkMode() {
   const isDark = ref(false);
@@ -29,7 +29,7 @@ export function useDarkMode() {
   // Watch for changes and persist only user-set preferences
   watch(isDark, (newValue) => {
     if (userHasSetPreference.value) {
-      localStorage.setItem(DARK_MODE_KEY, JSON.stringify(newValue));
+      localStorage.setItem(DARK_MODE_KEY, newValue ? 'dark' : 'light');
     }
     updateDarkClass();
   });
@@ -40,7 +40,7 @@ export function useDarkMode() {
     const stored = localStorage.getItem(DARK_MODE_KEY);
     if (stored !== null) {
       userHasSetPreference.value = true;
-      isDark.value = JSON.parse(stored);
+      isDark.value = stored === 'dark';
     } else {
       // Fall back to system preference
       isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;

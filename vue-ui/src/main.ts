@@ -1,15 +1,12 @@
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
-import Parse from '@/lib/parse';
+import { enablePatches } from 'immer';
 import App from './App.vue';
 import './style.css';
 
-// Initialize Parse SDK
-Parse.initialize(
-  import.meta.env.VITE_PARSE_APP_ID || 'job-tracker-app',
-  import.meta.env.VITE_PARSE_JS_KEY || 'js-key-change-in-production'
-);
-Parse.serverURL = import.meta.env.VITE_PARSE_SERVER_URL || '/parse';
+// Enable Immer patch generation for undo/redo
+enablePatches();
 
 // Routes
 const routes = [
@@ -19,9 +16,14 @@ const routes = [
     component: () => import('./views/ApplicationList.vue'),
   },
   {
+    path: '/applications/new',
+    name: 'application-new',
+    component: () => import('./views/ApplicationEdit.vue'),
+  },
+  {
     path: '/applications/:id',
-    name: 'application-detail',
-    component: () => import('./views/ApplicationDetail.vue'),
+    name: 'application-edit',
+    component: () => import('./views/ApplicationEdit.vue'),
     props: true,
   },
 ];
@@ -31,6 +33,9 @@ const router = createRouter({
   routes,
 });
 
+const pinia = createPinia();
+
 const app = createApp(App);
+app.use(pinia);
 app.use(router);
 app.mount('#app');
