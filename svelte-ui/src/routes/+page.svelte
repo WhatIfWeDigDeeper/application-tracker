@@ -120,10 +120,10 @@
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Applications</h1>
     <button type="button" class="btn-primary" onclick={() => (showCreateForm = true)}>
-      <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
       </svg>
-      New Application
+      Add Application
     </button>
   </div>
 
@@ -185,7 +185,17 @@
 
 <!-- Create Form Modal -->
 {#if showCreateForm}
-  <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+  <div
+    class="fixed inset-0 z-50 overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+    onkeydown={(e) => {
+      if (e.key === 'Escape') {
+        showCreateForm = false;
+      }
+    }}
+  >
     <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
       <button
         type="button"
@@ -195,7 +205,7 @@
       ></button>
       <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
         <div class="p-6">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">New Application</h2>
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Add Application</h2>
           <ApplicationForm
             onsubmit={(input) => handleCreate(input as CreateApplicationInput)}
             oncancel={() => (showCreateForm = false)}

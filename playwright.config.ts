@@ -1,5 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = process.env.TEST_UI_PORT ? Number(process.env.TEST_UI_PORT) : 3000;
+const baseURL = `http://localhost:${port}`;
+
+const webServerCommands: Record<number, string> = {
+  3000: 'cd ui && npm run dev',
+  3010: 'cd react-ui && npm run dev',
+  3020: 'cd vue-ui && npm run dev',
+  3030: 'cd svelte-ui && npm run dev',
+};
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -8,7 +18,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL,
     trace: 'on-first-retry',
   },
   projects: [
@@ -17,9 +27,9 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
   ],
-  webServer: {
-    command: 'cd ui && npm run dev',
-    url: 'http://localhost:3000',
+  webServer: webServerCommands[port] ? {
+    command: webServerCommands[port],
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
-  },
+  } : undefined,
 });

@@ -127,7 +127,7 @@
       </div>
 
       <div>
-        <label for="companyCategory" class="label mb-1">Industry</label>
+        <label for="companyCategory" class="label mb-1">Company Category</label>
         <select id="companyCategory" class="input" bind:value={companyCategory}>
           <option value="">Select industry...</option>
           {#each ALL_CATEGORIES as category}
@@ -199,45 +199,20 @@
       </div>
 
       <div class="flex items-center gap-4">
-        <label class="label">Cover Letter Required?</label>
-        <div class="flex items-center gap-4">
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="coverLetter"
-              class="text-primary-600 focus:ring-primary-500"
-              checked={coverLetterRequired === true}
-              onchange={() => (coverLetterRequired = true)}
-            />
-            <span class="text-sm text-gray-700 dark:text-gray-300">Yes</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="coverLetter"
-              class="text-primary-600 focus:ring-primary-500"
-              checked={coverLetterRequired === false}
-              onchange={() => (coverLetterRequired = false)}
-            />
-            <span class="text-sm text-gray-700 dark:text-gray-300">No</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input
-              type="radio"
-              name="coverLetter"
-              class="text-primary-600 focus:ring-primary-500"
-              checked={coverLetterRequired === null}
-              onchange={() => (coverLetterRequired = null)}
-            />
-            <span class="text-sm text-gray-700 dark:text-gray-300">Unknown</span>
-          </label>
-        </div>
+        <label for="coverLetterRequired" class="label">Cover letter required</label>
+        <input
+          id="coverLetterRequired"
+          type="checkbox"
+          class="text-primary-600 focus:ring-primary-500 rounded"
+          checked={coverLetterRequired === true}
+          onchange={(e) => (coverLetterRequired = (e.target as HTMLInputElement).checked)}
+        />
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="salaryMin" class="label mb-1">Salary Range (Min)</label>
+        <label for="salaryMin" class="label mb-1">Minimum Salary</label>
         <input
           id="salaryMin"
           type="number"
@@ -249,7 +224,7 @@
       </div>
 
       <div>
-        <label for="salaryMax" class="label mb-1">Salary Range (Max)</label>
+        <label for="salaryMax" class="label mb-1">Maximum Salary</label>
         <input
           id="salaryMax"
           type="number"
@@ -276,7 +251,7 @@
 
   <!-- Notes -->
   <div>
-    <label for="notes" class="label mb-1">Notes</label>
+    <label for="notes" class="label mb-1">General Notes</label>
     <textarea
       id="notes"
       class="input min-h-[120px]"
@@ -296,7 +271,7 @@
       class="btn-primary"
       disabled={submitting || !companyName.trim() || !positionTitle.trim()}
     >
-      {submitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Application'}
+      {submitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Add Application'}
     </button>
   </div>
 </form>

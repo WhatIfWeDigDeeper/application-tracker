@@ -3,7 +3,7 @@
 ## Default Local Ports
 - Next + Express: UI 3000, API 3001
 - React + Koa: UI 3010, API 5010
-- Vue + Parse: UI 3020, API 5001
+- Vue + Nuxt: UI 3020, API 5040
 - Svelte + Hono: UI 3030, API 5030
 
 ## Docker (compose)
@@ -18,6 +18,6 @@
 - express_prisma (Express + Prisma)
 - react_koa (Koa + pg)
 - svelte_hono (Hono + Drizzle)
-- vue_parse (Parse Server)
+- vue_nuxt (Nuxt + Drizzle)
 
 Notes: Keep ports in sync when running e2e; start the matching API before UI e2e tests.

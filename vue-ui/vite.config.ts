@@ -7,13 +7,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@shared': fileURLToPath(new URL('../nuxt-api/shared', import.meta.url)),
     },
   },
   server: {
     port: 3020,
     proxy: {
-      '/parse': {
-        target: 'http://localhost:5001',
+      '/api': {
+        target: 'http://localhost:5040',
         changeOrigin: true,
       },
     },

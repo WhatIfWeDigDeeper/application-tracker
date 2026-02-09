@@ -1,20 +1,15 @@
 import { test, expect } from '@playwright/test';
 
 test('should load the home page', async ({ page }) => {
-  await page.goto('http://localhost:3000');
+  await page.goto('/');
   await expect(page).toHaveTitle(/Application Tracker/i);
 });
 
-test('should display applications from API', async ({ page }) => {
-  await page.goto('http://localhost:3000');
+test('should display the main heading and add button', async ({ page }) => {
+  await page.goto('/');
 
-  // Wait for applications to load
-  await page.waitForTimeout(2000);
-
-  // Check if any application cards are visible
-  const cards = page.locator('[data-testid^="app-card"]');
-  const count = await cards.count();
-
-  console.log(`Found ${count} application cards`);
-  expect(count).toBeGreaterThanOrEqual(0);
+  // The add application button should be visible
+  await expect(
+    page.getByRole('button', { name: /Add Application/i })
+  ).toBeVisible();
 });
