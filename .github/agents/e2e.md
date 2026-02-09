@@ -2,7 +2,7 @@
 
 - Start the matching API before running UI Playwright suites. See env-and-ports for expected ports.
 - Root Playwright: `npm run test:e2e` (targets Next + Express). Ensure `api` on 5000 (or 3001 via Docker) and `ui` on 3000.
-- Vue + Parse: start `parse-server-api` on 5001, then `cd vue-ui && npm run test:e2e`.
+- Vue + Nuxt: start `nuxt-api` on 5040, then `cd vue-ui && npm run test:e2e`.
 - Other stacks: align UI/API ports per env-and-ports; run their local dev servers before e2e.
 - Use data-testid selectors where possible; avoid brittle text selectors.
 - Keep tests isolated: seed/reset data where needed; prefer creating entities via API when possible.

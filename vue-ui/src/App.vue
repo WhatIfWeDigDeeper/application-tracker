@@ -1,20 +1,10 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
+import { RouterView, useRouter } from 'vue-router';
 import { useDarkMode } from '@/composables/useDarkMode';
 import { SunIcon, MoonIcon, PlusIcon } from '@heroicons/vue/24/outline';
-import { ref } from 'vue';
-import ApplicationFormModal from '@/components/ApplicationFormModal.vue';
-import { useApplicationsListStore } from '@/stores/applicationsList';
 
 const { isDark, toggle } = useDarkMode();
-const showAddModal = ref(false);
-const listStore = useApplicationsListStore();
-
-function handleApplicationCreated() {
-  showAddModal.value = false;
-  // Refresh the list via the store
-  listStore.fetchApplications();
-}
+const router = useRouter();
 </script>
 
 <template>
@@ -50,7 +40,7 @@ function handleApplicationCreated() {
 
             <button
               class="btn btn-primary flex items-center"
-              @click="showAddModal = true"
+              @click="router.push('/applications/new')"
             >
               <PlusIcon class="h-5 w-5 mr-1" />
               Add Application
@@ -64,12 +54,5 @@ function handleApplicationCreated() {
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <RouterView />
     </main>
-
-    <!-- Add Application Modal -->
-    <ApplicationFormModal
-      v-if="showAddModal"
-      @close="showAddModal = false"
-      @saved="handleApplicationCreated"
-    />
   </div>
 </template>

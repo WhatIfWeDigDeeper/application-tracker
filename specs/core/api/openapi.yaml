@@ -5,7 +5,7 @@ info:
     RESTful API for the Job Application Tracker.
 
     This is a technology-agnostic API specification that can be implemented
-    with any backend framework (Express, FastAPI, Parse Server, etc.).
+    with any backend framework (Express, FastAPI, Nuxt, etc.).
 
     ## Key Concepts
 
