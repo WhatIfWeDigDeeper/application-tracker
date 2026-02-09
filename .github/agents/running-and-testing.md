@@ -59,12 +59,11 @@
 - Test: `npm run test`, `npm run test:ui`
 - Preview: `npm run preview`
 
-## parse-server-api/
+## nuxt-api/
 - Dev: `npm run dev`
 - Build: `npm run build`
 - Start: `npm run start`
-- Typecheck: `npm run typecheck`
-- Test: `npm run test`, `npm run test:watch`, `npm run test:ui`
+- DB: `npm run db:generate`, `npm run db:migrate`, `npm run db:push`, `npm run db:studio`
 
 ## vue-ui/
 - Dev: `npm run dev`
