@@ -169,6 +169,14 @@ When navigating between routes that share the same component (e.g. `/application
 ### Navigation Guard Bypass for Programmatic Navigation
 `onBeforeRouteLeave` fires on programmatic `router.push()` calls, not just user-initiated navigation. When a save or delete handler redirects via `router.push()`, a dirty-check guard will block it. Use a `skipNavGuard` ref set to `true` before the `router.push()` call, and check it first in the guard.
 
+## Subagent Usage
+
+### Prefer Blocking Parallel Over Background Agents
+When launching multiple subagents with no other work to do, use normal (blocking) parallel `Task` calls in a single message — results come back automatically when all complete. Only use `run_in_background: true` when you need to continue doing other work while agents run.
+
+### Monitor Background Agents Proactively
+When background agents are used, proactively check their progress via `TaskOutput`/`Read` and report status to the user. Do not wait silently for the user to ask.
+
 ## Running E2E Tests
 
 ### Prerequisites
