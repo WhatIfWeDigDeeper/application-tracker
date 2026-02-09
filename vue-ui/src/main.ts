@@ -16,9 +16,14 @@ const routes = [
     component: () => import('./views/ApplicationList.vue'),
   },
   {
+    path: '/applications/new',
+    name: 'application-new',
+    component: () => import('./views/ApplicationEdit.vue'),
+  },
+  {
     path: '/applications/:id',
-    name: 'application-detail',
-    component: () => import('./views/ApplicationDetail.vue'),
+    name: 'application-edit',
+    component: () => import('./views/ApplicationEdit.vue'),
     props: true,
   },
 ];
