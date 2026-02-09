@@ -32,9 +32,10 @@ This repository contains a complete job application tracker built with four diff
 ### 4. Vue + Nuxt + Drizzle
 **Directories**: `vue-ui/` + `nuxt-api/`
 **Stack**:
-- Frontend: Vue 3 + TypeScript + Vite + Tailwind CSS
+- Frontend: Vue 3 + Pinia + TypeScript + Vite + Tailwind CSS
 - Backend: Nuxt server routes
 - Database: Drizzle ORM + PostgreSQL
+- Event sourcing with Immer patches, undo/redo (Ctrl+Z / Ctrl+Shift+Z), history panel with diff view, and snapshot-based restore
 
 ## Core Features
 
