@@ -161,6 +161,14 @@ When components manage child resources:
 - Pass individual callbacks (`onAdd`, `onUpdate`, `onRemove`) instead of a single `onChange` with full state
 - This allows parent components to make targeted API calls without needing to diff arrays
 
+## Vue.js Patterns
+
+### Vue Router Component Reuse on Param Change
+When navigating between routes that share the same component (e.g. `/applications/new` → `/applications/:id`), Vue Router reuses the component instance — `onMounted` does not re-fire. Use `watch(() => props.id)` to detect the param change and reload data.
+
+### Navigation Guard Bypass for Programmatic Navigation
+`onBeforeRouteLeave` fires on programmatic `router.push()` calls, not just user-initiated navigation. When a save or delete handler redirects via `router.push()`, a dirty-check guard will block it. Use a `skipNavGuard` ref set to `true` before the `router.push()` call, and check it first in the guard.
+
 ## Running E2E Tests
 
 ### Prerequisites
