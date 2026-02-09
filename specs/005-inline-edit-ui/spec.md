@@ -21,10 +21,15 @@ The "+ Add Application" button navigates to a full page (not a modal) that uses 
 Since the API requires an `applicationId` to create stages, stages added during creation are stored in local reactive state. On save, the application is created first, then each stage is created via the existing individual stage CRUD endpoints. No backend API changes are required.
 
 ### Explicit Save with dirty tracking
-Changes require an explicit "Save" click. Snapshot-based dirty tracking compares current form values against the last saved state. Navigation away with unsaved changes triggers a browser confirm dialog.
+Changes require an explicit "Save" click. Snapshot-based dirty tracking compares current form values against the last saved state via JSON serialization. The save button label reflects the mode: "Create Application" (create) or "Save Changes" (edit). In edit mode, the save button is disabled when no changes are detected.
+
+Navigation away with unsaved changes triggers a `window.confirm()` dialog via `onBeforeRouteLeave`. Programmatic navigations (save, delete, discard in create mode) use a `skipNavGuard` ref to bypass the guard.
+
+### Vue Router component reuse
+When navigating from `/applications/new` to `/applications/:id` after creation, Vue Router reuses the `ApplicationEdit` component instance (`onMounted` does not re-fire). A `watch` on the `id` prop detects the route change and reloads the application data from the store.
 
 ### URL fields with clickable links
-URL input fields include an adjacent link icon that opens the URL in a new tab when the value is a valid URL. This preserves the read-only experience of having clickable links.
+URL input fields (`UrlFieldInput.vue`) include an adjacent link icon that opens the URL in a new tab when the value starts with `http://` or `https://`. This preserves the read-only experience of having clickable links.
 
 ## User Flows
 
@@ -34,31 +39,32 @@ URL input fields include an adjacent link icon that opens the URL in a new tab w
 3. Full-page form shows all fields in grouped sections, defaulting to today's date and "Applied" status
 4. User fills in required fields (company name, position title)
 5. User optionally adds interview stages in the stages section
-6. User clicks "Save"
-7. Application is created via API, stages are created individually
-8. Browser navigates to `/applications/:newId` (now in edit mode for the saved application)
+6. User clicks "Create Application"
+7. Application is created via `listStore.createApplication()`, then each local stage is created via individual `POST /api/applications/:id/interview-stages` calls
+8. Browser navigates to `/applications/:newId` (component reuses, `watch(props.id)` triggers reload)
 
 ### Edit application
 1. User clicks an application card in the list
 2. Browser navigates to `/applications/:id`
 3. Full-page form loads with all fields populated from the saved state
 4. User modifies fields
-5. User clicks "Save" — changes are persisted via the detail store (event sourcing records the changes)
-6. Undo/redo remains available via keyboard shortcuts and the UndoRedoBar
+5. User clicks "Save Changes" (only enabled when dirty) — changes are persisted via `detailStore.updateApplication()` (event sourcing records the changes)
+6. Undo/redo available via Ctrl/Cmd+Z / Ctrl/Cmd+Shift+Z (or Y) and the UndoRedoBar
 
 ### Discard changes
 1. User makes changes on the edit page
-2. User clicks "Discard"
-3. Confirm dialog appears
-4. On confirm: form fields revert to last saved state (or navigates to list in create mode)
+2. "Discard" button appears (only visible when form is dirty)
+3. User clicks "Discard" — confirm dialog appears
+4. On confirm: form fields revert to last saved state (edit mode) or navigates to list (create mode)
 
 ## Field Layout
 
 ### Header area
-- Back to List link
-- Save / Discard buttons (right side)
-- Archive / Delete buttons (edit mode only)
-- Undo/Redo bar + History button (edit mode only)
+- Back to List link (left side)
+- Save button: "Create Application" (create) or "Save Changes" (edit, disabled when clean)
+- Discard button (only visible when dirty)
+- Archive / Restore / Delete buttons (edit mode only)
+- Undo/Redo bar + History button (edit mode only, separate row below)
 
 ### Main card sections
 
@@ -95,7 +101,32 @@ URL input fields include an adjacent link icon that opens the URL in a new tab w
 - **Out of scope**: Other implementations (will follow later), API changes, event sourcing model changes
 
 ## Technical notes
-- Reuses existing components: InterviewStageForm, InterviewStageItem, RatingInput, ConfirmDialog, UndoRedoBar, HistoryPanel
+
+### Components
+- Reuses existing: InterviewStageForm, InterviewStageItem, RatingInput, ConfirmDialog, UndoRedoBar, HistoryPanel
 - Replaces: ApplicationFormModal.vue (deleted), ApplicationDetail.vue (deleted)
-- New components: ApplicationEdit.vue (view), UrlFieldInput.vue (component)
-- E2e tests added for the new create/edit/discard/delete flows
+- New: ApplicationEdit.vue (view), UrlFieldInput.vue (component)
+
+### Form state management
+- Individual `ref()` per field (not a single reactive object) for straightforward v-model binding
+- Snapshot-based dirty tracking: `captureSnapshot()` serializes all form fields to JSON; `isDirty` compares current snapshot to the saved one
+- `populateFromApplication()` fills form refs from an `Application` object
+- `buildInput()` constructs the API payload from form refs
+
+### Navigation patterns
+- `skipNavGuard` ref bypasses `onBeforeRouteLeave` for programmatic navigation after save, delete, and discard-in-create-mode
+- `watch(() => props.id)` handles Vue Router component reuse when navigating from `/applications/new` to `/applications/:id`
+- `loadApplication()` is the shared entry point for both `onMounted` and the id watcher
+
+### Undo/redo integration
+- Keyboard shortcuts (Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z/Y) registered via `window.addEventListener('keydown')` in `onMounted`
+- `watch(detailStore.application)` detects undo/redo state changes (`isUndoRedoInProgress`) and repopulates form + recaptures snapshot
+
+### Validation
+- Required: company name, position title (max 200 chars each)
+- Optional URL fields validated with `new URL()` constructor
+- Salary min/max validated as numbers; min must not exceed max
+- Errors displayed inline below each field; general errors in a banner
+
+### E2e tests
+- `application-crud.spec.ts` covers: navigation, validation errors, create + redirect, edit + persist, discard, create with stages, delete, back-to-list, default values, conditional offer due date
