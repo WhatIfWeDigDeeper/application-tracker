@@ -81,6 +81,7 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
+.output
 
 # Gatsby files
 .cache/
@@ -145,7 +146,7 @@ vite.config.ts.timestamp-*
 
 # Playwright
 test-results/
-playwright-report/
+playwright-report*
 playwright/.cache/
 
 # IDE
@@ -170,3 +171,5 @@ Thumbs.db
 
 # Claude settings
 .claude/settings.local.json
+
+.playwright-cli

@@ -81,7 +81,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - **express_prisma** - Root Express + Prisma implementation
 - **react_koa** - React + Koa + PostgreSQL (raw SQL) implementation
 - **svelte_hono** - Svelte + Hono + Drizzle ORM implementation
-- **vue_parse** - Vue + Parse Server implementation
+- **vue_nuxt** - Vue + Nuxt + Drizzle ORM implementation
 
 ### Connection Strings
 Each implementation uses schema-aware connection strings:
@@ -105,10 +105,11 @@ postgresql://postgres:postgres@localhost:5432/app_tracker?schema=<schema_name>
 - Uses Drizzle's `pgSchema('svelte_hono')`
 - Config in: `drizzle.config.ts` with `schemaFilter: ['svelte_hono']`
 
-**Vue-Parse-Server:**
-- Parse Server manages schema automatically in `vue_parse` schema
-- Connection configured in: `parse-server-api/src/config/index.ts`
-- **Vite Compatibility**: Parse SDK has a known issue with Vite due to LiveQuery's use of Node.js `events` module. The solution is a wrapper at `vue-ui/src/lib/parse.ts` that imports `parse/dist/parse.min.js` (which assigns Parse to `window.Parse`)
+**Vue-Nuxt-Drizzle:**
+- Schema defined in: `nuxt-api/server/db/schema.ts`
+- Uses Drizzle's `pgSchema('vue_nuxt')`
+- Config in: `nuxt-api/drizzle.config.ts` with `schemaFilter: ['vue_nuxt']`
+- Shared types in: `nuxt-api/shared/types.ts` (imported by both nuxt-api and vue-ui via `@shared` alias)
 
 ### Benefits
 - **Resource efficiency**: Single PostgreSQL instance
@@ -169,12 +170,12 @@ Before running e2e tests, ensure the required backend services are running:
 |---------------|---------|----------|-------------------|
 | Next.js + Express | 3000 | 3001 | `cd api && npm run dev` |
 | React + Koa | 3010 | 5010 | `cd koa-api && npm run dev` |
-| Vue + Parse | 3020 | 5001 | `cd parse-server-api && npm run dev` |
+| Vue + Nuxt | 3020 | 5040 | `cd nuxt-api && npm run dev` |
 | Svelte + Hono | 3030 | 5030 | `cd hono-api && npm run dev` |
 
 ### Running Tests
 ```bash
-# For vue-ui (requires parse-server-api running on port 5001)
+# For vue-ui (requires nuxt-api running on port 5040)
 cd vue-ui && npm run test:e2e
 
 # For other implementations, start their respective API first

@@ -4,46 +4,38 @@ A full-stack job application tracking system with multiple technology stack impl
 
 ## Overview
 
-This repository contains a complete job application tracker with multiple full-stack implementations, allowing you to choose your preferred technology stack while maintaining the same core functionality and user experience.
+This repository contains a complete job application tracker built with four different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
 
 ## Implementations
 
-### Root Implementation (Express + Prisma + Next.js)
-**Location**: Root directory (`/api` and `/ui`)
-**Stack**: Express.js + Prisma ORM + PostgreSQL + Next.js + React 19
+### 1. Next.js + Express + Prisma
+**Directories**: `ui/` + `api/`
+**Stack**:
+- Frontend: Next.js + React 19 + TypeScript + Tailwind CSS
+- Backend: Express.js + Prisma ORM
+- Database: PostgreSQL
 
-See [API Documentation](api/README.md) and [UI Documentation](ui/README.md) for details.
-
-### Alternative Implementations
-
-Each implementation provides the same core features with different technology stacks:
-
-#### 1. React + Koa + PostgreSQL
-**Location**: [`implementations/react-koa-pg/`](implementations/react-koa-pg/)
+### 2. React + Koa + PostgreSQL
+**Directories**: `react-ui/` + `koa-api/`
 **Stack**:
 - Frontend: React 19 + TypeScript + Vite + Tailwind CSS
 - Backend: Koa.js + raw PostgreSQL (no ORM)
 - Database: PostgreSQL with SQL migrations
 
-[View README](implementations/react-koa-pg/README.md)
-
-#### 2. Svelte + Hono + Drizzle
-**Location**: [`implementations/svelte-hono-drizzle/`](implementations/svelte-hono-drizzle/)
+### 3. Svelte + Hono + Drizzle
+**Directories**: `svelte-ui/` + `hono-api/`
 **Stack**:
 - Frontend: Svelte 5 + SvelteKit + Tailwind CSS
 - Backend: Hono (lightweight framework)
 - Database: Drizzle ORM + PostgreSQL
 
-[View README](implementations/svelte-hono-drizzle/README.md)
-
-#### 3. Vue + Parse Server
-**Location**: [`implementations/vue-parse-server/`](implementations/vue-parse-server/)
+### 4. Vue + Nuxt + Drizzle
+**Directories**: `vue-ui/` + `nuxt-api/`
 **Stack**:
-- Frontend: Vue 3 + TypeScript + Tailwind CSS
-- Backend: Parse Server
-- Database: MongoDB
-
-[View README](implementations/vue-parse-server/README.md)
+- Frontend: Vue 3 + Pinia + TypeScript + Vite + Tailwind CSS
+- Backend: Nuxt server routes
+- Database: Drizzle ORM + PostgreSQL
+- Event sourcing with Immer patches, undo/redo (Ctrl+Z / Ctrl+Shift+Z), history panel with diff view, and snapshot-based restore
 
 ## Core Features
 
@@ -59,46 +51,31 @@ All implementations provide:
 
 ## Database Architecture
 
-All PostgreSQL implementations share a single database (`app_tracker`) with separate schemas:
-- `express_prisma` - Root Express + Prisma implementation
-- `react_koa` - React + Koa + PostgreSQL implementation
-- `svelte_hono` - Svelte + Hono + Drizzle implementation
-
-The Vue + Parse Server implementation uses MongoDB.
+All implementations share a single PostgreSQL database (`app_tracker`) with separate schemas for isolation:
+- `express_prisma` - Next.js + Express + Prisma
+- `react_koa` - React + Koa + PostgreSQL
+- `svelte_hono` - Svelte + Hono + Drizzle
+- `vue_nuxt` - Vue + Nuxt + Drizzle
 
 See [CLAUDE.md](CLAUDE.md) for detailed database architecture documentation.
-
-## Quick Start
-
-### Root Implementation (Express + Prisma)
-```bash
-# Install dependencies
-npm run ci:all
-
-# Set up database
-npm run prisma:migrate:dev
-npm run seed
-
-# Start API and UI
-npm run dev
-```
-
-### Alternative Implementations
-Each implementation has its own setup instructions in its respective README file.
 
 ## Repository Structure
 
 ```
 /
-├── api/                          # Express + Prisma API
 ├── ui/                           # Next.js + React UI
-├── implementations/              # Alternative implementations
-│   ├── react-koa-pg/
-│   ├── svelte-hono-drizzle/
-│   └── vue-parse-server/
+├── api/                          # Express + Prisma API
+├── react-ui/                     # React + Vite UI
+├── koa-api/                      # Koa + PostgreSQL API
+├── svelte-ui/                    # SvelteKit UI
+├── hono-api/                     # Hono API
+├── vue-ui/                       # Vue + Vite UI
+├── nuxt-api/                     # Nuxt server API
+├── specs/                        # Feature specifications
+├── docs/                         # Documentation
 ├── .claude/                      # Claude Code skills and commands
 ├── CLAUDE.md                     # Repository instructions for Claude Code
-└── docker-compose.yml            # Docker setup for root implementation
+└── docker-compose.yml            # Docker + PostgreSQL setup
 ```
 
 ## Development Tools
@@ -106,8 +83,8 @@ Each implementation has its own setup instructions in its respective README file
 This repository includes Claude Code skills for common development tasks:
 - `/commit` - Generate commit messages
 - `/pr` - Create pull requests
-- `fix-build` - Fix build errors
-- `update-deps` - Update dependencies
+- `/fix-build` - Fix build errors
+- `/update-deps` - Update dependencies
 
 See [.claude/](.claude/) for all available commands and skills.
 

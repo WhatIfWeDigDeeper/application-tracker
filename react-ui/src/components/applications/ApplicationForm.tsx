@@ -382,6 +382,7 @@ export function ApplicationForm({
         </h3>
 
         <TextArea
+          label="General Notes"
           value={formData.notes}
           onChange={(e) => handleChange("notes", e.target.value)}
           rows={4}
@@ -404,7 +405,7 @@ export function ApplicationForm({
             ? "Saving..."
             : isEdit
             ? "Save Changes"
-            : "Create Application"}
+            : "Add Application"}
         </Button>
       </div>
     </form>

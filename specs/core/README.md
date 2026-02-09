@@ -45,9 +45,9 @@ To implement the Job Application Tracker with a different technology stack:
 
 ### Example Implementation Prompts
 
-**Vue + Parse Server:**
+**Vue + Nuxt:**
 ```
-Implement the Job Application Tracker using Vue 3 + Parse Server.
+Implement the Job Application Tracker using Vue 3 + Nuxt + Drizzle ORM.
 Reference specs in specs/core/ for requirements.
 API contract: specs/core/api/openapi.yaml
 ```
