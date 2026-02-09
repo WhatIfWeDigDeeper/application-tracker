@@ -8,6 +8,13 @@
       "when": 1770507914515,
       "tag": "0000_rich_bastion",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770599979150,
+      "tag": "0001_perpetual_sister_grimm",
+      "breakpoints": true
     }
   ]
 }

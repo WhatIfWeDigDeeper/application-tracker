@@ -3,7 +3,8 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 import type { Application, CreateApplicationInput, ApplicationStatus, CompanyCategory, JobSource } from '@/types';
 import { APPLICATION_STATUSES, COMPANY_CATEGORIES, JOB_SOURCES } from '@/types';
-import { applicationService } from '@/services/api';
+import { useApplicationDetailStore } from '@/stores/applicationDetail';
+import { useApplicationsListStore } from '@/stores/applicationsList';
 import RatingInput from './RatingInput.vue';
 import ConfirmDialog from './ConfirmDialog.vue';
 
@@ -146,16 +147,20 @@ async function handleSubmit() {
       notes: notes.value || undefined,
     };
 
-    let result: Application;
+    let result: Application | undefined;
 
     if (isEditMode.value && props.application) {
       input.status = status.value;
-      result = await applicationService.update(props.application.id, input);
+      const detailStore = useApplicationDetailStore();
+      result = await detailStore.updateApplication(input);
     } else {
-      result = await applicationService.create(input);
+      const listStore = useApplicationsListStore();
+      result = await listStore.createApplication(input);
     }
 
-    emit('saved', result);
+    if (result) {
+      emit('saved', result);
+    }
   } catch (err) {
     console.error('Failed to save application:', err);
     errors.value.general = err instanceof Error ? err.message : 'Failed to save application';

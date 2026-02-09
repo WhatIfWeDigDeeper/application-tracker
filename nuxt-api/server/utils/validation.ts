@@ -98,6 +98,7 @@ export const ListApplicationsQuerySchema = z.object({
 
 // Create Interview Stage
 export const CreateInterviewStageSchema = z.object({
+  id: z.string().uuid().optional(),
   name: z.string().min(1).max(100),
   order: z.number().int().min(0),
   isCompleted: z.boolean().default(false),
@@ -114,4 +115,38 @@ export const UpdateInterviewStageSchema = z.object({
   completedDate: z.string().nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
   performanceRating: z.number().int().min(1).max(5).nullable().optional(),
+});
+
+// --- Event Sourcing Validation Schemas ---
+
+// Append Event
+export const AppendEventSchema = z.object({
+  description: z.string().min(1).max(500),
+  changes: z.array(z.object({
+    field: z.string(),
+    label: z.string(),
+    oldValue: z.unknown(),
+    newValue: z.unknown(),
+  })),
+  patches: z.array(z.object({
+    op: z.enum(['replace', 'add', 'remove']),
+    path: z.array(z.union([z.string(), z.number()])),
+    value: z.unknown().optional(),
+  })),
+  inversePatches: z.array(z.object({
+    op: z.enum(['replace', 'add', 'remove']),
+    path: z.array(z.union([z.string(), z.number()])),
+    value: z.unknown().optional(),
+  })),
+});
+
+// List Events Query
+export const ListEventsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(200).default(50),
+});
+
+// Restore to Event
+export const RestoreToEventSchema = z.object({
+  targetSequence: z.coerce.number().int().min(1),
 });

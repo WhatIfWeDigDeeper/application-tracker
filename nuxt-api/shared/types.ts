@@ -116,6 +116,7 @@ export interface UpdateApplicationInput {
 
 // Create Interview Stage Input
 export interface CreateInterviewStageInput {
+  id?: string;
   name: string;
   order: number;
   isCompleted?: boolean;
@@ -197,3 +198,38 @@ export const JOB_SOURCES: { value: JobSource; label: string }[] = [
   { value: 'company-website', label: 'Company Website' },
   { value: 'other', label: 'Other' },
 ];
+
+// --- Event Sourcing Types ---
+
+// Mirror of Immer's Patch type (shared between frontend and backend)
+export interface ImmerPatch {
+  op: 'replace' | 'add' | 'remove';
+  path: (string | number)[];
+  value?: unknown;
+}
+
+export interface FieldChange {
+  field: string;
+  label: string;
+  oldValue: unknown;
+  newValue: unknown;
+}
+
+export interface ApplicationEvent {
+  id: string;
+  applicationId: string;
+  sequence: number;
+  description: string;
+  changes: FieldChange[];
+  patches: ImmerPatch[];
+  inversePatches: ImmerPatch[];
+  createdAt: string;
+}
+
+export interface ApplicationSnapshot {
+  id: string;
+  applicationId: string;
+  atSequence: number;
+  state: Application;
+  createdAt: string;
+}

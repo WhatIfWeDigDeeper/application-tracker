@@ -1,5 +1,6 @@
-import { uuid, varchar, text, integer, boolean, date, timestamp, pgSchema } from 'drizzle-orm/pg-core';
+import { uuid, varchar, text, integer, boolean, date, timestamp, jsonb, pgSchema, unique } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import type { FieldChange, ImmerPatch, Application } from '~~/shared/types';
 
 // Define the vue_nuxt schema
 export const vueNuxtSchema = pgSchema('vue_nuxt');
@@ -84,9 +85,39 @@ export const interviewStages = vueNuxtSchema.table('interview_stages', {
   performanceRating: integer('performance_rating'),
 });
 
+// Event Sourcing Tables
+export const applicationEvents = vueNuxtSchema.table('application_events', {
+  id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  applicationId: uuid('application_id')
+    .notNull()
+    .references(() => applications.id, { onDelete: 'cascade' }),
+  sequence: integer('sequence').notNull(),
+  description: varchar('description', { length: 500 }).notNull(),
+  changes: jsonb('changes').notNull().$type<FieldChange[]>(),
+  patches: jsonb('patches').notNull().$type<ImmerPatch[]>(),
+  inversePatches: jsonb('inverse_patches').notNull().$type<ImmerPatch[]>(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique('application_events_application_id_sequence_unique').on(table.applicationId, table.sequence),
+]);
+
+export const applicationSnapshots = vueNuxtSchema.table('application_snapshots', {
+  id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  applicationId: uuid('application_id')
+    .notNull()
+    .references(() => applications.id, { onDelete: 'cascade' }),
+  atSequence: integer('at_sequence').notNull(),
+  state: jsonb('state').notNull().$type<Application>(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique('application_snapshots_application_id_at_sequence_unique').on(table.applicationId, table.atSequence),
+]);
+
 // Relations
 export const applicationsRelations = relations(applications, ({ many }) => ({
   interviewStages: many(interviewStages),
+  applicationEvents: many(applicationEvents),
+  applicationSnapshots: many(applicationSnapshots),
 }));
 
 export const interviewStagesRelations = relations(interviewStages, ({ one }) => ({
@@ -96,8 +127,26 @@ export const interviewStagesRelations = relations(interviewStages, ({ one }) => 
   }),
 }));
 
+export const applicationEventsRelations = relations(applicationEvents, ({ one }) => ({
+  application: one(applications, {
+    fields: [applicationEvents.applicationId],
+    references: [applications.id],
+  }),
+}));
+
+export const applicationSnapshotsRelations = relations(applicationSnapshots, ({ one }) => ({
+  application: one(applications, {
+    fields: [applicationSnapshots.applicationId],
+    references: [applications.id],
+  }),
+}));
+
 // DB-layer types (inferred from schema)
 export type DbApplication = typeof applications.$inferSelect;
 export type NewDbApplication = typeof applications.$inferInsert;
 export type DbInterviewStage = typeof interviewStages.$inferSelect;
 export type NewDbInterviewStage = typeof interviewStages.$inferInsert;
+export type DbApplicationEvent = typeof applicationEvents.$inferSelect;
+export type NewDbApplicationEvent = typeof applicationEvents.$inferInsert;
+export type DbApplicationSnapshot = typeof applicationSnapshots.$inferSelect;
+export type NewDbApplicationSnapshot = typeof applicationSnapshots.$inferInsert;
