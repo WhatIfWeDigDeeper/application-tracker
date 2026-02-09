@@ -1,22 +1,10 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
+import { RouterView, useRouter } from 'vue-router';
 import { useDarkMode } from '@/composables/useDarkMode';
 import { SunIcon, MoonIcon, PlusIcon } from '@heroicons/vue/24/outline';
-import { ref, provide } from 'vue';
-import ApplicationFormModal from '@/components/ApplicationFormModal.vue';
 
 const { isDark, toggle } = useDarkMode();
-const showAddModal = ref(false);
-const refreshTrigger = ref(0);
-
-// Provide the refresh trigger for child components to watch
-provide('refreshTrigger', refreshTrigger);
-
-function handleApplicationCreated() {
-  showAddModal.value = false;
-  // Trigger refresh in ApplicationList by incrementing the trigger
-  refreshTrigger.value++;
-}
+const router = useRouter();
 </script>
 
 <template>
@@ -30,7 +18,7 @@ function handleApplicationCreated() {
             class="flex items-center"
           >
             <h1 class="text-xl font-bold text-gray-900 dark:text-white">
-              Job Application Tracker (Vue - Parse Server)
+              Job Application Tracker (Vue - Nuxt)
             </h1>
           </router-link>
 
@@ -52,7 +40,7 @@ function handleApplicationCreated() {
 
             <button
               class="btn btn-primary flex items-center"
-              @click="showAddModal = true"
+              @click="router.push('/applications/new')"
             >
               <PlusIcon class="h-5 w-5 mr-1" />
               Add Application
@@ -66,12 +54,5 @@ function handleApplicationCreated() {
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <RouterView />
     </main>
-
-    <!-- Add Application Modal -->
-    <ApplicationFormModal
-      v-if="showAddModal"
-      @close="showAddModal = false"
-      @saved="handleApplicationCreated"
-    />
   </div>
 </template>

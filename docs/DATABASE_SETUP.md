@@ -13,7 +13,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 - `express_prisma` - Root Express + Prisma implementation
 - `react_koa` - React + Koa + raw PostgreSQL implementation
 - `svelte_hono` - Svelte + Hono + Drizzle ORM implementation
-- `vue_parse` - Vue + Parse Server implementation
+- `vue_nuxt` - Vue + Nuxt + Drizzle ORM implementation
 
 ---
 
@@ -46,8 +46,8 @@ docker compose up -d
 cd implementations/svelte-hono-drizzle
 docker compose up -d
 
-# Vue + Parse Server
-cd implementations/vue-parse-server
+# Vue + Nuxt + Drizzle
+cd nuxt-api
 docker compose up -d
 ```
 
@@ -135,20 +135,20 @@ npm run db:push
 npm run dev
 ```
 
-#### Vue + Parse Server
+#### Vue + Nuxt + Drizzle
 
 ```bash
 # Set the DATABASE_URL
-export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/app_tracker?schema=vue_parse"
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/app_tracker?schema=vue_nuxt"
 
 # Install dependencies
-cd implementations/vue-parse-server/parse-server-api
+cd nuxt-api
 npm install
 
-# Parse Server will automatically create the vue_parse schema and tables
-# when it starts up
+# Push Drizzle schema to database (creates vue_nuxt schema + tables)
+npm run db:push
 
-# Start the Parse Server
+# Start the Nuxt API server
 npm run dev
 ```
 
@@ -170,7 +170,7 @@ Expected output should show:
  express_prisma  | postgres
  react_koa       | postgres
  svelte_hono     | postgres
- vue_parse       | postgres
+ vue_nuxt        | postgres
  public          | postgres
 ```
 
@@ -186,8 +186,8 @@ psql -h localhost -U postgres -d app_tracker -c "\dt react_koa.*"
 # Svelte Hono schema
 psql -h localhost -U postgres -d app_tracker -c "\dt svelte_hono.*"
 
-# Vue Parse schema
-psql -h localhost -U postgres -d app_tracker -c "\dt vue_parse.*"
+# Vue Nuxt schema
+psql -h localhost -U postgres -d app_tracker -c "\dt vue_nuxt.*"
 ```
 
 ---
@@ -285,9 +285,9 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/app_tracker?schema=re
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/app_tracker?schema=svelte_hono
 ```
 
-**Vue-Parse (implementations/vue-parse-server/parse-server-api/.env):**
+**Vue-Nuxt (nuxt-api/.env):**
 ```
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/app_tracker?schema=vue_parse
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/app_tracker?schema=vue_nuxt
 ```
 
 ---

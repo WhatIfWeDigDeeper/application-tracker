@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, inject, watch, type Ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useApplications } from '@/composables/useApplications';
+import { storeToRefs } from 'pinia';
+import { useApplicationsListStore } from '@/stores/applicationsList';
 import ApplicationCard from '@/components/ApplicationCard.vue';
 import FilterBar from '@/components/FilterBar.vue';
 import Pagination from '@/components/Pagination.vue';
@@ -10,38 +11,15 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { BriefcaseIcon } from '@heroicons/vue/24/outline';
 
 const router = useRouter();
-const {
-  applications,
-  total,
-  loading,
-  error,
-  filters,
-  totalPages,
-  fetchApplications,
-  archiveApplication,
-  restoreApplication,
-  deleteApplication,
-  setFilters,
-  resetFilters,
-  goToPage,
-} = useApplications();
+const listStore = useApplicationsListStore();
+const { applications, total, loading, error, filters, totalPages } = storeToRefs(listStore);
 
 // Delete confirmation
 const showDeleteConfirm = ref(false);
 const applicationToDelete = ref<string | null>(null);
 
-// Inject the refresh trigger from App.vue
-const refreshTrigger = inject<Ref<number>>('refreshTrigger');
-
-// Watch for refresh trigger changes from parent
-if (refreshTrigger) {
-  watch(refreshTrigger, () => {
-    fetchApplications();
-  });
-}
-
 onMounted(() => {
-  fetchApplications();
+  listStore.fetchApplications();
 });
 
 function handleCardClick(id: string) {
@@ -50,7 +28,7 @@ function handleCardClick(id: string) {
 
 async function handleArchive(id: string) {
   try {
-    await archiveApplication(id);
+    await listStore.archiveApplication(id);
   } catch (err) {
     console.error('Failed to archive application:', err);
   }
@@ -58,7 +36,7 @@ async function handleArchive(id: string) {
 
 async function handleRestore(id: string) {
   try {
-    await restoreApplication(id);
+    await listStore.restoreApplication(id);
   } catch (err) {
     console.error('Failed to restore application:', err);
   }
@@ -72,7 +50,7 @@ function handleDeleteRequest(id: string) {
 async function handleConfirmDelete() {
   if (applicationToDelete.value) {
     try {
-      await deleteApplication(applicationToDelete.value);
+      await listStore.deleteApplication(applicationToDelete.value);
     } catch (err) {
       console.error('Failed to delete application:', err);
     }
@@ -87,11 +65,11 @@ function handleCancelDelete() {
 }
 
 function handleFilterUpdate(updates: Partial<typeof filters.value>) {
-  setFilters(updates);
+  listStore.setFilters(updates);
 }
 
 function handlePageChange(page: number) {
-  goToPage(page);
+  listStore.goToPage(page);
 }
 </script>
 
@@ -103,7 +81,7 @@ function handlePageChange(page: number) {
       :result-count="applications.length"
       :total-count="total"
       @update:filters="handleFilterUpdate"
-      @clear-filters="resetFilters"
+      @clear-filters="listStore.resetFilters"
     />
 
     <!-- Loading State -->
