@@ -35,6 +35,11 @@ async function apiCall<T>(
       throw new ApiError(response.status, error || `HTTP ${response.status}`);
     }
 
+    // Handle 204 No Content (e.g., DELETE responses)
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
     const data = await response.json() as T;
     return data;
   } catch (error) {

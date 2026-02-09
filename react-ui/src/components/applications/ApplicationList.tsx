@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import type { Application } from "../../types/application";
 import { ApplicationCard } from "./ApplicationCard";
 import { EmptyState, Button, Pagination } from "../ui";
@@ -5,11 +6,9 @@ import { EmptyState, Button, Pagination } from "../ui";
 interface ApplicationListProps {
   applications: Application[];
   loading: boolean;
-  onSelect: (id: string) => void;
   onArchive: (id: string) => void;
   onRestore: (id: string) => void;
   onDelete: (id: string) => void;
-  onAddNew: () => void;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -20,11 +19,9 @@ interface ApplicationListProps {
 export function ApplicationList({
   applications,
   loading,
-  onSelect,
   onArchive,
   onRestore,
   onDelete,
-  onAddNew,
   currentPage,
   totalPages,
   onPageChange,
@@ -94,9 +91,9 @@ export function ApplicationList({
         title="No applications yet"
         description="Start tracking your job applications by adding your first one."
         action={
-          <Button variant="primary" onClick={onAddNew}>
-            Add Application
-          </Button>
+          <Link to="/applications/new">
+            <Button variant="primary">Add Application</Button>
+          </Link>
         }
       />
     );
@@ -109,7 +106,6 @@ export function ApplicationList({
           <ApplicationCard
             key={application.id}
             application={application}
-            onClick={() => onSelect(application.id)}
             onArchive={() =>
               application.isArchived
                 ? onRestore(application.id)
