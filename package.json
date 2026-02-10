@@ -67,6 +67,7 @@
     "test:e2e:ui": "npx -y playwright test --ui",
     "test:e2e:debug": "npx -y playwright test --debug",
     "clean": "rm -rf node_modules api/node_modules ui/node_modules api/dist ui/.next",
+    "docs:schema": "bash scripts/generate-schema-docs.sh",
     "kill:all-next-dev": "pkill -f \"next dev\""
   },
   "keywords": [],

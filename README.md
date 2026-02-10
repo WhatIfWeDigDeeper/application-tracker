@@ -84,6 +84,7 @@ See [CLAUDE.md](CLAUDE.md) for detailed database architecture documentation.
 
 - Node.js (v18+)
 - Docker and Docker Compose (for PostgreSQL)
+- [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
 ### Installation
 
@@ -123,6 +124,16 @@ cd nuxt-api && npm run dev
 cd svelte-ui && npm run dev
 cd hono-api && npm run dev
 ```
+
+### Schema Documentation
+
+Regenerate database ERD docs after schema changes (requires [tbls](https://github.com/k1LoW/tbls) and a running PostgreSQL instance):
+
+```bash
+npm run docs:schema
+```
+
+This generates Mermaid ERDs and per-table documentation under `docs/schema/` for each implementation schema.
 
 ## Testing
 
