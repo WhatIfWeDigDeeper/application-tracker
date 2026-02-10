@@ -197,6 +197,23 @@ When launching multiple subagents with no other work to do, use normal (blocking
 ### Monitor Background Agents Proactively
 When background agents are used, proactively check their progress via `TaskOutput`/`Read` and report status to the user. Do not wait silently for the user to ask.
 
+## Commit and Review Workflow
+
+### Interactive Sessions
+When working directly with the user in the main worktree:
+- **Do not commit unless explicitly asked** — the user will say "commit" when ready
+- Show changes and suggest committing, but wait for confirmation
+
+### Worktree/Subagent Sessions
+When agents are spawned in isolated git worktrees (via `/parallel-work`, `/parallel-agents`):
+- Agents should auto-commit their work before returning, since the worktree is ephemeral and uncommitted work would be lost
+
+### Documentation Maintenance
+When adding new scripts, tools, or infrastructure:
+- Update the root `README.md` (Getting Started, prerequisites, usage) — this is the entry point for teammates
+- Update `CLAUDE.md` if the change affects how Claude should work with the codebase
+- Documentation updates are part of completing the task, not a separate step
+
 ## Running E2E Tests
 
 ### Prerequisites
@@ -219,6 +236,13 @@ npm run test:e2e:react-koa # React-Koa (port 3010)
 npm run test:e2e:vue       # Vue-Nuxt (port 3020)
 npm run test:e2e:svelte    # Svelte-Hono (port 3030)
 ```
+
+### Schema Documentation
+Regenerate database ERD docs after schema changes:
+```bash
+npm run docs:schema    # Requires tbls (brew install tbls) and running PostgreSQL
+```
+This runs `scripts/generate-schema-docs.sh` which generates Mermaid ERDs under `docs/schema/` for all 4 schemas.
 
 ### Shared Selector Contract
 All implementations must match identical selectors for the shared e2e tests:
