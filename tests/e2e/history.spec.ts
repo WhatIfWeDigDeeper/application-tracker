@@ -155,4 +155,14 @@ test.describe.serial('History Panel - Vue Event Sourcing', () => {
     await closeHistory(page);
     await expect(panel(page)).not.toBeVisible();
   });
+
+  test.afterAll(async ({ page }) => {
+    if (!applicationUrl) return;
+    await page.goto(applicationUrl);
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('input[placeholder="Company Name *"]', { timeout: 10000 });
+    await page.click('button:has-text("Delete")');
+    await page.locator('button:has-text("Delete")').last().click();
+    await page.waitForURL('/');
+  });
 });

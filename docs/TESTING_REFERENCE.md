@@ -21,6 +21,21 @@ All implementations must match identical selectors for the shared e2e tests:
 - URL field placeholders: `"https://example.com"`, `"https://example.com/careers"`, `"https://linkedin.com/jobs/..."`
 - Labels: `/cover letter required/i`
 
+## Test Data Cleanup
+
+E2E tests clean up after themselves via `afterAll` hooks, but interrupted runs can leave data behind. Use the cleanup script to remove leftover test applications:
+
+```bash
+# defaults: nuxt-api (port 5040)
+npm run cleanup:test-data
+# preview without deleting
+npm run cleanup:test-data -- --dry-run
+# custom port + keyword
+npm run cleanup:test-data -- --port 3001 "My Keyword"
+```
+
+The script calls `GET /api/applications` then `DELETE /api/applications/:id` for each match, so it respects cascade logic. Default keywords cover common e2e test names (`Test Co`, `History Co`, `Delete Co`, etc.). Custom keywords replace the defaults.
+
 ## Unit Testing Patterns
 
 ### MSW for API Mocking

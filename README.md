@@ -206,6 +206,8 @@ npm run test:e2e:react-koa # React + Koa (port 3010)
 npm run test:e2e:all      # Run all e2e tests
 ```
 
+To clean up leftover test data from interrupted runs, see [Test Data Cleanup](docs/TESTING_REFERENCE.md#test-data-cleanup).
+
 ### Build Verification
 
 Build all implementations:
