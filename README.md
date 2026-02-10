@@ -52,10 +52,10 @@ All implementations provide:
 ## Database Architecture
 
 All implementations share a single PostgreSQL database (`app_tracker`) with separate schemas for isolation:
-- `express_prisma` - Next.js + Express + Prisma
-- `react_koa` - React + Koa + PostgreSQL
-- `svelte_hono` - Svelte + Hono + Drizzle
-- `vue_nuxt` - Vue + Nuxt + Drizzle
+- [`express_prisma`](docs/schema/express-prisma/README.md) - Next.js + Express + Prisma
+- [`react_koa`](docs/schema/react-koa/README.md) - React + Koa + PostgreSQL
+- [`svelte_hono`](docs/schema/svelte-hono/README.md) - Svelte + Hono + Drizzle
+- [`vue_nuxt`](docs/schema/vue-nuxt/README.md) - Vue + Nuxt + Drizzle
 
 See [CLAUDE.md](CLAUDE.md) for detailed database architecture documentation.
 
