@@ -1,43 +1,29 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import type {
-  JobApplication,
-  InterviewStage,
-  CreateApplicationInput,
-  UpdateApplicationInput,
-  UpdateInterviewStageInput,
-} from '@/types/application';
+import { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import type { JobApplication } from '@/types/application';
 import { useApplications } from '@/hooks/useApplications';
 import { useFilters } from '@/hooks/useFilters';
 import { useSorting } from '@/hooks/useSorting';
 import { Header } from '@/components/common/Header';
 import { ApplicationList } from '@/components/applications/ApplicationList';
-import { ApplicationForm } from '@/components/applications/ApplicationForm';
-import { ApplicationDetail } from '@/components/applications/ApplicationDetail';
 import { FilterBar } from '@/components/applications/FilterBar';
 import { SortControls } from '@/components/applications/SortControls';
-import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { PlusIcon } from '@/assets/icons/PlusIcon';
 
 export default function Home(): React.ReactElement {
+  const router = useRouter();
+
   const {
     applications,
     isLoading,
     error,
-    addApplication,
-    updateApplication,
-    deleteApplication,
     archiveApplication,
     restoreApplication,
     setFilters: setHookFilters,
     setSort: setHookSort,
-    addInterviewStage,
-    updateInterviewStage,
-    removeInterviewStage,
-    getApplicationById,
   } = useApplications();
 
   const { filters, setFilters, clearFilters, hasActiveFilters } = useFilters();
@@ -52,97 +38,16 @@ export default function Home(): React.ReactElement {
     setHookSort(sort);
   }, [sort, setHookSort]);
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingApplication, setEditingApplication] = useState<JobApplication | null>(null);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null);
-
-  // Get the currently selected application (refreshed from storage)
-  const selectedApplication = selectedApplicationId ? getApplicationById(selectedApplicationId) : null;
-
   const handleAddNew = (): void => {
-    setEditingApplication(null);
-    setIsFormOpen(true);
-  };
-
-  const handleFormSubmit = (data: CreateApplicationInput | UpdateApplicationInput): void => {
-    if (editingApplication) {
-      updateApplication(editingApplication.id, data as UpdateApplicationInput);
-    } else {
-      addApplication(data as CreateApplicationInput);
-    }
-    setIsFormOpen(false);
-    setEditingApplication(null);
-  };
-
-  const handleFormCancel = (): void => {
-    setIsFormOpen(false);
-    setEditingApplication(null);
+    router.push('/applications/new');
   };
 
   const handleSelectApplication = (application: JobApplication): void => {
-    setSelectedApplicationId(application.id);
-  };
-
-  const handleCloseDetail = (): void => {
-    setSelectedApplicationId(null);
-  };
-
-  const handleDetailUpdate = (id: string, data: UpdateApplicationInput): void => {
-    updateApplication(id, data);
-  };
-
-  const handleAddStage = async (stage: InterviewStage): Promise<void> => {
-    if (selectedApplication) {
-      await addInterviewStage(selectedApplication.id, stage);
-      // Auto-transition to 'interviewing' status if adding stages while 'applied'
-      if (selectedApplication.status === 'applied') {
-        updateApplication(selectedApplication.id, { status: 'interviewing' });
-      }
-    }
-  };
-
-  const handleUpdateStage = async (
-    stageId: string,
-    stage: UpdateInterviewStageInput
-  ): Promise<void> => {
-    if (selectedApplication) {
-      await updateInterviewStage(selectedApplication.id, stageId, stage);
-    }
-  };
-
-  const handleRemoveStage = async (stageId: string): Promise<void> => {
-    if (selectedApplication) {
-      await removeInterviewStage(selectedApplication.id, stageId);
-    }
-  };
-
-  const handleEditFromDetail = (): void => {
-    if (selectedApplication) {
-      setEditingApplication(selectedApplication);
-      setIsFormOpen(true);
-      setSelectedApplicationId(null);
-    }
-  };
-
-  const handleEditApplication = (application: JobApplication): void => {
-    setEditingApplication(application);
-    setIsFormOpen(true);
+    router.push(`/applications/${application.id}`);
   };
 
   const handleArchiveApplication = (id: string): void => {
     archiveApplication(id);
-  };
-
-  const handleDeleteApplication = (id: string): void => {
-    setDeleteConfirmId(id);
-  };
-
-  const handleConfirmDelete = (): void => {
-    if (deleteConfirmId) {
-      deleteApplication(deleteConfirmId);
-      setDeleteConfirmId(null);
-    }
   };
 
   const handleRestoreApplication = (id: string): void => {
@@ -186,58 +91,10 @@ export default function Home(): React.ReactElement {
           isLoading={isLoading}
           onAddNew={handleAddNew}
           onSelectApplication={handleSelectApplication}
-          onEditApplication={handleEditApplication}
           onArchiveApplication={handleArchiveApplication}
-          onDeleteApplication={handleDeleteApplication}
           onRestoreApplication={handleRestoreApplication}
         />
       </main>
-
-      {/* Add/Edit Form Modal */}
-      <Modal
-        isOpen={isFormOpen}
-        onClose={handleFormCancel}
-        title={editingApplication ? 'Edit Application' : 'Add New Application'}
-        size="xl"
-      >
-        <ApplicationForm
-          initialData={editingApplication ?? undefined}
-          onSubmit={handleFormSubmit}
-          onCancel={handleFormCancel}
-          mode={editingApplication ? 'edit' : 'create'}
-        />
-      </Modal>
-
-      {/* Application Detail Modal */}
-      <Modal
-        isOpen={selectedApplication !== null}
-        onClose={handleCloseDetail}
-        title="Application Details"
-        size="xl"
-      >
-        {selectedApplication && (
-          <ApplicationDetail
-            application={selectedApplication}
-            onUpdate={handleDetailUpdate}
-            onAddStage={handleAddStage}
-            onUpdateStage={handleUpdateStage}
-            onRemoveStage={handleRemoveStage}
-            onEdit={handleEditFromDetail}
-            onClose={handleCloseDetail}
-          />
-        )}
-      </Modal>
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={deleteConfirmId !== null}
-        onClose={() => setDeleteConfirmId(null)}
-        onConfirm={handleConfirmDelete}
-        title="Delete Application"
-        message="Are you sure you want to permanently delete this application? This action cannot be undone."
-        confirmLabel="Delete"
-        variant="danger"
-      />
     </div>
   );
 }

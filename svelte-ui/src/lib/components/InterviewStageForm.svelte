@@ -75,7 +75,7 @@
           type="text"
           class="input"
           bind:value={name}
-          placeholder="e.g., Phone Screen, Technical Interview"
+          placeholder="Phone Screen, Technical Interview..."
           required
         />
       </div>

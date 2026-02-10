@@ -78,13 +78,102 @@ See [CLAUDE.md](CLAUDE.md) for detailed database architecture documentation.
 └── docker-compose.yml            # Docker + PostgreSQL setup
 ```
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18+)
+- Docker and Docker Compose (for PostgreSQL)
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies for all implementations:
+   ```bash
+   npm run ci:all
+   ```
+
+3. Start PostgreSQL:
+   ```bash
+   docker-compose up -d postgres
+   ```
+
+4. Run database migrations:
+   ```bash
+   npm run prisma:migrate:dev
+   ```
+
+### Running Applications
+
+Each implementation can be run independently:
+
+```bash
+# Next.js + Express (UI 3000 + API 3001)
+npm run dev
+
+# React + Koa (UI 3010 + API 5010)
+cd react-ui && npm run dev
+cd koa-api && npm run dev
+
+# Vue + Nuxt (UI 3020 + API 5040)
+cd vue-ui && npm run dev
+cd nuxt-api && npm run dev
+
+# Svelte + Hono (UI 3030 + API 5030)
+cd svelte-ui && npm run dev
+cd hono-api && npm run dev
+```
+
+## Testing
+
+### Unit Tests
+
+Run tests for individual implementations:
+
+```bash
+npm run test:api          # Express + Prisma API tests
+npm run test:ui           # Next.js UI tests
+npm run test:koa-api      # Koa API tests
+npm run test:react-ui     # React UI tests
+npm run test:svelte-ui    # Svelte UI tests
+npm run test:vue-ui       # Vue UI tests
+```
+
+Run all unit tests:
+
+```bash
+npm run test              # Run api + ui tests only
+npm run test:all          # Run all implementation tests
+```
+
+### End-to-End Tests
+
+E2E tests use Playwright and run against each implementation:
+
+```bash
+npm run test:e2e          # Next.js + Express (port 3000)
+npm run test:e2e:vue      # Vue + Vite (port 3020)
+npm run test:e2e:svelte   # Svelte + Hono (port 3030)
+npm run test:e2e:react-koa # React + Koa (port 3010)
+npm run test:e2e:all      # Run all e2e tests
+```
+
+### Build Verification
+
+Build all implementations:
+
+```bash
+npm run build             # Build api + ui
+npm run build:all         # Build all implementations
+```
+
 ## Development Tools
 
 This repository includes Claude Code skills for common development tasks:
 - `/commit` - Generate commit messages
 - `/pr` - Create pull requests
 - `/fix-build` - Fix build errors
-- `/update-deps` - Update dependencies
+- `/package-json-maintenance` - Update dependencies and/or fix audit errors
 
 See [.claude/](.claude/) for all available commands and skills.
 

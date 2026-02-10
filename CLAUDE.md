@@ -161,6 +161,42 @@ When components manage child resources:
 - Pass individual callbacks (`onAdd`, `onUpdate`, `onRemove`) instead of a single `onChange` with full state
 - This allows parent components to make targeted API calls without needing to diff arrays
 
+## Cross-Framework Patterns
+
+### Prisma Date Format Mismatch
+Prisma returns dates as ISO datetime strings (`2026-02-09T00:00:00.000Z`) but HTML date inputs and Zod's `z.string().date()` expect `YYYY-MM-DD`. When populating forms from API responses, use `.split('T')[0]` to extract the date portion.
+
+### API 204 No Content Handling
+`response.json()` on a 204 No Content response (e.g., DELETE) throws a parse error. Always check `response.status === 204` before attempting to parse the body.
+
+### Zod Optional Fields: null vs undefined
+Optional Zod fields (`z.string().optional()`) reject `null` values. Use `undefined` instead so `JSON.stringify` omits the key entirely.
+
+### React Router v7 useBlocker Requires Data Router
+`useBlocker` only works with the data router API (`createBrowserRouter` + `RouterProvider`). Using it with legacy `<BrowserRouter>` causes silent component crashes. The react-ui implementation uses `router.tsx` with `createBrowserRouter` for this reason.
+
+### SvelteKit SSR Disable for SPA Mode
+SvelteKit with Playwright requires SSR to be disabled to avoid hydration timing issues. Add `export const ssr = false` in `src/routes/+layout.ts`.
+
+### Svelte 5 Two-Way Binding with Callbacks
+Svelte 5's `bind:value` doesn't propagate correctly when combined with callback-based `onchange` props. Use a local `$state` variable with an `$effect` that syncs from the prop, and call the callback in an `oninput` handler.
+
+## Vue.js Patterns
+
+### Vue Router Component Reuse on Param Change
+When navigating between routes that share the same component (e.g. `/applications/new` → `/applications/:id`), Vue Router reuses the component instance — `onMounted` does not re-fire. Use `watch(() => props.id)` to detect the param change and reload data.
+
+### Navigation Guard Bypass for Programmatic Navigation
+`onBeforeRouteLeave` fires on programmatic `router.push()` calls, not just user-initiated navigation. When a save or delete handler redirects via `router.push()`, a dirty-check guard will block it. Use a `skipNavGuard` ref set to `true` before the `router.push()` call, and check it first in the guard.
+
+## Subagent Usage
+
+### Prefer Blocking Parallel Over Background Agents
+When launching multiple subagents with no other work to do, use normal (blocking) parallel `Task` calls in a single message — results come back automatically when all complete. Only use `run_in_background: true` when you need to continue doing other work while agents run.
+
+### Monitor Background Agents Proactively
+When background agents are used, proactively check their progress via `TaskOutput`/`Read` and report status to the user. Do not wait silently for the user to ask.
+
 ## Running E2E Tests
 
 ### Prerequisites
@@ -173,13 +209,24 @@ Before running e2e tests, ensure the required backend services are running:
 | Vue + Nuxt | 3020 | 5040 | `cd nuxt-api && npm run dev` |
 | Svelte + Hono | 3030 | 5030 | `cd hono-api && npm run dev` |
 
-### Running Tests
-```bash
-# For vue-ui (requires nuxt-api running on port 5040)
-cd vue-ui && npm run test:e2e
+### Shared E2E Test Suite
+All 4 implementations share a single test suite in `tests/e2e/application-crud.spec.ts`, parameterized by `TEST_UI_PORT`. The Playwright config auto-starts the correct UI dev server based on port.
 
-# For other implementations, start their respective API first
+```bash
+# Run against specific implementation (API must be running separately)
+npm run test:e2e           # Next.js (port 3000)
+npm run test:e2e:react-koa # React-Koa (port 3010)
+npm run test:e2e:vue       # Vue-Nuxt (port 3020)
+npm run test:e2e:svelte    # Svelte-Hono (port 3030)
 ```
+
+### Shared Selector Contract
+All implementations must match identical selectors for the shared e2e tests:
+- Button text: `"Add Application"`, `"Create Application"`, `"Save Changes"`, `"Discard"`, `"Delete"`, `"Add Stage"`, `"Back to List"`
+- Input placeholders: `"Company Name *"`, `"Position Title *"`, `"Phone Screen, Technical Interview..."`
+- Element IDs: `#dateApplied`, `#status`, `#offerDueDate`, `#companyCategory`, `#jobSource`, `#specialRequirements`, `#notes`, `#salaryMin`, `#salaryMax`
+- URL field placeholders: `"https://example.com"`, `"https://example.com/careers"`, `"https://linkedin.com/jobs/..."`
+- Labels: `/cover letter required/i`
 
 ## Testing Patterns
 

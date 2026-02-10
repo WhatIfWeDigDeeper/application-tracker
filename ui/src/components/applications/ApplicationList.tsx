@@ -11,10 +11,10 @@ export interface ApplicationListProps {
   isLoading?: boolean;
   onAddNew: () => void;
   onSelectApplication: (application: JobApplication) => void;
-  onEditApplication: (application: JobApplication) => void;
-  onArchiveApplication: (id: string) => void;
-  onDeleteApplication: (id: string) => void;
-  onRestoreApplication: (id: string) => void;
+  onEditApplication?: (application: JobApplication) => void;
+  onArchiveApplication?: (id: string) => void;
+  onDeleteApplication?: (id: string) => void;
+  onRestoreApplication?: (id: string) => void;
 }
 
 export function ApplicationList({
@@ -22,9 +22,7 @@ export function ApplicationList({
   isLoading = false,
   onAddNew,
   onSelectApplication,
-  onEditApplication,
   onArchiveApplication,
-  onDeleteApplication,
   onRestoreApplication,
 }: ApplicationListProps): React.ReactElement {
   if (isLoading) {
@@ -72,10 +70,8 @@ export function ApplicationList({
           key={application.id}
           application={application}
           onClick={() => onSelectApplication(application)}
-          onEdit={() => onEditApplication(application)}
-          onArchive={() => onArchiveApplication(application.id)}
-          onDelete={() => onDeleteApplication(application.id)}
-          onRestore={() => onRestoreApplication(application.id)}
+          onArchive={onArchiveApplication ? () => onArchiveApplication(application.id) : undefined}
+          onRestore={onRestoreApplication ? () => onRestoreApplication(application.id) : undefined}
         />
       ))}
     </div>
