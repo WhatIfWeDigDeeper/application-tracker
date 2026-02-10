@@ -8,3 +8,4 @@ export { RatingDisplay, RatingInput } from "./Rating";
 export { Checkbox } from "./Checkbox";
 export { EmptyState } from "./EmptyState";
 export { Pagination } from "./Pagination";
+export { UrlFieldInput } from "./UrlFieldInput";
