@@ -214,11 +214,26 @@ npm run build:all         # Build all implementations
 
 ## Development Tools
 
-This repository includes Claude Code skills for common development tasks:
+This repository includes Claude Code commands and skills for common development tasks:
+
 - `/commit` - Generate commit messages
 - `/pr` - Create pull requests
 - `/fix-build` - Fix build errors
-- `/package-json-maintenance` - Update dependencies and/or fix audit errors
+
+Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation) with
+
+```bash
+# Extract lessons from conversations and persist to context files or skills
+npx skills add whatifwedigdeeper/agent-skills \
+--skill learn
+
+# Update dependencies and/or fix audit errors
+npx skills add whatifwedigdeeper/agent-skills \
+--skill package-json-maintenance
+
+# You may use this command to check for any updates
+npx skills check
+```
 
 See [.claude/](.claude/) for all available commands and skills.
 
