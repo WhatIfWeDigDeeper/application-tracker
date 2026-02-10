@@ -244,6 +244,15 @@ npm run docs:schema    # Requires tbls (brew install tbls) and running PostgreSQ
 ```
 This runs `scripts/generate-schema-docs.sh` which generates Mermaid ERDs under `docs/schema/` for all 4 schemas.
 
+### Type Diagrams
+Regenerate TypeScript type diagrams after type changes:
+```bash
+npm run docs:types         # All implementations
+npm run docs:types:nuxt    # Individual implementation
+```
+Uses `ts-to-mermaid` via npx (no install required). Output goes to `docs/types/{implementation}/`.
+Note: hono-api is excluded because its types are Zod-inferred (`z.infer<typeof Schema>`) which the tool can't resolve.
+
 ### Shared Selector Contract
 All implementations must match identical selectors for the shared e2e tests:
 - Button text: `"Add Application"`, `"Create Application"`, `"Save Changes"`, `"Discard"`, `"Delete"`, `"Add Stage"`, `"Back to List"`
