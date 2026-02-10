@@ -12,7 +12,7 @@
     "audit:ci:svelte-ui": "cd svelte-ui && npx -y audit-ci --config .auditconfig.json",
     "audit:ci:vue-ui": "cd vue-ui && npx -y audit-ci --config .auditconfig.json",
     "audit:ci:nuxt-api": "cd nuxt-api && npx -y audit-ci --config .auditconfig.json",
-    "audit:ci": "npm run audit:ci:api && npm run audit:ci:ui && npm run audit:ci:koa-api && npm run audit:ci:react-ui && npm run audit:ci:hono-api && npm run audit:ci:svelte-ui && npm run audit:ci:vue-ui && npm run audit:ci:nuxt-api",
+    "audit:ci:all": "npm run audit:ci:api && npm run audit:ci:ui && npm run audit:ci:koa-api && npm run audit:ci:react-ui && npm run audit:ci:hono-api && npm run audit:ci:svelte-ui && npm run audit:ci:vue-ui && npm run audit:ci:nuxt-api",
     "dev:api": "cd api && npm run dev",
     "dev:ui": "cd ui && npm run dev",
     "dev": "npm run dev:api & npm run dev:ui",

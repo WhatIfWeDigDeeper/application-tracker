@@ -20,7 +20,7 @@ jobs:
           node-version-file: '.node-version'
 
       - name: Run Security Audit
-        run: npm run audit:ci
+        run: npm run audit:ci:all
 
       - name: Install npm packages
         run: npm run ci:all
