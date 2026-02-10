@@ -84,9 +84,9 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - **vue_nuxt** - Vue + Nuxt + Drizzle ORM implementation
 
 ### Connection Strings
-Each implementation uses schema-aware connection strings:
+Each implementation uses schema-aware connection strings via `DATABASE_URL` (see `.env.example`):
 ```
-postgresql://postgres:postgres@localhost:5432/app_tracker?schema=<schema_name>
+postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>
 ```
 
 ### Schema Configuration by Implementation

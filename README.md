@@ -57,7 +57,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 - [`svelte_hono`](docs/schema/svelte-hono/README.md) - Svelte + Hono + Drizzle
 - [`vue_nuxt`](docs/schema/vue-nuxt/README.md) - Vue + Nuxt + Drizzle
 
-See [CLAUDE.md](CLAUDE.md) for detailed database architecture documentation.
+See [CLAUDE.md](CLAUDE.md#database-architecture) for detailed database architecture documentation.
 
 ## Repository Structure
 
