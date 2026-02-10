@@ -1,0 +1,97 @@
+classDiagram
+  %% Legend
+  %% --|> : Inheritance (extends)
+  %% ..|> : Implementation (implements)
+  %% --* : Composition (has/contains)
+  %% -- : Association
+
+  %% Errors encountered during conversion:
+  %% - TS2307: Cannot find module 'zod' or its corresponding type declarations.
+
+  class ApplicationStatus {
+    +value: z.infer~typeof ApplicationStatusSchema~
+  }
+
+  class CompanyCategory {
+    +value: z.infer~typeof CompanyCategorySchema~
+  }
+
+  class JobSource {
+    +value: z.infer~typeof JobSourceSchema~
+  }
+
+  class CreateApplicationInput {
+    +value: z.infer~typeof CreateApplicationSchema~
+  }
+
+  class UpdateApplicationInput {
+    +value: z.infer~typeof UpdateApplicationSchema~
+  }
+
+  class CreateInterviewStageInput {
+    +value: z.infer~typeof CreateInterviewStageSchema~
+  }
+
+  class UpdateInterviewStageInput {
+    +value: z.infer~typeof UpdateInterviewStageSchema~
+  }
+
+  class ListApplicationsQuery {
+    +value: z.infer~typeof ListApplicationsQuerySchema~
+  }
+
+  class InterviewStage {
+    <<interface>>
+    +id: string
+    +applicationId: string
+    +name: string
+    +order: number
+    +isCompleted: boolean
+    +completedDate: string or null
+    +notes: string or null
+    +performanceRating: number or null
+  }
+
+  class Application {
+    <<interface>>
+    +id: string
+    +companyName: string
+    +positionTitle: string
+    +dateApplied: string
+    +status: ApplicationStatus
+    +createdAt: string
+    +updatedAt: string
+    +companyUrl: string or null
+    +jobPostingUrl: string or null
+    +companyCareerUrl: string or null
+    +companyCategory: ComplexUnion
+    +skillsMatch: number or null
+    +jobSource: ComplexUnion
+    +coverLetterRequired: boolean or null
+    +specialRequirements: string or null
+    +salaryMin: number or null
+    +salaryMax: number or null
+    +notes: string or null
+    +offerDueDate: string or null
+    +isArchived: boolean
+    +interviewStages: InterviewStageArray~~
+  }
+
+  class PaginatedApplications {
+    <<interface>>
+    +items: ApplicationArray~~
+    +page: number
+    +limit: number
+    +total: number
+  }
+
+  class ErrorResponse {
+    <<interface>>
+    +code: "validation_error" or "not_found" or "internal_error"
+    +message: string
+    -details?: Array~Object~
+  }
+
+  Application --* ApplicationStatus : status
+  Application --* InterviewStage : interviewStages
+  PaginatedApplications --* Application : items

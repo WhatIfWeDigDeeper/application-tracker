@@ -68,6 +68,12 @@
     "test:e2e:debug": "npx -y playwright test --debug",
     "clean": "rm -rf node_modules api/node_modules ui/node_modules api/dist ui/.next",
     "docs:schema": "bash scripts/generate-schema-docs.sh",
+    "docs:types:nuxt": "npx -y ts-to-mermaid nuxt-api/shared/types.ts --save docs/types/nuxt-api/ && echo >> docs/types/nuxt-api/types.mermaid",
+    "docs:types:ui": "npx -y ts-to-mermaid ui/src/types/application.ts --save docs/types/ui/ && echo >> docs/types/ui/application.mermaid",
+    "docs:types:react-ui": "npx -y ts-to-mermaid react-ui/src/types/application.ts --save docs/types/react-ui/ && echo >> docs/types/react-ui/application.mermaid",
+    "docs:types:koa-api": "npx -y ts-to-mermaid koa-api/src/types/index.ts --save docs/types/koa-api/ && echo >> docs/types/koa-api/index.mermaid",
+    "docs:types:svelte-ui": "npx -y ts-to-mermaid svelte-ui/src/lib/types/index.ts --save docs/types/svelte-ui/ && echo >> docs/types/svelte-ui/index.mermaid",
+    "docs:types": "npm run docs:types:nuxt && npm run docs:types:ui && npm run docs:types:react-ui && npm run docs:types:koa-api && npm run docs:types:svelte-ui",
     "kill:all-next-dev": "pkill -f \"next dev\""
   },
   "keywords": [],

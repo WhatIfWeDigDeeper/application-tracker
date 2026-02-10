@@ -2,6 +2,29 @@
 
 A full-stack job application tracking system with multiple technology stack implementations.
 
+- [Overview](#overview)
+- [Implementations](#implementations)
+  - [1. Vue + Nuxt + Drizzle](#1-vue--nuxt--drizzle)
+  - [2. Next.js + Express + Prisma](#2-nextjs--express--prisma)
+  - [3. React + Koa + PostgreSQL](#3-react--koa--postgresql)
+  - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
+- [Core Features](#core-features)
+- [Database Architecture](#database-architecture)
+- [Type Diagrams](#type-diagrams)
+- [Repository Structure](#repository-structure)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running Applications](#running-applications)
+  - [Schema Documentation](#schema-documentation)
+- [Testing](#testing)
+  - [Unit Tests](#unit-tests)
+  - [End-to-End Tests](#end-to-end-tests)
+  - [Build Verification](#build-verification)
+- [Development Tools](#development-tools)
+- [License](#license)
+
+
 ## Overview
 
 This repository contains a complete job application tracker built with four different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
@@ -58,6 +81,17 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 - [`svelte_hono`](docs/schema/svelte-hono/README.md) - Svelte + Hono + Drizzle
 
 See [CLAUDE.md](CLAUDE.md#database-architecture) for detailed database architecture documentation.
+
+## Type Diagrams
+
+Mermaid class diagrams generated from TypeScript type definitions:
+- [nuxt-api](docs/types/nuxt-api/types.mermaid) - Vue + Nuxt (includes event sourcing types)
+- [ui](docs/types/ui/application.mermaid) - Next.js + Express
+- [react-ui](docs/types/react-ui/application.mermaid) - React + Koa
+- [koa-api](docs/types/koa-api/index.mermaid) - Koa API (partial - Zod-inferred types unresolved)
+- [svelte-ui](docs/types/svelte-ui/index.mermaid) - Svelte + Hono
+
+Regenerate with `npm run docs:types`.
 
 ## Repository Structure
 

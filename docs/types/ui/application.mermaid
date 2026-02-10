@@ -1,0 +1,171 @@
+classDiagram
+  %% Legend
+  %% --|> : Inheritance (extends)
+  %% ..|> : Implementation (implements)
+  %% --* : Composition (has/contains)
+  %% -- : Association
+
+  class ApplicationStatus {
+    <<enumeration>>
+    <<type>>
+    'accepted offer' | 'applied' | 'declined offer' | 'given offer' | 'interviewing' | 'no offer' | 'rejected' | 'unsubmitted'
+  }
+
+  class CompanyCategory {
+    <<enumeration>>
+    <<type>>
+    'ai' | 'climate' | 'consulting' | 'consumer-tech' | 'cybersecurity' | 'e-commerce' | 'education' | 'energy' | 'enterprise-software' | 'finance' | 'gaming' | 'government' | 'health' | 'hospitality' | 'media-entertainment' | 'nonprofit' | 'other' | 'restaurant' | 'retail'
+  }
+
+  class JobSource {
+    <<enumeration>>
+    <<type>>
+    'colleague' | 'company-website' | 'friend' | 'indeed' | 'linkedin' | 'other' | 'recruiter'
+  }
+
+  class InterviewStage {
+    <<interface>>
+    +id: string
+    +name: string
+    +order: number
+    +isCompleted: boolean
+    -completedDate?: string
+    -notes?: string
+    -performanceRating?: number
+  }
+
+  class JobApplication {
+    <<interface>>
+    +id: string
+    +companyName: string
+    +positionTitle: string
+    +dateApplied: string
+    +status: ApplicationStatus
+    +createdAt: string
+    +updatedAt: string
+    -companyUrl?: string
+    -jobPostingUrl?: string
+    -companyCareerUrl?: string
+    -companyCategory?: CompanyCategory
+    -skillsMatch?: number
+    -jobSource?: JobSource
+    -coverLetterRequired?: boolean
+    -specialRequirements?: string
+    -salaryMin?: number
+    -salaryMax?: number
+    -notes?: string
+    +interviewStages: InterviewStageArray~~
+    -offerDueDate?: string
+    +isArchived: boolean
+  }
+
+  class StorageSchema {
+    <<interface>>
+    +version: number
+    +applications: JobApplicationArray~~
+    +lastModified: string
+  }
+
+  class CreateApplicationInput {
+    <<interface>>
+    +companyName: string
+    +positionTitle: string
+    -dateApplied?: string
+    -companyUrl?: string
+    -jobPostingUrl?: string
+    -companyCareerUrl?: string
+    -companyCategory?: CompanyCategory
+    -skillsMatch?: number
+    -jobSource?: JobSource
+    -coverLetterRequired?: boolean
+    -specialRequirements?: string
+    -salaryMin?: number
+    -salaryMax?: number
+    -notes?: string
+  }
+
+  class UpdateApplicationInput {
+    <<interface>>
+    -companyName?: string
+    -positionTitle?: string
+    -dateApplied?: string
+    -status?: ApplicationStatus
+    -companyUrl?: string
+    -jobPostingUrl?: string
+    -companyCareerUrl?: string
+    -companyCategory?: CompanyCategory
+    -skillsMatch?: number
+    -jobSource?: JobSource
+    -coverLetterRequired?: boolean
+    -specialRequirements?: string
+    -salaryMin?: number
+    -salaryMax?: number
+    -notes?: string
+    -offerDueDate?: string
+  }
+
+  class InterviewStageInput {
+    <<interface>>
+    +name: string
+    -isCompleted?: boolean
+    -completedDate?: string
+    -notes?: string
+    -performanceRating?: number
+  }
+
+  class UpdateInterviewStageInput {
+  }
+
+  class ApplicationFilters {
+    <<interface>>
+    -status?: ApplicationStatusArray~~
+    -companyCategory?: CompanyCategoryArray~~
+    -jobSource?: JobSourceArray~~
+    -skillsMatchMin?: number
+    -includeArchived?: boolean
+  }
+
+  class SortField {
+    <<enumeration>>
+    'companyName' | 'dateApplied' | 'status' | 'updatedAt'
+  }
+
+  class SortDirection {
+    <<enumeration>>
+    'asc' | 'desc'
+  }
+
+  class SortOptions {
+    <<interface>>
+    +field: SortField
+    +direction: SortDirection
+  }
+
+  class ValidationError {
+    <<interface>>
+    +field: string
+    +message: string
+  }
+
+  class ValidationResult {
+    <<interface>>
+    +isValid: boolean
+    +errors: ValidationErrorArray~~
+  }
+
+  JobApplication --* ApplicationStatus : status
+  JobApplication --* CompanyCategory : companyCategory
+  JobApplication --* JobSource : jobSource
+  JobApplication --* InterviewStage : interviewStages
+  StorageSchema --* JobApplication : applications
+  CreateApplicationInput --* CompanyCategory : companyCategory
+  CreateApplicationInput --* JobSource : jobSource
+  UpdateApplicationInput --* ApplicationStatus : status
+  UpdateApplicationInput --* CompanyCategory : companyCategory
+  UpdateApplicationInput --* JobSource : jobSource
+  ApplicationFilters --* ApplicationStatus : status
+  ApplicationFilters --* CompanyCategory : companyCategory
+  ApplicationFilters --* JobSource : jobSource
+  SortOptions --* SortField : field
+  SortOptions --* SortDirection : direction
+  ValidationResult --* ValidationError : errors
