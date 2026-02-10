@@ -46,38 +46,38 @@ erDiagram
 "express_prisma.InterviewStage" }o--|| "express_prisma.Application" : "FOREIGN KEY (#quot;applicationId#quot;) REFERENCES express_prisma.#quot;Application#quot;(id) ON UPDATE CASCADE ON DELETE CASCADE"
 
 "express_prisma.InterviewStage" {
-  text id
-  text applicationId FK
-  text name
-  integer order
-  boolean isCompleted
-  timestamp_3__without_time_zone completedDate
-  text notes
-  integer performanceRating
-  timestamp_3__without_time_zone createdAt
-  timestamp_3__without_time_zone updatedAt
+  id text
+  applicationId text FK
+  name text
+  order integer
+  isCompleted boolean
+  completedDate timestamp_3__without_time_zone
+  notes text
+  performanceRating integer
+  createdAt timestamp_3__without_time_zone
+  updatedAt timestamp_3__without_time_zone
 }
 "express_prisma.Application" {
-  text id
-  text companyName
-  text positionTitle
-  timestamp_3__without_time_zone dateApplied
-  text status
-  timestamp_3__without_time_zone createdAt
-  timestamp_3__without_time_zone updatedAt
-  text companyUrl
-  text jobPostingUrl
-  text companyCareerUrl
-  text companyCategory
-  integer skillsMatch
-  text jobSource
-  boolean coverLetterRequired
-  text specialRequirements
-  integer salaryMin
-  integer salaryMax
-  text notes
-  timestamp_3__without_time_zone offerDueDate
-  boolean isArchived
+  id text
+  companyName text
+  positionTitle text
+  dateApplied timestamp_3__without_time_zone
+  status text
+  createdAt timestamp_3__without_time_zone
+  updatedAt timestamp_3__without_time_zone
+  companyUrl text
+  jobPostingUrl text
+  companyCareerUrl text
+  companyCategory text
+  skillsMatch integer
+  jobSource text
+  coverLetterRequired boolean
+  specialRequirements text
+  salaryMin integer
+  salaryMax integer
+  notes text
+  offerDueDate timestamp_3__without_time_zone
+  isArchived boolean
 }
 ```
 

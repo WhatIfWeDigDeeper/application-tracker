@@ -33,48 +33,48 @@ erDiagram
 "express_prisma.InterviewStage" }o--|| "express_prisma.Application" : "FOREIGN KEY (#quot;applicationId#quot;) REFERENCES express_prisma.#quot;Application#quot;(id) ON UPDATE CASCADE ON DELETE CASCADE"
 
 "express_prisma._prisma_migrations" {
-  varchar_36_ id
-  varchar_64_ checksum
-  timestamp_with_time_zone finished_at
-  varchar_255_ migration_name
-  text logs
-  timestamp_with_time_zone rolled_back_at
-  timestamp_with_time_zone started_at
-  integer applied_steps_count
+  id varchar_36_
+  checksum varchar_64_
+  finished_at timestamp_with_time_zone
+  migration_name varchar_255_
+  logs text
+  rolled_back_at timestamp_with_time_zone
+  started_at timestamp_with_time_zone
+  applied_steps_count integer
 }
 "express_prisma.Application" {
-  text id
-  text companyName
-  text positionTitle
-  timestamp_3__without_time_zone dateApplied
-  text status
-  timestamp_3__without_time_zone createdAt
-  timestamp_3__without_time_zone updatedAt
-  text companyUrl
-  text jobPostingUrl
-  text companyCareerUrl
-  text companyCategory
-  integer skillsMatch
-  text jobSource
-  boolean coverLetterRequired
-  text specialRequirements
-  integer salaryMin
-  integer salaryMax
-  text notes
-  timestamp_3__without_time_zone offerDueDate
-  boolean isArchived
+  id text
+  companyName text
+  positionTitle text
+  dateApplied timestamp_3__without_time_zone
+  status text
+  createdAt timestamp_3__without_time_zone
+  updatedAt timestamp_3__without_time_zone
+  companyUrl text
+  jobPostingUrl text
+  companyCareerUrl text
+  companyCategory text
+  skillsMatch integer
+  jobSource text
+  coverLetterRequired boolean
+  specialRequirements text
+  salaryMin integer
+  salaryMax integer
+  notes text
+  offerDueDate timestamp_3__without_time_zone
+  isArchived boolean
 }
 "express_prisma.InterviewStage" {
-  text id
-  text applicationId FK
-  text name
-  integer order
-  boolean isCompleted
-  timestamp_3__without_time_zone completedDate
-  text notes
-  integer performanceRating
-  timestamp_3__without_time_zone createdAt
-  timestamp_3__without_time_zone updatedAt
+  id text
+  applicationId text FK
+  name text
+  order integer
+  isCompleted boolean
+  completedDate timestamp_3__without_time_zone
+  notes text
+  performanceRating integer
+  createdAt timestamp_3__without_time_zone
+  updatedAt timestamp_3__without_time_zone
 }
 ```
 

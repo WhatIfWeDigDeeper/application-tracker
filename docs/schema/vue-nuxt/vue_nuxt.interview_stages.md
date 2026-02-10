@@ -41,36 +41,36 @@ erDiagram
 "vue_nuxt.interview_stages" }o--|| "vue_nuxt.applications" : "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE"
 
 "vue_nuxt.interview_stages" {
-  uuid id
-  uuid application_id FK
-  varchar_100_ name
-  integer order
-  boolean is_completed
-  date completed_date
-  text notes
-  integer performance_rating
+  id uuid
+  application_id uuid FK
+  name varchar_100_
+  order integer
+  is_completed boolean
+  completed_date date
+  notes text
+  performance_rating integer
 }
 "vue_nuxt.applications" {
-  uuid id
-  varchar_200_ company_name
-  varchar_200_ position_title
-  date date_applied
-  vue_nuxt_application_status status
-  text company_url
-  text job_posting_url
-  text company_career_url
-  vue_nuxt_company_category company_category
-  integer skills_match
-  vue_nuxt_job_source job_source
-  boolean cover_letter_required
-  text special_requirements
-  integer salary_min
-  integer salary_max
-  text notes
-  date offer_due_date
-  boolean is_archived
-  timestamp_with_time_zone created_at
-  timestamp_with_time_zone updated_at
+  id uuid
+  company_name varchar_200_
+  position_title varchar_200_
+  date_applied date
+  status vue_nuxt_application_status
+  company_url text
+  job_posting_url text
+  company_career_url text
+  company_category vue_nuxt_company_category
+  skills_match integer
+  job_source vue_nuxt_job_source
+  cover_letter_required boolean
+  special_requirements text
+  salary_min integer
+  salary_max integer
+  notes text
+  offer_due_date date
+  is_archived boolean
+  created_at timestamp_with_time_zone
+  updated_at timestamp_with_time_zone
 }
 ```
 

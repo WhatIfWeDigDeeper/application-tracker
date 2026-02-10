@@ -32,36 +32,36 @@ erDiagram
 "svelte_hono.interview_stages" }o--|| "svelte_hono.applications" : "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
 
 "svelte_hono.applications" {
-  uuid id
-  varchar_200_ company_name
-  varchar_200_ position_title
-  date date_applied
-  svelte_hono_application_status status
-  text company_url
-  text job_posting_url
-  text company_career_url
-  svelte_hono_company_category company_category
-  integer skills_match
-  svelte_hono_job_source job_source
-  boolean cover_letter_required
-  text special_requirements
-  integer salary_min
-  integer salary_max
-  text notes
-  date offer_due_date
-  boolean is_archived
-  timestamp_with_time_zone created_at
-  timestamp_with_time_zone updated_at
+  id uuid
+  company_name varchar_200_
+  position_title varchar_200_
+  date_applied date
+  status svelte_hono_application_status
+  company_url text
+  job_posting_url text
+  company_career_url text
+  company_category svelte_hono_company_category
+  skills_match integer
+  job_source svelte_hono_job_source
+  cover_letter_required boolean
+  special_requirements text
+  salary_min integer
+  salary_max integer
+  notes text
+  offer_due_date date
+  is_archived boolean
+  created_at timestamp_with_time_zone
+  updated_at timestamp_with_time_zone
 }
 "svelte_hono.interview_stages" {
-  uuid id
-  uuid application_id FK
-  varchar_100_ name
-  integer order
-  boolean is_completed
-  date completed_date
-  text notes
-  integer performance_rating
+  id uuid
+  application_id uuid FK
+  name varchar_100_
+  order integer
+  is_completed boolean
+  completed_date date
+  notes text
+  performance_rating integer
 }
 ```
 

@@ -71,36 +71,36 @@ erDiagram
 "react_koa.interview_stages" }o--|| "react_koa.applications" : "FOREIGN KEY (application_id) REFERENCES react_koa.applications(id) ON DELETE CASCADE"
 
 "react_koa.applications" {
-  uuid id
-  varchar_200_ company_name
-  varchar_200_ position_title
-  date date_applied
-  react_koa_application_status status
-  timestamp_with_time_zone created_at
-  timestamp_with_time_zone updated_at
-  text company_url
-  text job_posting_url
-  text company_career_url
-  react_koa_company_category company_category
-  integer skills_match
-  react_koa_job_source job_source
-  boolean cover_letter_required
-  varchar_1000_ special_requirements
-  integer salary_min
-  integer salary_max
-  text notes
-  date offer_due_date
-  boolean is_archived
+  id uuid
+  company_name varchar_200_
+  position_title varchar_200_
+  date_applied date
+  status react_koa_application_status
+  created_at timestamp_with_time_zone
+  updated_at timestamp_with_time_zone
+  company_url text
+  job_posting_url text
+  company_career_url text
+  company_category react_koa_company_category
+  skills_match integer
+  job_source react_koa_job_source
+  cover_letter_required boolean
+  special_requirements varchar_1000_
+  salary_min integer
+  salary_max integer
+  notes text
+  offer_due_date date
+  is_archived boolean
 }
 "react_koa.interview_stages" {
-  uuid id
-  uuid application_id FK
-  varchar_100_ name
-  integer order
-  boolean is_completed
-  date completed_date
-  text notes
-  integer performance_rating
+  id uuid
+  application_id uuid FK
+  name varchar_100_
+  order integer
+  is_completed boolean
+  completed_date date
+  notes text
+  performance_rating integer
 }
 ```
 
