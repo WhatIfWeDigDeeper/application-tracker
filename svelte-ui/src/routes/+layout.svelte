@@ -39,7 +39,7 @@
 </script>
 
 <div class="min-h-full">
-  <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+  <nav class="bg-white dark:bg-gray-800 shadow-xs border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
@@ -53,7 +53,7 @@
         <div class="flex items-center gap-4">
           <button
             type="button"
-            class="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            class="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500"
             onclick={toggleDarkMode}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >

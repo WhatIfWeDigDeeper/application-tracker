@@ -86,7 +86,7 @@ export function RatingInput({
             type="button"
             onClick={() => handleClick(rating)}
             className={cn(
-              "transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded",
+              "transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 rounded",
               isFilled
                 ? "text-yellow-400 hover:text-yellow-500"
                 : "text-gray-300 hover:text-yellow-300 dark:text-gray-600 dark:hover:text-yellow-400"

@@ -25,7 +25,7 @@
     type="button"
     class="flex-shrink-0 h-5 w-5 rounded border-2 {stage.isCompleted
       ? 'bg-primary-600 border-primary-600'
-      : 'border-gray-300 dark:border-gray-600'} focus:outline-none focus:ring-2 focus:ring-primary-500"
+      : 'border-gray-300 dark:border-gray-600'} focus:outline-hidden focus:ring-2 focus:ring-primary-500"
     onclick={onToggleComplete}
     aria-label={stage.isCompleted ? 'Mark incomplete' : 'Mark complete'}
   >
