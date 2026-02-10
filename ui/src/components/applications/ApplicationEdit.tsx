@@ -86,7 +86,7 @@ function populateFromApplication(app: JobApplication): FormState {
   return {
     companyName: app.companyName,
     positionTitle: app.positionTitle,
-    dateApplied: app.dateApplied ? app.dateApplied.split('T')[0] : '',
+    dateApplied: app.dateApplied ? app.dateApplied.split('T')[0] ?? '' : '',
     status: app.status,
     companyUrl: app.companyUrl || '',
     jobPostingUrl: app.jobPostingUrl || '',
@@ -99,7 +99,7 @@ function populateFromApplication(app: JobApplication): FormState {
     salaryMax: app.salaryMax?.toString() || '',
     specialRequirements: app.specialRequirements || '',
     notes: app.notes || '',
-    offerDueDate: app.offerDueDate ? app.offerDueDate.split('T')[0] : '',
+    offerDueDate: app.offerDueDate ? app.offerDueDate.split('T')[0] ?? '' : '',
   };
 }
 
