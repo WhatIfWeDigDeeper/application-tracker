@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Use Node.js from .node-version
         uses: actions/setup-node@v4
@@ -20,16 +20,16 @@ jobs:
           node-version-file: '.node-version'
 
       - name: Run Security Audit
-        run: npm run audit:ci
+        run: npm run audit:ci:all
 
       - name: Install npm packages
         run: npm run ci:all
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint:all
 
       - name: Build
-        run: npm run build
+        run: npm run build:all
 
       - name: Test
-        run: npm test
+        run: npm run test:all

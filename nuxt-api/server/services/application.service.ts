@@ -1,7 +1,7 @@
 import { eq, and, sql, asc, desc, gte, inArray } from 'drizzle-orm';
 import { db } from '../db/client';
 import { applications, interviewStages, type DbApplication, type DbInterviewStage } from '../db/schema';
-import type { Application, InterviewStage as InterviewStageResponse } from '~~/shared/types';
+import type { Application } from '~~/shared/types';
 import type { z } from 'zod';
 import type { ListApplicationsQuerySchema, CreateApplicationSchema, UpdateApplicationSchema } from '../utils/validation';
 
@@ -59,7 +59,7 @@ function toApplicationResponse(app: DbApplication, stages: DbInterviewStage[]): 
   };
 }
 
-export async function listApplications(query: ListApplicationsQuery) {
+export async function listApplications(query: ListApplicationsQuery): Promise<{ items: Application[]; page: number; limit: number; total: number }> {
   const { status, companyCategory, jobSource, skillsMatchMin, includeArchived, sortBy, sortDir, page, limit } = query;
 
   // Build conditions

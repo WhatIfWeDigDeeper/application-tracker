@@ -1,5 +1,5 @@
 import { api } from './api';
-import type { Application, FilterState, PaginatedResponse, CreateApplicationInput, UpdateApplicationInput } from '$lib/types';
+import type { Application, FilterState, CreateApplicationInput, UpdateApplicationInput } from '$lib/types';
 
 // Default filter state
 const defaultFilters: FilterState = {
