@@ -80,7 +80,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 - [`react_koa`](docs/schema/react-koa/README.md) - React + Koa + PostgreSQL
 - [`svelte_hono`](docs/schema/svelte-hono/README.md) - Svelte + Hono + Drizzle
 
-See [CLAUDE.md](CLAUDE.md#database-architecture) for detailed database architecture documentation.
+See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for detailed schema configuration per implementation.
 
 ## Type Diagrams
 
