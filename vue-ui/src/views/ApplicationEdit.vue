@@ -1028,6 +1028,7 @@ onUnmounted(() => {
       v-if="showHistoryPanel && isEditMode && id && application"
       :application-id="id"
       @close="showHistoryPanel = false"
+      @restored="populateFromApplication(application!); recaptureSnapshot()"
     />
   </div>
 </template>
