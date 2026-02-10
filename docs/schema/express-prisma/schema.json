@@ -1,0 +1,719 @@
+{
+  "name": "app_tracker",
+  "tables": [
+    {
+      "name": "express_prisma._prisma_migrations",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "varchar(36)",
+          "nullable": false
+        },
+        {
+          "name": "checksum",
+          "type": "varchar(64)",
+          "nullable": false
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "migration_name",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "logs",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "rolled_back_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "applied_steps_count",
+          "type": "integer",
+          "nullable": false,
+          "default": "0"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "_prisma_migrations_pkey",
+          "def": "CREATE UNIQUE INDEX _prisma_migrations_pkey ON express_prisma._prisma_migrations USING btree (id)",
+          "table": "express_prisma._prisma_migrations",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "_prisma_migrations_applied_steps_count_not_null",
+          "type": "n",
+          "def": "NOT NULL applied_steps_count",
+          "table": "express_prisma._prisma_migrations",
+          "referenced_table": "",
+          "columns": [
+            "applied_steps_count"
+          ]
+        },
+        {
+          "name": "_prisma_migrations_checksum_not_null",
+          "type": "n",
+          "def": "NOT NULL checksum",
+          "table": "express_prisma._prisma_migrations",
+          "referenced_table": "",
+          "columns": [
+            "checksum"
+          ]
+        },
+        {
+          "name": "_prisma_migrations_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "express_prisma._prisma_migrations",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "_prisma_migrations_migration_name_not_null",
+          "type": "n",
+          "def": "NOT NULL migration_name",
+          "table": "express_prisma._prisma_migrations",
+          "referenced_table": "",
+          "columns": [
+            "migration_name"
+          ]
+        },
+        {
+          "name": "_prisma_migrations_started_at_not_null",
+          "type": "n",
+          "def": "NOT NULL started_at",
+          "table": "express_prisma._prisma_migrations",
+          "referenced_table": "",
+          "columns": [
+            "started_at"
+          ]
+        },
+        {
+          "name": "_prisma_migrations_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "express_prisma._prisma_migrations",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "express_prisma.Application",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "companyName",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "positionTitle",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "dateApplied",
+          "type": "timestamp(3) without time zone",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "default": "'unsubmitted'::text"
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp(3) without time zone",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp(3) without time zone",
+          "nullable": false
+        },
+        {
+          "name": "companyUrl",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "jobPostingUrl",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "companyCareerUrl",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "companyCategory",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "skillsMatch",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "jobSource",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "coverLetterRequired",
+          "type": "boolean",
+          "nullable": true
+        },
+        {
+          "name": "specialRequirements",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "salaryMin",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "salaryMax",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "offerDueDate",
+          "type": "timestamp(3) without time zone",
+          "nullable": true
+        },
+        {
+          "name": "isArchived",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "Application_pkey",
+          "def": "CREATE UNIQUE INDEX \"Application_pkey\" ON express_prisma.\"Application\" USING btree (id)",
+          "table": "express_prisma.Application",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "Application_status_idx",
+          "def": "CREATE INDEX \"Application_status_idx\" ON express_prisma.\"Application\" USING btree (status)",
+          "table": "express_prisma.Application",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "Application_isArchived_idx",
+          "def": "CREATE INDEX \"Application_isArchived_idx\" ON express_prisma.\"Application\" USING btree (\"isArchived\")",
+          "table": "express_prisma.Application",
+          "columns": [
+            "isArchived"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "Application_companyName_not_null",
+          "type": "n",
+          "def": "NOT NULL \"companyName\"",
+          "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "companyName"
+          ]
+        },
+        {
+          "name": "Application_createdAt_not_null",
+          "type": "n",
+          "def": "NOT NULL \"createdAt\"",
+          "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "createdAt"
+          ]
+        },
+        {
+          "name": "Application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "Application_isArchived_not_null",
+          "type": "n",
+          "def": "NOT NULL \"isArchived\"",
+          "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "isArchived"
+          ]
+        },
+        {
+          "name": "Application_positionTitle_not_null",
+          "type": "n",
+          "def": "NOT NULL \"positionTitle\"",
+          "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "positionTitle"
+          ]
+        },
+        {
+          "name": "Application_status_not_null",
+          "type": "n",
+          "def": "NOT NULL status",
+          "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "Application_updatedAt_not_null",
+          "type": "n",
+          "def": "NOT NULL \"updatedAt\"",
+          "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "updatedAt"
+          ]
+        },
+        {
+          "name": "Application_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "express_prisma.InterviewStage",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "applicationId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "isCompleted",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "completedDate",
+          "type": "timestamp(3) without time zone",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "performanceRating",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp(3) without time zone",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp(3) without time zone",
+          "nullable": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "InterviewStage_pkey",
+          "def": "CREATE UNIQUE INDEX \"InterviewStage_pkey\" ON express_prisma.\"InterviewStage\" USING btree (id)",
+          "table": "express_prisma.InterviewStage",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "InterviewStage_applicationId_idx",
+          "def": "CREATE INDEX \"InterviewStage_applicationId_idx\" ON express_prisma.\"InterviewStage\" USING btree (\"applicationId\")",
+          "table": "express_prisma.InterviewStage",
+          "columns": [
+            "applicationId"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "InterviewStage_applicationId_not_null",
+          "type": "n",
+          "def": "NOT NULL \"applicationId\"",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "",
+          "columns": [
+            "applicationId"
+          ]
+        },
+        {
+          "name": "InterviewStage_createdAt_not_null",
+          "type": "n",
+          "def": "NOT NULL \"createdAt\"",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "",
+          "columns": [
+            "createdAt"
+          ]
+        },
+        {
+          "name": "InterviewStage_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "InterviewStage_isCompleted_not_null",
+          "type": "n",
+          "def": "NOT NULL \"isCompleted\"",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "",
+          "columns": [
+            "isCompleted"
+          ]
+        },
+        {
+          "name": "InterviewStage_name_not_null",
+          "type": "n",
+          "def": "NOT NULL name",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "",
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "InterviewStage_order_not_null",
+          "type": "n",
+          "def": "NOT NULL \"order\"",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "",
+          "columns": [
+            "order"
+          ]
+        },
+        {
+          "name": "InterviewStage_updatedAt_not_null",
+          "type": "n",
+          "def": "NOT NULL \"updatedAt\"",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "",
+          "columns": [
+            "updatedAt"
+          ]
+        },
+        {
+          "name": "InterviewStage_applicationId_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (\"applicationId\") REFERENCES express_prisma.\"Application\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "Application",
+          "columns": [
+            "applicationId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "InterviewStage_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "express_prisma.InterviewStage",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "table": "express_prisma.InterviewStage",
+      "columns": [
+        "applicationId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "express_prisma.Application",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (\"applicationId\") REFERENCES express_prisma.\"Application\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    }
+  ],
+  "enums": [
+    {
+      "name": "express_prisma.ApplicationStatus",
+      "values": [
+        "accepted",
+        "applied",
+        "interviewing",
+        "offered",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "express_prisma.CompanyCategory",
+      "values": [
+        "enterprise",
+        "mid_market",
+        "other",
+        "scale_up",
+        "startup"
+      ]
+    },
+    {
+      "name": "express_prisma.JobSource",
+      "values": [
+        "company_website",
+        "job_board",
+        "other",
+        "recruiter",
+        "referral"
+      ]
+    },
+    {
+      "name": "react_koa.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "react_koa.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "svelte_hono.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "svelte_hono.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "svelte_hono.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "vue_nuxt.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "vue_nuxt.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    }
+  ],
+  "driver": {
+    "name": "postgres",
+    "database_version": "PostgreSQL 18.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "meta": {
+      "current_schema": "public",
+      "search_paths": [
+        "postgres",
+        "public"
+      ],
+      "dict": {
+        "Functions": "Stored procedures and functions"
+      }
+    }
+  }
+}

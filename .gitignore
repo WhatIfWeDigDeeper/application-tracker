@@ -173,3 +173,6 @@ Thumbs.db
 .claude/settings.local.json
 
 .playwright-cli
+
+# Script temp files
+scripts/.tmp/
