@@ -1,5 +1,5 @@
 ---
-command: ship
+command: ship-it
 description: Create branch, commit, push, and open a pull request
 arguments: optional branch name or PR title
 ---

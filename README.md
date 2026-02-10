@@ -37,7 +37,7 @@ This repository contains a complete job application tracker built with four diff
 - Frontend: Vue 3 + Pinia + TypeScript + Vite + Tailwind CSS
 - Backend: Nuxt server routes
 - Database: Drizzle ORM + PostgreSQL
-- Event sourcing with Immer patches, undo/redo (Ctrl+Z / Ctrl+Shift+Z), history panel with diff view, and snapshot-based restore
+- Event sourcing with Immer patches, undo/redo (Ctrl+Z / Ctrl+Shift+Z), history panel with diff view, and snapshot-based restore — see [sequence diagram](docs/vue-nuxt-history.mermaid)
 
 ### 2. Next.js + Express + Prisma
 **Directories**: `ui/` + `api/`
@@ -224,6 +224,7 @@ This repository includes Claude Code commands and skills for common development 
 - `/commit` - Generate commit messages
 - `/pr` - Create pull requests
 - `/fix-build` - Fix build errors
+- `/ship-it` - Create branch, commit, push, and open a PR
 
 Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation) with
 
