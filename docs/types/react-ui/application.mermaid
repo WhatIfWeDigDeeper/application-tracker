@@ -1,0 +1,173 @@
+classDiagram
+  %% Legend
+  %% --|> : Inheritance (extends)
+  %% ..|> : Implementation (implements)
+  %% --* : Composition (has/contains)
+  %% -- : Association
+
+  class ApplicationStatus {
+    <<enumeration>>
+    <<type>>
+    "accepted offer" | "applied" | "declined offer" | "given offer" | "interviewing" | "no offer" | "rejected"
+  }
+
+  class CompanyCategory {
+    <<enumeration>>
+    "ai"
+    "climate"
+    "consulting"
+    "consumer-tech"
+    "cybersecurity"
+    "e-commerce"
+    "education"
+    "energy"
+    "enterprise-software"
+    "finance"
+    "gaming"
+    "government"
+    "health"
+    "hospitality"
+    "media-entertainment"
+    "nonprofit"
+    "other"
+    "restaurant"
+    "retail"
+  }
+
+  class JobSource {
+    <<enumeration>>
+    "colleague"
+    "company-website"
+    "friend"
+    "indeed"
+    "linkedin"
+    "other"
+    "recruiter"
+  }
+
+  class InterviewStage {
+    <<interface>>
+    +id: string
+    -applicationId?: string
+    +name: string
+    +order: number
+    +isCompleted: boolean
+    +completedDate: string or null
+    +notes: string or null
+    +performanceRating: number or null
+  }
+
+  class Application {
+    <<interface>>
+    +id: string
+    +companyName: string
+    +positionTitle: string
+    +dateApplied: string
+    +status: ApplicationStatus
+    +createdAt: string
+    +updatedAt: string
+    +companyUrl: string or null
+    +jobPostingUrl: string or null
+    +companyCareerUrl: string or null
+    +companyCategory: ComplexUnion
+    +skillsMatch: number or null
+    +jobSource: ComplexUnion
+    +coverLetterRequired: boolean or null
+    +specialRequirements: string or null
+    +salaryMin: number or null
+    +salaryMax: number or null
+    +notes: string or null
+    +offerDueDate: string or null
+    +isArchived: boolean
+    +interviewStages: InterviewStageArray~~
+  }
+
+  class CreateApplicationInput {
+    <<interface>>
+    +companyName: string
+    +positionTitle: string
+    -dateApplied?: string
+    -companyUrl?: string
+    -jobPostingUrl?: string
+    -companyCareerUrl?: string
+    -companyCategory?: CompanyCategory
+    -skillsMatch?: number
+    -jobSource?: JobSource
+    -coverLetterRequired?: boolean
+    -specialRequirements?: string
+    -salaryMin?: number
+    -salaryMax?: number
+    -notes?: string
+  }
+
+  class UpdateApplicationInput {
+    <<interface>>
+    -status?: ApplicationStatus
+    -offerDueDate?: string or null
+    -isArchived?: boolean
+  }
+
+  class CreateInterviewStageInput {
+    <<interface>>
+    +name: string
+    +order: number
+    -isCompleted?: boolean
+    -completedDate?: string or null
+    -notes?: string
+    -performanceRating?: number
+  }
+
+  class UpdateInterviewStageInput {
+    <<interface>>
+  }
+
+  class PaginatedApplications {
+    <<interface>>
+    +items: ApplicationArray~~
+    +page: number
+    +limit: number
+    +total: number
+  }
+
+  class ListApplicationsParams {
+    <<interface>>
+    -status?: string
+    -companyCategory?: string
+    -jobSource?: string
+    -skillsMatchMin?: number
+    -includeArchived?: boolean
+    -sortBy?: "dateApplied" or "companyName" or "updatedAt"
+    -sortDir?: "asc" or "desc"
+    -page?: number
+    -limit?: number
+  }
+
+  class FilterState {
+    <<interface>>
+    +status: ApplicationStatusArray~~
+    +companyCategory: ComplexUnion
+    +jobSource: ComplexUnion
+    +skillsMatchMin: number or null
+    +includeArchived: boolean
+  }
+
+  class SortState {
+    <<interface>>
+    +sortBy: "dateApplied" or "companyName" or "updatedAt"
+    +sortDir: "asc" or "desc"
+  }
+
+  class ErrorResponse {
+    <<interface>>
+    +code: "validation_error" or "not_found" or "internal_error"
+    +message: string
+    -details?: Array~Object~
+  }
+
+  Application --* ApplicationStatus : status
+  Application --* InterviewStage : interviewStages
+  CreateApplicationInput --* CompanyCategory : companyCategory
+  CreateApplicationInput --* JobSource : jobSource
+  UpdateApplicationInput --* ApplicationStatus : status
+  PaginatedApplications --* Application : items
+  FilterState --* ApplicationStatus : status
