@@ -31,8 +31,8 @@ export const UrlFieldInput = forwardRef<HTMLInputElement, UrlFieldInputProps>(
             id={inputId}
             value={value}
             className={cn(
-              "flex-1 w-full px-3 py-2 border rounded-lg shadow-sm transition-colors",
-              "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
+              "flex-1 w-full px-3 py-2 border rounded-lg shadow-xs transition-colors",
+              "focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
               "dark:bg-gray-800 dark:border-gray-600 dark:text-white",
               error
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -46,7 +46,7 @@ export const UrlFieldInput = forwardRef<HTMLInputElement, UrlFieldInputProps>(
               href={stringValue}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-md text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="p-2 rounded-md text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-hidden focus:ring-2 focus:ring-primary-500"
               title="Open URL in new tab"
             >
               <svg
