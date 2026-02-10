@@ -28,7 +28,7 @@
   // Watch for filter changes
   $effect(() => {
     // Access filters to track them
-    const _ = applicationStore.filters;
+    void applicationStore.filters;
     loadApplications();
   });
 
