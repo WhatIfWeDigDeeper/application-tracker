@@ -4,63 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-Template repository with Claude Code skills, commands, and configuration for Node.js and React applications.
-
-## Structure
-
-```
-.claude/
-├── commands/     # User-initiated slash commands
-├── skills/       # Proactive automations Claude can suggest
-├── scripts/      # Automation scripts
-└── settings.json # Plugins and permissions
-```
-
-## Commands (User-Initiated)
-
-**Git workflow:**
-- `/commit` - Stage changes and create commit with generated message
-- `/pr` - Create pull request with generated description
-- `/review` - Review code changes before committing
-
-**Parallel development:**
-- `/parallel-work [features...]` - Set up git worktrees for parallel feature development
-- `/integrate-parallel-work [features...]` - Merge parallel features into integration branch
-- `/parallel-agents [features...]` - Spawn subagents for parallel work
-
-**Learning:**
-- `/learn` - Extract lessons from conversation and persist to CLAUDE.md, skills, or commands
-
-## Skills (Claude Can Suggest)
-
-**Building & Fixing:**
-- `fix-build` - Diagnose and fix build/type errors
-- `debug <issue>` - Investigate and fix a bug systematically
-
-**Code Generation:**
-- `add-feature <name>` - Add feature with full validation in worktree
-- `add-component <name>` - Create React component with TypeScript
-- `add-hook <name>` - Create custom React hook with tests
-- `add-api-route <route>` - Create Next.js API route with validation
-- `add-test <component>` - Add Jest/React Testing Library tests
-
-**Maintenance:**
-- `refactor <target>` - Refactor code while preserving tests
-- `update-deps <packages>` - Update dependencies with validation (supports globs, '.' for all)
-- `audit-and-fix <packages>` - Security audit and fix vulnerabilities
-- `perf-audit` - Profile and optimize performance
-
-**Documentation:**
-- `e2e-test <feature>` - Create Playwright e2e tests
-- `document-feature <name>` - Generate technical and user documentation
-
-## Scripts
-
-- `bash .claude/scripts/validate-markdown.sh` - Check markdown formatting
-
-## Documentation Guidelines
-
-- **NEVER create documentation at repository root** - use `/docs/` or `implementations/<name>/docs/`
+Monorepo with multiple frontend+backend implementation pairs sharing a single PostgreSQL database. Skills in `.claude/skills/`, commands in `.claude/commands/`.
 
 ## Key Patterns
 
@@ -69,57 +13,28 @@ Template repository with Claude Code skills, commands, and configuration for Nod
 - **Parallel Execution**: 3+ items use Task tool subagents
 
 ## Active Technologies
-- TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite (for dev tooling) (001-job-application-tracker)
-- localStorage (browser-based, no server-side persistence) (001-job-application-tracker)
-- PostgreSQL 18 (single database with multiple schemas for different implementations)
+
+- TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite
+- PostgreSQL 18 (single database with multiple schemas)
+
+## Documentation Guidelines
+
+- **NEVER create documentation at repository root** - use `/docs/` or `implementations/<name>/docs/`
 
 ## Database Architecture
 
-### Multi-Schema Organization
-All implementations share a single PostgreSQL database (`app_tracker`) but use separate schemas for isolation:
+Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolation:
+- **express_prisma** — `api/prisma/schema.prisma`
+- **react_koa** — `koa-api/src/db/schema.sql`
+- **svelte_hono** — `hono-api/src/db/schema.ts` (Drizzle)
+- **vue_nuxt** — `nuxt-api/server/db/schema.ts` (Drizzle), shared types via `@shared` alias
 
-- **express_prisma** - Root Express + Prisma implementation
-- **react_koa** - React + Koa + PostgreSQL (raw SQL) implementation
-- **svelte_hono** - Svelte + Hono + Drizzle ORM implementation
-- **vue_nuxt** - Vue + Nuxt + Drizzle ORM implementation
+Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 
-### Connection Strings
-Each implementation uses schema-aware connection strings via `DATABASE_URL` (see `.env.example`):
-```
-postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>
-```
-
-### Schema Configuration by Implementation
-
-**Root (Express + Prisma):**
-- Schema defined in: `api/prisma/schema.prisma`
-- Uses `@@schema("express_prisma")` directive
-
-**React-Koa-PG:**
-- Schema defined in: `koa-api/src/db/schema.sql`
-- Creates `react_koa` schema at the top of the file
-- Uses `SET search_path TO react_koa;`
-
-**Svelte-Hono-Drizzle:**
-- Schema defined in: `hono-api/src/db/schema.ts`
-- Uses Drizzle's `pgSchema('svelte_hono')`
-- Config in: `drizzle.config.ts` with `schemaFilter: ['svelte_hono']`
-
-**Vue-Nuxt-Drizzle:**
-- Schema defined in: `nuxt-api/server/db/schema.ts`
-- Uses Drizzle's `pgSchema('vue_nuxt')`
-- Config in: `nuxt-api/drizzle.config.ts` with `schemaFilter: ['vue_nuxt']`
-- Shared types in: `nuxt-api/shared/types.ts` (imported by both nuxt-api and vue-ui via `@shared` alias)
-
-### Benefits
-- **Resource efficiency**: Single PostgreSQL instance
-- **Data isolation**: Each implementation has its own namespace
-- **Easy comparison**: All data accessible from one database
-- **Independent operation**: Schemas don't interfere with each other
+See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-implementation config details.
 
 ## Code Quality Requirements
 
-### After Adding or Modifying Code
 **Always complete the validation chain** after making code changes:
 
 1. **Add tests** - Create or update tests for new functionality
@@ -127,171 +42,51 @@ postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>
 3. **Run linting** - Execute `npm run lint` to check code style
 4. **Run build** - Execute `npm run build` to verify compilation
 
-**When to skip steps:**
-- Trivial changes (typo fixes, comment updates) - skip all
-- Test-only changes - skip step 1, run steps 2-4
-- Documentation-only changes - skip all
-
-**Note:** Skills like `add-component`, `add-api-route`, and `add-hook` already include these steps.
+**Skip when:** trivial changes (all steps), test-only changes (step 1), docs-only changes (all steps).
 
 ## Dependency Management
 
-### Package Version Selection
-When installing **new packages**:
-- Always use the **latest stable version** unless there are breaking changes with existing dependencies
-- Check for compatibility issues with the project's Node.js version and other installed packages
-- Document any version constraints in comments if pinning is necessary
-- Use exact versions in package.json (no ^ or ~) for reproducibility
-- If the package does not contain Typescript types, check if there is an @types/{package name} and install if so
+When installing **new packages**: use latest stable version, exact versions (no ^ or ~), install `@types/*` if needed.
 
-When **updating existing packages**:
-- Use the `update-deps` skill for systematic updates with validation
-- Test the validation chain (`build` → `lint` → `test` → `test:e2e`) after updates
+When **updating**: use the `update-deps` skill, then run the full validation chain.
 
 ## API Design Patterns
 
-### Individual Operations Over Batch Replace
-When managing nested resources (e.g., interview stages within applications):
-- **Prefer individual CRUD operations** (`addStage`, `updateStage`, `removeStage`) over batch replace operations (`setStages`)
-- Batch replace typically deletes all existing items before creating new ones, causing unexpected DELETE calls
-- Individual operations are more predictable and efficient (only the intended HTTP method is called)
-
-### Callback Patterns for Components
-When components manage child resources:
-- Pass individual callbacks (`onAdd`, `onUpdate`, `onRemove`) instead of a single `onChange` with full state
-- This allows parent components to make targeted API calls without needing to diff arrays
+Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) over batch replace. Pass individual callbacks (`onAdd`, `onUpdate`, `onRemove`) instead of a single `onChange` with full state.
 
 ## Cross-Framework Patterns
 
-### Prisma Date Format Mismatch
-Prisma returns dates as ISO datetime strings (`2026-02-09T00:00:00.000Z`) but HTML date inputs and Zod's `z.string().date()` expect `YYYY-MM-DD`. When populating forms from API responses, use `.split('T')[0]` to extract the date portion.
-
-### API 204 No Content Handling
-`response.json()` on a 204 No Content response (e.g., DELETE) throws a parse error. Always check `response.status === 204` before attempting to parse the body.
-
-### Zod Optional Fields: null vs undefined
-Optional Zod fields (`z.string().optional()`) reject `null` values. Use `undefined` instead so `JSON.stringify` omits the key entirely.
-
-### React Router v7 useBlocker Requires Data Router
-`useBlocker` only works with the data router API (`createBrowserRouter` + `RouterProvider`). Using it with legacy `<BrowserRouter>` causes silent component crashes. The react-ui implementation uses `router.tsx` with `createBrowserRouter` for this reason.
-
-### SvelteKit SSR Disable for SPA Mode
-SvelteKit with Playwright requires SSR to be disabled to avoid hydration timing issues. Add `export const ssr = false` in `src/routes/+layout.ts`.
-
-### Svelte 5 Two-Way Binding with Callbacks
-Svelte 5's `bind:value` doesn't propagate correctly when combined with callback-based `onchange` props. Use a local `$state` variable with an `$effect` that syncs from the prop, and call the callback in an `oninput` handler.
+- **Prisma dates**: Returns ISO datetime (`2026-02-09T00:00:00.000Z`), HTML inputs need `YYYY-MM-DD` — use `.split('T')[0]`
+- **API 204 handling**: `response.json()` on 204 throws — check `response.status === 204` first
+- **Zod optional vs null**: `z.string().optional()` rejects `null` — use `undefined` so `JSON.stringify` omits the key
+- **React Router useBlocker**: Only works with `createBrowserRouter` + `RouterProvider`, not `<BrowserRouter>`
+- **SvelteKit SSR**: Add `export const ssr = false` in `src/routes/+layout.ts` for SPA mode with Playwright
+- **Svelte 5 bind:value**: Doesn't propagate with callback `onchange` — use local `$state` + `$effect`, call callback in `oninput`
 
 ## Vue.js Patterns
 
-### Vue Router Component Reuse on Param Change
-When navigating between routes that share the same component (e.g. `/applications/new` → `/applications/:id`), Vue Router reuses the component instance — `onMounted` does not re-fire. Use `watch(() => props.id)` to detect the param change and reload data.
-
-### Navigation Guard Bypass for Programmatic Navigation
-`onBeforeRouteLeave` fires on programmatic `router.push()` calls, not just user-initiated navigation. When a save or delete handler redirects via `router.push()`, a dirty-check guard will block it. Use a `skipNavGuard` ref set to `true` before the `router.push()` call, and check it first in the guard.
+- **Router component reuse**: `onMounted` won't re-fire on param change — use `watch(() => props.id)` to reload data
+- **Nav guard bypass**: `onBeforeRouteLeave` fires on `router.push()` — use a `skipNavGuard` ref, set `true` before push
 
 ## Subagent Usage
 
-### Prefer Blocking Parallel Over Background Agents
-When launching multiple subagents with no other work to do, use normal (blocking) parallel `Task` calls in a single message — results come back automatically when all complete. Only use `run_in_background: true` when you need to continue doing other work while agents run.
-
-### Monitor Background Agents Proactively
-When background agents are used, proactively check their progress via `TaskOutput`/`Read` and report status to the user. Do not wait silently for the user to ask.
+- **Prefer blocking parallel**: Use normal parallel `Task` calls when no other work to do. Only `run_in_background: true` when continuing other work.
+- **Monitor proactively**: Check background agent progress via `TaskOutput`/`Read`. Don't wait for the user to ask.
 
 ## Commit and Review Workflow
 
-### Interactive Sessions
-When working directly with the user in the main worktree:
-- **Do not commit unless explicitly asked** — the user will say "commit" when ready
-- Show changes and suggest committing, but wait for confirmation
-
-### Worktree/Subagent Sessions
-When agents are spawned in isolated git worktrees (via `/parallel-work`, `/parallel-agents`):
-- Agents should auto-commit their work before returning, since the worktree is ephemeral and uncommitted work would be lost
-
-### Documentation Maintenance
-When adding new scripts, tools, or infrastructure:
-- Update the root `README.md` (Getting Started, prerequisites, usage) — this is the entry point for teammates
-- Update `CLAUDE.md` if the change affects how Claude should work with the codebase
-- Documentation updates are part of completing the task, not a separate step
+- **Interactive sessions**: Do not commit unless explicitly asked
+- **Worktree/subagent sessions**: Auto-commit before returning (worktree is ephemeral)
+- **PR descriptions**: When follow-up commits substantially change scope, update the PR body via `gh pr edit <number> --body`
+- **Documentation**: Update `README.md` and `CLAUDE.md` as part of completing tasks that add scripts/tools/infrastructure
 
 ## Running E2E Tests
 
-### Prerequisites
-Before running e2e tests, ensure the required backend services are running:
-
-| Implementation | UI Port | API Port | Start API Command |
-|---------------|---------|----------|-------------------|
-| Next.js + Express | 3000 | 3001 | `cd api && npm run dev` |
-| React + Koa | 3010 | 5010 | `cd koa-api && npm run dev` |
-| Vue + Nuxt | 3020 | 5040 | `cd nuxt-api && npm run dev` |
-| Svelte + Hono | 3030 | 5030 | `cd hono-api && npm run dev` |
-
-### Shared E2E Test Suite
-All 4 implementations share a single test suite in `tests/e2e/application-crud.spec.ts`, parameterized by `TEST_UI_PORT`. The Playwright config auto-starts the correct UI dev server based on port.
-
 ```bash
-# Run against specific implementation (API must be running separately)
 npm run test:e2e           # Next.js (port 3000)
 npm run test:e2e:react-koa # React-Koa (port 3010)
 npm run test:e2e:vue       # Vue-Nuxt (port 3020)
 npm run test:e2e:svelte    # Svelte-Hono (port 3030)
 ```
 
-### Schema Documentation
-Regenerate database ERD docs after schema changes:
-```bash
-npm run docs:schema    # Requires tbls (brew install tbls) and running PostgreSQL
-```
-This runs `scripts/generate-schema-docs.sh` which generates Mermaid ERDs under `docs/schema/` for all 4 schemas.
-
-### Type Diagrams
-Regenerate TypeScript type diagrams after type changes:
-```bash
-npm run docs:types         # All implementations
-npm run docs:types:nuxt    # Individual implementation
-```
-Uses `ts-to-mermaid` via npx (no install required). Output goes to `docs/types/{implementation}/`.
-Note: hono-api is excluded because its types are Zod-inferred (`z.infer<typeof Schema>`) which the tool can't resolve.
-
-### Shared Selector Contract
-All implementations must match identical selectors for the shared e2e tests:
-- Button text: `"Add Application"`, `"Create Application"`, `"Save Changes"`, `"Discard"`, `"Delete"`, `"Add Stage"`, `"Back to List"`
-- Input placeholders: `"Company Name *"`, `"Position Title *"`, `"Phone Screen, Technical Interview..."`
-- Element IDs: `#dateApplied`, `#status`, `#offerDueDate`, `#companyCategory`, `#jobSource`, `#specialRequirements`, `#notes`, `#salaryMin`, `#salaryMax`
-- URL field placeholders: `"https://example.com"`, `"https://example.com/careers"`, `"https://linkedin.com/jobs/..."`
-- Labels: `/cover letter required/i`
-
-## Testing Patterns
-
-### MSW for API Mocking
-- MSW handlers are in `ui/src/test-utils/mocks/handlers.ts`
-- Server setup in `ui/src/test-utils/mocks/server.ts`
-- Requires fetch polyfills (TextEncoder, Response, etc.) in Jest environment
-
-### Component Tests with Modals
-- Use `cleanup()` after each test when testing components with portals/modals
-- Create fresh mock functions per test using factory pattern (`createMockProps()`)
-- Use `waitFor()` when interacting with modals to ensure they're rendered
-
-### Test File Organization
-- Hook tests: `src/hooks/*.test.ts`
-- Component tests: `src/components/**/*.test.tsx`
-- Service tests: `src/__tests__/services/*.test.ts`
-
-## Version Documentation Files
-
-When updating packages with major version changes, update version references in these files:
-
-**Always update:**
-- `CLAUDE.md` - Active Technologies section
-- `README.md` - Stack descriptions
-- `docs/IMPLEMENTATION_READY.md` - Technology stack section
-- `docs/API_IMPLEMENTATION_SUMMARY.md` - Technology stack section
-- `specs/001-job-application-tracker/plan.md` - Technical Context section
-
-**Never update (historical records):**
-- `specs/*/research.md` - Original research notes
-- `specs/*/tasks.md` - Completed task records
-
-## Recent Changes
-- 001-job-application-tracker: Added TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite (for dev tooling)
+Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
