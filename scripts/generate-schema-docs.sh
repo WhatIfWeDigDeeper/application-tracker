@@ -19,16 +19,20 @@ if [[ -z "${DATABASE_URL:-}" ]]; then
     echo "Copy .env.example to .env and configure DATABASE_URL." >&2
     exit 1
   fi
-  DATABASE_URL=$(grep -E '^DATABASE_URL=' .env | cut -d'=' -f2-)
-  if [[ -z "${DATABASE_URL}" ]] || [[ "${DATABASE_URL}" == *'${'* ]]; then
-    echo "Error: DATABASE_URL is missing or contains unresolved variables in .env." >&2
-    echo "Set a valid DATABASE_URL in .env. See .env.example for reference." >&2
+  # Source .env to resolve variable references (e.g. ${POSTGRES_USER})
+  set -a
+  source .env
+  set +a
+  if [[ -z "${DATABASE_URL:-}" ]]; then
+    echo "Error: DATABASE_URL is not defined in .env." >&2
+    echo "Add a DATABASE_URL to your .env file. See .env.example for reference." >&2
     exit 1
   fi
 fi
 
-# Strip any ?schema= or &schema= params and ensure sslmode=disable
+# Strip query params, replace docker hostname with localhost, ensure sslmode=disable
 BASE_URL="${DATABASE_URL%%\?*}"
+BASE_URL="${BASE_URL//@postgres:/@localhost:}"
 DB_URL="${BASE_URL}?sslmode=disable"
 DOC_DIR="docs/schema"
 
