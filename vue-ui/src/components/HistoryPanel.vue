@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: [];
+  restored: [];
 }>();
 
 const historyStore = useHistoryStore();
@@ -66,6 +67,7 @@ async function handleRestore(commit: Commit) {
       const restored = await eventService.restore(props.applicationId, commit.sequence);
       detailStore.application = restored;
       await historyStore.loadHistory(props.applicationId);
+      emit('restored');
     } catch (err) {
       console.error('Failed to restore to version:', err);
     }
