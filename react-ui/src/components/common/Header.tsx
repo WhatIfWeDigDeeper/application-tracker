@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui";
 
-interface HeaderProps {
-  onAddApplication: () => void;
-}
-
-export function Header({ onAddApplication }: HeaderProps) {
+export function Header() {
+  const navigate = useNavigate();
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
       return (
@@ -32,7 +30,7 @@ export function Header({ onAddApplication }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo / Title */}
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <svg
               className="w-8 h-8 text-primary-600"
               fill="none"
@@ -49,7 +47,7 @@ export function Header({ onAddApplication }: HeaderProps) {
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               Job Application Tracker (React - Koa - PG)
             </h1>
-          </div>
+          </Link>
 
           {/* Actions */}
           <div className="flex items-center gap-3">
@@ -91,7 +89,7 @@ export function Header({ onAddApplication }: HeaderProps) {
             </button>
 
             {/* Add Application Button */}
-            <Button onClick={onAddApplication}>
+            <Button onClick={() => navigate("/applications/new")}>
               <svg
                 className="w-4 h-4 mr-2"
                 fill="none"

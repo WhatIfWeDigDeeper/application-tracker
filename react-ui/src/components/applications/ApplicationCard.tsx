@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import type { Application } from "../../types/application";
 import { Card, Badge, RatingDisplay, ConfirmDialog } from "../ui";
 import { formatDate, getDaysUntil, isOverdue } from "../../lib/utils";
@@ -7,14 +8,12 @@ import { cn } from "../../lib/utils";
 
 interface ApplicationCardProps {
   application: Application;
-  onClick: () => void;
   onArchive: () => void;
   onDelete: () => void;
 }
 
 export function ApplicationCard({
   application,
-  onClick,
   onArchive,
   onDelete,
 }: ApplicationCardProps) {
@@ -43,7 +42,7 @@ export function ApplicationCard({
           application.isArchived && "opacity-60"
         )}
       >
-        <div className="p-4" onClick={onClick}>
+        <Link to={`/applications/${application.id}`} className="block p-4">
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
@@ -99,7 +98,7 @@ export function ApplicationCard({
               </span>
             )}
           </div>
-        </div>
+        </Link>
 
         {/* Actions Menu */}
         <div

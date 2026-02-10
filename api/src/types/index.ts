@@ -48,6 +48,7 @@ export const JobSourceSchema = z.enum([
 export const CreateApplicationSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
   positionTitle: z.string().min(1, "Position title is required"),
+  status: ApplicationStatusSchema.optional(),
   dateApplied: z.string().date().optional(),
   companyUrl: z.string().url().optional().or(z.literal("")),
   jobPostingUrl: z.string().url().optional().or(z.literal("")),
