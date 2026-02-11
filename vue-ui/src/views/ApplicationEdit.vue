@@ -835,7 +835,7 @@ onUnmounted(() => {
                   v-model="salaryMin"
                   type="number"
                   class="input mt-1"
-                  placeholder="120000"
+                  placeholder="180000"
                   :class="errors.salaryMin && 'border-red-500'"
                 >
                 <p
@@ -856,7 +856,7 @@ onUnmounted(() => {
                   v-model="salaryMax"
                   type="number"
                   class="input mt-1"
-                  placeholder="150000"
+                  placeholder="235000"
                   :class="errors.salaryMax && 'border-red-500'"
                 >
                 <p
