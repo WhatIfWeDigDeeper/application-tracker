@@ -3,6 +3,7 @@
 A full-stack job application tracking system with multiple technology stack implementations.
 
 - [Overview](#overview)
+  - [Sample Editing screen](#sample-editing-screen)
 - [Implementations](#implementations)
   - [1. Vue + Nuxt + Drizzle](#1-vue--nuxt--drizzle)
   - [2. Next.js + Express + Prisma](#2-nextjs--express--prisma)
@@ -28,6 +29,12 @@ A full-stack job application tracking system with multiple technology stack impl
 ## Overview
 
 This repository contains a complete job application tracker built with four different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
+
+### Sample Editing screen
+
+Please note that the UI is still being refined.
+
+![Sample Edit Job Application with history](docs/imgs/vue-app-details.png)
 
 ## Implementations
 
