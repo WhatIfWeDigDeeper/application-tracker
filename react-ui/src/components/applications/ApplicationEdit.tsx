@@ -626,7 +626,7 @@ export function ApplicationEdit() {
             type="text"
             value={form.companyName}
             onChange={(e) => updateField("companyName", e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg shadow-sm transition-colors text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
+            className={`w-full px-3 py-2 border rounded-lg shadow-xs transition-colors text-xl font-semibold focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
               errors.companyName
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                 : "border-gray-300 dark:border-gray-600"
@@ -646,7 +646,7 @@ export function ApplicationEdit() {
             type="text"
             value={form.positionTitle}
             onChange={(e) => updateField("positionTitle", e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
+            className={`w-full px-3 py-2 border rounded-lg shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
               errors.positionTitle
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                 : "border-gray-300 dark:border-gray-600"
@@ -674,7 +674,7 @@ export function ApplicationEdit() {
               type="date"
               value={form.dateApplied}
               onChange={(e) => updateField("dateApplied", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             />
           </div>
 
@@ -691,7 +691,7 @@ export function ApplicationEdit() {
               onChange={(e) =>
                 updateField("status", e.target.value as ApplicationStatus)
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm transition-colors appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors appearance-none bg-white focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             >
               {APPLICATION_STATUSES.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -724,7 +724,7 @@ export function ApplicationEdit() {
                 onChange={(e) =>
                   updateField("companyCategory", e.target.value)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm transition-colors appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors appearance-none bg-white focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               >
                 <option value="">Select category</option>
                 {COMPANY_CATEGORIES.map((c) => (
@@ -781,7 +781,7 @@ export function ApplicationEdit() {
                 id="jobSource"
                 value={form.jobSource}
                 onChange={(e) => updateField("jobSource", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm transition-colors appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors appearance-none bg-white focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               >
                 <option value="">Select source</option>
                 {JOB_SOURCES.map((s) => (
@@ -819,7 +819,7 @@ export function ApplicationEdit() {
                   type="number"
                   value={form.salaryMin}
                   onChange={(e) => updateField("salaryMin", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
+                  className={`w-full px-3 py-2 border rounded-lg shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
                     errors.salaryMin
                       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                       : "border-gray-300 dark:border-gray-600"
@@ -845,7 +845,7 @@ export function ApplicationEdit() {
                   type="number"
                   value={form.salaryMax}
                   onChange={(e) => updateField("salaryMax", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
+                  className={`w-full px-3 py-2 border rounded-lg shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
                     errors.salaryMax
                       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                       : "border-gray-300 dark:border-gray-600"
@@ -896,7 +896,7 @@ export function ApplicationEdit() {
                 updateField("specialRequirements", e.target.value)
               }
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm transition-colors resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors resize-none focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               placeholder="Portfolio required, specific skills..."
             />
           </div>
@@ -914,7 +914,7 @@ export function ApplicationEdit() {
               value={form.notes}
               onChange={(e) => updateField("notes", e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm transition-colors resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors resize-none focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               placeholder="Referral info, interview prep notes..."
             />
           </div>
@@ -933,7 +933,7 @@ export function ApplicationEdit() {
                 type="date"
                 value={form.offerDueDate}
                 onChange={(e) => updateField("offerDueDate", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               />
             </div>
           )}
