@@ -13,23 +13,46 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for docs-only changes
+        id: docs-check
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            docs/**
+            **/*.md
+            **/*.mermaid
+            **/*.txt
+            **/*.png
+            **/*.jpg
+          files_ignore: |
+            package.json
+            **/package.json
 
       - name: Use Node.js from .node-version
+        if: steps.docs-check.outputs.only_changed == 'false'
         uses: actions/setup-node@v4
         with:
           node-version-file: '.node-version'
 
       - name: Run Security Audit
+        if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run audit:ci:all
 
       - name: Install npm packages
+        if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run ci:all
 
       - name: Lint
+        if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run lint:all
 
       - name: Build
+        if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run build:all
 
       - name: Test
+        if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run test:all
