@@ -1,0 +1,900 @@
+{
+  "name": "app_tracker",
+  "tables": [
+    {
+      "name": "vue_nuxt.applications",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "company_name",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "position_title",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "date_applied",
+          "type": "date",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "vue_nuxt.application_status",
+          "nullable": false,
+          "default": "'applied'::vue_nuxt.application_status"
+        },
+        {
+          "name": "company_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "job_posting_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_career_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_category",
+          "type": "vue_nuxt.company_category",
+          "nullable": true
+        },
+        {
+          "name": "skills_match",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "job_source",
+          "type": "vue_nuxt.job_source",
+          "nullable": true
+        },
+        {
+          "name": "cover_letter_required",
+          "type": "boolean",
+          "nullable": true
+        },
+        {
+          "name": "special_requirements",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "salary_min",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "salary_max",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "offer_due_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "is_archived",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "applications_pkey",
+          "def": "CREATE UNIQUE INDEX applications_pkey ON vue_nuxt.applications USING btree (id)",
+          "table": "vue_nuxt.applications",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "applications_company_name_not_null",
+          "type": "n",
+          "def": "NOT NULL company_name",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "company_name"
+          ]
+        },
+        {
+          "name": "applications_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "applications_date_applied_not_null",
+          "type": "n",
+          "def": "NOT NULL date_applied",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "date_applied"
+          ]
+        },
+        {
+          "name": "applications_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "applications_is_archived_not_null",
+          "type": "n",
+          "def": "NOT NULL is_archived",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "is_archived"
+          ]
+        },
+        {
+          "name": "applications_position_title_not_null",
+          "type": "n",
+          "def": "NOT NULL position_title",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "position_title"
+          ]
+        },
+        {
+          "name": "applications_status_not_null",
+          "type": "n",
+          "def": "NOT NULL status",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "applications_updated_at_not_null",
+          "type": "n",
+          "def": "NOT NULL updated_at",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "updated_at"
+          ]
+        },
+        {
+          "name": "applications_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "vue_nuxt.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vue_nuxt.interview_stages",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "is_completed",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "completed_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "performance_rating",
+          "type": "integer",
+          "nullable": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "interview_stages_pkey",
+          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON vue_nuxt.interview_stages USING btree (id)",
+          "table": "vue_nuxt.interview_stages",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "interview_stages_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "vue_nuxt.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "interview_stages_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "vue_nuxt.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_is_completed_not_null",
+          "type": "n",
+          "def": "NOT NULL is_completed",
+          "table": "vue_nuxt.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "is_completed"
+          ]
+        },
+        {
+          "name": "interview_stages_name_not_null",
+          "type": "n",
+          "def": "NOT NULL name",
+          "table": "vue_nuxt.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "interview_stages_order_not_null",
+          "type": "n",
+          "def": "NOT NULL \"order\"",
+          "table": "vue_nuxt.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "order"
+          ]
+        },
+        {
+          "name": "interview_stages_application_id_applications_id_fk",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE",
+          "table": "vue_nuxt.interview_stages",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "vue_nuxt.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_events",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "sequence",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "varchar(500)",
+          "nullable": false
+        },
+        {
+          "name": "changes",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "patches",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "inverse_patches",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "application_events_pkey",
+          "def": "CREATE UNIQUE INDEX application_events_pkey ON vue_nuxt.application_events USING btree (id)",
+          "table": "vue_nuxt.application_events",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_events_application_id_sequence_unique",
+          "def": "CREATE UNIQUE INDEX application_events_application_id_sequence_unique ON vue_nuxt.application_events USING btree (application_id, sequence)",
+          "table": "vue_nuxt.application_events",
+          "columns": [
+            "application_id",
+            "sequence"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "application_events_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "application_events_changes_not_null",
+          "type": "n",
+          "def": "NOT NULL changes",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "changes"
+          ]
+        },
+        {
+          "name": "application_events_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "application_events_description_not_null",
+          "type": "n",
+          "def": "NOT NULL description",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "description"
+          ]
+        },
+        {
+          "name": "application_events_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_events_inverse_patches_not_null",
+          "type": "n",
+          "def": "NOT NULL inverse_patches",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "inverse_patches"
+          ]
+        },
+        {
+          "name": "application_events_patches_not_null",
+          "type": "n",
+          "def": "NOT NULL patches",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "patches"
+          ]
+        },
+        {
+          "name": "application_events_sequence_not_null",
+          "type": "n",
+          "def": "NOT NULL sequence",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "sequence"
+          ]
+        },
+        {
+          "name": "application_events_application_id_applications_id_fk",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_events_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_events_application_id_sequence_unique",
+          "type": "UNIQUE",
+          "def": "UNIQUE (application_id, sequence)",
+          "table": "vue_nuxt.application_events",
+          "referenced_table": "",
+          "columns": [
+            "application_id",
+            "sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_snapshots",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "at_sequence",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "application_snapshots_pkey",
+          "def": "CREATE UNIQUE INDEX application_snapshots_pkey ON vue_nuxt.application_snapshots USING btree (id)",
+          "table": "vue_nuxt.application_snapshots",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_snapshots_application_id_at_sequence_unique",
+          "def": "CREATE UNIQUE INDEX application_snapshots_application_id_at_sequence_unique ON vue_nuxt.application_snapshots USING btree (application_id, at_sequence)",
+          "table": "vue_nuxt.application_snapshots",
+          "columns": [
+            "application_id",
+            "at_sequence"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "application_snapshots_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "vue_nuxt.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "application_snapshots_at_sequence_not_null",
+          "type": "n",
+          "def": "NOT NULL at_sequence",
+          "table": "vue_nuxt.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "at_sequence"
+          ]
+        },
+        {
+          "name": "application_snapshots_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "vue_nuxt.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "application_snapshots_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "vue_nuxt.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_snapshots_state_not_null",
+          "type": "n",
+          "def": "NOT NULL state",
+          "table": "vue_nuxt.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "state"
+          ]
+        },
+        {
+          "name": "application_snapshots_application_id_applications_id_fk",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE",
+          "table": "vue_nuxt.application_snapshots",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_snapshots_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "vue_nuxt.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_snapshots_application_id_at_sequence_unique",
+          "type": "UNIQUE",
+          "def": "UNIQUE (application_id, at_sequence)",
+          "table": "vue_nuxt.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "application_id",
+            "at_sequence"
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "table": "vue_nuxt.interview_stages",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "vue_nuxt.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE"
+    },
+    {
+      "table": "vue_nuxt.application_events",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "vue_nuxt.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE"
+    },
+    {
+      "table": "vue_nuxt.application_snapshots",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "vue_nuxt.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE"
+    }
+  ],
+  "enums": [
+    {
+      "name": "express_prisma.ApplicationStatus",
+      "values": [
+        "accepted",
+        "applied",
+        "interviewing",
+        "offered",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "express_prisma.CompanyCategory",
+      "values": [
+        "enterprise",
+        "mid_market",
+        "other",
+        "scale_up",
+        "startup"
+      ]
+    },
+    {
+      "name": "express_prisma.JobSource",
+      "values": [
+        "company_website",
+        "job_board",
+        "other",
+        "recruiter",
+        "referral"
+      ]
+    },
+    {
+      "name": "react_koa.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "react_koa.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "svelte_hono.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "svelte_hono.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "svelte_hono.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "vue_nuxt.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "vue_nuxt.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    }
+  ],
+  "driver": {
+    "name": "postgres",
+    "database_version": "PostgreSQL 18.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "meta": {
+      "current_schema": "public",
+      "search_paths": [
+        "postgres",
+        "public"
+      ],
+      "dict": {
+        "Functions": "Stored procedures and functions"
+      }
+    }
+  }
+}

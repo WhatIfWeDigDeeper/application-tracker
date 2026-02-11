@@ -1,0 +1,758 @@
+{
+  "name": "app_tracker",
+  "tables": [
+    {
+      "name": "react_koa.applications",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default": "react_koa.uuid_generate_v4()"
+        },
+        {
+          "name": "company_name",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "position_title",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "date_applied",
+          "type": "date",
+          "nullable": false,
+          "default": "CURRENT_DATE"
+        },
+        {
+          "name": "status",
+          "type": "react_koa.application_status",
+          "nullable": false,
+          "default": "'applied'::react_koa.application_status"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "company_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "job_posting_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_career_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_category",
+          "type": "react_koa.company_category",
+          "nullable": true
+        },
+        {
+          "name": "skills_match",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "job_source",
+          "type": "react_koa.job_source",
+          "nullable": true
+        },
+        {
+          "name": "cover_letter_required",
+          "type": "boolean",
+          "nullable": true
+        },
+        {
+          "name": "special_requirements",
+          "type": "varchar(1000)",
+          "nullable": true
+        },
+        {
+          "name": "salary_min",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "salary_max",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "offer_due_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "is_archived",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "applications_pkey",
+          "def": "CREATE UNIQUE INDEX applications_pkey ON react_koa.applications USING btree (id)",
+          "table": "react_koa.applications",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "idx_applications_status",
+          "def": "CREATE INDEX idx_applications_status ON react_koa.applications USING btree (status)",
+          "table": "react_koa.applications",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_applications_is_archived",
+          "def": "CREATE INDEX idx_applications_is_archived ON react_koa.applications USING btree (is_archived)",
+          "table": "react_koa.applications",
+          "columns": [
+            "is_archived"
+          ]
+        },
+        {
+          "name": "idx_applications_date_applied",
+          "def": "CREATE INDEX idx_applications_date_applied ON react_koa.applications USING btree (date_applied)",
+          "table": "react_koa.applications",
+          "columns": [
+            "date_applied"
+          ]
+        },
+        {
+          "name": "idx_applications_company_category",
+          "def": "CREATE INDEX idx_applications_company_category ON react_koa.applications USING btree (company_category)",
+          "table": "react_koa.applications",
+          "columns": [
+            "company_category"
+          ]
+        },
+        {
+          "name": "idx_applications_job_source",
+          "def": "CREATE INDEX idx_applications_job_source ON react_koa.applications USING btree (job_source)",
+          "table": "react_koa.applications",
+          "columns": [
+            "job_source"
+          ]
+        },
+        {
+          "name": "idx_applications_updated_at",
+          "def": "CREATE INDEX idx_applications_updated_at ON react_koa.applications USING btree (updated_at)",
+          "table": "react_koa.applications",
+          "columns": [
+            "updated_at"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "applications_company_name_not_null",
+          "type": "n",
+          "def": "NOT NULL company_name",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "company_name"
+          ]
+        },
+        {
+          "name": "applications_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "applications_date_applied_not_null",
+          "type": "n",
+          "def": "NOT NULL date_applied",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "date_applied"
+          ]
+        },
+        {
+          "name": "applications_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "applications_is_archived_not_null",
+          "type": "n",
+          "def": "NOT NULL is_archived",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "is_archived"
+          ]
+        },
+        {
+          "name": "applications_notes_check",
+          "type": "CHECK",
+          "def": "CHECK (((notes IS NULL) OR (length(notes) \u003c= 5000)))",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "notes"
+          ]
+        },
+        {
+          "name": "applications_position_title_not_null",
+          "type": "n",
+          "def": "NOT NULL position_title",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "position_title"
+          ]
+        },
+        {
+          "name": "applications_salary_max_check",
+          "type": "CHECK",
+          "def": "CHECK (((salary_max IS NULL) OR (salary_max \u003e= 0)))",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "salary_max"
+          ]
+        },
+        {
+          "name": "applications_salary_min_check",
+          "type": "CHECK",
+          "def": "CHECK (((salary_min IS NULL) OR (salary_min \u003e= 0)))",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "salary_min"
+          ]
+        },
+        {
+          "name": "applications_skills_match_check",
+          "type": "CHECK",
+          "def": "CHECK (((skills_match IS NULL) OR ((skills_match \u003e= 1) AND (skills_match \u003c= 5))))",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "skills_match"
+          ]
+        },
+        {
+          "name": "applications_status_not_null",
+          "type": "n",
+          "def": "NOT NULL status",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "applications_updated_at_not_null",
+          "type": "n",
+          "def": "NOT NULL updated_at",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "updated_at"
+          ]
+        },
+        {
+          "name": "applications_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "react_koa.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "name": "update_applications_updated_at",
+          "def": "CREATE TRIGGER update_applications_updated_at BEFORE UPDATE ON react_koa.applications FOR EACH ROW EXECUTE FUNCTION react_koa.update_updated_at_column()"
+        }
+      ]
+    },
+    {
+      "name": "react_koa.interview_stages",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default": "react_koa.uuid_generate_v4()"
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "is_completed",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "completed_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "performance_rating",
+          "type": "integer",
+          "nullable": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "interview_stages_pkey",
+          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON react_koa.interview_stages USING btree (id)",
+          "table": "react_koa.interview_stages",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "idx_interview_stages_application_id",
+          "def": "CREATE INDEX idx_interview_stages_application_id ON react_koa.interview_stages USING btree (application_id)",
+          "table": "react_koa.interview_stages",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "idx_interview_stages_order",
+          "def": "CREATE INDEX idx_interview_stages_order ON react_koa.interview_stages USING btree (application_id, \"order\")",
+          "table": "react_koa.interview_stages",
+          "columns": [
+            "application_id",
+            "order"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "interview_stages_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "interview_stages_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_is_completed_not_null",
+          "type": "n",
+          "def": "NOT NULL is_completed",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "is_completed"
+          ]
+        },
+        {
+          "name": "interview_stages_name_not_null",
+          "type": "n",
+          "def": "NOT NULL name",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "interview_stages_notes_check",
+          "type": "CHECK",
+          "def": "CHECK (((notes IS NULL) OR (length(notes) \u003c= 2000)))",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "notes"
+          ]
+        },
+        {
+          "name": "interview_stages_order_not_null",
+          "type": "n",
+          "def": "NOT NULL \"order\"",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "order"
+          ]
+        },
+        {
+          "name": "interview_stages_performance_rating_check",
+          "type": "CHECK",
+          "def": "CHECK (((performance_rating IS NULL) OR ((performance_rating \u003e= 1) AND (performance_rating \u003c= 5))))",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "performance_rating"
+          ]
+        },
+        {
+          "name": "interview_stages_application_id_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES react_koa.applications(id) ON DELETE CASCADE",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "react_koa.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "table": "react_koa.interview_stages",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "react_koa.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES react_koa.applications(id) ON DELETE CASCADE"
+    }
+  ],
+  "functions": [
+    {
+      "name": "react_koa.uuid_nil",
+      "return_type": "uuid",
+      "arguments": "",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_ns_dns",
+      "return_type": "uuid",
+      "arguments": "",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_ns_url",
+      "return_type": "uuid",
+      "arguments": "",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_ns_oid",
+      "return_type": "uuid",
+      "arguments": "",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_ns_x500",
+      "return_type": "uuid",
+      "arguments": "",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_generate_v1",
+      "return_type": "uuid",
+      "arguments": "",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_generate_v1mc",
+      "return_type": "uuid",
+      "arguments": "",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_generate_v3",
+      "return_type": "uuid",
+      "arguments": "namespace uuid, name text",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_generate_v4",
+      "return_type": "uuid",
+      "arguments": "",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.uuid_generate_v5",
+      "return_type": "uuid",
+      "arguments": "namespace uuid, name text",
+      "type": "FUNCTION"
+    },
+    {
+      "name": "react_koa.update_updated_at_column",
+      "return_type": "trigger",
+      "arguments": "",
+      "type": "FUNCTION"
+    }
+  ],
+  "enums": [
+    {
+      "name": "express_prisma.ApplicationStatus",
+      "values": [
+        "accepted",
+        "applied",
+        "interviewing",
+        "offered",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "express_prisma.CompanyCategory",
+      "values": [
+        "enterprise",
+        "mid_market",
+        "other",
+        "scale_up",
+        "startup"
+      ]
+    },
+    {
+      "name": "express_prisma.JobSource",
+      "values": [
+        "company_website",
+        "job_board",
+        "other",
+        "recruiter",
+        "referral"
+      ]
+    },
+    {
+      "name": "react_koa.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "react_koa.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "svelte_hono.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "svelte_hono.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "svelte_hono.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "vue_nuxt.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "vue_nuxt.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    }
+  ],
+  "driver": {
+    "name": "postgres",
+    "database_version": "PostgreSQL 18.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "meta": {
+      "current_schema": "public",
+      "search_paths": [
+        "postgres",
+        "public"
+      ],
+      "dict": {
+        "Functions": "Stored procedures and functions"
+      }
+    }
+  }
+}

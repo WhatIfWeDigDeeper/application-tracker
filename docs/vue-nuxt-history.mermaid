@@ -1,0 +1,100 @@
+%%{init: {'theme': 'base', 'themeVariables': {'signalTextColor': '#333333', 'signalColor': '#555555', 'actorTextColor': '#333333', 'noteBkgColor': '#fff3cd', 'noteTextColor': '#333333', 'labelTextColor': '#333333'}}}%%
+sequenceDiagram
+    autonumber
+
+    participant User
+    participant Vue as Vue UI<br/>(Pinia Stores)
+    participant Immer
+    participant API as Nuxt API
+    participant DB as PostgreSQL<br/>(vue_nuxt schema)
+
+    %% ─── EDIT FLOW ───
+    rect rgb(235, 245, 255)
+        Note over User,DB: Edit Flow — User modifies an application
+        User->>Vue: Edit field (e.g. status)
+        Vue->>API: PUT /api/applications/:id
+        API->>DB: UPDATE applications SET ...
+        API-->>Vue: Updated application
+
+        Vue->>Immer: produceWithPatches(oldState, draft => ...)
+        Immer-->>Vue: [nextState, patches, inversePatches]
+
+        Vue->>API: POST /api/applications/:id/events
+        Note right of Vue: { description, changes,<br/>patches, inversePatches }
+        API->>DB: SELECT max(sequence) FROM events
+        API->>DB: INSERT INTO application_events<br/>(sequence = max + 1)
+
+        alt sequence % 50 === 0
+            Note over API,DB: Snapshot checkpoint
+            API->>DB: SELECT full app state (with stages)
+            API->>DB: INSERT INTO application_snapshots<br/>{ atSequence, state: full app }
+        end
+
+        API-->>Vue: Event { id, sequence }
+        Vue->>Vue: historyStore.addCommit()<br/>with patches + inversePatches
+    end
+
+    %% ─── UNDO / REDO ───
+    rect rgb(255, 245, 235)
+        Note over User,DB: Undo — Apply inverse patches locally, sync to server
+        User->>Vue: Click Undo
+        Vue->>Immer: applyPatches(currentState, inversePatches)
+        Immer-->>Vue: previousState
+        Vue->>API: Sync diff via CRUD calls<br/>(PUT app, POST/PUT/DELETE stages)
+        API->>DB: Update application + stages
+        Vue->>Vue: Move cursor back, update UI
+    end
+
+    rect rgb(245, 255, 235)
+        Note over User,DB: Redo — Apply forward patches locally, sync to server
+        User->>Vue: Click Redo
+        Vue->>Immer: applyPatches(currentState, patches)
+        Immer-->>Vue: nextState
+        Vue->>API: Sync diff via CRUD calls
+        API->>DB: Update application + stages
+        Vue->>Vue: Move cursor forward, update UI
+    end
+
+    %% ─── LOAD HISTORY ───
+    rect rgb(245, 240, 255)
+        Note over User,DB: Load History — Fetch events from server (no local storage)
+        User->>Vue: Open history panel
+        Vue->>API: GET /api/applications/:id/events?page=1&limit=200
+        API->>DB: SELECT * FROM application_events<br/>ORDER BY sequence DESC
+        API-->>Vue: { events[], total }
+        Vue->>Vue: Map events → commits[]<br/>Set cursor to latest
+    end
+
+    %% ─── RESTORE ───
+    rect rgb(255, 240, 240)
+        Note over User,DB: Restore — Rebuild state at target sequence
+        User->>Vue: Restore to version N
+        Vue->>API: POST /api/applications/:id/events/:seq/restore
+
+        API->>DB: Find latest snapshot WHERE atSequence ≤ N
+
+        alt Snapshot found (e.g. at seq 50, restoring to 63)
+            Note over API,DB: Forward replay from snapshot
+            API->>DB: SELECT events WHERE seq > 50 AND seq ≤ 63<br/>ORDER BY sequence ASC
+            API->>Immer: Start from snapshot.state
+            loop For each event 51→63
+                API->>Immer: applyPatches(state, event.patches)
+            end
+        else No snapshot (e.g. restoring to seq 12)
+            Note over API,DB: Backward replay from current state
+            API->>DB: SELECT current app state
+            API->>DB: SELECT events WHERE seq > 12<br/>ORDER BY sequence DESC
+            loop For each event (newest → oldest)
+                API->>Immer: applyPatches(state, event.inversePatches)
+            end
+        end
+
+        Note over API,DB: Apply restored state to DB
+        API->>DB: UPDATE applications SET ... (restored fields)
+        API->>DB: DELETE + re-INSERT interview stages
+        API->>DB: DELETE events WHERE sequence > N
+        API->>DB: DELETE snapshots WHERE atSequence > N
+        API->>DB: INSERT event "Restored to version N"
+        API-->>Vue: Restored application
+        Vue->>Vue: Reload history from server
+    end

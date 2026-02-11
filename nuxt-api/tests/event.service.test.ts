@@ -19,10 +19,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { db } from '../server/db/client';
-import { applications, interviewStages, applicationEvents, applicationSnapshots } from '../server/db/schema';
+import { applications, applicationEvents, applicationSnapshots } from '../server/db/schema';
 import { appendEvent, listEvents, getLatestSnapshot, restoreToEvent } from '../server/services/event.service';
 import { createApplication, getApplication, deleteApplication } from '../server/services/application.service';
-import type { FieldChange, ImmerPatch } from '../shared/types';
+import type { ImmerPatch } from '../shared/types';
 
 // Test data helpers
 function createTestPatches(): { patches: ImmerPatch[]; inversePatches: ImmerPatch[] } {
@@ -255,7 +255,7 @@ describe('Event Service', () => {
       }).where(eq(applications.id, testAppId));
 
       // Append an event recording this change
-      const event1 = await appendEvent(
+      await appendEvent(
         testAppId,
         'Updated status to interviewing',
         [{ field: 'status', label: 'Status', oldValue: 'applied', newValue: 'interviewing' }],

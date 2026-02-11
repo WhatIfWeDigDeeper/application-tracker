@@ -17,7 +17,7 @@
   );
 </script>
 
-<div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+<div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
   <div class="flex flex-wrap gap-4 items-end">
     <!-- Status Filter -->
     <div class="flex-1 min-w-[150px]">

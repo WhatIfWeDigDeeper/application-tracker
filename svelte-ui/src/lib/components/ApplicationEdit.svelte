@@ -483,7 +483,7 @@
   // Reactive effect: reload when id changes (e.g., from /new to /:id)
   $effect(() => {
     // We access `id` to track it
-    const currentId = id;
+    void id;
     loadApplication();
   });
 

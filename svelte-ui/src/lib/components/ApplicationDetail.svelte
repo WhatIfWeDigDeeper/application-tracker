@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Application, UpdateApplicationInput, CreateInterviewStageInput, UpdateInterviewStageInput, ApplicationStatus } from '$lib/types';
   import { ALL_STATUSES, STATUS_LABELS, CATEGORY_LABELS, SOURCE_LABELS } from '$lib/types';
-  import StatusBadge from './StatusBadge.svelte';
   import RatingDisplay from './RatingDisplay.svelte';
   import InterviewStageList from './InterviewStageList.svelte';
   import ApplicationForm from './ApplicationForm.svelte';

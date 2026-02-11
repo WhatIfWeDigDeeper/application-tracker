@@ -2,40 +2,63 @@
 
 A full-stack job application tracking system with multiple technology stack implementations.
 
+- [Overview](#overview)
+- [Implementations](#implementations)
+  - [1. Vue + Nuxt + Drizzle](#1-vue--nuxt--drizzle)
+  - [2. Next.js + Express + Prisma](#2-nextjs--express--prisma)
+  - [3. React + Koa + PostgreSQL](#3-react--koa--postgresql)
+  - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
+- [Core Features](#core-features)
+- [Database Architecture](#database-architecture)
+- [Type Diagrams](#type-diagrams)
+- [Repository Structure](#repository-structure)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running Applications](#running-applications)
+  - [Schema Documentation](#schema-documentation)
+- [Testing](#testing)
+  - [Unit Tests](#unit-tests)
+  - [End-to-End Tests](#end-to-end-tests)
+  - [Build Verification](#build-verification)
+- [Development Tools](#development-tools)
+- [License](#license)
+
+
 ## Overview
 
 This repository contains a complete job application tracker built with four different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
 
 ## Implementations
 
-### 1. Next.js + Express + Prisma
+### 1. Vue + Nuxt + Drizzle
+**Directories**: `vue-ui/` + `nuxt-api/`
+**Stack**:
+- Frontend: Vue 3 + Pinia + TypeScript + Vite + Tailwind CSS
+- Backend: Nuxt server routes
+- Database: Drizzle ORM + PostgreSQL
+- Event sourcing with Immer patches, undo/redo (Ctrl+Z / Ctrl+Shift+Z), history panel with diff view, and snapshot-based restore — see [sequence diagram](docs/vue-nuxt-history.mermaid)
+
+### 2. Next.js + Express + Prisma
 **Directories**: `ui/` + `api/`
 **Stack**:
 - Frontend: Next.js + React 19 + TypeScript + Tailwind CSS
 - Backend: Express.js + Prisma ORM
 - Database: PostgreSQL
 
-### 2. React + Koa + PostgreSQL
+### 3. React + Koa + PostgreSQL
 **Directories**: `react-ui/` + `koa-api/`
 **Stack**:
 - Frontend: React 19 + TypeScript + Vite + Tailwind CSS
 - Backend: Koa.js + raw PostgreSQL (no ORM)
 - Database: PostgreSQL with SQL migrations
 
-### 3. Svelte + Hono + Drizzle
+### 4. Svelte + Hono + Drizzle
 **Directories**: `svelte-ui/` + `hono-api/`
 **Stack**:
 - Frontend: Svelte 5 + SvelteKit + Tailwind CSS
 - Backend: Hono (lightweight framework)
 - Database: Drizzle ORM + PostgreSQL
-
-### 4. Vue + Nuxt + Drizzle
-**Directories**: `vue-ui/` + `nuxt-api/`
-**Stack**:
-- Frontend: Vue 3 + Pinia + TypeScript + Vite + Tailwind CSS
-- Backend: Nuxt server routes
-- Database: Drizzle ORM + PostgreSQL
-- Event sourcing with Immer patches, undo/redo (Ctrl+Z / Ctrl+Shift+Z), history panel with diff view, and snapshot-based restore
 
 ## Core Features
 
@@ -52,12 +75,26 @@ All implementations provide:
 ## Database Architecture
 
 All implementations share a single PostgreSQL database (`app_tracker`) with separate schemas for isolation:
-- `express_prisma` - Next.js + Express + Prisma
-- `react_koa` - React + Koa + PostgreSQL
-- `svelte_hono` - Svelte + Hono + Drizzle
-- `vue_nuxt` - Vue + Nuxt + Drizzle
 
-See [CLAUDE.md](CLAUDE.md) for detailed database architecture documentation.
+| Schema | Apps | ERD |
+|--------|------|-----|
+| `vue_nuxt` | Vue + Nuxt + Drizzle | [schema docs](docs/schema/vue-nuxt/README.md) |
+| `express_prisma` | Next.js + Express + Prisma | [schema docs](docs/schema/express-prisma/README.md) |
+| `react_koa` | React + Koa + PostgreSQL | [schema docs](docs/schema/react-koa/README.md) |
+| `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
+
+See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
+
+## Type Diagrams
+
+Mermaid class diagrams generated from TypeScript type definitions:
+- [nuxt-api](docs/types/nuxt-api/types.mermaid) - Vue + Nuxt (includes event sourcing types)
+- [ui](docs/types/ui/application.mermaid) - Next.js + Express
+- [react-ui](docs/types/react-ui/application.mermaid) - React + Koa
+- [koa-api](docs/types/koa-api/index.mermaid) - Koa API (partial - Zod-inferred types unresolved)
+- [svelte-ui](docs/types/svelte-ui/index.mermaid) - Svelte + Hono
+
+Regenerate with `npm run docs:types`.
 
 ## Repository Structure
 
@@ -84,6 +121,7 @@ See [CLAUDE.md](CLAUDE.md) for detailed database architecture documentation.
 
 - Node.js (v18+)
 - Docker and Docker Compose (for PostgreSQL)
+- [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
 ### Installation
 
@@ -124,6 +162,16 @@ cd svelte-ui && npm run dev
 cd hono-api && npm run dev
 ```
 
+### Schema Documentation
+
+Regenerate database ERD docs after schema changes (requires [tbls](https://github.com/k1LoW/tbls) and a running PostgreSQL instance):
+
+```bash
+npm run docs:schema
+```
+
+This generates Mermaid ERDs and per-table documentation under `docs/schema/` for each implementation schema.
+
 ## Testing
 
 ### Unit Tests
@@ -158,6 +206,8 @@ npm run test:e2e:react-koa # React + Koa (port 3010)
 npm run test:e2e:all      # Run all e2e tests
 ```
 
+To clean up leftover test data from interrupted runs, see [Test Data Cleanup](docs/TESTING_REFERENCE.md#test-data-cleanup).
+
 ### Build Verification
 
 Build all implementations:
@@ -169,11 +219,27 @@ npm run build:all         # Build all implementations
 
 ## Development Tools
 
-This repository includes Claude Code skills for common development tasks:
+This repository includes Claude Code commands and skills for common development tasks:
+
 - `/commit` - Generate commit messages
 - `/pr` - Create pull requests
 - `/fix-build` - Fix build errors
-- `/package-json-maintenance` - Update dependencies and/or fix audit errors
+- `/ship-it` - Create branch, commit, push, and open a PR
+
+Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation) with
+
+```bash
+# Extract lessons from conversations and persist to context files or skills
+npx skills add whatifwedigdeeper/agent-skills \
+--skill learn
+
+# Update dependencies and/or fix audit errors
+npx skills add whatifwedigdeeper/agent-skills \
+--skill package-json-maintenance
+
+# You may use this command to check for any updates
+npx skills check
+```
 
 See [.claude/](.claude/) for all available commands and skills.
 
