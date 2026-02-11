@@ -45,7 +45,7 @@
     {#if isValidUrl}
       <button
         type="button"
-        class="p-2 rounded-md text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+        class="p-2 rounded-md text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-hidden focus:ring-2 focus:ring-primary-500"
         title="Open URL in new tab"
         onclick={openUrl}
       >
