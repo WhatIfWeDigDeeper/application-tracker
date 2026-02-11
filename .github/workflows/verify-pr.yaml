@@ -27,6 +27,9 @@ jobs:
             **/*.txt
             **/*.png
             **/*.jpg
+            .claude/**
+            .specifykit/**
+            .vscode/**
           files_ignore: |
             package.json
             **/package.json
