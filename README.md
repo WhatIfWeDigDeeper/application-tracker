@@ -37,7 +37,7 @@ This repository contains a complete job application tracker built with four diff
 - Frontend: Vue 3 + Pinia + TypeScript + Vite + Tailwind CSS
 - Backend: Nuxt server routes
 - Database: Drizzle ORM + PostgreSQL
-- Event sourcing with Immer patches, undo/redo (Ctrl+Z / Ctrl+Shift+Z), history panel with diff view, and snapshot-based restore — see [sequence diagram](docs/vue-nuxt-history.mermaid)
+- Event sourcing with Immer patches, undo/redo (Ctrl+Z / Ctrl+Shift+Z), history panel with diff view, patch-based restore, and checkpoint snapshots — see [sequence diagram](docs/vue-nuxt-history.mermaid)
 
 ### 2. Next.js + Express + Prisma
 **Directories**: `ui/` + `api/`
