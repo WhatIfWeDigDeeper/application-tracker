@@ -1,12 +1,12 @@
 # Multi-stage Express API Dockerfile
-FROM node:18-alpine AS base
+FROM node:24-alpine AS base
 
 WORKDIR /app
 
 # Install dependencies stage
 FROM base AS deps
 COPY api/package.json api/package-lock.json ./
-RUN npm ci
+RUN npm ci --no-update-notifier
 
 # Build stage
 FROM base AS builder
@@ -15,6 +15,7 @@ COPY api/package.json .
 COPY api/src ./src
 COPY api/tsconfig.json .
 COPY api/prisma ./prisma
+RUN npx prisma generate
 RUN npm run build
 
 # Production stage
