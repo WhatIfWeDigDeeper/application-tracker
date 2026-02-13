@@ -77,7 +77,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 - **Interactive sessions**: Do not commit unless explicitly asked
 - **Worktree/subagent sessions**: Auto-commit before returning (worktree is ephemeral)
-- **PR descriptions**: When follow-up commits substantially change scope, update the PR body via `gh pr edit <number> --body`
+- **PR descriptions**: When follow-up commits substantially change scope, immediately update the PR body via `gh pr edit <number> --body` — do not wait to be asked
 - **Documentation**: Update `README.md` and `CLAUDE.md` as part of completing tasks that add scripts/tools/infrastructure
 
 ## Running E2E Tests
