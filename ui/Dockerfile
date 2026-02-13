@@ -1,17 +1,18 @@
 # Multi-stage Next.js Dockerfile
-FROM node:18-alpine AS base
+FROM node:24-alpine AS base
 
 WORKDIR /app
 
 # Install dependencies stage
 FROM base AS deps
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY ui/package.json ui/package-lock.json ./
+RUN npm ci --no-update-notifier
 
 # Build stage
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY ui/ .
+RUN mkdir -p public
 RUN npm run build
 
 # Production stage
