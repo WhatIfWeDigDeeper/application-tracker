@@ -28,6 +28,7 @@ jobs:
             **/*.png
             **/*.jpg
             .claude/**
+            .agent*/**
             .specifykit/**
             .vscode/**
           files_ignore: |
