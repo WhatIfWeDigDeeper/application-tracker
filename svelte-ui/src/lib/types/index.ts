@@ -152,6 +152,29 @@ export interface ErrorResponse {
   details?: Array<{ field: string; message: string }>;
 }
 
+// History types
+export interface FieldChange {
+  field: string;
+  label: string;
+  oldValue: unknown;
+  newValue: unknown;
+}
+
+export interface HistoryEntry {
+  id: string;
+  sequence: number;
+  description: string;
+  changes: FieldChange[];
+  createdAt: string;
+}
+
+export interface PaginatedHistoryResponse {
+  entries: HistoryEntry[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 // Display helpers
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   applied: 'Applied',

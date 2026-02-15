@@ -1,9 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// History/event sourcing is only implemented in the Vue+Nuxt stack (port 3020).
-// Non-Vue scripts in package.json use --grep-invert to exclude this describe block.
+// Shared history tests for Vue+Nuxt (event sourcing, port 3020) and Svelte+Hono (snapshots, port 3030).
+// Stacks without history support use --grep-invert 'History Panel' to exclude this file.
 
-test.describe.serial('History Panel - Vue Event Sourcing', () => {
+test.describe.serial('History Panel', () => {
   let applicationUrl: string;
   const uniqueCompany = `History Co ${Date.now()}`;
   const uniquePosition = `Engineer ${Date.now()}`;
@@ -35,7 +35,7 @@ test.describe.serial('History Panel - Vue Event Sourcing', () => {
   }
 
   async function closeHistory(page: Page) {
-    // Close button is the first button in the panel header (XMarkIcon)
+    // Close button is the first button in the panel header (XMarkIcon / SVG)
     await panel(page).locator('button').first().click();
     await expect(panel(page)).not.toBeVisible({ timeout: 5000 });
   }
@@ -45,7 +45,6 @@ test.describe.serial('History Panel - Vue Event Sourcing', () => {
 
     await openHistory(page);
 
-    // The creation event: Created application "Company - Position"
     await expect(panel(page).locator('text=Created application')).toBeVisible({ timeout: 5000 });
     await expect(panel(page).locator('text=(current)')).toBeVisible();
 
@@ -61,8 +60,7 @@ test.describe.serial('History Panel - Vue Event Sourcing', () => {
 
     await openHistory(page);
 
-    // buildInput() sends all form fields, so description is "Updated N fields"
-    // The newest entry (first in list) should contain "Updated" and be marked (current)
+    // The newest entry should contain "Updated" and be marked (current)
     const newestEntry = entries(page).first();
     await expect(newestEntry).toContainText(/Updated/, { timeout: 5000 });
     await expect(newestEntry).toContainText('(current)');
@@ -87,7 +85,7 @@ test.describe.serial('History Panel - Vue Event Sourcing', () => {
     const newestEntry = entries(page).first();
     await newestEntry.locator('button').first().click();
 
-    // The EventDiff should show the "Company Name" field label
+    // Both Vue EventDiff and Svelte FieldDiff render "Company Name:" with a colon
     await expect(panel(page).locator('text=Company Name:')).toBeVisible({ timeout: 3000 });
     // Old value shown with strikethrough
     await expect(panel(page).locator('.line-through')).toBeVisible();
@@ -126,14 +124,13 @@ test.describe.serial('History Panel - Vue Event Sourcing', () => {
     await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue(`${uniqueCompany} Updated`);
   });
 
-  test('should show "(current)" on the restore event after restore', async ({ page }) => {
+  test('should show "Restored to version" after restore', async ({ page }) => {
     await page.goto(applicationUrl);
     await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('input[placeholder="Company Name *"]', { timeout: 10000 });
 
     await openHistory(page);
 
-    // After restore, a "Restored to version N" event is the newest
     const newestEntry = entries(page).first();
     await expect(newestEntry).toContainText('Restored to version', { timeout: 5000 });
     await expect(newestEntry).toContainText('(current)');

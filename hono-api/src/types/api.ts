@@ -167,6 +167,36 @@ export const PaginatedApplicationsSchema = z.object({
 });
 export type PaginatedApplicationsResponse = z.infer<typeof PaginatedApplicationsSchema>;
 
+// History types
+export const FieldChangeSchema = z.object({
+  field: z.string(),
+  label: z.string(),
+  oldValue: z.unknown(),
+  newValue: z.unknown(),
+});
+export type FieldChange = z.infer<typeof FieldChangeSchema>;
+
+export const HistoryEntrySchema = z.object({
+  id: z.string().uuid(),
+  sequence: z.number().int(),
+  description: z.string(),
+  changes: z.array(FieldChangeSchema),
+  createdAt: z.string(),
+});
+export type HistoryEntryResponse = z.infer<typeof HistoryEntrySchema>;
+
+export const PaginatedHistorySchema = z.object({
+  entries: z.array(HistoryEntrySchema),
+  total: z.number().int(),
+  page: z.number().int(),
+  limit: z.number().int(),
+});
+export type PaginatedHistoryResponse = z.infer<typeof PaginatedHistorySchema>;
+
+export const RestoreRequestSchema = z.object({
+  sequence: z.number().int().min(1),
+});
+
 // Error response
 export const ErrorResponseSchema = z.object({
   code: z.enum(['validation_error', 'not_found', 'internal_error']),

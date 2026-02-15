@@ -1,0 +1,355 @@
+{
+  "id": "cf391da5-bcf8-4c3d-a243-70de19db0543",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "svelte_hono.application_history": {
+      "name": "application_history",
+      "schema": "svelte_hono",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "application_history_application_id_applications_id_fk": {
+          "name": "application_history_application_id_applications_id_fk",
+          "tableFrom": "application_history",
+          "tableTo": "applications",
+          "schemaTo": "svelte_hono",
+          "columnsFrom": [
+            "application_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "svelte_hono.applications": {
+      "name": "applications",
+      "schema": "svelte_hono",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_title": {
+          "name": "position_title",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_applied": {
+          "name": "date_applied",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "application_status",
+          "typeSchema": "svelte_hono",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'applied'"
+        },
+        "company_url": {
+          "name": "company_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "job_posting_url": {
+          "name": "job_posting_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_career_url": {
+          "name": "company_career_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_category": {
+          "name": "company_category",
+          "type": "company_category",
+          "typeSchema": "svelte_hono",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "skills_match": {
+          "name": "skills_match",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "job_source": {
+          "name": "job_source",
+          "type": "job_source",
+          "typeSchema": "svelte_hono",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_letter_required": {
+          "name": "cover_letter_required",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "special_requirements": {
+          "name": "special_requirements",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "salary_min": {
+          "name": "salary_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "salary_max": {
+          "name": "salary_max",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "offer_due_date": {
+          "name": "offer_due_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_archived": {
+          "name": "is_archived",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "svelte_hono.interview_stages": {
+      "name": "interview_stages",
+      "schema": "svelte_hono",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_completed": {
+          "name": "is_completed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "completed_date": {
+          "name": "completed_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "performance_rating": {
+          "name": "performance_rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "interview_stages_application_id_applications_id_fk": {
+          "name": "interview_stages_application_id_applications_id_fk",
+          "tableFrom": "interview_stages",
+          "tableTo": "applications",
+          "schemaTo": "svelte_hono",
+          "columnsFrom": [
+            "application_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "svelte_hono.application_status": {
+      "name": "application_status",
+      "schema": "svelte_hono",
+      "values": [
+        "applied",
+        "rejected",
+        "interviewing",
+        "given offer",
+        "accepted offer",
+        "declined offer",
+        "no offer"
+      ]
+    },
+    "svelte_hono.company_category": {
+      "name": "company_category",
+      "schema": "svelte_hono",
+      "values": [
+        "education",
+        "health",
+        "climate",
+        "ai",
+        "energy",
+        "finance",
+        "enterprise-software",
+        "consumer-tech",
+        "e-commerce",
+        "cybersecurity",
+        "gaming",
+        "media-entertainment",
+        "consulting",
+        "government",
+        "nonprofit",
+        "retail",
+        "restaurant",
+        "hospitality",
+        "other"
+      ]
+    },
+    "svelte_hono.job_source": {
+      "name": "job_source",
+      "schema": "svelte_hono",
+      "values": [
+        "recruiter",
+        "linkedin",
+        "indeed",
+        "friend",
+        "colleague",
+        "company-website",
+        "other"
+      ]
+    }
+  },
+  "schemas": {
+    "svelte_hono": "svelte_hono"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
