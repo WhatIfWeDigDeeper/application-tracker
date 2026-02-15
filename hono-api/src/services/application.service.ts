@@ -1,6 +1,6 @@
 import { eq, and, sql, asc, desc, gte, inArray } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { applications, interviewStages, type Application, type InterviewStage } from '../db/schema.js';
+import { applications, interviewStages, type Application } from '../db/schema.js';
 import type {
   CreateApplicationInput,
   UpdateApplicationInput,
@@ -8,56 +8,27 @@ import type {
   ApplicationResponse,
   PaginatedApplicationsResponse,
 } from '../types/api.js';
+import { toApplicationResponse } from './shared.js';
+import { recordHistory, buildDescription } from './history.service.js';
 
-// Helper to format date for response
-function formatDate(date: string | Date | null): string | null {
-  if (!date) return null;
-  if (typeof date === 'string') return date;
-  return date.toISOString().split('T')[0];
-}
-
-// Helper to format datetime for response
-function formatDateTime(date: Date | null): string {
-  if (!date) return new Date().toISOString();
-  return date.toISOString();
-}
-
-// Transform DB application to API response
-function toApplicationResponse(app: Application, stages: InterviewStage[]): ApplicationResponse {
-  return {
-    id: app.id,
-    companyName: app.companyName,
-    positionTitle: app.positionTitle,
-    dateApplied: formatDate(app.dateApplied) || '',
-    status: app.status,
-    createdAt: formatDateTime(app.createdAt),
-    updatedAt: formatDateTime(app.updatedAt),
-    companyUrl: app.companyUrl,
-    jobPostingUrl: app.jobPostingUrl,
-    companyCareerUrl: app.companyCareerUrl,
-    companyCategory: app.companyCategory,
-    skillsMatch: app.skillsMatch,
-    jobSource: app.jobSource,
-    coverLetterRequired: app.coverLetterRequired,
-    specialRequirements: app.specialRequirements,
-    salaryMin: app.salaryMin,
-    salaryMax: app.salaryMax,
-    notes: app.notes,
-    offerDueDate: formatDate(app.offerDueDate),
-    isArchived: app.isArchived,
-    interviewStages: stages
-      .sort((a, b) => a.order - b.order)
-      .map((s) => ({
-        id: s.id,
-        name: s.name,
-        order: s.order,
-        isCompleted: s.isCompleted,
-        completedDate: formatDate(s.completedDate),
-        notes: s.notes,
-        performanceRating: s.performanceRating,
-      })),
-  };
-}
+const FIELD_LABELS_MAP: Record<string, string> = {
+  companyName: 'Company Name',
+  positionTitle: 'Position Title',
+  dateApplied: 'Date Applied',
+  status: 'Status',
+  companyUrl: 'Company URL',
+  jobPostingUrl: 'Job Posting URL',
+  companyCareerUrl: 'Career Page URL',
+  companyCategory: 'Company Category',
+  skillsMatch: 'Skills Match',
+  jobSource: 'Job Source',
+  coverLetterRequired: 'Cover Letter Required',
+  specialRequirements: 'Special Requirements',
+  salaryMin: 'Min Salary',
+  salaryMax: 'Max Salary',
+  notes: 'Notes',
+  offerDueDate: 'Offer Due Date',
+};
 
 export async function listApplications(query: ListApplicationsQuery): Promise<PaginatedApplicationsResponse> {
   const { status, companyCategory, jobSource, skillsMatchMin, includeArchived, sortBy, sortDir, page, limit } = query;
@@ -158,6 +129,8 @@ export async function createApplication(input: CreateApplicationInput): Promise<
     })
     .returning();
 
+  await recordHistory(app.id, buildDescription('create', `${app.companyName} - ${app.positionTitle}`));
+
   return toApplicationResponse(app, []);
 }
 
@@ -197,10 +170,20 @@ export async function updateApplication(id: string, input: UpdateApplicationInpu
     where: eq(interviewStages.applicationId, id),
   });
 
+  // Record history after update (snapshot captures post-mutation state)
+  const changedFields = Object.keys(input)
+    .filter((key) => key in FIELD_LABELS_MAP)
+    .map((key) => FIELD_LABELS_MAP[key]);
+  if (changedFields.length > 0) {
+    await recordHistory(id, buildDescription('update', changedFields.join(', ')));
+  }
+
   return toApplicationResponse(updated, stages);
 }
 
 export async function deleteApplication(id: string): Promise<boolean> {
+  await recordHistory(id, buildDescription('delete'));
+
   const result = await db.delete(applications).where(eq(applications.id, id)).returning({ id: applications.id });
   return result.length > 0;
 }
@@ -218,6 +201,8 @@ export async function archiveApplication(id: string): Promise<ApplicationRespons
     where: eq(interviewStages.applicationId, id),
   });
 
+  await recordHistory(id, buildDescription('archive'));
+
   return toApplicationResponse(updated, stages);
 }
 
@@ -233,6 +218,8 @@ export async function restoreApplication(id: string): Promise<ApplicationRespons
   const stages = await db.query.interviewStages.findMany({
     where: eq(interviewStages.applicationId, id),
   });
+
+  await recordHistory(id, buildDescription('restore'));
 
   return toApplicationResponse(updated, stages);
 }

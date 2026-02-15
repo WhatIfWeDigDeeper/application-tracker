@@ -7,9 +7,11 @@ import {
   ListApplicationsQuerySchema,
   CreateInterviewStageSchema,
   UpdateInterviewStageSchema,
+  RestoreRequestSchema,
 } from '../types/api.js';
 import * as applicationService from '../services/application.service.js';
 import * as interviewStageService from '../services/interview-stage.service.js';
+import * as historyService from '../services/history.service.js';
 
 const applications = new Hono();
 
@@ -127,6 +129,53 @@ applications.post('/:id/restore', zValidator('param', z.object({ id: z.string().
     return c.json({ code: 'internal_error', message: 'An unexpected error occurred' }, 500);
   }
 });
+
+// Get application history
+applications.get(
+  '/:id/history',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  zValidator(
+    'query',
+    z.object({
+      page: z.coerce.number().int().min(1).default(1),
+      limit: z.coerce.number().int().min(1).max(100).default(50),
+    })
+  ),
+  async (c) => {
+    try {
+      const { id } = c.req.valid('param');
+      const { page, limit } = c.req.valid('query');
+      const result = await historyService.listHistory(id, page, limit);
+      return c.json(result);
+    } catch (error) {
+      console.error('Error listing application history:', error);
+      return c.json({ code: 'internal_error', message: 'An unexpected error occurred' }, 500);
+    }
+  }
+);
+
+// Restore application to historical version
+applications.post(
+  '/:id/history/restore',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  zValidator('json', RestoreRequestSchema),
+  async (c) => {
+    try {
+      const { id } = c.req.valid('param');
+      const { sequence } = c.req.valid('json');
+      const result = await historyService.restoreToVersion(id, sequence);
+
+      if (!result) {
+        return c.json({ code: 'not_found', message: 'History entry not found' }, 404);
+      }
+
+      return c.json(result);
+    } catch (error) {
+      console.error('Error restoring application version:', error);
+      return c.json({ code: 'internal_error', message: 'An unexpected error occurred' }, 500);
+    }
+  }
+);
 
 // Create interview stage
 applications.post(

@@ -6,6 +6,7 @@ import type {
   UpdateInterviewStageInput,
   InterviewStage,
   PaginatedResponse,
+  PaginatedHistoryResponse,
   FilterState,
 } from '$lib/types';
 
@@ -113,5 +114,21 @@ export const api = {
       method: 'DELETE',
     });
     return handleResponse<void>(response);
+  },
+
+  // History
+  async getHistory(applicationId: string, page = 1, limit = 50): Promise<PaginatedHistoryResponse> {
+    const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
+    const response = await fetch(`${API_BASE}/applications/${applicationId}/history?${params}`);
+    return handleResponse<PaginatedHistoryResponse>(response);
+  },
+
+  async restoreToVersion(applicationId: string, sequence: number): Promise<Application> {
+    const response = await fetch(`${API_BASE}/applications/${applicationId}/history/restore`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sequence }),
+    });
+    return handleResponse<Application>(response);
   },
 };

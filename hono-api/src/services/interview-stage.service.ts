@@ -2,13 +2,8 @@ import { eq, and } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { applications, interviewStages, type InterviewStage } from '../db/schema.js';
 import type { CreateInterviewStageInput, UpdateInterviewStageInput, InterviewStageResponse } from '../types/api.js';
-
-// Helper to format date for response
-function formatDate(date: string | Date | null): string | null {
-  if (!date) return null;
-  if (typeof date === 'string') return date;
-  return date.toISOString().split('T')[0];
-}
+import { formatDate } from './shared.js';
+import { recordHistory, buildDescription } from './history.service.js';
 
 // Transform DB stage to API response
 function toStageResponse(stage: InterviewStage): InterviewStageResponse {
@@ -50,6 +45,8 @@ export async function createInterviewStage(
   // Update application's updatedAt
   await db.update(applications).set({ updatedAt: new Date() }).where(eq(applications.id, applicationId));
 
+  await recordHistory(applicationId, buildDescription('stage_add', input.name));
+
   return toStageResponse(stage);
 }
 
@@ -84,10 +81,21 @@ export async function updateInterviewStage(
   // Update application's updatedAt
   await db.update(applications).set({ updatedAt: new Date() }).where(eq(applications.id, applicationId));
 
+  await recordHistory(applicationId, buildDescription('stage_update', existing.name));
+
   return toStageResponse(updated);
 }
 
 export async function deleteInterviewStage(applicationId: string, stageId: string): Promise<boolean> {
+  // Query stage first to get its name for history
+  const stage = await db.query.interviewStages.findFirst({
+    where: and(eq(interviewStages.id, stageId), eq(interviewStages.applicationId, applicationId)),
+  });
+
+  if (stage) {
+    await recordHistory(applicationId, buildDescription('stage_delete', stage.name));
+  }
+
   const result = await db
     .delete(interviewStages)
     .where(and(eq(interviewStages.id, stageId), eq(interviewStages.applicationId, applicationId)))

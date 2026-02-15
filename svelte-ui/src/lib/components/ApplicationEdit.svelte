@@ -26,6 +26,7 @@
   import InterviewStageForm from './InterviewStageForm.svelte';
   import InterviewStageItem from './InterviewStageItem.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
+  import HistoryPanel from './HistoryPanel.svelte';
 
   interface Props {
     id?: string;
@@ -74,6 +75,7 @@
   let editingStage = $state<{ id: string; stage: InterviewStage } | null>(null);
   let showDeleteStageConfirm = $state(false);
   let stageToDelete = $state<string | null>(null);
+  let showHistory = $state(false);
 
   // Local stages for create mode
   let localStages = $state<InterviewStage[]>([]);
@@ -556,6 +558,17 @@
             </button>
           {/if}
 
+          <!-- History (edit mode only) -->
+          {#if isEditMode && application}
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick={() => (showHistory = !showHistory)}
+            >
+              History
+            </button>
+          {/if}
+
           <!-- Delete (edit mode only) -->
           {#if isEditMode && application}
             <button
@@ -886,6 +899,20 @@
       confirmVariant="danger"
       onconfirm={handleConfirmDeleteStage}
       oncancel={() => { showDeleteStageConfirm = false; stageToDelete = null; }}
+    />
+  {/if}
+
+  <!-- History Panel -->
+  {#if showHistory && application}
+    <HistoryPanel
+      applicationId={application.id}
+      onclose={() => (showHistory = false)}
+      onrestored={async () => {
+        if (!application) return;
+        application = await api.getApplication(application.id);
+        populateFromApplication(application);
+        recaptureSnapshot();
+      }}
     />
   {/if}
 </div>
