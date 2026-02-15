@@ -1,4 +1,4 @@
-import { uuid, varchar, text, integer, boolean, date, timestamp, pgSchema } from 'drizzle-orm/pg-core';
+import { uuid, varchar, text, integer, boolean, date, timestamp, jsonb, pgSchema } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Define the svelte_hono schema
@@ -84,9 +84,22 @@ export const interviewStages = svelteHonoSchema.table('interview_stages', {
   performanceRating: integer('performance_rating'),
 });
 
+// Application History (snapshot-based version tracking)
+export const applicationHistory = svelteHonoSchema.table('application_history', {
+  id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  applicationId: uuid('application_id')
+    .notNull()
+    .references(() => applications.id, { onDelete: 'cascade' }),
+  sequence: integer('sequence').notNull(),
+  description: varchar('description', { length: 500 }).notNull(),
+  snapshot: jsonb('snapshot').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // Relations
 export const applicationsRelations = relations(applications, ({ many }) => ({
   interviewStages: many(interviewStages),
+  history: many(applicationHistory),
 }));
 
 export const interviewStagesRelations = relations(interviewStages, ({ one }) => ({
@@ -96,11 +109,20 @@ export const interviewStagesRelations = relations(interviewStages, ({ one }) => 
   }),
 }));
 
+export const applicationHistoryRelations = relations(applicationHistory, ({ one }) => ({
+  application: one(applications, {
+    fields: [applicationHistory.applicationId],
+    references: [applications.id],
+  }),
+}));
+
 // Types
 export type Application = typeof applications.$inferSelect;
 export type NewApplication = typeof applications.$inferInsert;
 export type InterviewStage = typeof interviewStages.$inferSelect;
 export type NewInterviewStage = typeof interviewStages.$inferInsert;
+export type ApplicationHistoryEntry = typeof applicationHistory.$inferSelect;
+export type NewApplicationHistoryEntry = typeof applicationHistory.$inferInsert;
 export type ApplicationStatus = (typeof applicationStatusEnum.enumValues)[number];
 export type CompanyCategory = (typeof companyCategoryEnum.enumValues)[number];
 export type JobSource = (typeof jobSourceEnum.enumValues)[number];
