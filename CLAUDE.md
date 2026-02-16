@@ -28,6 +28,7 @@ Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolat
 - **react_koa** — `koa-api/src/db/schema.sql`
 - **svelte_hono** — `hono-api/src/db/schema.ts` (Drizzle)
 - **vue_nuxt** — `nuxt-api/server/db/schema.ts` (Drizzle), shared types via `@shared` alias
+- **react_nestjs** — `nest-api/src/database/schema.ts` (Drizzle)
 
 Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 
@@ -89,6 +90,7 @@ npm run test:e2e           # Next.js (port 3000)
 npm run test:e2e:react-koa # React-Koa (port 3010)
 npm run test:e2e:vue       # Vue-Nuxt (port 3020)
 npm run test:e2e:svelte    # Svelte-Hono (port 3030)
+npm run test:e2e:tanstack  # React+TanStack-NestJS (port 3050)
 ```
 
 Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.

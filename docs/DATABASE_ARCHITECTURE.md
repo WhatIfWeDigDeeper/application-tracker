@@ -30,3 +30,9 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - Uses Drizzle's `pgSchema('vue_nuxt')`
 - Config in: `nuxt-api/drizzle.config.ts` with `schemaFilter: ['vue_nuxt']`
 - Shared types in: `nuxt-api/shared/types.ts` (imported by both nuxt-api and vue-ui via `@shared` alias)
+
+**React-TanStack-NestJS-Drizzle:**
+- Schema defined in: `nest-api/src/database/schema.ts`
+- Uses Drizzle's `pgSchema('react_nestjs')`
+- Config in: `nest-api/drizzle.config.ts` with `schemaFilter: ['react_nestjs']`
+- Snapshot-based history (like Express, Koa, Hono)

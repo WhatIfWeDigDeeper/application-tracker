@@ -1,0 +1,170 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Query,
+  Body,
+  HttpCode,
+  Inject,
+  NotFoundException,
+  UsePipes,
+} from '@nestjs/common';
+import { ApplicationsService } from './applications.service.js';
+import { HistoryService } from './history.service.js';
+import { InterviewStagesService } from './interview-stages.service.js';
+import { ZodValidationPipe } from '../pipes/zod-validation.pipe.js';
+import {
+  CreateApplicationSchema,
+  UpdateApplicationSchema,
+  ListApplicationsQuerySchema,
+  CreateInterviewStageSchema,
+  UpdateInterviewStageSchema,
+  RestoreRequestSchema,
+  type CreateApplicationInput,
+  type UpdateApplicationInput,
+  type ListApplicationsQuery,
+  type CreateInterviewStageInput,
+  type UpdateInterviewStageInput,
+  type ApplicationResponse,
+  type PaginatedApplicationsResponse,
+  type PaginatedHistoryResponse,
+  type InterviewStageResponse,
+} from '../types/api.js';
+import { z } from 'zod';
+
+const HistoryQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+});
+
+@Controller('applications')
+export class ApplicationsController {
+  constructor(
+    @Inject(ApplicationsService) private applicationsService: ApplicationsService,
+    @Inject(HistoryService) private historyService: HistoryService,
+    @Inject(InterviewStagesService) private interviewStagesService: InterviewStagesService,
+  ) {}
+
+  @Get()
+  @UsePipes(new ZodValidationPipe(ListApplicationsQuerySchema))
+  async list(@Query() query: ListApplicationsQuery): Promise<PaginatedApplicationsResponse> {
+    return this.applicationsService.listApplications(query);
+  }
+
+  @Post()
+  @HttpCode(201)
+  async create(
+    @Body(new ZodValidationPipe(CreateApplicationSchema)) input: CreateApplicationInput
+  ): Promise<ApplicationResponse> {
+    return this.applicationsService.createApplication(input);
+  }
+
+  @Get(':id')
+  async getOne(@Param('id') id: string): Promise<ApplicationResponse> {
+    const app = await this.applicationsService.getApplication(id);
+    if (!app) {
+      throw new NotFoundException({ code: 'not_found', message: 'Application not found' });
+    }
+    return app;
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(UpdateApplicationSchema)) input: UpdateApplicationInput
+  ): Promise<ApplicationResponse> {
+    const app = await this.applicationsService.updateApplication(id, input);
+    if (!app) {
+      throw new NotFoundException({ code: 'not_found', message: 'Application not found' });
+    }
+    return app;
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async remove(@Param('id') id: string): Promise<void> {
+    const deleted = await this.applicationsService.deleteApplication(id);
+    if (!deleted) {
+      throw new NotFoundException({ code: 'not_found', message: 'Application not found' });
+    }
+  }
+
+  @Post(':id/archive')
+  async archive(@Param('id') id: string): Promise<ApplicationResponse> {
+    const app = await this.applicationsService.archiveApplication(id);
+    if (!app) {
+      throw new NotFoundException({ code: 'not_found', message: 'Application not found' });
+    }
+    return app;
+  }
+
+  @Post(':id/restore')
+  async restore(@Param('id') id: string): Promise<ApplicationResponse> {
+    const app = await this.applicationsService.restoreApplication(id);
+    if (!app) {
+      throw new NotFoundException({ code: 'not_found', message: 'Application not found' });
+    }
+    return app;
+  }
+
+  @Get(':id/history')
+  async getHistory(
+    @Param('id') id: string,
+    @Query(new ZodValidationPipe(HistoryQuerySchema)) query: { page: number; limit: number }
+  ): Promise<PaginatedHistoryResponse> {
+    return this.historyService.listHistory(id, query.page, query.limit);
+  }
+
+  @Post(':id/history/restore')
+  async restoreVersion(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(RestoreRequestSchema)) body: { sequence: number }
+  ): Promise<ApplicationResponse> {
+    const result = await this.historyService.restoreToVersion(id, body.sequence);
+    if (!result) {
+      throw new NotFoundException({ code: 'not_found', message: 'History entry not found' });
+    }
+    return result;
+  }
+
+  @Post(':id/interview-stages')
+  @HttpCode(201)
+  async createStage(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(CreateInterviewStageSchema)) input: CreateInterviewStageInput
+  ): Promise<InterviewStageResponse> {
+    const stage = await this.interviewStagesService.createInterviewStage(id, input);
+    if (!stage) {
+      throw new NotFoundException({ code: 'not_found', message: 'Application not found' });
+    }
+    return stage;
+  }
+
+  @Patch(':id/interview-stages/:stageId')
+  async updateStage(
+    @Param('id') id: string,
+    @Param('stageId') stageId: string,
+    @Body(new ZodValidationPipe(UpdateInterviewStageSchema)) input: UpdateInterviewStageInput
+  ): Promise<InterviewStageResponse> {
+    const stage = await this.interviewStagesService.updateInterviewStage(id, stageId, input);
+    if (!stage) {
+      throw new NotFoundException({ code: 'not_found', message: 'Interview stage not found' });
+    }
+    return stage;
+  }
+
+  @Delete(':id/interview-stages/:stageId')
+  @HttpCode(204)
+  async deleteStage(
+    @Param('id') id: string,
+    @Param('stageId') stageId: string,
+  ): Promise<void> {
+    const deleted = await this.interviewStagesService.deleteInterviewStage(id, stageId);
+    if (!deleted) {
+      throw new NotFoundException({ code: 'not_found', message: 'Interview stage not found' });
+    }
+  }
+}
