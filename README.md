@@ -98,7 +98,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `express_prisma` | Next.js + Express + Prisma | [schema docs](docs/schema/express-prisma/README.md) |
 | `react_koa` | React + Koa + PostgreSQL | [schema docs](docs/schema/react-koa/README.md) |
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
-| `react_nestjs` | React + TanStack + NestJS + Drizzle | — |
+| `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 

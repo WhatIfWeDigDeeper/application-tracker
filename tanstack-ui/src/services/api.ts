@@ -175,8 +175,7 @@ export async function getHistory(
   const response = await fetch(
     `${API_BASE_URL}/applications/${id}/history?page=${page}&limit=${limit}`
   );
-  if (!response.ok) throw new Error("Failed to fetch history");
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function restoreToVersion(
@@ -191,8 +190,7 @@ export async function restoreToVersion(
       body: JSON.stringify({ sequence }),
     }
   );
-  if (!response.ok) throw new Error("Failed to restore version");
-  return response.json();
+  return handleResponse(response);
 }
 
 export { ApiError };

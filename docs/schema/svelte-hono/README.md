@@ -6,6 +6,7 @@
 | ---- | ------- | ------- | ---- |
 | [svelte_hono.applications](svelte_hono.applications.md) | 20 |  | BASE TABLE |
 | [svelte_hono.interview_stages](svelte_hono.interview_stages.md) | 8 |  | BASE TABLE |
+| [svelte_hono.application_history](svelte_hono.application_history.md) | 6 |  | BASE TABLE |
 
 ## Enums
 
@@ -17,6 +18,9 @@
 | react_koa.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
 | react_koa.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
 | react_koa.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
+| react_nestjs.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
+| react_nestjs.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
+| react_nestjs.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
 | svelte_hono.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
 | svelte_hono.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
 | svelte_hono.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
@@ -30,6 +34,7 @@
 erDiagram
 
 "svelte_hono.interview_stages" }o--|| "svelte_hono.applications" : "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
+"svelte_hono.application_history" }o--|| "svelte_hono.applications" : "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
 
 "svelte_hono.applications" {
   id uuid
@@ -62,6 +67,14 @@ erDiagram
   completed_date date
   notes text
   performance_rating integer
+}
+"svelte_hono.application_history" {
+  id uuid
+  application_id uuid FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  created_at timestamp_with_time_zone
 }
 ```
 

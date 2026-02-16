@@ -2,7 +2,139 @@
   "name": "app_tracker",
   "tables": [
     {
-      "name": "svelte_hono.applications",
+      "name": "react_nestjs.application_history",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "sequence",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "varchar(500)",
+          "nullable": false
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "application_history_pkey",
+          "def": "CREATE UNIQUE INDEX application_history_pkey ON react_nestjs.application_history USING btree (id)",
+          "table": "react_nestjs.application_history",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "application_history_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "application_history_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "application_history_description_not_null",
+          "type": "n",
+          "def": "NOT NULL description",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "description"
+          ]
+        },
+        {
+          "name": "application_history_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_history_sequence_not_null",
+          "type": "n",
+          "def": "NOT NULL sequence",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "sequence"
+          ]
+        },
+        {
+          "name": "application_history_snapshot_not_null",
+          "type": "n",
+          "def": "NOT NULL snapshot",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "snapshot"
+          ]
+        },
+        {
+          "name": "application_history_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_history_application_id_applications_id_fk",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "react_nestjs.applications",
       "type": "BASE TABLE",
       "columns": [
         {
@@ -27,9 +159,9 @@
         },
         {
           "name": "status",
-          "type": "svelte_hono.application_status",
+          "type": "react_nestjs.application_status",
           "nullable": false,
-          "default": "'applied'::svelte_hono.application_status"
+          "default": "'applied'::react_nestjs.application_status"
         },
         {
           "name": "company_url",
@@ -48,7 +180,7 @@
         },
         {
           "name": "company_category",
-          "type": "svelte_hono.company_category",
+          "type": "react_nestjs.company_category",
           "nullable": true
         },
         {
@@ -58,7 +190,7 @@
         },
         {
           "name": "job_source",
-          "type": "svelte_hono.job_source",
+          "type": "react_nestjs.job_source",
           "nullable": true
         },
         {
@@ -113,8 +245,8 @@
       "indexes": [
         {
           "name": "applications_pkey",
-          "def": "CREATE UNIQUE INDEX applications_pkey ON svelte_hono.applications USING btree (id)",
-          "table": "svelte_hono.applications",
+          "def": "CREATE UNIQUE INDEX applications_pkey ON react_nestjs.applications USING btree (id)",
+          "table": "react_nestjs.applications",
           "columns": [
             "id"
           ]
@@ -125,7 +257,7 @@
           "name": "applications_company_name_not_null",
           "type": "n",
           "def": "NOT NULL company_name",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "company_name"
@@ -135,7 +267,7 @@
           "name": "applications_created_at_not_null",
           "type": "n",
           "def": "NOT NULL created_at",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "created_at"
@@ -145,7 +277,7 @@
           "name": "applications_date_applied_not_null",
           "type": "n",
           "def": "NOT NULL date_applied",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "date_applied"
@@ -155,7 +287,7 @@
           "name": "applications_id_not_null",
           "type": "n",
           "def": "NOT NULL id",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "id"
@@ -165,7 +297,7 @@
           "name": "applications_is_archived_not_null",
           "type": "n",
           "def": "NOT NULL is_archived",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "is_archived"
@@ -175,7 +307,7 @@
           "name": "applications_position_title_not_null",
           "type": "n",
           "def": "NOT NULL position_title",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "position_title"
@@ -185,7 +317,7 @@
           "name": "applications_status_not_null",
           "type": "n",
           "def": "NOT NULL status",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "status"
@@ -195,7 +327,7 @@
           "name": "applications_updated_at_not_null",
           "type": "n",
           "def": "NOT NULL updated_at",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "updated_at"
@@ -205,7 +337,7 @@
           "name": "applications_pkey",
           "type": "PRIMARY KEY",
           "def": "PRIMARY KEY (id)",
-          "table": "svelte_hono.applications",
+          "table": "react_nestjs.applications",
           "referenced_table": "",
           "columns": [
             "id"
@@ -214,7 +346,7 @@
       ]
     },
     {
-      "name": "svelte_hono.interview_stages",
+      "name": "react_nestjs.interview_stages",
       "type": "BASE TABLE",
       "columns": [
         {
@@ -262,8 +394,8 @@
       "indexes": [
         {
           "name": "interview_stages_pkey",
-          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON svelte_hono.interview_stages USING btree (id)",
-          "table": "svelte_hono.interview_stages",
+          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON react_nestjs.interview_stages USING btree (id)",
+          "table": "react_nestjs.interview_stages",
           "columns": [
             "id"
           ]
@@ -274,7 +406,7 @@
           "name": "interview_stages_application_id_not_null",
           "type": "n",
           "def": "NOT NULL application_id",
-          "table": "svelte_hono.interview_stages",
+          "table": "react_nestjs.interview_stages",
           "referenced_table": "",
           "columns": [
             "application_id"
@@ -284,7 +416,7 @@
           "name": "interview_stages_id_not_null",
           "type": "n",
           "def": "NOT NULL id",
-          "table": "svelte_hono.interview_stages",
+          "table": "react_nestjs.interview_stages",
           "referenced_table": "",
           "columns": [
             "id"
@@ -294,7 +426,7 @@
           "name": "interview_stages_is_completed_not_null",
           "type": "n",
           "def": "NOT NULL is_completed",
-          "table": "svelte_hono.interview_stages",
+          "table": "react_nestjs.interview_stages",
           "referenced_table": "",
           "columns": [
             "is_completed"
@@ -304,7 +436,7 @@
           "name": "interview_stages_name_not_null",
           "type": "n",
           "def": "NOT NULL name",
-          "table": "svelte_hono.interview_stages",
+          "table": "react_nestjs.interview_stages",
           "referenced_table": "",
           "columns": [
             "name"
@@ -314,7 +446,7 @@
           "name": "interview_stages_order_not_null",
           "type": "n",
           "def": "NOT NULL \"order\"",
-          "table": "svelte_hono.interview_stages",
+          "table": "react_nestjs.interview_stages",
           "referenced_table": "",
           "columns": [
             "order"
@@ -323,8 +455,8 @@
         {
           "name": "interview_stages_application_id_applications_id_fk",
           "type": "FOREIGN KEY",
-          "def": "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE",
-          "table": "svelte_hono.interview_stages",
+          "def": "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE",
+          "table": "react_nestjs.interview_stages",
           "referenced_table": "applications",
           "columns": [
             "application_id"
@@ -337,139 +469,7 @@
           "name": "interview_stages_pkey",
           "type": "PRIMARY KEY",
           "def": "PRIMARY KEY (id)",
-          "table": "svelte_hono.interview_stages",
-          "referenced_table": "",
-          "columns": [
-            "id"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "svelte_hono.application_history",
-      "type": "BASE TABLE",
-      "columns": [
-        {
-          "name": "id",
-          "type": "uuid",
-          "nullable": false
-        },
-        {
-          "name": "application_id",
-          "type": "uuid",
-          "nullable": false
-        },
-        {
-          "name": "sequence",
-          "type": "integer",
-          "nullable": false
-        },
-        {
-          "name": "description",
-          "type": "varchar(500)",
-          "nullable": false
-        },
-        {
-          "name": "snapshot",
-          "type": "jsonb",
-          "nullable": false
-        },
-        {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "nullable": false,
-          "default": "now()"
-        }
-      ],
-      "indexes": [
-        {
-          "name": "application_history_pkey",
-          "def": "CREATE UNIQUE INDEX application_history_pkey ON svelte_hono.application_history USING btree (id)",
-          "table": "svelte_hono.application_history",
-          "columns": [
-            "id"
-          ]
-        }
-      ],
-      "constraints": [
-        {
-          "name": "application_history_application_id_not_null",
-          "type": "n",
-          "def": "NOT NULL application_id",
-          "table": "svelte_hono.application_history",
-          "referenced_table": "",
-          "columns": [
-            "application_id"
-          ]
-        },
-        {
-          "name": "application_history_created_at_not_null",
-          "type": "n",
-          "def": "NOT NULL created_at",
-          "table": "svelte_hono.application_history",
-          "referenced_table": "",
-          "columns": [
-            "created_at"
-          ]
-        },
-        {
-          "name": "application_history_description_not_null",
-          "type": "n",
-          "def": "NOT NULL description",
-          "table": "svelte_hono.application_history",
-          "referenced_table": "",
-          "columns": [
-            "description"
-          ]
-        },
-        {
-          "name": "application_history_id_not_null",
-          "type": "n",
-          "def": "NOT NULL id",
-          "table": "svelte_hono.application_history",
-          "referenced_table": "",
-          "columns": [
-            "id"
-          ]
-        },
-        {
-          "name": "application_history_sequence_not_null",
-          "type": "n",
-          "def": "NOT NULL sequence",
-          "table": "svelte_hono.application_history",
-          "referenced_table": "",
-          "columns": [
-            "sequence"
-          ]
-        },
-        {
-          "name": "application_history_snapshot_not_null",
-          "type": "n",
-          "def": "NOT NULL snapshot",
-          "table": "svelte_hono.application_history",
-          "referenced_table": "",
-          "columns": [
-            "snapshot"
-          ]
-        },
-        {
-          "name": "application_history_application_id_applications_id_fk",
-          "type": "FOREIGN KEY",
-          "def": "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE",
-          "table": "svelte_hono.application_history",
-          "referenced_table": "applications",
-          "columns": [
-            "application_id"
-          ],
-          "referenced_columns": [
-            "id"
-          ]
-        },
-        {
-          "name": "application_history_pkey",
-          "type": "PRIMARY KEY",
-          "def": "PRIMARY KEY (id)",
-          "table": "svelte_hono.application_history",
+          "table": "react_nestjs.interview_stages",
           "referenced_table": "",
           "columns": [
             "id"
@@ -480,30 +480,30 @@
   ],
   "relations": [
     {
-      "table": "svelte_hono.interview_stages",
+      "table": "react_nestjs.application_history",
       "columns": [
         "application_id"
       ],
       "cardinality": "zero_or_more",
-      "parent_table": "svelte_hono.applications",
+      "parent_table": "react_nestjs.applications",
       "parent_columns": [
         "id"
       ],
       "parent_cardinality": "exactly_one",
-      "def": "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
+      "def": "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
     },
     {
-      "table": "svelte_hono.application_history",
+      "table": "react_nestjs.interview_stages",
       "columns": [
         "application_id"
       ],
       "cardinality": "zero_or_more",
-      "parent_table": "svelte_hono.applications",
+      "parent_table": "react_nestjs.applications",
       "parent_columns": [
         "id"
       ],
       "parent_cardinality": "exactly_one",
-      "def": "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
+      "def": "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
     }
   ],
   "enums": [

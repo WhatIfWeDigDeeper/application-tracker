@@ -52,6 +52,7 @@ SCHEMAS=(
   "react_koa:react-koa"
   "svelte_hono:svelte-hono"
   "vue_nuxt:vue-nuxt"
+  "react_nestjs:react-nestjs"
 )
 
 for entry in "${SCHEMAS[@]}"; do

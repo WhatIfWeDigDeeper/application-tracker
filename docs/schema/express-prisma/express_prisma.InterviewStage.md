@@ -63,8 +63,6 @@ erDiagram
   positionTitle text
   dateApplied timestamp_3__without_time_zone
   status text
-  createdAt timestamp_3__without_time_zone
-  updatedAt timestamp_3__without_time_zone
   companyUrl text
   jobPostingUrl text
   companyCareerUrl text
@@ -78,6 +76,8 @@ erDiagram
   notes text
   offerDueDate timestamp_3__without_time_zone
   isArchived boolean
+  createdAt timestamp_3__without_time_zone
+  updatedAt timestamp_3__without_time_zone
 }
 ```
 

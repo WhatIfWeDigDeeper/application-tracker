@@ -1,4 +1,4 @@
-# svelte_hono.applications
+# react_nestjs.applications
 
 ## Description
 
@@ -6,17 +6,17 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | uuid |  | false | [svelte_hono.interview_stages](svelte_hono.interview_stages.md) [svelte_hono.application_history](svelte_hono.application_history.md) |  |  |
+| id | uuid |  | false | [react_nestjs.application_history](react_nestjs.application_history.md) [react_nestjs.interview_stages](react_nestjs.interview_stages.md) |  |  |
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
 | date_applied | date |  | false |  |  |  |
-| status | svelte_hono.application_status | 'applied'::svelte_hono.application_status | false |  |  |  |
+| status | react_nestjs.application_status | 'applied'::react_nestjs.application_status | false |  |  |  |
 | company_url | text |  | true |  |  |  |
 | job_posting_url | text |  | true |  |  |  |
 | company_career_url | text |  | true |  |  |  |
-| company_category | svelte_hono.company_category |  | true |  |  |  |
+| company_category | react_nestjs.company_category |  | true |  |  |  |
 | skills_match | integer |  | true |  |  |  |
-| job_source | svelte_hono.job_source |  | true |  |  |  |
+| job_source | react_nestjs.job_source |  | true |  |  |  |
 | cover_letter_required | boolean |  | true |  |  |  |
 | special_requirements | text |  | true |  |  |  |
 | salary_min | integer |  | true |  |  |  |
@@ -45,28 +45,28 @@
 
 | Name | Definition |
 | ---- | ---------- |
-| applications_pkey | CREATE UNIQUE INDEX applications_pkey ON svelte_hono.applications USING btree (id) |
+| applications_pkey | CREATE UNIQUE INDEX applications_pkey ON react_nestjs.applications USING btree (id) |
 
 ## Relations
 
 ```mermaid
 erDiagram
 
-"svelte_hono.interview_stages" }o--|| "svelte_hono.applications" : "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
-"svelte_hono.application_history" }o--|| "svelte_hono.applications" : "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
+"react_nestjs.application_history" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
+"react_nestjs.interview_stages" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
 
-"svelte_hono.applications" {
+"react_nestjs.applications" {
   id uuid
   company_name varchar_200_
   position_title varchar_200_
   date_applied date
-  status svelte_hono_application_status
+  status react_nestjs_application_status
   company_url text
   job_posting_url text
   company_career_url text
-  company_category svelte_hono_company_category
+  company_category react_nestjs_company_category
   skills_match integer
-  job_source svelte_hono_job_source
+  job_source react_nestjs_job_source
   cover_letter_required boolean
   special_requirements text
   salary_min integer
@@ -77,7 +77,15 @@ erDiagram
   created_at timestamp_with_time_zone
   updated_at timestamp_with_time_zone
 }
-"svelte_hono.interview_stages" {
+"react_nestjs.application_history" {
+  id uuid
+  application_id uuid FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  created_at timestamp_with_time_zone
+}
+"react_nestjs.interview_stages" {
   id uuid
   application_id uuid FK
   name varchar_100_
@@ -86,14 +94,6 @@ erDiagram
   completed_date date
   notes text
   performance_rating integer
-}
-"svelte_hono.application_history" {
-  id uuid
-  application_id uuid FK
-  sequence integer
-  description varchar_500_
-  snapshot jsonb
-  created_at timestamp_with_time_zone
 }
 ```
 

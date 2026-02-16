@@ -19,6 +19,9 @@
 | react_koa.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
 | react_koa.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
 | react_koa.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
+| react_nestjs.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
+| react_nestjs.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
+| react_nestjs.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
 | svelte_hono.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
 | svelte_hono.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
 | svelte_hono.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |

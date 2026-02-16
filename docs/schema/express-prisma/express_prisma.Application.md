@@ -6,13 +6,11 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | text |  | false | [express_prisma.InterviewStage](express_prisma.InterviewStage.md) |  |  |
+| id | text |  | false | [express_prisma.ApplicationHistory](express_prisma.ApplicationHistory.md) [express_prisma.InterviewStage](express_prisma.InterviewStage.md) |  |  |
 | companyName | text |  | false |  |  |  |
 | positionTitle | text |  | false |  |  |  |
 | dateApplied | timestamp(3) without time zone |  | true |  |  |  |
 | status | text | 'unsubmitted'::text | false |  |  |  |
-| createdAt | timestamp(3) without time zone | CURRENT_TIMESTAMP | false |  |  |  |
-| updatedAt | timestamp(3) without time zone |  | false |  |  |  |
 | companyUrl | text |  | true |  |  |  |
 | jobPostingUrl | text |  | true |  |  |  |
 | companyCareerUrl | text |  | true |  |  |  |
@@ -26,6 +24,8 @@
 | notes | text |  | true |  |  |  |
 | offerDueDate | timestamp(3) without time zone |  | true |  |  |  |
 | isArchived | boolean | false | false |  |  |  |
+| createdAt | timestamp(3) without time zone | CURRENT_TIMESTAMP | false |  |  |  |
+| updatedAt | timestamp(3) without time zone |  | false |  |  |  |
 
 ## Constraints
 
@@ -53,6 +53,7 @@
 ```mermaid
 erDiagram
 
+"express_prisma.ApplicationHistory" }o--|| "express_prisma.Application" : "FOREIGN KEY (#quot;applicationId#quot;) REFERENCES express_prisma.#quot;Application#quot;(id) ON UPDATE CASCADE ON DELETE CASCADE"
 "express_prisma.InterviewStage" }o--|| "express_prisma.Application" : "FOREIGN KEY (#quot;applicationId#quot;) REFERENCES express_prisma.#quot;Application#quot;(id) ON UPDATE CASCADE ON DELETE CASCADE"
 
 "express_prisma.Application" {
@@ -61,8 +62,6 @@ erDiagram
   positionTitle text
   dateApplied timestamp_3__without_time_zone
   status text
-  createdAt timestamp_3__without_time_zone
-  updatedAt timestamp_3__without_time_zone
   companyUrl text
   jobPostingUrl text
   companyCareerUrl text
@@ -76,6 +75,16 @@ erDiagram
   notes text
   offerDueDate timestamp_3__without_time_zone
   isArchived boolean
+  createdAt timestamp_3__without_time_zone
+  updatedAt timestamp_3__without_time_zone
+}
+"express_prisma.ApplicationHistory" {
+  id text
+  applicationId text FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  createdAt timestamp_3__without_time_zone
 }
 "express_prisma.InterviewStage" {
   id text

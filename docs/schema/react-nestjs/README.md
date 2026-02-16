@@ -4,9 +4,9 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
-| [express_prisma.Application](express_prisma.Application.md) | 20 |  | BASE TABLE |
-| [express_prisma.ApplicationHistory](express_prisma.ApplicationHistory.md) | 6 |  | BASE TABLE |
-| [express_prisma.InterviewStage](express_prisma.InterviewStage.md) | 10 |  | BASE TABLE |
+| [react_nestjs.application_history](react_nestjs.application_history.md) | 6 |  | BASE TABLE |
+| [react_nestjs.applications](react_nestjs.applications.md) | 20 |  | BASE TABLE |
+| [react_nestjs.interview_stages](react_nestjs.interview_stages.md) | 8 |  | BASE TABLE |
 
 ## Enums
 
@@ -33,50 +33,48 @@
 ```mermaid
 erDiagram
 
-"express_prisma.ApplicationHistory" }o--|| "express_prisma.Application" : "FOREIGN KEY (#quot;applicationId#quot;) REFERENCES express_prisma.#quot;Application#quot;(id) ON UPDATE CASCADE ON DELETE CASCADE"
-"express_prisma.InterviewStage" }o--|| "express_prisma.Application" : "FOREIGN KEY (#quot;applicationId#quot;) REFERENCES express_prisma.#quot;Application#quot;(id) ON UPDATE CASCADE ON DELETE CASCADE"
+"react_nestjs.application_history" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
+"react_nestjs.interview_stages" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
 
-"express_prisma.Application" {
-  id text
-  companyName text
-  positionTitle text
-  dateApplied timestamp_3__without_time_zone
-  status text
-  companyUrl text
-  jobPostingUrl text
-  companyCareerUrl text
-  companyCategory text
-  skillsMatch integer
-  jobSource text
-  coverLetterRequired boolean
-  specialRequirements text
-  salaryMin integer
-  salaryMax integer
-  notes text
-  offerDueDate timestamp_3__without_time_zone
-  isArchived boolean
-  createdAt timestamp_3__without_time_zone
-  updatedAt timestamp_3__without_time_zone
-}
-"express_prisma.ApplicationHistory" {
-  id text
-  applicationId text FK
+"react_nestjs.application_history" {
+  id uuid
+  application_id uuid FK
   sequence integer
   description varchar_500_
   snapshot jsonb
-  createdAt timestamp_3__without_time_zone
+  created_at timestamp_with_time_zone
 }
-"express_prisma.InterviewStage" {
-  id text
-  applicationId text FK
-  name text
-  order integer
-  isCompleted boolean
-  completedDate timestamp_3__without_time_zone
+"react_nestjs.applications" {
+  id uuid
+  company_name varchar_200_
+  position_title varchar_200_
+  date_applied date
+  status react_nestjs_application_status
+  company_url text
+  job_posting_url text
+  company_career_url text
+  company_category react_nestjs_company_category
+  skills_match integer
+  job_source react_nestjs_job_source
+  cover_letter_required boolean
+  special_requirements text
+  salary_min integer
+  salary_max integer
   notes text
-  performanceRating integer
-  createdAt timestamp_3__without_time_zone
-  updatedAt timestamp_3__without_time_zone
+  offer_due_date date
+  is_archived boolean
+  created_at timestamp_with_time_zone
+  updated_at timestamp_with_time_zone
+}
+"react_nestjs.interview_stages" {
+  id uuid
+  application_id uuid FK
+  name varchar_100_
+  order integer
+  is_completed boolean
+  completed_date date
+  notes text
+  performance_rating integer
 }
 ```
 

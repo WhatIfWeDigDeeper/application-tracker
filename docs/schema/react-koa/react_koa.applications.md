@@ -6,7 +6,7 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | uuid | react_koa.uuid_generate_v4() | false | [react_koa.interview_stages](react_koa.interview_stages.md) |  |  |
+| id | uuid | react_koa.uuid_generate_v4() | false | [react_koa.interview_stages](react_koa.interview_stages.md) [react_koa.application_history](react_koa.application_history.md) |  |  |
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
 | date_applied | date | CURRENT_DATE | false |  |  |  |
@@ -69,6 +69,7 @@
 erDiagram
 
 "react_koa.interview_stages" }o--|| "react_koa.applications" : "FOREIGN KEY (application_id) REFERENCES react_koa.applications(id) ON DELETE CASCADE"
+"react_koa.application_history" }o--|| "react_koa.applications" : "FOREIGN KEY (application_id) REFERENCES react_koa.applications(id) ON DELETE CASCADE"
 
 "react_koa.applications" {
   id uuid
@@ -101,6 +102,14 @@ erDiagram
   completed_date date
   notes text
   performance_rating integer
+}
+"react_koa.application_history" {
+  id uuid
+  application_id uuid FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  created_at timestamp_with_time_zone
 }
 ```
 

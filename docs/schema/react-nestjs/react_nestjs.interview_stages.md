@@ -1,4 +1,4 @@
-# svelte_hono.interview_stages
+# react_nestjs.interview_stages
 
 ## Description
 
@@ -7,7 +7,7 @@
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | id | uuid |  | false |  |  |  |
-| application_id | uuid |  | false |  | [svelte_hono.applications](svelte_hono.applications.md) |  |
+| application_id | uuid |  | false |  | [react_nestjs.applications](react_nestjs.applications.md) |  |
 | name | varchar(100) |  | false |  |  |  |
 | order | integer |  | false |  |  |  |
 | is_completed | boolean | false | false |  |  |  |
@@ -24,23 +24,23 @@
 | interview_stages_is_completed_not_null | n | NOT NULL is_completed |
 | interview_stages_name_not_null | n | NOT NULL name |
 | interview_stages_order_not_null | n | NOT NULL "order" |
-| interview_stages_application_id_applications_id_fk | FOREIGN KEY | FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE |
+| interview_stages_application_id_applications_id_fk | FOREIGN KEY | FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE |
 | interview_stages_pkey | PRIMARY KEY | PRIMARY KEY (id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
-| interview_stages_pkey | CREATE UNIQUE INDEX interview_stages_pkey ON svelte_hono.interview_stages USING btree (id) |
+| interview_stages_pkey | CREATE UNIQUE INDEX interview_stages_pkey ON react_nestjs.interview_stages USING btree (id) |
 
 ## Relations
 
 ```mermaid
 erDiagram
 
-"svelte_hono.interview_stages" }o--|| "svelte_hono.applications" : "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
+"react_nestjs.interview_stages" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
 
-"svelte_hono.interview_stages" {
+"react_nestjs.interview_stages" {
   id uuid
   application_id uuid FK
   name varchar_100_
@@ -50,18 +50,18 @@ erDiagram
   notes text
   performance_rating integer
 }
-"svelte_hono.applications" {
+"react_nestjs.applications" {
   id uuid
   company_name varchar_200_
   position_title varchar_200_
   date_applied date
-  status svelte_hono_application_status
+  status react_nestjs_application_status
   company_url text
   job_posting_url text
   company_career_url text
-  company_category svelte_hono_company_category
+  company_category react_nestjs_company_category
   skills_match integer
-  job_source svelte_hono_job_source
+  job_source react_nestjs_job_source
   cover_letter_required boolean
   special_requirements text
   salary_min integer
