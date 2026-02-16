@@ -9,6 +9,26 @@ import type {
   ListApplicationsQuery,
   PaginatedApplications,
 } from "../types/index.js";
+import { recordHistory, buildDescription } from "./history.service.js";
+
+const FIELD_LABELS_MAP: Record<string, string> = {
+  companyName: "Company Name",
+  positionTitle: "Position Title",
+  dateApplied: "Date Applied",
+  status: "Status",
+  companyUrl: "Company URL",
+  jobPostingUrl: "Job Posting URL",
+  companyCareerUrl: "Career Page URL",
+  companyCategory: "Company Category",
+  skillsMatch: "Skills Match",
+  jobSource: "Job Source",
+  coverLetterRequired: "Cover Letter Required",
+  specialRequirements: "Special Requirements",
+  salaryMin: "Min Salary",
+  salaryMax: "Max Salary",
+  notes: "Notes",
+  offerDueDate: "Offer Due Date",
+};
 
 // Database row types (snake_case)
 interface ApplicationRow {
@@ -265,6 +285,11 @@ export class ApplicationService {
       ]
     );
 
+    await recordHistory(
+      result.rows[0].id,
+      buildDescription("create", `${result.rows[0].company_name} - ${result.rows[0].position_title}`)
+    );
+
     return toApplication(result.rows[0], []);
   }
 
@@ -341,10 +366,21 @@ export class ApplicationService {
     );
 
     const stages = stagesResult.rows.map(toInterviewStage);
+
+    // Record history after update
+    const changedFields = Object.keys(input)
+      .filter((key) => key in FIELD_LABELS_MAP && input[key as keyof UpdateApplicationInput] !== undefined)
+      .map((key) => FIELD_LABELS_MAP[key]);
+    if (changedFields.length > 0) {
+      await recordHistory(id, buildDescription("update", changedFields.join(", ")));
+    }
+
     return toApplication(result.rows[0], stages);
   }
 
   async deleteApplication(id: string): Promise<void> {
+    await recordHistory(id, buildDescription("delete"));
+
     const result = await query(
       `DELETE FROM applications WHERE id = $1 RETURNING id`,
       [id]
@@ -356,11 +392,15 @@ export class ApplicationService {
   }
 
   async archiveApplication(id: string): Promise<Application> {
-    return this.updateApplication(id, { isArchived: true });
+    const app = await this.updateApplication(id, { isArchived: true });
+    await recordHistory(id, buildDescription("archive"));
+    return app;
   }
 
   async restoreApplication(id: string): Promise<Application> {
-    return this.updateApplication(id, { isArchived: false });
+    const app = await this.updateApplication(id, { isArchived: false });
+    await recordHistory(id, buildDescription("restore"));
+    return app;
   }
 }
 

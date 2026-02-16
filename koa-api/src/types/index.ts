@@ -229,3 +229,33 @@ export interface ErrorResponse {
   message: string;
   details?: Array<{ field: string; message: string }>;
 }
+
+// History types
+export const FieldChangeSchema = z.object({
+  field: z.string(),
+  label: z.string(),
+  oldValue: z.unknown(),
+  newValue: z.unknown(),
+});
+export type FieldChange = z.infer<typeof FieldChangeSchema>;
+
+export const HistoryEntrySchema = z.object({
+  id: z.string().uuid(),
+  sequence: z.number().int(),
+  description: z.string(),
+  changes: z.array(FieldChangeSchema),
+  createdAt: z.string(),
+});
+export type HistoryEntry = z.infer<typeof HistoryEntrySchema>;
+
+export const PaginatedHistorySchema = z.object({
+  entries: z.array(HistoryEntrySchema),
+  total: z.number().int(),
+  page: z.number().int(),
+  limit: z.number().int(),
+});
+export type PaginatedHistory = z.infer<typeof PaginatedHistorySchema>;
+
+export const RestoreRequestSchema = z.object({
+  sequence: z.number().int().min(1),
+});

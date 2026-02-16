@@ -1,13 +1,43 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { applicationService } from "../services/applications.service.js";
+import { listHistory, restoreToVersion } from "../services/history.service.js";
 import interviewStagesRouter from "./interview-stages.js";
 import {
   CreateApplicationSchema,
   UpdateApplicationSchema,
   ListApplicationsQuerySchema,
+  RestoreRequestSchema,
 } from "../types/index.js";
 
 const router = Router();
+
+// History routes
+router.get("/:id/history", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const page = parseInt((req.query.page as string) || "1", 10);
+    const limit = parseInt((req.query.limit as string) || "50", 10);
+    const result = await listHistory(id, page, limit);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/:id/history/restore", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const { sequence } = RestoreRequestSchema.parse(req.body);
+    const result = await restoreToVersion(id, sequence);
+    if (!result) {
+      res.status(404).json({ message: "History entry not found" });
+      return;
+    }
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+});
 
 // Mount interview stages router
 router.use("/:id/interview-stages", interviewStagesRouter);

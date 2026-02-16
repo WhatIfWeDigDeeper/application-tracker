@@ -5,6 +5,7 @@ import {
   UpdateInterviewStageInput,
 } from "../types/index.js";
 import { AppError } from "../middleware/errorHandler.js";
+import { recordHistory, buildDescription } from "./history.service.js";
 
 // Convert date-only strings (YYYY-MM-DD) to ISO datetime for Prisma
 function toISODateTime(dateStr: string | undefined): Date | undefined {
@@ -37,13 +38,17 @@ export class InterviewStageService {
     });
     const nextOrder = (lastStage?.order ?? -1) + 1;
 
-    return prisma.interviewStage.create({
+    const stage = await prisma.interviewStage.create({
       data: {
         ...prepareDateFields(input),
         applicationId,
         order: nextOrder,
       },
     });
+
+    await recordHistory(applicationId, buildDescription("stage_add", stage.name));
+
+    return stage;
   }
 
   async updateStage(stageId: string, input: UpdateInterviewStageInput): Promise<InterviewStage> {
@@ -54,10 +59,14 @@ export class InterviewStageService {
       throw new AppError("not_found", 404, `Stage ${stageId} not found`);
     }
 
-    return prisma.interviewStage.update({
+    const updated = await prisma.interviewStage.update({
       where: { id: stageId },
       data: prepareDateFields(input),
     });
+
+    await recordHistory(stage.applicationId, buildDescription("stage_update", stage.name));
+
+    return updated;
   }
 
   async deleteStage(stageId: string): Promise<void> {
@@ -67,6 +76,8 @@ export class InterviewStageService {
     if (!stage) {
       throw new AppError("not_found", 404, `Stage ${stageId} not found`);
     }
+
+    await recordHistory(stage.applicationId, buildDescription("stage_delete", stage.name));
 
     await prisma.interviewStage.delete({
       where: { id: stageId },

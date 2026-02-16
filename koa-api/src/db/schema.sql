@@ -101,6 +101,18 @@ CREATE INDEX IF NOT EXISTS idx_applications_updated_at ON applications(updated_a
 CREATE INDEX IF NOT EXISTS idx_interview_stages_application_id ON interview_stages(application_id);
 CREATE INDEX IF NOT EXISTS idx_interview_stages_order ON interview_stages(application_id, "order");
 
+-- Application History table (snapshot-based)
+CREATE TABLE IF NOT EXISTS application_history (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  application_id UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+  sequence INTEGER NOT NULL,
+  description VARCHAR(500) NOT NULL,
+  snapshot JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_application_history_app_seq
+  ON application_history(application_id, sequence);
+
 -- Trigger to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$

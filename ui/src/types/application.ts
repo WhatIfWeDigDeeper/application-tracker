@@ -150,6 +150,32 @@ export type UpdateInterviewStageInput = Partial<InterviewStageInput> & {
 };
 
 // ============================================================================
+// History Types
+// ============================================================================
+
+export interface FieldChange {
+  field: string;
+  label: string;
+  oldValue: string | number | boolean | null;
+  newValue: string | number | boolean | null;
+}
+
+export interface HistoryEntry {
+  id: string;
+  sequence: number;
+  description: string;
+  changes: FieldChange[];
+  createdAt: string;
+}
+
+export interface PaginatedHistoryResponse {
+  entries: HistoryEntry[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// ============================================================================
 // Filter & Sort Types
 // ============================================================================
 

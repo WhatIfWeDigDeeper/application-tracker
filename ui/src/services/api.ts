@@ -124,6 +124,15 @@ export const applicationsApi = {
     apiCall<ApiData>(`/applications/${id}/restore`, {
       method: 'POST',
     }),
+
+  getHistory: (id: string, page: number = 1, limit: number = 50): Promise<ApiData> =>
+    apiCall<ApiData>(`/applications/${id}/history?page=${page}&limit=${limit}`),
+
+  restoreToVersion: (id: string, sequence: number): Promise<ApiData> =>
+    apiCall<ApiData>(`/applications/${id}/history/restore`, {
+      method: 'POST',
+      body: JSON.stringify({ sequence }),
+    }),
 };
 
 // Interview Stages endpoints

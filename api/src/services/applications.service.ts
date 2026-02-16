@@ -6,6 +6,7 @@ import {
   ListApplicationsQuery,
 } from "../types/index.js";
 import { AppError } from "../middleware/errorHandler.js";
+import { recordHistory, buildDescription } from "./history.service.js";
 
 type ApplicationWithStages = Prisma.ApplicationGetPayload<{
   include: { interviewStages: true };
@@ -37,6 +38,25 @@ function prepareDateFields<T extends Record<string, unknown>>(input: T): T {
   }
   return result;
 }
+
+const FIELD_LABELS_MAP: Record<string, string> = {
+  companyName: "Company Name",
+  positionTitle: "Position Title",
+  dateApplied: "Date Applied",
+  status: "Status",
+  companyUrl: "Company URL",
+  jobPostingUrl: "Job Posting URL",
+  companyCareerUrl: "Career Page URL",
+  companyCategory: "Company Category",
+  skillsMatch: "Skills Match",
+  jobSource: "Job Source",
+  coverLetterRequired: "Cover Letter Required",
+  specialRequirements: "Special Requirements",
+  salaryMin: "Min Salary",
+  salaryMax: "Max Salary",
+  notes: "Notes",
+  offerDueDate: "Offer Due Date",
+};
 
 export class ApplicationService {
   async listApplications(query: ListApplicationsQuery): Promise<ListApplicationsResult> {
@@ -84,13 +104,17 @@ export class ApplicationService {
   }
 
   async createApplication(input: CreateApplicationInput): Promise<ApplicationWithStages> {
-    return prisma.application.create({
+    const app = await prisma.application.create({
       data: {
         ...prepareDateFields(input),
         status: "unsubmitted",
       },
       include: { interviewStages: true },
     });
+
+    await recordHistory(app.id, buildDescription("create", `${app.companyName} - ${app.positionTitle}`));
+
+    return app;
   }
 
   async updateApplication(id: string, input: UpdateApplicationInput): Promise<ApplicationWithStages> {
@@ -99,11 +123,20 @@ export class ApplicationService {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
 
-    return prisma.application.update({
+    const updated = await prisma.application.update({
       where: { id },
       data: prepareDateFields(input),
       include: { interviewStages: { orderBy: { order: "asc" } } },
     });
+
+    const changedFields = Object.keys(input)
+      .filter((key) => key in FIELD_LABELS_MAP)
+      .map((key) => FIELD_LABELS_MAP[key]);
+    if (changedFields.length > 0) {
+      await recordHistory(id, buildDescription("update", changedFields.join(", ")));
+    }
+
+    return updated;
   }
 
   async deleteApplication(id: string): Promise<void> {
@@ -112,6 +145,7 @@ export class ApplicationService {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
 
+    await recordHistory(id, buildDescription("delete"));
     await prisma.application.delete({ where: { id } });
   }
 
@@ -120,11 +154,15 @@ export class ApplicationService {
     if (!existing) {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
-    return prisma.application.update({
+    const result = await prisma.application.update({
       where: { id },
       data: { isArchived: true },
       include: { interviewStages: true },
     });
+
+    await recordHistory(id, buildDescription("archive"));
+
+    return result;
   }
 
   async restoreApplication(id: string): Promise<ApplicationWithStages> {
@@ -132,11 +170,15 @@ export class ApplicationService {
     if (!existing) {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
-    return prisma.application.update({
+    const result = await prisma.application.update({
       where: { id },
       data: { isArchived: false },
       include: { interviewStages: true },
     });
+
+    await recordHistory(id, buildDescription("restore"));
+
+    return result;
   }
 }
 

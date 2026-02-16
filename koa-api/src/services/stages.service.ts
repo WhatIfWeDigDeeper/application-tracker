@@ -6,6 +6,7 @@ import type {
   CreateInterviewStageInput,
   UpdateInterviewStageInput,
 } from "../types/index.js";
+import { recordHistory, buildDescription } from "./history.service.js";
 
 // Database row type
 interface InterviewStageRow {
@@ -83,6 +84,8 @@ export class InterviewStageService {
       [applicationId]
     );
 
+    await recordHistory(applicationId, buildDescription("stage_add", input.name.trim()));
+
     return toInterviewStage(result.rows[0]);
   }
 
@@ -153,6 +156,9 @@ export class InterviewStageService {
       [result.rows[0].application_id]
     );
 
+    const stageName = result.rows[0].name;
+    await recordHistory(applicationId, buildDescription("stage_update", stageName));
+
     return toInterviewStage(result.rows[0]);
   }
 
@@ -171,6 +177,8 @@ export class InterviewStageService {
       );
     }
 
+    const stageName = existingResult.rows[0].name;
+
     await query(`DELETE FROM interview_stages WHERE id = $1`, [stageId]);
 
     // Update parent application's updated_at
@@ -178,6 +186,8 @@ export class InterviewStageService {
       `UPDATE applications SET updated_at = NOW() WHERE id = $1`,
       [applicationId]
     );
+
+    await recordHistory(applicationId, buildDescription("stage_delete", stageName));
   }
 
   async getStagesByApplicationId(applicationId: string): Promise<InterviewStage[]> {
