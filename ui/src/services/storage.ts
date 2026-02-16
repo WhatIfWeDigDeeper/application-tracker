@@ -167,7 +167,7 @@ export function createApplication(input: CreateApplicationInput): JobApplication
     id: generateId(),
     companyName: input.companyName.trim(),
     positionTitle: input.positionTitle.trim(),
-    dateApplied: input.dateApplied ?? null,
+    dateApplied: input.dateApplied || null,
     status: 'applied',
     createdAt: now,
     updatedAt: now,
