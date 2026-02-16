@@ -252,19 +252,18 @@ This repository includes Claude Code commands and skills for common development 
 - `/fix-build` - Fix build errors
 - `/ship-it` - Create branch, commit, push, and open a PR
 
-Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation) with
+Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation):
+
+| Skill | Description |
+|-------|-------------|
+| `learn` | Extract lessons from conversations |
+| `js-deps` | Update dependencies and/or fix audit errors |
+| `ship-it` | Branch, commit, push, and open a PR |
+
+Since `npx skills check` and `npx skills update` apparently do not work with the above repo at this time, you may force update all skills:
 
 ```bash
-# Extract lessons from conversations and persist to context files or skills
-npx skills add whatifwedigdeeper/agent-skills \
---skill learn
-
-# Update dependencies and/or fix audit errors
-npx skills add whatifwedigdeeper/agent-skills \
---skill package-json-maintenance
-
-# You may use this command to check for any updates
-npx skills check
+npx skills add -y whatifwedigdeeper/agent-skills
 ```
 
 See [.claude/](.claude/) for all available commands and skills.
