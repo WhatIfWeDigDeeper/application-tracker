@@ -2,126 +2,6 @@
   "name": "app_tracker",
   "tables": [
     {
-      "name": "express_prisma._prisma_migrations",
-      "type": "BASE TABLE",
-      "columns": [
-        {
-          "name": "id",
-          "type": "varchar(36)",
-          "nullable": false
-        },
-        {
-          "name": "checksum",
-          "type": "varchar(64)",
-          "nullable": false
-        },
-        {
-          "name": "finished_at",
-          "type": "timestamp with time zone",
-          "nullable": true
-        },
-        {
-          "name": "migration_name",
-          "type": "varchar(255)",
-          "nullable": false
-        },
-        {
-          "name": "logs",
-          "type": "text",
-          "nullable": true
-        },
-        {
-          "name": "rolled_back_at",
-          "type": "timestamp with time zone",
-          "nullable": true
-        },
-        {
-          "name": "started_at",
-          "type": "timestamp with time zone",
-          "nullable": false,
-          "default": "now()"
-        },
-        {
-          "name": "applied_steps_count",
-          "type": "integer",
-          "nullable": false,
-          "default": "0"
-        }
-      ],
-      "indexes": [
-        {
-          "name": "_prisma_migrations_pkey",
-          "def": "CREATE UNIQUE INDEX _prisma_migrations_pkey ON express_prisma._prisma_migrations USING btree (id)",
-          "table": "express_prisma._prisma_migrations",
-          "columns": [
-            "id"
-          ]
-        }
-      ],
-      "constraints": [
-        {
-          "name": "_prisma_migrations_applied_steps_count_not_null",
-          "type": "n",
-          "def": "NOT NULL applied_steps_count",
-          "table": "express_prisma._prisma_migrations",
-          "referenced_table": "",
-          "columns": [
-            "applied_steps_count"
-          ]
-        },
-        {
-          "name": "_prisma_migrations_checksum_not_null",
-          "type": "n",
-          "def": "NOT NULL checksum",
-          "table": "express_prisma._prisma_migrations",
-          "referenced_table": "",
-          "columns": [
-            "checksum"
-          ]
-        },
-        {
-          "name": "_prisma_migrations_id_not_null",
-          "type": "n",
-          "def": "NOT NULL id",
-          "table": "express_prisma._prisma_migrations",
-          "referenced_table": "",
-          "columns": [
-            "id"
-          ]
-        },
-        {
-          "name": "_prisma_migrations_migration_name_not_null",
-          "type": "n",
-          "def": "NOT NULL migration_name",
-          "table": "express_prisma._prisma_migrations",
-          "referenced_table": "",
-          "columns": [
-            "migration_name"
-          ]
-        },
-        {
-          "name": "_prisma_migrations_started_at_not_null",
-          "type": "n",
-          "def": "NOT NULL started_at",
-          "table": "express_prisma._prisma_migrations",
-          "referenced_table": "",
-          "columns": [
-            "started_at"
-          ]
-        },
-        {
-          "name": "_prisma_migrations_pkey",
-          "type": "PRIMARY KEY",
-          "def": "PRIMARY KEY (id)",
-          "table": "express_prisma._prisma_migrations",
-          "referenced_table": "",
-          "columns": [
-            "id"
-          ]
-        }
-      ]
-    },
-    {
       "name": "express_prisma.Application",
       "type": "BASE TABLE",
       "columns": [
@@ -150,17 +30,6 @@
           "type": "text",
           "nullable": false,
           "default": "'unsubmitted'::text"
-        },
-        {
-          "name": "createdAt",
-          "type": "timestamp(3) without time zone",
-          "nullable": false,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        {
-          "name": "updatedAt",
-          "type": "timestamp(3) without time zone",
-          "nullable": false
         },
         {
           "name": "companyUrl",
@@ -227,6 +96,17 @@
           "type": "boolean",
           "nullable": false,
           "default": "false"
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp(3) without time zone",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp(3) without time zone",
+          "nullable": false
         }
       ],
       "indexes": [
@@ -331,6 +211,147 @@
           "type": "PRIMARY KEY",
           "def": "PRIMARY KEY (id)",
           "table": "express_prisma.Application",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "express_prisma.ApplicationHistory",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "applicationId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "sequence",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "varchar(500)",
+          "nullable": false
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp(3) without time zone",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ApplicationHistory_pkey",
+          "def": "CREATE UNIQUE INDEX \"ApplicationHistory_pkey\" ON express_prisma.\"ApplicationHistory\" USING btree (id)",
+          "table": "express_prisma.ApplicationHistory",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "ApplicationHistory_applicationId_sequence_idx",
+          "def": "CREATE INDEX \"ApplicationHistory_applicationId_sequence_idx\" ON express_prisma.\"ApplicationHistory\" USING btree (\"applicationId\", sequence)",
+          "table": "express_prisma.ApplicationHistory",
+          "columns": [
+            "applicationId",
+            "sequence"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "ApplicationHistory_applicationId_not_null",
+          "type": "n",
+          "def": "NOT NULL \"applicationId\"",
+          "table": "express_prisma.ApplicationHistory",
+          "referenced_table": "",
+          "columns": [
+            "applicationId"
+          ]
+        },
+        {
+          "name": "ApplicationHistory_createdAt_not_null",
+          "type": "n",
+          "def": "NOT NULL \"createdAt\"",
+          "table": "express_prisma.ApplicationHistory",
+          "referenced_table": "",
+          "columns": [
+            "createdAt"
+          ]
+        },
+        {
+          "name": "ApplicationHistory_description_not_null",
+          "type": "n",
+          "def": "NOT NULL description",
+          "table": "express_prisma.ApplicationHistory",
+          "referenced_table": "",
+          "columns": [
+            "description"
+          ]
+        },
+        {
+          "name": "ApplicationHistory_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "express_prisma.ApplicationHistory",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "ApplicationHistory_sequence_not_null",
+          "type": "n",
+          "def": "NOT NULL sequence",
+          "table": "express_prisma.ApplicationHistory",
+          "referenced_table": "",
+          "columns": [
+            "sequence"
+          ]
+        },
+        {
+          "name": "ApplicationHistory_snapshot_not_null",
+          "type": "n",
+          "def": "NOT NULL snapshot",
+          "table": "express_prisma.ApplicationHistory",
+          "referenced_table": "",
+          "columns": [
+            "snapshot"
+          ]
+        },
+        {
+          "name": "ApplicationHistory_applicationId_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (\"applicationId\") REFERENCES express_prisma.\"Application\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+          "table": "express_prisma.ApplicationHistory",
+          "referenced_table": "Application",
+          "columns": [
+            "applicationId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "ApplicationHistory_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "express_prisma.ApplicationHistory",
           "referenced_table": "",
           "columns": [
             "id"
@@ -512,6 +533,19 @@
   ],
   "relations": [
     {
+      "table": "express_prisma.ApplicationHistory",
+      "columns": [
+        "applicationId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "express_prisma.Application",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (\"applicationId\") REFERENCES express_prisma.\"Application\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
       "table": "express_prisma.InterviewStage",
       "columns": [
         "applicationId"
@@ -595,6 +629,54 @@
     },
     {
       "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_nestjs.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "react_nestjs.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_nestjs.job_source",
       "values": [
         "colleague",
         "company-website",

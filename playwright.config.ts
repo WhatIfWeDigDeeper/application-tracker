@@ -8,6 +8,7 @@ const webServerCommands: Record<number, string> = {
   3010: 'cd react-ui && npm run dev',
   3020: 'cd vue-ui && npm run dev',
   3030: 'cd svelte-ui && npm run dev',
+  3050: 'cd tanstack-ui && npm run dev',
 };
 
 export default defineConfig({

@@ -1,0 +1,748 @@
+{
+  "name": "app_tracker",
+  "tables": [
+    {
+      "name": "react_nestjs.application_history",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "sequence",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "varchar(500)",
+          "nullable": false
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "application_history_pkey",
+          "def": "CREATE UNIQUE INDEX application_history_pkey ON react_nestjs.application_history USING btree (id)",
+          "table": "react_nestjs.application_history",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "application_history_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "application_history_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "application_history_description_not_null",
+          "type": "n",
+          "def": "NOT NULL description",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "description"
+          ]
+        },
+        {
+          "name": "application_history_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_history_sequence_not_null",
+          "type": "n",
+          "def": "NOT NULL sequence",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "sequence"
+          ]
+        },
+        {
+          "name": "application_history_snapshot_not_null",
+          "type": "n",
+          "def": "NOT NULL snapshot",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "snapshot"
+          ]
+        },
+        {
+          "name": "application_history_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_history_application_id_applications_id_fk",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE",
+          "table": "react_nestjs.application_history",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "react_nestjs.applications",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "company_name",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "position_title",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "date_applied",
+          "type": "date",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "react_nestjs.application_status",
+          "nullable": false,
+          "default": "'applied'::react_nestjs.application_status"
+        },
+        {
+          "name": "company_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "job_posting_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_career_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_category",
+          "type": "react_nestjs.company_category",
+          "nullable": true
+        },
+        {
+          "name": "skills_match",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "job_source",
+          "type": "react_nestjs.job_source",
+          "nullable": true
+        },
+        {
+          "name": "cover_letter_required",
+          "type": "boolean",
+          "nullable": true
+        },
+        {
+          "name": "special_requirements",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "salary_min",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "salary_max",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "offer_due_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "is_archived",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "applications_pkey",
+          "def": "CREATE UNIQUE INDEX applications_pkey ON react_nestjs.applications USING btree (id)",
+          "table": "react_nestjs.applications",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "applications_company_name_not_null",
+          "type": "n",
+          "def": "NOT NULL company_name",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "company_name"
+          ]
+        },
+        {
+          "name": "applications_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "applications_date_applied_not_null",
+          "type": "n",
+          "def": "NOT NULL date_applied",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "date_applied"
+          ]
+        },
+        {
+          "name": "applications_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "applications_is_archived_not_null",
+          "type": "n",
+          "def": "NOT NULL is_archived",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "is_archived"
+          ]
+        },
+        {
+          "name": "applications_position_title_not_null",
+          "type": "n",
+          "def": "NOT NULL position_title",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "position_title"
+          ]
+        },
+        {
+          "name": "applications_status_not_null",
+          "type": "n",
+          "def": "NOT NULL status",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "applications_updated_at_not_null",
+          "type": "n",
+          "def": "NOT NULL updated_at",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "updated_at"
+          ]
+        },
+        {
+          "name": "applications_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "react_nestjs.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "react_nestjs.interview_stages",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "is_completed",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "completed_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "performance_rating",
+          "type": "integer",
+          "nullable": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "interview_stages_pkey",
+          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON react_nestjs.interview_stages USING btree (id)",
+          "table": "react_nestjs.interview_stages",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "interview_stages_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "react_nestjs.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "interview_stages_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "react_nestjs.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_is_completed_not_null",
+          "type": "n",
+          "def": "NOT NULL is_completed",
+          "table": "react_nestjs.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "is_completed"
+          ]
+        },
+        {
+          "name": "interview_stages_name_not_null",
+          "type": "n",
+          "def": "NOT NULL name",
+          "table": "react_nestjs.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "interview_stages_order_not_null",
+          "type": "n",
+          "def": "NOT NULL \"order\"",
+          "table": "react_nestjs.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "order"
+          ]
+        },
+        {
+          "name": "interview_stages_application_id_applications_id_fk",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE",
+          "table": "react_nestjs.interview_stages",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "react_nestjs.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "table": "react_nestjs.application_history",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "react_nestjs.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
+    },
+    {
+      "table": "react_nestjs.interview_stages",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "react_nestjs.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
+    }
+  ],
+  "enums": [
+    {
+      "name": "express_prisma.ApplicationStatus",
+      "values": [
+        "accepted",
+        "applied",
+        "interviewing",
+        "offered",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "express_prisma.CompanyCategory",
+      "values": [
+        "enterprise",
+        "mid_market",
+        "other",
+        "scale_up",
+        "startup"
+      ]
+    },
+    {
+      "name": "express_prisma.JobSource",
+      "values": [
+        "company_website",
+        "job_board",
+        "other",
+        "recruiter",
+        "referral"
+      ]
+    },
+    {
+      "name": "react_koa.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "react_koa.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_nestjs.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "react_nestjs.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_nestjs.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "svelte_hono.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "svelte_hono.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "svelte_hono.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "vue_nuxt.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "vue_nuxt.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    }
+  ],
+  "driver": {
+    "name": "postgres",
+    "database_version": "PostgreSQL 18.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "meta": {
+      "current_schema": "public",
+      "search_paths": [
+        "postgres",
+        "public"
+      ],
+      "dict": {
+        "Functions": "Stored procedures and functions"
+      }
+    }
+  }
+}

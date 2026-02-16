@@ -9,6 +9,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [2. Next.js + Express + Prisma](#2-nextjs--express--prisma)
   - [3. React + Koa + PostgreSQL](#3-react--koa--postgresql)
   - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
+  - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -28,7 +29,7 @@ A full-stack job application tracking system with multiple technology stack impl
 
 ## Overview
 
-This repository contains a complete job application tracker built with four different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
+This repository contains a complete job application tracker built with five different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
 
 ### Sample Editing screen
 
@@ -67,6 +68,14 @@ Please note that the UI is still being refined.
 - Backend: Hono (lightweight framework)
 - Database: Drizzle ORM + PostgreSQL
 
+### 5. React + TanStack + NestJS + Drizzle
+**Directories**: `tanstack-ui/` + `nest-api/`
+**Stack**:
+- Frontend: React 19 + TanStack Query v5 + TanStack Router + TypeScript + Vite + Tailwind CSS
+- Backend: NestJS with Fastify adapter
+- Database: Drizzle ORM + PostgreSQL
+- Snapshot-based history with field diffs and restore
+
 ## Core Features
 
 All implementations provide:
@@ -89,6 +98,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `express_prisma` | Next.js + Express + Prisma | [schema docs](docs/schema/express-prisma/README.md) |
 | `react_koa` | React + Koa + PostgreSQL | [schema docs](docs/schema/react-koa/README.md) |
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
+| `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -114,6 +124,8 @@ Regenerate with `npm run docs:types`.
 ├── svelte-ui/                    # SvelteKit UI
 ├── hono-api/                     # Hono API
 ├── vue-ui/                       # Vue + Vite UI
+├── tanstack-ui/                  # React + TanStack Query/Router UI
+├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
 ├── specs/                        # Feature specifications
 ├── docs/                         # Documentation
@@ -167,6 +179,10 @@ cd nuxt-api && npm run dev
 # Svelte + Hono (UI 3030 + API 5030)
 cd svelte-ui && npm run dev
 cd hono-api && npm run dev
+
+# React + TanStack + NestJS (UI 3050 + API 5050)
+cd tanstack-ui && npm run dev
+cd nest-api && npm run dev
 ```
 
 ### Schema Documentation
@@ -192,6 +208,8 @@ npm run test:koa-api      # Koa API tests
 npm run test:react-ui     # React UI tests
 npm run test:svelte-ui    # Svelte UI tests
 npm run test:vue-ui       # Vue UI tests
+npm run test:nest-api     # NestJS API tests
+npm run test:tanstack-ui  # TanStack UI tests
 ```
 
 Run all unit tests:
@@ -210,6 +228,7 @@ npm run test:e2e          # Next.js + Express (port 3000)
 npm run test:e2e:vue      # Vue + Vite (port 3020)
 npm run test:e2e:svelte   # Svelte + Hono (port 3030)
 npm run test:e2e:react-koa # React + Koa (port 3010)
+npm run test:e2e:tanstack  # React + TanStack + NestJS (port 3050)
 npm run test:e2e:all      # Run all e2e tests
 ```
 
@@ -233,19 +252,18 @@ This repository includes Claude Code commands and skills for common development 
 - `/fix-build` - Fix build errors
 - `/ship-it` - Create branch, commit, push, and open a PR
 
-Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation) with
+Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation):
+
+| Skill | Description |
+|-------|-------------|
+| `learn` | Extract lessons from conversations |
+| `js-deps` | Update dependencies and/or fix audit errors |
+| `ship-it` | Branch, commit, push, and open a PR |
+
+Since `npx skills check` and `npx skills update` apparently do not work with the above repo at this time, you may force update all skills:
 
 ```bash
-# Extract lessons from conversations and persist to context files or skills
-npx skills add whatifwedigdeeper/agent-skills \
---skill learn
-
-# Update dependencies and/or fix audit errors
-npx skills add whatifwedigdeeper/agent-skills \
---skill package-json-maintenance
-
-# You may use this command to check for any updates
-npx skills check
+npx skills add -y whatifwedigdeeper/agent-skills
 ```
 
 See [.claude/](.claude/) for all available commands and skills.

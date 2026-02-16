@@ -8,8 +8,7 @@
         {
           "name": "id",
           "type": "uuid",
-          "nullable": false,
-          "default": "gen_random_uuid()"
+          "nullable": false
         },
         {
           "name": "company_name",
@@ -221,8 +220,7 @@
         {
           "name": "id",
           "type": "uuid",
-          "nullable": false,
-          "default": "gen_random_uuid()"
+          "nullable": false
         },
         {
           "name": "application_id",
@@ -346,11 +344,156 @@
           ]
         }
       ]
+    },
+    {
+      "name": "svelte_hono.application_history",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "sequence",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "varchar(500)",
+          "nullable": false
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "application_history_pkey",
+          "def": "CREATE UNIQUE INDEX application_history_pkey ON svelte_hono.application_history USING btree (id)",
+          "table": "svelte_hono.application_history",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "application_history_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "svelte_hono.application_history",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "application_history_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "svelte_hono.application_history",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "application_history_description_not_null",
+          "type": "n",
+          "def": "NOT NULL description",
+          "table": "svelte_hono.application_history",
+          "referenced_table": "",
+          "columns": [
+            "description"
+          ]
+        },
+        {
+          "name": "application_history_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "svelte_hono.application_history",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_history_sequence_not_null",
+          "type": "n",
+          "def": "NOT NULL sequence",
+          "table": "svelte_hono.application_history",
+          "referenced_table": "",
+          "columns": [
+            "sequence"
+          ]
+        },
+        {
+          "name": "application_history_snapshot_not_null",
+          "type": "n",
+          "def": "NOT NULL snapshot",
+          "table": "svelte_hono.application_history",
+          "referenced_table": "",
+          "columns": [
+            "snapshot"
+          ]
+        },
+        {
+          "name": "application_history_application_id_applications_id_fk",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE",
+          "table": "svelte_hono.application_history",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_history_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "svelte_hono.application_history",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
     }
   ],
   "relations": [
     {
       "table": "svelte_hono.interview_stages",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "svelte_hono.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
+    },
+    {
+      "table": "svelte_hono.application_history",
       "columns": [
         "application_id"
       ],
@@ -433,6 +576,54 @@
     },
     {
       "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_nestjs.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected"
+      ]
+    },
+    {
+      "name": "react_nestjs.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_nestjs.job_source",
       "values": [
         "colleague",
         "company-website",

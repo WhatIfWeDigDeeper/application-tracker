@@ -6,7 +6,7 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | uuid | gen_random_uuid() | false | [svelte_hono.interview_stages](svelte_hono.interview_stages.md) |  |  |
+| id | uuid |  | false | [svelte_hono.interview_stages](svelte_hono.interview_stages.md) [svelte_hono.application_history](svelte_hono.application_history.md) |  |  |
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
 | date_applied | date |  | false |  |  |  |
@@ -53,6 +53,7 @@
 erDiagram
 
 "svelte_hono.interview_stages" }o--|| "svelte_hono.applications" : "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
+"svelte_hono.application_history" }o--|| "svelte_hono.applications" : "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE"
 
 "svelte_hono.applications" {
   id uuid
@@ -85,6 +86,14 @@ erDiagram
   completed_date date
   notes text
   performance_rating integer
+}
+"svelte_hono.application_history" {
+  id uuid
+  application_id uuid FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  created_at timestamp_with_time_zone
 }
 ```
 

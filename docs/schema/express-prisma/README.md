@@ -4,8 +4,8 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
-| [express_prisma._prisma_migrations](express_prisma._prisma_migrations.md) | 8 |  | BASE TABLE |
 | [express_prisma.Application](express_prisma.Application.md) | 20 |  | BASE TABLE |
+| [express_prisma.ApplicationHistory](express_prisma.ApplicationHistory.md) | 6 |  | BASE TABLE |
 | [express_prisma.InterviewStage](express_prisma.InterviewStage.md) | 10 |  | BASE TABLE |
 
 ## Enums
@@ -18,6 +18,9 @@
 | react_koa.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
 | react_koa.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
 | react_koa.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
+| react_nestjs.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
+| react_nestjs.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
+| react_nestjs.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
 | svelte_hono.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected |
 | svelte_hono.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
 | svelte_hono.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
@@ -30,26 +33,15 @@
 ```mermaid
 erDiagram
 
+"express_prisma.ApplicationHistory" }o--|| "express_prisma.Application" : "FOREIGN KEY (#quot;applicationId#quot;) REFERENCES express_prisma.#quot;Application#quot;(id) ON UPDATE CASCADE ON DELETE CASCADE"
 "express_prisma.InterviewStage" }o--|| "express_prisma.Application" : "FOREIGN KEY (#quot;applicationId#quot;) REFERENCES express_prisma.#quot;Application#quot;(id) ON UPDATE CASCADE ON DELETE CASCADE"
 
-"express_prisma._prisma_migrations" {
-  id varchar_36_
-  checksum varchar_64_
-  finished_at timestamp_with_time_zone
-  migration_name varchar_255_
-  logs text
-  rolled_back_at timestamp_with_time_zone
-  started_at timestamp_with_time_zone
-  applied_steps_count integer
-}
 "express_prisma.Application" {
   id text
   companyName text
   positionTitle text
   dateApplied timestamp_3__without_time_zone
   status text
-  createdAt timestamp_3__without_time_zone
-  updatedAt timestamp_3__without_time_zone
   companyUrl text
   jobPostingUrl text
   companyCareerUrl text
@@ -63,6 +55,16 @@ erDiagram
   notes text
   offerDueDate timestamp_3__without_time_zone
   isArchived boolean
+  createdAt timestamp_3__without_time_zone
+  updatedAt timestamp_3__without_time_zone
+}
+"express_prisma.ApplicationHistory" {
+  id text
+  applicationId text FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  createdAt timestamp_3__without_time_zone
 }
 "express_prisma.InterviewStage" {
   id text

@@ -6,7 +6,7 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | uuid | gen_random_uuid() | false |  |  |  |
+| id | uuid |  | false |  |  |  |
 | application_id | uuid |  | false |  | [svelte_hono.applications](svelte_hono.applications.md) |  |
 | name | varchar(100) |  | false |  |  |  |
 | order | integer |  | false |  |  |  |
