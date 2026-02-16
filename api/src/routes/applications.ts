@@ -15,8 +15,10 @@ const router = Router();
 router.get("/:id/history", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const page = parseInt((req.query.page as string) || "1", 10);
-    const limit = parseInt((req.query.limit as string) || "50", 10);
+    const rawPage = parseInt((req.query.page as string) || "1", 10);
+    const rawLimit = parseInt((req.query.limit as string) || "50", 10);
+    const page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+    const limit = Number.isNaN(rawLimit) || rawLimit < 1 ? 50 : Math.min(rawLimit, 100);
     const result = await listHistory(id, page, limit);
     res.json(result);
   } catch (err) {

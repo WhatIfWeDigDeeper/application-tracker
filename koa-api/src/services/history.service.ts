@@ -52,7 +52,7 @@ interface HistoryRow {
   created_at: Date;
 }
 
-const FIELD_LABELS: Record<string, string> = {
+export const FIELD_LABELS: Record<string, string> = {
   companyName: "Company Name",
   positionTitle: "Position Title",
   dateApplied: "Date Applied",
@@ -220,65 +220,75 @@ export async function restoreToVersion(
 
   const snapshot = result.rows[0].snapshot as Application;
 
-  // Update the application row
-  await query(
-    `UPDATE applications SET
-      company_name = $1, position_title = $2, date_applied = $3, status = $4,
-      company_url = $5, job_posting_url = $6, company_career_url = $7,
-      company_category = $8, skills_match = $9, job_source = $10,
-      cover_letter_required = $11, special_requirements = $12,
-      salary_min = $13, salary_max = $14, notes = $15,
-      offer_due_date = $16, is_archived = $17, updated_at = NOW()
-    WHERE id = $18`,
-    [
-      snapshot.companyName,
-      snapshot.positionTitle,
-      snapshot.dateApplied,
-      snapshot.status,
-      snapshot.companyUrl,
-      snapshot.jobPostingUrl,
-      snapshot.companyCareerUrl,
-      snapshot.companyCategory,
-      snapshot.skillsMatch,
-      snapshot.jobSource,
-      snapshot.coverLetterRequired,
-      snapshot.specialRequirements,
-      snapshot.salaryMin,
-      snapshot.salaryMax,
-      snapshot.notes,
-      snapshot.offerDueDate,
-      snapshot.isArchived,
+  // Wrap restore in a transaction to prevent partial updates
+  try {
+    await query("BEGIN");
+
+    // Update the application row
+    await query(
+      `UPDATE applications SET
+        company_name = $1, position_title = $2, date_applied = $3, status = $4,
+        company_url = $5, job_posting_url = $6, company_career_url = $7,
+        company_category = $8, skills_match = $9, job_source = $10,
+        cover_letter_required = $11, special_requirements = $12,
+        salary_min = $13, salary_max = $14, notes = $15,
+        offer_due_date = $16, is_archived = $17, updated_at = NOW()
+      WHERE id = $18`,
+      [
+        snapshot.companyName,
+        snapshot.positionTitle,
+        snapshot.dateApplied,
+        snapshot.status,
+        snapshot.companyUrl,
+        snapshot.jobPostingUrl,
+        snapshot.companyCareerUrl,
+        snapshot.companyCategory,
+        snapshot.skillsMatch,
+        snapshot.jobSource,
+        snapshot.coverLetterRequired,
+        snapshot.specialRequirements,
+        snapshot.salaryMin,
+        snapshot.salaryMax,
+        snapshot.notes,
+        snapshot.offerDueDate,
+        snapshot.isArchived,
+        applicationId,
+      ]
+    );
+
+    // Delete current stages
+    await query(`DELETE FROM interview_stages WHERE application_id = $1`, [
       applicationId,
-    ]
-  );
+    ]);
 
-  // Delete current stages
-  await query(`DELETE FROM interview_stages WHERE application_id = $1`, [
-    applicationId,
-  ]);
-
-  // Re-insert stages from snapshot
-  if (snapshot.interviewStages && snapshot.interviewStages.length > 0) {
-    for (const s of snapshot.interviewStages) {
-      const stageId = uuid();
-      await query(
-        `INSERT INTO interview_stages (id, application_id, name, "order", is_completed, completed_date, notes, performance_rating)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [
-          stageId,
-          applicationId,
-          s.name,
-          s.order,
-          s.isCompleted,
-          s.completedDate || null,
-          s.notes,
-          s.performanceRating,
-        ]
-      );
+    // Re-insert stages from snapshot
+    if (snapshot.interviewStages && snapshot.interviewStages.length > 0) {
+      for (const s of snapshot.interviewStages) {
+        const stageId = uuid();
+        await query(
+          `INSERT INTO interview_stages (id, application_id, name, "order", is_completed, completed_date, notes, performance_rating)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [
+            stageId,
+            applicationId,
+            s.name,
+            s.order,
+            s.isCompleted,
+            s.completedDate || null,
+            s.notes,
+            s.performanceRating,
+          ]
+        );
+      }
     }
+
+    await query("COMMIT");
+  } catch (err) {
+    await query("ROLLBACK");
+    throw err;
   }
 
-  // Record history after restore
+  // Record history after restore (outside transaction — non-critical)
   await recordHistory(
     applicationId,
     buildDescription("restore_version", String(targetSequence))

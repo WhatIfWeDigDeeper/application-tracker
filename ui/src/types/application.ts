@@ -156,8 +156,8 @@ export type UpdateInterviewStageInput = Partial<InterviewStageInput> & {
 export interface FieldChange {
   field: string;
   label: string;
-  oldValue: string | number | boolean | null;
-  newValue: string | number | boolean | null;
+  oldValue: unknown;
+  newValue: unknown;
 }
 
 export interface HistoryEntry {

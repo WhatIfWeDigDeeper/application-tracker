@@ -9,26 +9,7 @@ import type {
   ListApplicationsQuery,
   PaginatedApplications,
 } from "../types/index.js";
-import { recordHistory, buildDescription } from "./history.service.js";
-
-const FIELD_LABELS_MAP: Record<string, string> = {
-  companyName: "Company Name",
-  positionTitle: "Position Title",
-  dateApplied: "Date Applied",
-  status: "Status",
-  companyUrl: "Company URL",
-  jobPostingUrl: "Job Posting URL",
-  companyCareerUrl: "Career Page URL",
-  companyCategory: "Company Category",
-  skillsMatch: "Skills Match",
-  jobSource: "Job Source",
-  coverLetterRequired: "Cover Letter Required",
-  specialRequirements: "Special Requirements",
-  salaryMin: "Min Salary",
-  salaryMax: "Max Salary",
-  notes: "Notes",
-  offerDueDate: "Offer Due Date",
-};
+import { recordHistory, buildDescription, FIELD_LABELS } from "./history.service.js";
 
 // Database row types (snake_case)
 interface ApplicationRow {
@@ -369,8 +350,8 @@ export class ApplicationService {
 
     // Record history after update
     const changedFields = Object.keys(input)
-      .filter((key) => key in FIELD_LABELS_MAP && input[key as keyof UpdateApplicationInput] !== undefined)
-      .map((key) => FIELD_LABELS_MAP[key]);
+      .filter((key) => key in FIELD_LABELS && input[key as keyof UpdateApplicationInput] !== undefined)
+      .map((key) => FIELD_LABELS[key]);
     if (changedFields.length > 0) {
       await recordHistory(id, buildDescription("update", changedFields.join(", ")));
     }
@@ -379,8 +360,6 @@ export class ApplicationService {
   }
 
   async deleteApplication(id: string): Promise<void> {
-    await recordHistory(id, buildDescription("delete"));
-
     const result = await query(
       `DELETE FROM applications WHERE id = $1 RETURNING id`,
       [id]

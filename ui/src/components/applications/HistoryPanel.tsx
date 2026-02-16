@@ -59,6 +59,14 @@ export function HistoryPanel({ applicationId, refreshKey, onClose, onRestored }:
     loadHistory();
   }, [loadHistory, refreshKey]);
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   function toggleExpand(entryId: string) {
     setExpandedEntry((prev) => (prev === entryId ? null : entryId));
   }

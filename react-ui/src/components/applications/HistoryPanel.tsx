@@ -62,6 +62,14 @@ export function HistoryPanel({
     loadHistory();
   }, [loadHistory, refreshKey]);
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   function toggleExpand(entryId: string) {
     setExpandedEntry((prev) => (prev === entryId ? null : entryId));
   }
@@ -87,6 +95,7 @@ export function HistoryPanel({
           History
         </h2>
         <button
+          type="button"
           onClick={onClose}
           aria-label="Close history panel"
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"

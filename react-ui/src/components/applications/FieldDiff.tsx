@@ -7,6 +7,11 @@ interface FieldDiffProps {
 function formatValue(value: unknown): string {
   if (value === null || value === undefined) return "None";
   if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (Array.isArray(value)) {
+    if (value.length === 0) return "None";
+    return `${value.length} item${value.length === 1 ? "" : "s"}`;
+  }
+  if (typeof value === "object") return JSON.stringify(value);
   return String(value);
 }
 

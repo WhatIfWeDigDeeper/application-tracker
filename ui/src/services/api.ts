@@ -3,6 +3,8 @@
  * Handles all HTTP requests to the Express API
  */
 
+import type { PaginatedHistoryResponse } from '@/types/application';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export class ApiError extends Error {
@@ -125,8 +127,8 @@ export const applicationsApi = {
       method: 'POST',
     }),
 
-  getHistory: (id: string, page: number = 1, limit: number = 50): Promise<ApiData> =>
-    apiCall<ApiData>(`/applications/${id}/history?page=${page}&limit=${limit}`),
+  getHistory: (id: string, page: number = 1, limit: number = 50): Promise<PaginatedHistoryResponse> =>
+    apiCall<PaginatedHistoryResponse>(`/applications/${id}/history?page=${page}&limit=${limit}`),
 
   restoreToVersion: (id: string, sequence: number): Promise<ApiData> =>
     apiCall<ApiData>(`/applications/${id}/history/restore`, {

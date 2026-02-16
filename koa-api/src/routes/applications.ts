@@ -58,8 +58,10 @@ router.post("/:id/restore", async (ctx): Promise<void> => {
 
 // Get application history
 router.get("/:id/history", async (ctx): Promise<void> => {
-  const page = parseInt((ctx.query.page as string) || "1");
-  const limit = Math.min(parseInt((ctx.query.limit as string) || "50"), 100);
+  const rawPage = parseInt((ctx.query.page as string) || "1");
+  const rawLimit = parseInt((ctx.query.limit as string) || "50");
+  const page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+  const limit = Number.isNaN(rawLimit) || rawLimit < 1 ? 50 : Math.min(rawLimit, 100);
   const result = await listHistory(ctx.params.id, page, limit);
   ctx.body = result;
 });

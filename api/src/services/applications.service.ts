@@ -6,7 +6,7 @@ import {
   ListApplicationsQuery,
 } from "../types/index.js";
 import { AppError } from "../middleware/errorHandler.js";
-import { recordHistory, buildDescription } from "./history.service.js";
+import { recordHistory, buildDescription, FIELD_LABELS } from "./history.service.js";
 
 type ApplicationWithStages = Prisma.ApplicationGetPayload<{
   include: { interviewStages: true };
@@ -38,25 +38,6 @@ function prepareDateFields<T extends Record<string, unknown>>(input: T): T {
   }
   return result;
 }
-
-const FIELD_LABELS_MAP: Record<string, string> = {
-  companyName: "Company Name",
-  positionTitle: "Position Title",
-  dateApplied: "Date Applied",
-  status: "Status",
-  companyUrl: "Company URL",
-  jobPostingUrl: "Job Posting URL",
-  companyCareerUrl: "Career Page URL",
-  companyCategory: "Company Category",
-  skillsMatch: "Skills Match",
-  jobSource: "Job Source",
-  coverLetterRequired: "Cover Letter Required",
-  specialRequirements: "Special Requirements",
-  salaryMin: "Min Salary",
-  salaryMax: "Max Salary",
-  notes: "Notes",
-  offerDueDate: "Offer Due Date",
-};
 
 export class ApplicationService {
   async listApplications(query: ListApplicationsQuery): Promise<ListApplicationsResult> {
@@ -130,8 +111,8 @@ export class ApplicationService {
     });
 
     const changedFields = Object.keys(input)
-      .filter((key) => key in FIELD_LABELS_MAP)
-      .map((key) => FIELD_LABELS_MAP[key]);
+      .filter((key) => key in FIELD_LABELS)
+      .map((key) => FIELD_LABELS[key]);
     if (changedFields.length > 0) {
       await recordHistory(id, buildDescription("update", changedFields.join(", ")));
     }
@@ -145,7 +126,6 @@ export class ApplicationService {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
 
-    await recordHistory(id, buildDescription("delete"));
     await prisma.application.delete({ where: { id } });
   }
 

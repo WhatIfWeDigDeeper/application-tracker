@@ -179,6 +179,9 @@ export class InterviewStageService {
 
     const stageName = existingResult.rows[0].name;
 
+    // Record history before delete so snapshot still includes the stage
+    await recordHistory(applicationId, buildDescription("stage_delete", stageName));
+
     await query(`DELETE FROM interview_stages WHERE id = $1`, [stageId]);
 
     // Update parent application's updated_at
@@ -186,8 +189,6 @@ export class InterviewStageService {
       `UPDATE applications SET updated_at = NOW() WHERE id = $1`,
       [applicationId]
     );
-
-    await recordHistory(applicationId, buildDescription("stage_delete", stageName));
   }
 
   async getStagesByApplicationId(applicationId: string): Promise<InterviewStage[]> {

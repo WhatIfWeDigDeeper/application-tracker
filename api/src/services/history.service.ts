@@ -55,7 +55,7 @@ interface ApplicationSnapshot {
   }[];
 }
 
-const FIELD_LABELS: Record<string, string> = {
+export const FIELD_LABELS: Record<string, string> = {
   companyName: "Company Name",
   positionTitle: "Position Title",
   dateApplied: "Date Applied",
@@ -196,51 +196,54 @@ export async function restoreToVersion(
 
   const snapshot = entry.snapshot as unknown as ApplicationSnapshot;
 
-  // Update application fields
-  await prisma.application.update({
-    where: { id: applicationId },
-    data: {
-      companyName: snapshot.companyName,
-      positionTitle: snapshot.positionTitle,
-      dateApplied: snapshot.dateApplied ? new Date(`${snapshot.dateApplied}T00:00:00.000Z`) : null,
-      status: snapshot.status,
-      companyUrl: snapshot.companyUrl,
-      jobPostingUrl: snapshot.jobPostingUrl,
-      companyCareerUrl: snapshot.companyCareerUrl,
-      companyCategory: snapshot.companyCategory,
-      skillsMatch: snapshot.skillsMatch,
-      jobSource: snapshot.jobSource,
-      coverLetterRequired: snapshot.coverLetterRequired,
-      specialRequirements: snapshot.specialRequirements,
-      salaryMin: snapshot.salaryMin,
-      salaryMax: snapshot.salaryMax,
-      notes: snapshot.notes,
-      offerDueDate: snapshot.offerDueDate ? new Date(`${snapshot.offerDueDate}T00:00:00.000Z`) : null,
-      isArchived: snapshot.isArchived,
-    },
-  });
-
-  // Delete all current stages
-  await prisma.interviewStage.deleteMany({
-    where: { applicationId },
-  });
-
-  // Re-insert stages from snapshot
-  if (snapshot.interviewStages && snapshot.interviewStages.length > 0) {
-    await prisma.interviewStage.createMany({
-      data: snapshot.interviewStages.map((s) => ({
-        applicationId,
-        name: s.name,
-        order: s.order,
-        isCompleted: s.isCompleted,
-        completedDate: s.completedDate ? new Date(`${s.completedDate}T00:00:00.000Z`) : null,
-        notes: s.notes,
-        performanceRating: s.performanceRating,
-      })),
+  // Wrap restore in a transaction to prevent partial updates
+  await prisma.$transaction(async (tx) => {
+    // Update application fields
+    await tx.application.update({
+      where: { id: applicationId },
+      data: {
+        companyName: snapshot.companyName,
+        positionTitle: snapshot.positionTitle,
+        dateApplied: snapshot.dateApplied ? new Date(`${snapshot.dateApplied}T00:00:00.000Z`) : null,
+        status: snapshot.status,
+        companyUrl: snapshot.companyUrl,
+        jobPostingUrl: snapshot.jobPostingUrl,
+        companyCareerUrl: snapshot.companyCareerUrl,
+        companyCategory: snapshot.companyCategory,
+        skillsMatch: snapshot.skillsMatch,
+        jobSource: snapshot.jobSource,
+        coverLetterRequired: snapshot.coverLetterRequired,
+        specialRequirements: snapshot.specialRequirements,
+        salaryMin: snapshot.salaryMin,
+        salaryMax: snapshot.salaryMax,
+        notes: snapshot.notes,
+        offerDueDate: snapshot.offerDueDate ? new Date(`${snapshot.offerDueDate}T00:00:00.000Z`) : null,
+        isArchived: snapshot.isArchived,
+      },
     });
-  }
 
-  // Record history after restore
+    // Delete all current stages
+    await tx.interviewStage.deleteMany({
+      where: { applicationId },
+    });
+
+    // Re-insert stages from snapshot
+    if (snapshot.interviewStages && snapshot.interviewStages.length > 0) {
+      await tx.interviewStage.createMany({
+        data: snapshot.interviewStages.map((s) => ({
+          applicationId,
+          name: s.name,
+          order: s.order,
+          isCompleted: s.isCompleted,
+          completedDate: s.completedDate ? new Date(`${s.completedDate}T00:00:00.000Z`) : null,
+          notes: s.notes,
+          performanceRating: s.performanceRating,
+        })),
+      });
+    }
+  });
+
+  // Record history after restore (outside transaction — non-critical)
   await recordHistory(applicationId, buildDescription("restore_version", String(targetSequence)));
 
   // Return the restored state
