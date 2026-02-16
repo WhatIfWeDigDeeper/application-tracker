@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Application CRUD - Inline Edit', () => {
+  const createdUrls: string[] = [];
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
@@ -33,6 +35,7 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
+    createdUrls.push(page.url());
 
     await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('E2E Test Company');
     await expect(page.locator('input[placeholder="Position Title *"]')).toHaveValue('Senior Engineer');
@@ -45,6 +48,7 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.fill('input[placeholder="Position Title *"]', 'Developer');
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
+    createdUrls.push(page.url());
 
     const companyInput = page.locator('input[placeholder="Company Name *"]');
     await companyInput.clear();
@@ -70,6 +74,7 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.fill('input[placeholder="Position Title *"]', 'Tester');
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
+    createdUrls.push(page.url());
 
     const companyInput = page.locator('input[placeholder="Company Name *"]');
     await companyInput.clear();
@@ -100,6 +105,7 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
+    createdUrls.push(page.url());
 
     await expect(page.locator('text=Phone Screen')).toBeVisible();
   });
@@ -212,5 +218,20 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.click('button:has-text("Create Application")');
 
     await expect(page.locator('text=Minimum salary must not exceed maximum')).toBeVisible();
+  });
+
+  test.afterAll(async ({ browser }) => {
+    if (createdUrls.length === 0) return;
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    for (const url of createdUrls) {
+      await page.goto(url);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForSelector('input[placeholder="Company Name *"]', { timeout: 10000 });
+      await page.click('button:has-text("Delete")');
+      await page.locator('button:has-text("Delete")').last().click();
+      await page.waitForURL('/');
+    }
+    await context.close();
   });
 });
