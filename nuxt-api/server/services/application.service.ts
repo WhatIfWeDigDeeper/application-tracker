@@ -28,7 +28,7 @@ function toApplicationResponse(app: DbApplication, stages: DbInterviewStage[]): 
     id: app.id,
     companyName: app.companyName,
     positionTitle: app.positionTitle,
-    dateApplied: formatDate(app.dateApplied) || '',
+    dateApplied: formatDate(app.dateApplied),
     status: app.status,
     createdAt: formatDateTime(app.createdAt),
     updatedAt: formatDateTime(app.updatedAt),
@@ -107,7 +107,9 @@ export async function listApplications(query: ListApplicationsQuery): Promise<{ 
   const offset = (page - 1) * limit;
   const apps = await db.query.applications.findMany({
     where: conditions.length > 0 ? and(...conditions) : undefined,
-    orderBy: [orderFn(sortColumn)],
+    orderBy: sortBy === 'dateApplied'
+      ? [sql`${sortColumn} ${sql.raw(sortDir === 'asc' ? 'ASC' : 'DESC')} NULLS LAST`]
+      : [orderFn(sortColumn)],
     limit,
     offset,
     with: {
@@ -136,7 +138,7 @@ export async function getApplication(id: string): Promise<Application | null> {
 }
 
 export async function createApplication(input: CreateApplicationInput): Promise<Application> {
-  const dateApplied = input.dateApplied || new Date().toISOString().split('T')[0];
+  const dateApplied = input.dateApplied || null;
 
   const [app] = await db
     .insert(applications)

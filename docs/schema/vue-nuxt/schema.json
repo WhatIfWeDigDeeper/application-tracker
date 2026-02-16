@@ -23,7 +23,7 @@
         {
           "name": "date_applied",
           "type": "date",
-          "nullable": false
+          "nullable": true
         },
         {
           "name": "status",
@@ -139,16 +139,6 @@
           "referenced_table": "",
           "columns": [
             "created_at"
-          ]
-        },
-        {
-          "name": "applications_date_applied_not_null",
-          "type": "n",
-          "def": "NOT NULL date_applied",
-          "table": "vue_nuxt.applications",
-          "referenced_table": "",
-          "columns": [
-            "date_applied"
           ]
         },
         {

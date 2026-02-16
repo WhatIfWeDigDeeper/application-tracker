@@ -52,7 +52,7 @@ export const applications = svelteHonoSchema.table('applications', {
   id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   companyName: varchar('company_name', { length: 200 }).notNull(),
   positionTitle: varchar('position_title', { length: 200 }).notNull(),
-  dateApplied: date('date_applied').notNull(),
+  dateApplied: date('date_applied'),
   status: applicationStatusEnum('status').notNull().default('applied'),
   companyUrl: text('company_url'),
   jobPostingUrl: text('job_posting_url'),

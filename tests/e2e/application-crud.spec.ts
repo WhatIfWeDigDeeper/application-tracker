@@ -137,13 +137,36 @@ test.describe('Application CRUD - Inline Edit', () => {
     await expect(page).toHaveURL('/');
   });
 
-  test('should default to today date and Applied status on create', async ({ page }) => {
+  test('should have empty date applied and Applied status on create', async ({ page }) => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
 
-    const today = new Date().toISOString().split('T')[0];
-    await expect(page.locator('#dateApplied')).toHaveValue(today);
+    await expect(page.locator('#dateApplied')).toHaveValue('');
     await expect(page.locator('#status')).toHaveValue('applied');
+  });
+
+  test('should create application without date applied and display em dash', async ({ page }) => {
+    await page.goto('/applications/new');
+    await page.waitForLoadState('domcontentloaded');
+
+    await page.fill('input[placeholder="Company Name *"]', 'No Date Company');
+    await page.fill('input[placeholder="Position Title *"]', 'Engineer');
+
+    await page.click('button:has-text("Create Application")');
+    await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
+    createdUrls.push(page.url());
+
+    // Go back to list and verify em dash is shown for null date
+    await page.click('text=Back to List');
+    await page.waitForURL('/');
+
+    // The application card should show "Applied: —" for the missing date
+    const noDateCard = page
+      .locator('div')
+      .filter({ has: page.getByText('No Date Company') })
+      .filter({ has: page.getByText('Applied: —') })
+      .last();
+    await expect(noDateCard).toBeVisible();
   });
 
   test('should show Offer Due Date only when status is given offer', async ({ page }) => {

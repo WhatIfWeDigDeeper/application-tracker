@@ -50,7 +50,8 @@ const offerDueInfo = computed(() => {
   }
 });
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string | null) {
+  if (!dateStr) return '\u2014';
   return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',

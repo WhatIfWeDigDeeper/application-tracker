@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS applications (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   company_name VARCHAR(200) NOT NULL,
   position_title VARCHAR(200) NOT NULL,
-  date_applied DATE NOT NULL DEFAULT CURRENT_DATE,
+  date_applied DATE DEFAULT NULL,
   status application_status NOT NULL DEFAULT 'applied',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

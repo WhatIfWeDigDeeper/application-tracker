@@ -20,7 +20,7 @@ export function toApplicationResponse(app: Application, stages: InterviewStage[]
     id: app.id,
     companyName: app.companyName,
     positionTitle: app.positionTitle,
-    dateApplied: formatDate(app.dateApplied) || '',
+    dateApplied: formatDate(app.dateApplied),
     status: app.status,
     createdAt: formatDateTime(app.createdAt),
     updatedAt: formatDateTime(app.updatedAt),

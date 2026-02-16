@@ -27,7 +27,8 @@
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   });
 
-  function formatDate(dateStr: string): string {
+  function formatDate(dateStr: string | null): string {
+    if (!dateStr) return '\u2014';
     return new Date(dateStr).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',

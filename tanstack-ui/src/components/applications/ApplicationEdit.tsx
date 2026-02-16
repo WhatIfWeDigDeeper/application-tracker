@@ -56,7 +56,7 @@ function initialFormState(): FormState {
   return {
     companyName: "",
     positionTitle: "",
-    dateApplied: getTodayDate(),
+    dateApplied: "",
     status: "applied",
     companyUrl: "",
     jobPostingUrl: "",
@@ -77,7 +77,7 @@ function populateFromApplication(app: Application): FormState {
   return {
     companyName: app.companyName,
     positionTitle: app.positionTitle,
-    dateApplied: app.dateApplied,
+    dateApplied: app.dateApplied || "",
     status: app.status,
     companyUrl: app.companyUrl || "",
     jobPostingUrl: app.jobPostingUrl || "",

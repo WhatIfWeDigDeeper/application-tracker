@@ -67,7 +67,7 @@ function createDefaultFormState(): FormState {
   return {
     companyName: '',
     positionTitle: '',
-    dateApplied: getCurrentDateISO(),
+    dateApplied: '',
     status: 'applied',
     companyUrl: '',
     jobPostingUrl: '',
@@ -274,7 +274,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
     return {
       companyName: form.companyName.trim(),
       positionTitle: form.positionTitle.trim(),
-      dateApplied: form.dateApplied || undefined,
+      dateApplied: form.dateApplied || null,
       status: form.status,
       companyUrl: form.companyUrl || undefined,
       jobPostingUrl: form.jobPostingUrl || undefined,

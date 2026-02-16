@@ -16,7 +16,7 @@ import type {
   ValidationResult,
 } from '@/types/application';
 import { STORAGE_KEY, STORAGE_VERSION, DEFAULT_INTERVIEW_STAGES } from '@/lib/constants';
-import { generateId, getCurrentDateISO, getCurrentDateTimeISO } from '@/lib/utils';
+import { generateId, getCurrentDateTimeISO } from '@/lib/utils';
 import { validateApplication, validateInterviewStage } from './validation';
 
 // ============================================================================
@@ -121,9 +121,12 @@ export function getApplications(
       let comparison = 0;
 
       switch (sort.field) {
-        case 'dateApplied':
-          comparison = new Date(a.dateApplied).getTime() - new Date(b.dateApplied).getTime();
+        case 'dateApplied': {
+          const aTime = a.dateApplied ? new Date(a.dateApplied).getTime() : -Infinity;
+          const bTime = b.dateApplied ? new Date(b.dateApplied).getTime() : -Infinity;
+          comparison = aTime - bTime;
           break;
+        }
         case 'companyName':
           comparison = a.companyName.localeCompare(b.companyName);
           break;
@@ -140,7 +143,11 @@ export function getApplications(
   } else {
     // Default: sort by date applied, newest first
     applications.sort(
-      (a, b) => new Date(b.dateApplied).getTime() - new Date(a.dateApplied).getTime()
+      (a, b) => {
+        const aTime = a.dateApplied ? new Date(a.dateApplied).getTime() : -Infinity;
+        const bTime = b.dateApplied ? new Date(b.dateApplied).getTime() : -Infinity;
+        return bTime - aTime;
+      }
     );
   }
 
@@ -160,7 +167,7 @@ export function createApplication(input: CreateApplicationInput): JobApplication
     id: generateId(),
     companyName: input.companyName.trim(),
     positionTitle: input.positionTitle.trim(),
-    dateApplied: input.dateApplied ?? getCurrentDateISO(),
+    dateApplied: input.dateApplied ?? null,
     status: 'applied',
     createdAt: now,
     updatedAt: now,

@@ -3,7 +3,7 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 }
 
 export function formatDate(dateString: string | null): string {
-  if (!dateString) return "";
+  if (!dateString) return "\u2014";
   const date = new Date(dateString + "T00:00:00");
   return date.toLocaleDateString("en-US", {
     year: "numeric",

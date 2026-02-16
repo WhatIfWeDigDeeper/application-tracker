@@ -57,7 +57,7 @@ classDiagram
     +id: string
     +companyName: string
     +positionTitle: string
-    +dateApplied: string
+    +dateApplied: string or null
     +status: ApplicationStatus
     +createdAt: string
     +updatedAt: string
@@ -90,6 +90,18 @@ classDiagram
     +code: "validation_error" or "not_found" or "internal_error"
     +message: string
     -details?: Array~Object~
+  }
+
+  class FieldChange {
+    +value: z.infer~typeof FieldChangeSchema~
+  }
+
+  class HistoryEntry {
+    +value: z.infer~typeof HistoryEntrySchema~
+  }
+
+  class PaginatedHistory {
+    +value: z.infer~typeof PaginatedHistorySchema~
   }
 
   Application --* ApplicationStatus : status

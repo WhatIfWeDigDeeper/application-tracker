@@ -15,7 +15,6 @@ import {
   APPLICATION_STATUSES,
   STATUS_LABELS,
 } from '@/lib/constants';
-import { getCurrentDateISO } from '@/lib/utils';
 
 export interface ApplicationFormProps {
   initialData?: Partial<CreateApplicationInput & { status?: string; offerDueDate?: string }>;
@@ -103,16 +102,6 @@ export function ApplicationForm({
         [name]: parsedValue,
       };
 
-      // Auto-populate Date Applied when changing status from Unsubmitted to Applied
-      if (name === 'status' && value === 'applied' && !prev.dateApplied) {
-        updated.dateApplied = getCurrentDateISO();
-      }
-
-      // Clear Date Applied when changing status to Unsubmitted
-      if (name === 'status' && value === 'unsubmitted') {
-        updated.dateApplied = '';
-      }
-
       return updated;
     });
 
@@ -144,7 +133,7 @@ export function ApplicationForm({
     const baseData: CreateApplicationInput = {
       companyName: formData.companyName,
       positionTitle: formData.positionTitle,
-      dateApplied: formData.dateApplied || undefined,
+      dateApplied: formData.dateApplied || null,
       companyUrl: formData.companyUrl || undefined,
       jobPostingUrl: formData.jobPostingUrl || undefined,
       companyCareerUrl: formData.companyCareerUrl || undefined,
@@ -216,10 +205,9 @@ export function ApplicationForm({
               label="Date Applied"
               name="dateApplied"
               type="date"
-              value={formData.dateApplied}
+              value={formData.dateApplied ?? ''}
               onChange={handleChange}
               error={errors.dateApplied}
-              disabled={formData.status === 'unsubmitted'}
             />
           </div>
         )}
@@ -229,7 +217,7 @@ export function ApplicationForm({
             label="Date Applied"
             name="dateApplied"
             type="date"
-            value={formData.dateApplied}
+            value={formData.dateApplied ?? ''}
             onChange={handleChange}
             error={errors.dateApplied}
           />

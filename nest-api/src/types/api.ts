@@ -85,7 +85,7 @@ export const ApplicationSchema = z.object({
   id: z.string().uuid(),
   companyName: z.string().max(200),
   positionTitle: z.string().max(200),
-  dateApplied: z.string(),
+  dateApplied: z.string().nullable(),
   status: ApplicationStatusSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -127,7 +127,7 @@ export type CreateApplicationInput = z.infer<typeof CreateApplicationSchema>;
 export const UpdateApplicationSchema = z.object({
   companyName: z.string().min(1).max(200).optional(),
   positionTitle: z.string().min(1).max(200).optional(),
-  dateApplied: z.string().optional(),
+  dateApplied: z.string().nullable().optional(),
   status: ApplicationStatusSchema.optional(),
   companyUrl: z.string().url().nullable().optional(),
   jobPostingUrl: z.string().url().nullable().optional(),

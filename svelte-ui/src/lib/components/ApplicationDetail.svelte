@@ -21,7 +21,8 @@
   let isEditing = $state(false);
   let showDeleteConfirm = $state(false);
 
-  function formatDate(dateStr: string): string {
+  function formatDate(dateStr: string | null): string {
+    if (!dateStr) return '\u2014';
     return new Date(dateStr).toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
