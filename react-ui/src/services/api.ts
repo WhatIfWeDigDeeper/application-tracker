@@ -8,6 +8,7 @@ import type {
   UpdateInterviewStageInput,
   ListApplicationsParams,
   ErrorResponse,
+  PaginatedHistoryResponse,
 } from "../types/application";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
@@ -163,6 +164,35 @@ export async function deleteInterviewStage(
     }
   );
   return handleResponse(response);
+}
+
+// History API
+export async function getHistory(
+  id: string,
+  page: number = 1,
+  limit: number = 50
+): Promise<PaginatedHistoryResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/applications/${id}/history?page=${page}&limit=${limit}`
+  );
+  if (!response.ok) throw new Error("Failed to fetch history");
+  return response.json();
+}
+
+export async function restoreToVersion(
+  id: string,
+  sequence: number
+): Promise<Application> {
+  const response = await fetch(
+    `${API_BASE_URL}/applications/${id}/history/restore`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sequence }),
+    }
+  );
+  if (!response.ok) throw new Error("Failed to restore version");
+  return response.json();
 }
 
 export { ApiError };

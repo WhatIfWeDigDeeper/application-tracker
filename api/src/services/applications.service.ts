@@ -6,6 +6,7 @@ import {
   ListApplicationsQuery,
 } from "../types/index.js";
 import { AppError } from "../middleware/errorHandler.js";
+import { recordHistory, buildDescription, FIELD_LABELS } from "./history.service.js";
 
 type ApplicationWithStages = Prisma.ApplicationGetPayload<{
   include: { interviewStages: true };
@@ -84,13 +85,17 @@ export class ApplicationService {
   }
 
   async createApplication(input: CreateApplicationInput): Promise<ApplicationWithStages> {
-    return prisma.application.create({
+    const app = await prisma.application.create({
       data: {
         ...prepareDateFields(input),
         status: "unsubmitted",
       },
       include: { interviewStages: true },
     });
+
+    await recordHistory(app.id, buildDescription("create", `${app.companyName} - ${app.positionTitle}`));
+
+    return app;
   }
 
   async updateApplication(id: string, input: UpdateApplicationInput): Promise<ApplicationWithStages> {
@@ -99,11 +104,20 @@ export class ApplicationService {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
 
-    return prisma.application.update({
+    const updated = await prisma.application.update({
       where: { id },
       data: prepareDateFields(input),
       include: { interviewStages: { orderBy: { order: "asc" } } },
     });
+
+    const changedFields = Object.keys(input)
+      .filter((key) => key in FIELD_LABELS)
+      .map((key) => FIELD_LABELS[key]);
+    if (changedFields.length > 0) {
+      await recordHistory(id, buildDescription("update", changedFields.join(", ")));
+    }
+
+    return updated;
   }
 
   async deleteApplication(id: string): Promise<void> {
@@ -120,11 +134,15 @@ export class ApplicationService {
     if (!existing) {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
-    return prisma.application.update({
+    const result = await prisma.application.update({
       where: { id },
       data: { isArchived: true },
       include: { interviewStages: true },
     });
+
+    await recordHistory(id, buildDescription("archive"));
+
+    return result;
   }
 
   async restoreApplication(id: string): Promise<ApplicationWithStages> {
@@ -132,11 +150,15 @@ export class ApplicationService {
     if (!existing) {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
-    return prisma.application.update({
+    const result = await prisma.application.update({
       where: { id },
       data: { isArchived: false },
       include: { interviewStages: true },
     });
+
+    await recordHistory(id, buildDescription("restore"));
+
+    return result;
   }
 }
 

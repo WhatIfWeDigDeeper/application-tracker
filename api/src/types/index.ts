@@ -88,6 +88,33 @@ export const ListApplicationsQuerySchema = z.object({
   limit: z.string().optional().transform((v) => parseInt(v || "20")),
 });
 
+// History types
+export const FieldChangeSchema = z.object({
+  field: z.string(),
+  label: z.string(),
+  oldValue: z.unknown(),
+  newValue: z.unknown(),
+});
+
+export const HistoryEntrySchema = z.object({
+  id: z.string().uuid(),
+  sequence: z.number().int(),
+  description: z.string(),
+  changes: z.array(FieldChangeSchema),
+  createdAt: z.string(),
+});
+
+export const PaginatedHistorySchema = z.object({
+  entries: z.array(HistoryEntrySchema),
+  total: z.number().int(),
+  page: z.number().int(),
+  limit: z.number().int(),
+});
+
+export const RestoreRequestSchema = z.object({
+  sequence: z.number().int().min(1),
+});
+
 // Type exports
 export type CreateApplicationInput = z.infer<typeof CreateApplicationSchema>;
 export type UpdateApplicationInput = z.infer<typeof UpdateApplicationSchema>;

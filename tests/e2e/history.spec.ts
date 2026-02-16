@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// Shared history tests for Vue+Nuxt (event sourcing, port 3020) and Svelte+Hono (snapshots, port 3030).
-// Stacks without history support use --grep-invert 'History Panel' to exclude this file.
+// Shared history tests for all stacks with history support:
+// Next.js+Express (port 3000), React+Koa (port 3010), Vue+Nuxt (port 3020), Svelte+Hono (port 3030).
 
 test.describe.serial('History Panel', () => {
   let applicationUrl: string;

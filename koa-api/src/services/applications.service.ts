@@ -9,6 +9,7 @@ import type {
   ListApplicationsQuery,
   PaginatedApplications,
 } from "../types/index.js";
+import { recordHistory, buildDescription, FIELD_LABELS } from "./history.service.js";
 
 // Database row types (snake_case)
 interface ApplicationRow {
@@ -265,6 +266,11 @@ export class ApplicationService {
       ]
     );
 
+    await recordHistory(
+      result.rows[0].id,
+      buildDescription("create", `${result.rows[0].company_name} - ${result.rows[0].position_title}`)
+    );
+
     return toApplication(result.rows[0], []);
   }
 
@@ -341,6 +347,15 @@ export class ApplicationService {
     );
 
     const stages = stagesResult.rows.map(toInterviewStage);
+
+    // Record history after update
+    const changedFields = Object.keys(input)
+      .filter((key) => key in FIELD_LABELS && input[key as keyof UpdateApplicationInput] !== undefined)
+      .map((key) => FIELD_LABELS[key]);
+    if (changedFields.length > 0) {
+      await recordHistory(id, buildDescription("update", changedFields.join(", ")));
+    }
+
     return toApplication(result.rows[0], stages);
   }
 
@@ -356,11 +371,15 @@ export class ApplicationService {
   }
 
   async archiveApplication(id: string): Promise<Application> {
-    return this.updateApplication(id, { isArchived: true });
+    const app = await this.updateApplication(id, { isArchived: true });
+    await recordHistory(id, buildDescription("archive"));
+    return app;
   }
 
   async restoreApplication(id: string): Promise<Application> {
-    return this.updateApplication(id, { isArchived: false });
+    const app = await this.updateApplication(id, { isArchived: false });
+    await recordHistory(id, buildDescription("restore"));
+    return app;
   }
 }
 
