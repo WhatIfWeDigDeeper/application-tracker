@@ -31,7 +31,7 @@ export function useUnsavedChanges(isDirty: boolean): {
       window.addEventListener('beforeunload', handleBeforeUnload);
     }
 
-    return () => {
+    return (): void => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isDirty]);

@@ -70,8 +70,8 @@ export function ApplicationList({
           key={application.id}
           application={application}
           onClick={() => onSelectApplication(application)}
-          onArchive={onArchiveApplication ? () => onArchiveApplication(application.id) : undefined}
-          onRestore={onRestoreApplication ? () => onRestoreApplication(application.id) : undefined}
+          onArchive={onArchiveApplication ? (): void => onArchiveApplication(application.id) : undefined}
+          onRestore={onRestoreApplication ? (): void => onRestoreApplication(application.id) : undefined}
         />
       ))}
     </div>

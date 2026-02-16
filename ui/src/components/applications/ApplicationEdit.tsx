@@ -13,12 +13,14 @@ import type {
   UpdateInterviewStageInput,
 } from '@/types/application';
 import { applicationsApi, stagesApi } from '@/services/api';
+import { logger } from '@/lib/logger';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { UrlFieldInput } from '@/components/applications/UrlFieldInput';
 import { StageForm } from '@/components/interviews/StageForm';
 import { InterviewStage as InterviewStageComponent } from '@/components/interviews/InterviewStage';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { HistoryPanel } from '@/components/applications/HistoryPanel';
 import { PlusIcon } from '@/assets/icons/PlusIcon';
 import { getCurrentDateISO, generateId, cn } from '@/lib/utils';
 import {
@@ -142,6 +144,8 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
   const [editingStage, setEditingStage] = useState<InterviewStage | null>(null);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyKey, setHistoryKey] = useState(0);
 
   // ---------------------------------------------------------------------------
   // Dirty tracking
@@ -305,6 +309,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
         const newForm = populateFromApplication(updatedApp);
         setForm(newForm);
         snapshotRef.current = JSON.stringify(newForm);
+        setHistoryKey((k) => k + 1);
       } else {
         // Create mode: create application, then create local stages
         const input = buildInput();
@@ -378,7 +383,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
       setSkipGuard(true);
       router.push('/');
     } catch (err: unknown) {
-      console.error('Failed to delete application:', err);
+      logger.error('Failed to delete application:', err);
     }
     setShowDeleteConfirm(false);
   };
@@ -403,9 +408,10 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
         });
         // Reload application to get updated stages
         await loadApplication(applicationId);
+        setHistoryKey((k) => k + 1);
         setShowStageForm(false);
       } catch (err: unknown) {
-        console.error('Failed to add interview stage:', err);
+        logger.error('Failed to add interview stage:', err);
       }
     } else {
       // Create mode: store locally
@@ -439,10 +445,11 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
         if (Object.keys(update).length > 0) {
           await stagesApi.update(applicationId, editingStage.id, update);
           await loadApplication(applicationId);
+          setHistoryKey((k) => k + 1);
         }
         setEditingStage(null);
       } catch (err: unknown) {
-        console.error('Failed to update interview stage:', err);
+        logger.error('Failed to update interview stage:', err);
       }
     } else {
       // Create mode: update locally
@@ -471,8 +478,9 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
       try {
         await stagesApi.delete(applicationId, editingStage.id);
         await loadApplication(applicationId);
+        setHistoryKey((k) => k + 1);
       } catch (err: unknown) {
-        console.error('Failed to delete interview stage:', err);
+        logger.error('Failed to delete interview stage:', err);
       }
     } else {
       // Create mode: remove locally
@@ -495,8 +503,9 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
       try {
         await stagesApi.update(applicationId, stageId, update);
         await loadApplication(applicationId);
+        setHistoryKey((k) => k + 1);
       } catch (err: unknown) {
-        console.error('Failed to toggle stage completion:', err);
+        logger.error('Failed to toggle stage completion:', err);
       }
     } else {
       // Create mode: toggle locally
@@ -583,6 +592,16 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
               disabled={isSaving}
             >
               Discard
+            </Button>
+          )}
+
+          {/* History (edit mode only) */}
+          {isEditMode && (
+            <Button
+              variant="secondary"
+              onClick={() => setShowHistory(true)}
+            >
+              History
             </Button>
           )}
 
@@ -1055,6 +1074,18 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
         confirmLabel="Delete"
         variant="danger"
       />
+
+      {/* History Panel */}
+      {showHistory && applicationId && (
+        <HistoryPanel
+          applicationId={applicationId}
+          refreshKey={historyKey}
+          onClose={() => setShowHistory(false)}
+          onRestored={() => {
+            loadApplication(applicationId);
+          }}
+        />
+      )}
     </div>
   );
 }

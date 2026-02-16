@@ -29,9 +29,23 @@ model Application {
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   interviewStages         InterviewStage[]
+  history                 ApplicationHistory[]
 
   @@index([status])
   @@index([isArchived])
+  @@schema("express_prisma")
+}
+
+model ApplicationHistory {
+  id              String   @id @default(uuid())
+  applicationId   String
+  sequence        Int
+  description     String   @db.VarChar(500)
+  snapshot        Json
+  createdAt       DateTime @default(now())
+  application     Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, sequence])
   @@schema("express_prisma")
 }
 

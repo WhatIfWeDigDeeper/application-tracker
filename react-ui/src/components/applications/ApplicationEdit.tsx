@@ -25,6 +25,7 @@ import { getTodayDate } from "../../lib/utils";
 import * as api from "../../services/api";
 import { Button, RatingInput, ConfirmDialog, UrlFieldInput } from "../ui";
 import { InterviewStageItem, InlineInterviewStageForm } from "../interviews";
+import { HistoryPanel } from "./HistoryPanel";
 
 // ---------------------------------------------------------------------------
 // Form state type
@@ -193,6 +194,8 @@ export function ApplicationEdit() {
   const [saving, setSaving] = useState(false);
 
   // UI state
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyKey, setHistoryKey] = useState(0);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAddStageForm, setShowAddStageForm] = useState(false);
@@ -319,6 +322,7 @@ export function ApplicationEdit() {
         const populated = populateFromApplication(updated);
         setForm(populated);
         setSnapshot(captureSnapshot(populated));
+        setHistoryKey((k) => k + 1);
       } else {
         const input = buildCreateInput(form);
         const created = await api.createApplication(
@@ -421,6 +425,7 @@ export function ApplicationEdit() {
           input as CreateInterviewStageInput
         );
         await loadApplication(id);
+        setHistoryKey((k) => k + 1);
         setShowAddStageForm(false);
       } catch (err) {
         console.error("Failed to add interview stage:", err);
@@ -449,6 +454,7 @@ export function ApplicationEdit() {
       try {
         await api.updateInterviewStage(id, stageId, input);
         await loadApplication(id);
+        setHistoryKey((k) => k + 1);
         setEditingStage(null);
       } catch (err) {
         console.error("Failed to update interview stage:", err);
@@ -476,6 +482,7 @@ export function ApplicationEdit() {
       try {
         await api.deleteInterviewStage(id, stageId);
         await loadApplication(id);
+        setHistoryKey((k) => k + 1);
       } catch (err) {
         console.error("Failed to delete interview stage:", err);
       }
@@ -496,6 +503,7 @@ export function ApplicationEdit() {
           completedDate,
         });
         await loadApplication(id);
+        setHistoryKey((k) => k + 1);
       } catch (err) {
         console.error("Failed to toggle stage completion:", err);
       }
@@ -596,6 +604,16 @@ export function ApplicationEdit() {
               disabled={saving}
             >
               Discard
+            </Button>
+          )}
+
+          {/* History (edit mode only) */}
+          {isEditMode && (
+            <Button
+              variant="secondary"
+              onClick={() => setShowHistory(true)}
+            >
+              History
             </Button>
           )}
 
@@ -1033,6 +1051,18 @@ export function ApplicationEdit() {
         confirmLabel="Delete"
         isDestructive
       />
+
+      {/* History Panel */}
+      {showHistory && id && (
+        <HistoryPanel
+          applicationId={id}
+          refreshKey={historyKey}
+          onClose={() => setShowHistory(false)}
+          onRestored={() => {
+            loadApplication(id);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import { prisma } from "./client";
+import { logger } from "../lib/logger.js";
 
 const seed = async (): Promise<void> => {
-  // eslint-disable-next-line no-console
-  console.log("🌱 Seeding database...");
+  logger.info("🌱 Seeding database...");
 
   // Clear existing data
   await prisma.interviewStage.deleteMany({});
@@ -66,14 +66,12 @@ const seed = async (): Promise<void> => {
       notes: "Scheduled for 2026-01-20",
     },
   });
-  // eslint-disable-next-line no-console
-  console.log("✅ Seed complete!");
+  logger.info("✅ Seed complete!");
 };
 
 seed()
   .catch((e) => {
-    // eslint-disable-next-line no-console
-    console.error("❌ Seed failed:", e);
+    logger.error("❌ Seed failed:", e);
     process.exit(1);
   })
   .finally(async () => {

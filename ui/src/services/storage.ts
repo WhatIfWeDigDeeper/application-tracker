@@ -3,6 +3,7 @@
  * Implements the StorageService interface from contracts/storage-service.ts
  */
 
+import { logger } from '@/lib/logger';
 import type {
   JobApplication,
   InterviewStage,
@@ -48,7 +49,7 @@ function loadStorage(): StorageSchema {
 
     return parsed;
   } catch {
-    console.error('Failed to parse localStorage data, resetting to empty');
+    logger.error('Failed to parse localStorage data, resetting to empty');
     return getEmptySchema();
   }
 }
@@ -62,7 +63,7 @@ function saveStorage(schema: StorageSchema): void {
     schema.lastModified = getCurrentDateTimeISO();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(schema));
   } catch (error) {
-    console.error('Failed to save to localStorage:', error);
+    logger.error('Failed to save to localStorage:', error);
   }
 }
 

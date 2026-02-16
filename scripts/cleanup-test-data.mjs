@@ -16,6 +16,9 @@
  */
 
 const DEFAULT_PORT = 5040;
+// Express (3001) serves at /applications; all others use /api/applications
+const PORTS_WITHOUT_API_PREFIX = [3001];
+
 const DEFAULT_KEYWORDS = [
   'Test Co',
   'Test Company',
@@ -26,6 +29,7 @@ const DEFAULT_KEYWORDS = [
   'Discard Test',
   'Edit Test',
   'Final Test',
+  'Updated Company',
 ];
 
 function parseArgs(argv) {
@@ -52,12 +56,16 @@ function matches(app, keywords) {
   return keywords.some((kw) => haystack.includes(kw.toLowerCase()));
 }
 
-async function fetchAllApplications(baseUrl) {
+function getApiPath(port) {
+  return PORTS_WITHOUT_API_PREFIX.includes(port) ? '/applications' : '/api/applications';
+}
+
+async function fetchAllApplications(baseUrl, apiPath) {
   const apps = [];
   let page = 1;
   while (true) {
-    const res = await fetch(`${baseUrl}/api/applications?limit=100&page=${page}&includeArchived=true`);
-    if (!res.ok) throw new Error(`GET /api/applications failed: ${res.status} ${res.statusText}`);
+    const res = await fetch(`${baseUrl}${apiPath}?limit=100&page=${page}&includeArchived=true`);
+    if (!res.ok) throw new Error(`GET ${apiPath} failed: ${res.status} ${res.statusText}`);
     const data = await res.json();
     apps.push(...data.items);
     if (apps.length >= data.total) break;
@@ -69,11 +77,12 @@ async function fetchAllApplications(baseUrl) {
 async function main() {
   const { port, dryRun, keywords } = parseArgs(process.argv);
   const baseUrl = `http://localhost:${port}`;
+  const apiPath = getApiPath(port);
 
   console.log(`Connecting to ${baseUrl}`);
   console.log(`Keywords: ${keywords.join(', ')}${dryRun ? ' (dry run)' : ''}\n`);
 
-  const apps = await fetchAllApplications(baseUrl);
+  const apps = await fetchAllApplications(baseUrl, apiPath);
   const toDelete = apps.filter((app) => matches(app, keywords));
 
   if (toDelete.length === 0) {
@@ -94,7 +103,7 @@ async function main() {
 
   let deleted = 0;
   for (const app of toDelete) {
-    const res = await fetch(`${baseUrl}/api/applications/${app.id}`, { method: 'DELETE' });
+    const res = await fetch(`${baseUrl}${apiPath}/${app.id}`, { method: 'DELETE' });
     if (res.status === 204 || res.ok) {
       deleted++;
     } else {
