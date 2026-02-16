@@ -3,6 +3,7 @@
  */
 
 import { Theme, SystemTheme, THEME_STORAGE_KEY } from '@/types/theme';
+import { logger } from '@/lib/logger';
 
 /**
  * Detect system dark mode preference
@@ -38,7 +39,7 @@ export const getStoredTheme = (): Theme | null => {
       return stored as Theme;
     }
   } catch (error) {
-    console.warn('Failed to read theme from localStorage:', error);
+    logger.warn('Failed to read theme from localStorage:', error);
   }
 
   return null;
@@ -55,7 +56,7 @@ export const saveTheme = (theme: Theme): void => {
   try {
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch (error) {
-    console.warn('Failed to save theme to localStorage:', error);
+    logger.warn('Failed to save theme to localStorage:', error);
   }
 };
 

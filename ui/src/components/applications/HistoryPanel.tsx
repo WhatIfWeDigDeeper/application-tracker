@@ -60,18 +60,18 @@ export function HistoryPanel({ applicationId, refreshKey, onClose, onRestored }:
   }, [loadHistory, refreshKey]);
 
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
+    function handleKeyDown(e: KeyboardEvent): void {
       if (e.key === 'Escape') onClose();
     }
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return (): void => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  function toggleExpand(entryId: string) {
+  function toggleExpand(entryId: string): void {
     setExpandedEntry((prev) => (prev === entryId ? null : entryId));
   }
 
-  async function handleRestore(entry: HistoryEntry) {
+  async function handleRestore(entry: HistoryEntry): Promise<void> {
     setRestoring(true);
     try {
       await applicationsApi.restoreToVersion(applicationId, entry.sequence);

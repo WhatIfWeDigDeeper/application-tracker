@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import type {
   JobApplication,
   InterviewStage,
@@ -123,7 +124,7 @@ export function useApplications(): UseApplicationsReturn {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load applications';
       setError(message);
-      console.error('Error loading applications:', err);
+      logger.error('Error loading applications:', err);
     } finally {
       setIsLoading(false);
     }

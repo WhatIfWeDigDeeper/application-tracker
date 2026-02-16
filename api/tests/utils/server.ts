@@ -1,12 +1,12 @@
 import request from "supertest";
 import express, { Express } from "express";
-import { logger } from "../../src/middleware/logger";
+import { requestLogger } from "../../src/middleware/logger";
 import { errorHandler } from "../../src/middleware/errorHandler";
 
 export function createTestApp(): Express {
   const app = express();
   app.use(express.json());
-  app.use(logger);
+  app.use(requestLogger);
 
   // Health endpoint for testing
   app.get("/health", (req, res) => {
