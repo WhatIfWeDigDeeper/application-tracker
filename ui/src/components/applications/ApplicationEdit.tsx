@@ -13,6 +13,7 @@ import type {
   UpdateInterviewStageInput,
 } from '@/types/application';
 import { applicationsApi, stagesApi } from '@/services/api';
+import { logger } from '@/lib/logger';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { UrlFieldInput } from '@/components/applications/UrlFieldInput';
 import { StageForm } from '@/components/interviews/StageForm';
@@ -382,7 +383,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
       setSkipGuard(true);
       router.push('/');
     } catch (err: unknown) {
-      console.error('Failed to delete application:', err);
+      logger.error('Failed to delete application:', err);
     }
     setShowDeleteConfirm(false);
   };
@@ -410,7 +411,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
         setHistoryKey((k) => k + 1);
         setShowStageForm(false);
       } catch (err: unknown) {
-        console.error('Failed to add interview stage:', err);
+        logger.error('Failed to add interview stage:', err);
       }
     } else {
       // Create mode: store locally
@@ -448,7 +449,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
         }
         setEditingStage(null);
       } catch (err: unknown) {
-        console.error('Failed to update interview stage:', err);
+        logger.error('Failed to update interview stage:', err);
       }
     } else {
       // Create mode: update locally
@@ -479,7 +480,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
         await loadApplication(applicationId);
         setHistoryKey((k) => k + 1);
       } catch (err: unknown) {
-        console.error('Failed to delete interview stage:', err);
+        logger.error('Failed to delete interview stage:', err);
       }
     } else {
       // Create mode: remove locally
@@ -504,7 +505,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
         await loadApplication(applicationId);
         setHistoryKey((k) => k + 1);
       } catch (err: unknown) {
-        console.error('Failed to toggle stage completion:', err);
+        logger.error('Failed to toggle stage completion:', err);
       }
     } else {
       // Create mode: toggle locally

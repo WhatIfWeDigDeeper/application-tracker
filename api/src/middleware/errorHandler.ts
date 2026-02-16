@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
+import { logger } from "../lib/logger.js";
 
 export interface ErrorResponse {
   code: string;
@@ -26,7 +27,7 @@ export const errorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): Response => {
-  console.error("Error:", err.message, err.stack);
+  logger.error("Error:", err.message, err.stack);
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
