@@ -113,7 +113,7 @@
     "docs:types:koa-api": "npx -y ts-to-mermaid koa-api/src/types/index.ts --save docs/types/koa-api/ && echo >> docs/types/koa-api/index.mermaid",
     "docs:types:svelte-ui": "npx -y ts-to-mermaid svelte-ui/src/lib/types/index.ts --save docs/types/svelte-ui/ && echo >> docs/types/svelte-ui/index.mermaid",
     "docs:types": "npm run docs:types:nuxt && npm run docs:types:ui && npm run docs:types:react-ui && npm run docs:types:koa-api && npm run docs:types:svelte-ui",
-    "kill:all-next-dev": "pkill -f \"next dev\"",
+    "stop:all": "bash scripts/stop-all.sh",
     "cleanup:test-data": "node scripts/cleanup-test-data.mjs --"
   },
   "keywords": [],
