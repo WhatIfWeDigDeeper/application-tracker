@@ -22,13 +22,15 @@ jobs:
         with:
           files: |
             docs/**
+            *.md
             **/*.md
             **/*.mermaid
             **/*.txt
-            **/*.png
-            **/*.jpg
-            .claude/**
+            docs/**/*.png
+            docs/**/*.jpg
             .agent*/**
+            .claude/**
+            .github/**/*.md
             .specifykit/**
             .vscode/**
           files_ignore: |
