@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS applications (
   skills_match INTEGER CHECK (skills_match IS NULL OR (skills_match >= 1 AND skills_match <= 5)),
   job_source job_source,
   cover_letter_required BOOLEAN,
-  special_requirements VARCHAR(1000),
+  special_requirements VARCHAR(5000),
   salary_min INTEGER CHECK (salary_min IS NULL OR salary_min >= 0),
   salary_max INTEGER CHECK (salary_max IS NULL OR salary_max >= 0),
   notes TEXT CHECK (notes IS NULL OR LENGTH(notes) <= 5000),

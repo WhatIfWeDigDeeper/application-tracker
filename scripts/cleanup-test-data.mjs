@@ -20,6 +20,7 @@ const DEFAULT_PORT = 5040;
 const PORTS_WITHOUT_API_PREFIX = [3001];
 
 const DEFAULT_KEYWORDS = [
+  'E2E',
   'Test Co',
   'Test Company',
   'History Co',

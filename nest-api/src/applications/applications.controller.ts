@@ -7,12 +7,16 @@ import {
   Param,
   Query,
   Body,
+  Req,
+  Res,
   HttpCode,
   Inject,
   NotFoundException,
   UsePipes,
 } from '@nestjs/common';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ApplicationsService } from './applications.service.js';
+import { CsvService } from './csv.service.js';
 import { HistoryService } from './history.service.js';
 import { InterviewStagesService } from './interview-stages.service.js';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe.js';
@@ -44,6 +48,7 @@ const HistoryQuerySchema = z.object({
 export class ApplicationsController {
   constructor(
     @Inject(ApplicationsService) private applicationsService: ApplicationsService,
+    @Inject(CsvService) private csvService: CsvService,
     @Inject(HistoryService) private historyService: HistoryService,
     @Inject(InterviewStagesService) private interviewStagesService: InterviewStagesService,
   ) {}
@@ -60,6 +65,37 @@ export class ApplicationsController {
     @Body(new ZodValidationPipe(CreateApplicationSchema)) input: CreateApplicationInput
   ): Promise<ApplicationResponse> {
     return this.applicationsService.createApplication(input);
+  }
+
+  @Post('import')
+  async importCsv(@Req() req: FastifyRequest, @Res() reply: FastifyReply): Promise<void> {
+    const file = await req.file();
+    if (!file) {
+      reply.status(400).send({ code: 'validation_error', message: 'No file uploaded' });
+      return;
+    }
+    const buffer = await file.toBuffer();
+    const result = await this.csvService.importFromCsv(buffer);
+    reply.status(200).send(result);
+  }
+
+  @Get('export')
+  async exportCsv(@Res() reply: FastifyReply): Promise<void> {
+    const csv = await this.csvService.exportToCsv();
+    const date = new Date().toISOString().split('T')[0];
+    reply
+      .header('Content-Type', 'text/csv')
+      .header('Content-Disposition', `attachment; filename="applications-${date}.csv"`)
+      .send(csv);
+  }
+
+  @Get('sample-csv')
+  getSampleCsv(@Res() reply: FastifyReply): void {
+    const csv = this.csvService.getSampleCsv();
+    reply
+      .header('Content-Type', 'text/csv')
+      .header('Content-Disposition', 'attachment; filename="applications-template.csv"')
+      .send(csv);
   }
 
   @Get(':id')

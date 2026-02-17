@@ -88,6 +88,16 @@ export function useRestoreToVersion() {
   });
 }
 
+export function useImportApplications() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => api.importApplicationsCsv(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: applicationKeys.lists() });
+    },
+  });
+}
+
 export function useCreateStage() {
   const queryClient = useQueryClient();
   return useMutation({

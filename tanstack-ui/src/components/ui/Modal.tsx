@@ -131,6 +131,7 @@ export function ConfirmDialog({
           variant={isDestructive ? "danger" : "primary"}
           onClick={onConfirm}
           disabled={isLoading}
+          autoFocus
         >
           {isLoading ? "Loading..." : confirmLabel}
         </Button>
