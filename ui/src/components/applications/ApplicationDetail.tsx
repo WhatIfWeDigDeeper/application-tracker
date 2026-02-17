@@ -85,7 +85,15 @@ export function ApplicationDetail({
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const newStatus = e.target.value as JobApplication['status'];
-    onUpdate(application.id, { status: newStatus });
+    const updateData: UpdateApplicationInput = { status: newStatus };
+    // When changing to unsubmitted, clear dateApplied
+    if (newStatus === 'unsubmitted') {
+      updateData.dateApplied = null;
+    } else if (application.status === 'unsubmitted' && !application.dateApplied) {
+      // Transitioning FROM unsubmitted: auto-fill today's date
+      updateData.dateApplied = new Date().toISOString().split('T')[0] ?? '';
+    }
+    onUpdate(application.id, updateData);
     setIsStatusChanging(false);
   };
 

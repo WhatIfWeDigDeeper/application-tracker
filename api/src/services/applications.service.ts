@@ -86,11 +86,15 @@ export class ApplicationService {
   }
 
   async createApplication(input: CreateApplicationInput): Promise<ApplicationWithStages> {
+    const preparedInput = prepareDateFields(input);
+    // When status is unsubmitted (the default), dateApplied must be null
+    const data = {
+      ...preparedInput,
+      status: "unsubmitted" as const,
+      dateApplied: null,
+    };
     const app = await prisma.application.create({
-      data: {
-        ...prepareDateFields(input),
-        status: "unsubmitted",
-      },
+      data,
       include: { interviewStages: true },
     });
 
@@ -105,9 +109,14 @@ export class ApplicationService {
       throw new AppError("not_found", 404, `Application ${id} not found`);
     }
 
+    const preparedData = prepareDateFields(input);
+    // When status is being set to 'unsubmitted', force dateApplied to null
+    if (input.status === "unsubmitted") {
+      (preparedData as Record<string, unknown>).dateApplied = null;
+    }
     const updated = await prisma.application.update({
       where: { id },
-      data: prepareDateFields(input),
+      data: preparedData,
       include: { interviewStages: { orderBy: { order: "asc" } } },
     });
 

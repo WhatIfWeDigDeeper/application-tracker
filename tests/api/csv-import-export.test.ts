@@ -68,7 +68,7 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(result.errors).toEqual([]);
 
       // Verify the application was created by listing
-      const listResponse = await fetch(`${API_BASE}/applications`);
+      const listResponse = await fetch(`${API_BASE}/applications?limit=100`);
       const listData = await listResponse.json();
       const created = listData.items.find(
         (a: Record<string, unknown>) => a.companyName === "CSV Test Corp"
@@ -105,14 +105,14 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(result.skipped).toBe(0);
 
       // Verify defaults
-      const listResponse = await fetch(`${API_BASE}/applications`);
+      const listResponse = await fetch(`${API_BASE}/applications?limit=100`);
       const listData = await listResponse.json();
       const created = listData.items.find(
         (a: Record<string, unknown>) => a.companyName === "Minimal Corp"
       );
       expect(created).toBeDefined();
       if (created) createdApplicationIds.push(created.id);
-      expect(created.status).toBe("applied");
+      expect(created.status).toBe("unsubmitted");
       expect(created.dateApplied).toBeNull();
     });
 
@@ -140,7 +140,7 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(result.errors[1].row).toBe(3); // Second data row
 
       // Clean up the valid row
-      const listResponse = await fetch(`${API_BASE}/applications`);
+      const listResponse = await fetch(`${API_BASE}/applications?limit=100`);
       const listData = await listResponse.json();
       const created = listData.items.find(
         (a: Record<string, unknown>) => a.companyName === "Valid Row"
@@ -205,7 +205,7 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(result.skipped).toBe(1); // Second row skipped
 
       // Clean up
-      const listResponse = await fetch(`${API_BASE}/applications`);
+      const listResponse = await fetch(`${API_BASE}/applications?limit=100`);
       const listData = await listResponse.json();
       const created = listData.items.find(
         (a: Record<string, unknown>) => a.companyName === "First Corp"
@@ -234,7 +234,7 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(result.skipped).toBe(0);
 
       // Clean up
-      const listResponse = await fetch(`${API_BASE}/applications`);
+      const listResponse = await fetch(`${API_BASE}/applications?limit=100`);
       const listData = await listResponse.json();
       for (const name of ["No URL Corp A", "No URL Corp B"]) {
         const created = listData.items.find(
@@ -284,8 +284,6 @@ describe("CSV Import/Export Integration Tests", () => {
         body: JSON.stringify({
           companyName: "Export Test Corp",
           positionTitle: "Export Role",
-          dateApplied: "2026-02-10",
-          status: "interviewing",
           salaryMin: 80000,
           salaryMax: 120000,
         }),
@@ -293,6 +291,13 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(createResponse.status).toBe(201);
       const createdApp = await createResponse.json();
       createdApplicationIds.push(createdApp.id);
+
+      // Set status and dateApplied via update (create defaults to unsubmitted with null date)
+      await fetch(`${API_BASE}/applications/${createdApp.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "interviewing", dateApplied: "2026-02-10" }),
+      });
 
       const response = await fetch(`${API_BASE}/applications/export`);
       expect(response.status).toBe(200);
@@ -323,7 +328,6 @@ describe("CSV Import/Export Integration Tests", () => {
         body: JSON.stringify({
           companyName: "Format Test Corp",
           positionTitle: "Format Role",
-          dateApplied: "2026-01-20",
           coverLetterRequired: true,
         }),
       });
@@ -331,11 +335,11 @@ describe("CSV Import/Export Integration Tests", () => {
       const createdApp = await createResponse.json();
       createdApplicationIds.push(createdApp.id);
 
-      // Set offerDueDate via update (not available on create)
+      // Set status, dateApplied, and offerDueDate via update (create defaults to unsubmitted)
       await fetch(`${API_BASE}/applications/${createdApp.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offerDueDate: "2026-04-01" }),
+        body: JSON.stringify({ status: "applied", dateApplied: "2026-01-20", offerDueDate: "2026-04-01" }),
       });
 
       const response = await fetch(`${API_BASE}/applications/export`);
@@ -384,7 +388,6 @@ describe("CSV Import/Export Integration Tests", () => {
         body: JSON.stringify({
           companyName: "Roundtrip Corp",
           positionTitle: "Roundtrip Role",
-          dateApplied: "2026-02-01",
           jobPostingUrl: uniqueUrl,
           skillsMatch: 3,
           coverLetterRequired: false,
@@ -431,7 +434,7 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(result.imported).toBe(1);
 
       // Verify the re-imported data
-      const listResponse = await fetch(`${API_BASE}/applications`);
+      const listResponse = await fetch(`${API_BASE}/applications?limit=100`);
       const listData = await listResponse.json();
       const reimported = listData.items.find(
         (a: Record<string, unknown>) => a.companyName === "Roundtrip Corp" && a.jobPostingUrl === uniqueUrl
@@ -439,7 +442,7 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(reimported).toBeDefined();
       if (reimported) createdApplicationIds.push(reimported.id);
       expect(reimported.positionTitle).toBe("Roundtrip Role");
-      expect(reimported.status).toBe("applied"); // DB default
+      expect(reimported.status).toBe("unsubmitted"); // DB default (create doesn't accept status)
       expect(reimported.skillsMatch).toBe(3);
       expect(reimported.salaryMin).toBe(70000);
     });

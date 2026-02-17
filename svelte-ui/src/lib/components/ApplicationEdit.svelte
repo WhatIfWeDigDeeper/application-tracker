@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto, beforeNavigate } from '$app/navigation';
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, untrack } from 'svelte';
   import type {
     Application,
     ApplicationStatus,
@@ -49,7 +49,7 @@
   let companyName = $state('');
   let positionTitle = $state('');
   let dateApplied = $state('');
-  let status = $state<ApplicationStatus>('applied');
+  let status = $state<ApplicationStatus>('unsubmitted');
   let companyUrl = $state('');
   let jobPostingUrl = $state('');
   let companyCareerUrl = $state('');
@@ -110,6 +110,19 @@
 
   function recaptureSnapshot() {
     snapshot = captureSnapshot();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Date-status enforcement
+  // ---------------------------------------------------------------------------
+  function handleStatusChange(newStatus: ApplicationStatus) {
+    const oldStatus = status;
+    status = newStatus;
+    if (newStatus === 'unsubmitted') {
+      dateApplied = '';
+    } else if (oldStatus === 'unsubmitted') {
+      dateApplied = new Date().toISOString().split('T')[0];
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -483,10 +496,12 @@
   }
 
   // Reactive effect: reload when id changes (e.g., from /new to /:id)
+  // Use untrack so only `id` is a dependency — loadApplication reads all form
+  // state via captureSnapshot() which would otherwise re-trigger this effect
+  // whenever any form field changes.
   $effect(() => {
-    // We access `id` to track it
     void id;
-    loadApplication();
+    untrack(() => loadApplication());
   });
 
   onMount(() => {
@@ -624,8 +639,10 @@
             <input
               id="dateApplied"
               type="date"
-              class="input mt-1"
-              bind:value={dateApplied}
+              class="input mt-1 {status === 'unsubmitted' ? 'opacity-50 cursor-not-allowed' : ''}"
+              value={dateApplied}
+              oninput={(e) => (dateApplied = (e.target as HTMLInputElement).value)}
+              disabled={status === 'unsubmitted'}
             />
           </div>
 
@@ -634,7 +651,8 @@
             <select
               id="status"
               class="input mt-1"
-              bind:value={status}
+              value={status}
+              onchange={(e) => handleStatusChange((e.target as HTMLSelectElement).value as ApplicationStatus)}
             >
               {#each ALL_STATUSES as s}
                 <option value={s}>{STATUS_LABELS[s]}</option>

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 // Application Status enum
 export const ApplicationStatusSchema = z.enum([
+  'unsubmitted',
   'applied',
   'rejected',
   'interviewing',

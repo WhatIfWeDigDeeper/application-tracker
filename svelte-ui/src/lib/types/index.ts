@@ -1,5 +1,6 @@
 // Application Status
 export type ApplicationStatus =
+  | 'unsubmitted'
   | 'applied'
   | 'rejected'
   | 'interviewing'
@@ -177,6 +178,7 @@ export interface PaginatedHistoryResponse {
 
 // Display helpers
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
+  unsubmitted: 'Unsubmitted',
   applied: 'Applied',
   rejected: 'Rejected',
   interviewing: 'Interviewing',
@@ -219,6 +221,7 @@ export const SOURCE_LABELS: Record<JobSource, string> = {
 };
 
 export const STATUS_COLORS: Record<ApplicationStatus, string> = {
+  unsubmitted: 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200',
   applied: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
   interviewing: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
   'given offer': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
@@ -229,6 +232,7 @@ export const STATUS_COLORS: Record<ApplicationStatus, string> = {
 };
 
 export const ALL_STATUSES: ApplicationStatus[] = [
+  'unsubmitted',
   'applied',
   'interviewing',
   'given offer',

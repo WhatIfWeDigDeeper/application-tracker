@@ -8,6 +8,7 @@ export const APPLICATION_STATUSES: {
   value: ApplicationStatus;
   label: string;
 }[] = [
+  { value: "unsubmitted", label: "Unsubmitted" },
   { value: "applied", label: "Applied" },
   { value: "interviewing", label: "Interviewing" },
   { value: "given offer", label: "Given Offer" },
@@ -53,6 +54,7 @@ export const JOB_SOURCES: { value: JobSource; label: string }[] = [
 ];
 
 export const STATUS_COLORS: Record<ApplicationStatus, string> = {
+  unsubmitted: "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200",
   applied: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   interviewing:
     "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",

@@ -75,7 +75,7 @@ export class CsvService {
           companyName: row.companyName,
           positionTitle: row.positionTitle,
           dateApplied: row.dateApplied ?? null,
-          status: row.status ?? 'applied',
+          status: row.status ?? 'unsubmitted',
           companyUrl: row.companyUrl ?? null,
           jobPostingUrl: row.jobPostingUrl ?? null,
           companyCareerUrl: row.companyCareerUrl ?? null,

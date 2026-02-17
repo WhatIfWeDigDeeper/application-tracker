@@ -233,8 +233,7 @@ export class ApplicationService {
 
   async createApplication(input: CreateApplicationInput): Promise<Application> {
     const id = uuid();
-    const dateApplied = input.dateApplied || null;
-
+    // Status defaults to 'unsubmitted'; force dateApplied to null for unsubmitted
     const result = await query<ApplicationRow>(
       `INSERT INTO applications (
         id, company_name, position_title, date_applied, status,
@@ -243,14 +242,14 @@ export class ApplicationService {
         cover_letter_required, special_requirements,
         salary_min, salary_max, notes
       ) VALUES (
-        $1, $2, $3, $4, 'applied',
+        $1, $2, $3, $4, 'unsubmitted',
         $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
       ) RETURNING *`,
       [
         id,
         input.companyName.trim(),
         input.positionTitle.trim(),
-        dateApplied,
+        null,
         input.companyUrl || null,
         input.jobPostingUrl || null,
         input.companyCareerUrl || null,
@@ -325,6 +324,21 @@ export class ApplicationService {
 
         updates.push(`${column} = $${paramIndex}`);
         params.push(value);
+        paramIndex++;
+      }
+    }
+
+    // If status is being set to 'unsubmitted', force dateApplied to null
+    if (input.status === "unsubmitted") {
+      // Check if dateApplied is already in the updates list
+      const dateAppliedIdx = updates.findIndex((u) => u.startsWith("date_applied"));
+      if (dateAppliedIdx >= 0) {
+        // Replace the existing value
+        params[dateAppliedIdx] = null;
+      } else {
+        // Add dateApplied = null to the updates
+        updates.push(`date_applied = $${paramIndex}`);
+        params.push(null);
         paramIndex++;
       }
     }

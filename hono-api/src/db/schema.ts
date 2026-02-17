@@ -6,6 +6,7 @@ export const svelteHonoSchema = pgSchema('svelte_hono');
 
 // Enums
 export const applicationStatusEnum = svelteHonoSchema.enum('application_status', [
+  'unsubmitted',
   'applied',
   'rejected',
   'interviewing',
@@ -53,7 +54,7 @@ export const applications = svelteHonoSchema.table('applications', {
   companyName: varchar('company_name', { length: 200 }).notNull(),
   positionTitle: varchar('position_title', { length: 200 }).notNull(),
   dateApplied: date('date_applied'),
-  status: applicationStatusEnum('status').notNull().default('applied'),
+  status: applicationStatusEnum('status').notNull().default('unsubmitted'),
   companyUrl: text('company_url'),
   jobPostingUrl: text('job_posting_url'),
   companyCareerUrl: text('company_career_url'),

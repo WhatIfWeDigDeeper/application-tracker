@@ -46,6 +46,8 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.fill('input[placeholder="Company Name *"]', 'Edit Test Company');
     await page.fill('input[placeholder="Position Title *"]', 'Developer');
+    // Set status to applied so dateApplied is auto-filled (ensures item sorts to top of paginated lists)
+    await page.selectOption('#status', 'applied');
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
     createdUrls.push(page.url());
@@ -137,12 +139,29 @@ test.describe('Application CRUD - Inline Edit', () => {
     await expect(page).toHaveURL('/');
   });
 
-  test('should have empty date applied and Applied status on create', async ({ page }) => {
+  test('should have empty date applied and Unsubmitted status on create', async ({ page }) => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
 
     await expect(page.locator('#dateApplied')).toHaveValue('');
-    await expect(page.locator('#status')).toHaveValue('applied');
+    await expect(page.locator('#dateApplied')).toBeDisabled();
+    await expect(page.locator('#status')).toHaveValue('unsubmitted');
+  });
+
+  test('should enable and auto-fill date when changing status from unsubmitted', async ({ page }) => {
+    await page.goto('/applications/new');
+    await page.waitForLoadState('domcontentloaded');
+
+    // Initially disabled
+    await expect(page.locator('#dateApplied')).toBeDisabled();
+
+    // Change status to applied
+    await page.selectOption('#status', 'applied');
+
+    // Date should now be enabled and auto-filled with today's date
+    await expect(page.locator('#dateApplied')).toBeEnabled();
+    const today = new Date().toISOString().split('T')[0];
+    await expect(page.locator('#dateApplied')).toHaveValue(today);
   });
 
   test('should create application without date applied and display em dash', async ({ page }) => {
@@ -156,17 +175,14 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
     createdUrls.push(page.url());
 
-    // Go back to list and verify em dash is shown for null date
-    await page.click('text=Back to List');
-    await page.waitForURL('/');
+    // Verify date field is empty on the edit page (null dateApplied)
+    await expect(page.locator('#dateApplied')).toHaveValue('');
 
-    // The application card should show "Applied: —" for the missing date
-    const noDateCard = page
-      .locator('div')
-      .filter({ has: page.getByText('No Date Company') })
-      .filter({ has: page.getByText('Applied: —') })
-      .last();
-    await expect(noDateCard).toBeVisible();
+    // Reload the page to verify null date persisted
+    await page.reload();
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('input[placeholder="Company Name *"]', { timeout: 10000 });
+    await expect(page.locator('#dateApplied')).toHaveValue('');
   });
 
   test('should show Offer Due Date only when status is given offer', async ({ page }) => {

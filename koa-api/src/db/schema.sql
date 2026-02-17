@@ -12,6 +12,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA react_koa;
 
 -- Application Status enum type
 CREATE TYPE application_status AS ENUM (
+  'unsubmitted',
   'applied',
   'rejected',
   'interviewing',
@@ -61,7 +62,7 @@ CREATE TABLE IF NOT EXISTS applications (
   company_name VARCHAR(200) NOT NULL,
   position_title VARCHAR(200) NOT NULL,
   date_applied DATE DEFAULT NULL,
-  status application_status NOT NULL DEFAULT 'applied',
+  status application_status NOT NULL DEFAULT 'unsubmitted',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   company_url TEXT,

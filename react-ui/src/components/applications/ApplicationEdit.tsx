@@ -54,7 +54,7 @@ function initialFormState(): FormState {
     companyName: "",
     positionTitle: "",
     dateApplied: "",
-    status: "applied",
+    status: "unsubmitted",
     companyUrl: "",
     jobPostingUrl: "",
     companyCareerUrl: "",
@@ -300,7 +300,18 @@ export function ApplicationEdit() {
     field: K,
     value: FormState[K]
   ) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => {
+      const updated = { ...prev, [field]: value };
+      // Date-status enforcement
+      if (field === "status") {
+        if (value === "unsubmitted") {
+          updated.dateApplied = "";
+        } else if (prev.status === "unsubmitted" && value !== "unsubmitted") {
+          updated.dateApplied = new Date().toISOString().split("T")[0];
+        }
+      }
+      return updated;
+    });
   };
 
   // -------------------------------------------------------------------------
@@ -692,7 +703,10 @@ export function ApplicationEdit() {
               type="date"
               value={form.dateApplied}
               onChange={(e) => updateField("dateApplied", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              disabled={form.status === "unsubmitted"}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
+                form.status === "unsubmitted" ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             />
           </div>
 

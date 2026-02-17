@@ -114,7 +114,8 @@ export class ApplicationsService {
   }
 
   async createApplication(input: CreateApplicationInput): Promise<ApplicationResponse> {
-    const dateApplied = input.dateApplied || null;
+    // Default status is 'unsubmitted' (DB default); force dateApplied to null for unsubmitted
+    const dateApplied = null;
 
     const [app] = await this.db
       .insert(applications)
@@ -156,6 +157,11 @@ export class ApplicationsService {
     if (input.positionTitle !== undefined) updateValues.positionTitle = input.positionTitle;
     if (input.dateApplied !== undefined) updateValues.dateApplied = input.dateApplied;
     if (input.status !== undefined) updateValues.status = input.status;
+
+    // If status is being set to 'unsubmitted', force dateApplied to null
+    if (input.status === 'unsubmitted') {
+      updateValues.dateApplied = null;
+    }
     if (input.companyUrl !== undefined) updateValues.companyUrl = input.companyUrl;
     if (input.jobPostingUrl !== undefined) updateValues.jobPostingUrl = input.jobPostingUrl;
     if (input.companyCareerUrl !== undefined) updateValues.companyCareerUrl = input.companyCareerUrl;
