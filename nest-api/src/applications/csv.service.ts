@@ -4,7 +4,7 @@ import { DRIZZLE, type DrizzleDB } from '../database/database.provider.js';
 import { applications } from '../database/schema.js';
 import { HistoryService, buildDescription } from './history.service.js';
 import { CsvRowSchema, type ImportResult } from '../types/api.js';
-import { isNotNull } from 'drizzle-orm';
+import { isNotNull, sql } from 'drizzle-orm';
 
 const CSV_COLUMNS = [
   'companyName', 'positionTitle', 'dateApplied', 'status',
@@ -104,7 +104,7 @@ export class CsvService {
     const rows = await this.db
       .select()
       .from(applications)
-      .orderBy(applications.dateApplied);
+      .orderBy(sql`${applications.dateApplied} NULLS LAST`);
 
     const csvRows = rows.map(app => ({
       companyName: app.companyName,
@@ -130,7 +130,7 @@ export class CsvService {
 
   getSampleCsv(): string {
     const header = CSV_COLUMNS.join(',');
-    const example = 'Acme Corp,Software Engineer,2026-01-15,applied,https://acme.com,https://acme.com/jobs/123,https://acme.com/careers,ai,4,linkedin,false,Must have 3+ years React experience,80000,120000,Great company culture,2026-03-01';
+    const example = 'Acme Corp,Software Engineer,2026-01-15,applied,https://acme.com,https://acme.com/jobs/123,https://acme.com/careers,ai,4,linkedin,false,Must have 3+ years React experience,80000,120000,Great company culture,';
     return `${header}\n${example}\n`;
   }
 }

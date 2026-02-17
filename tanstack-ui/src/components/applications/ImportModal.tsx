@@ -37,12 +37,12 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
     <Modal isOpen={isOpen} onClose={handleClose} title="Import Applications" size="md">
       {!result ? (
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Upload a CSV file to import applications.{" "}
             <a
               href={getSampleCsvUrl()}
               download
-              className="text-blue-600 hover:text-blue-800 underline"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
             >
               Download template
             </a>
@@ -52,8 +52,13 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
             type="file"
             accept=".csv"
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-400 dark:hover:file:bg-blue-900/50"
           />
+          {importMutation.isError && (
+            <p className="text-sm text-red-600 dark:text-red-400">
+              Import failed: {importMutation.error instanceof Error ? importMutation.error.message : "An unexpected error occurred"}
+            </p>
+          )}
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={handleClose}>
               Cancel

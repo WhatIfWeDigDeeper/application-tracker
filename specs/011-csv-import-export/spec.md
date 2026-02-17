@@ -148,7 +148,7 @@ companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCar
 | skillsMatch | No | integer 1-5 | |
 | jobSource | No | enum value | One of 7 source values |
 | coverLetterRequired | No | `true` / `false` | |
-| specialRequirements | No | string (max 1000) | |
+| specialRequirements | No | string (max 5000) | |
 | salaryMin | No | integer >= 0 | |
 | salaryMax | No | integer >= 0 | |
 | notes | No | string (max 5000) | |
