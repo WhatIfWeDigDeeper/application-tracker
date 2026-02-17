@@ -9,7 +9,7 @@ import {
   useRestoreApplication,
   useDeleteApplication,
 } from "../queries/applicationMutations";
-import { ApplicationList, FilterBar } from "../components/applications";
+import { ApplicationList, FilterBar, ImportModal } from "../components/applications";
 
 export const Route = createFileRoute("/")({
   component: ListPage,
@@ -30,6 +30,7 @@ function ListPage() {
 
   const { sorting, setSortBy, toggleSortDir } = useSorting();
   const [currentPage, setCurrentPage] = useState(1);
+  const [isImportOpen, setImportOpen] = useState(false);
 
   const params: ListApplicationsParams = {
     status: filters.status.length > 0 ? filters.status.join(",") : undefined,
@@ -109,7 +110,9 @@ function ListPage() {
           onClearFilters={handleClearFilters}
           hasActiveFilters={hasActiveFilters}
           activeFilterCount={activeFilterCount}
+          onImportClick={() => setImportOpen(true)}
         />
+        <ImportModal isOpen={isImportOpen} onClose={() => setImportOpen(false)} />
       </div>
 
       {/* Application List */}

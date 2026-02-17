@@ -13,6 +13,11 @@ async function bootstrap(): Promise<void> {
     new FastifyAdapter(),
   );
 
+  await app.register(
+    (await import('@fastify/multipart')).default,
+    { limits: { fileSize: 1_048_576 } },
+  );
+
   app.enableCors({
     origin: ['http://localhost:3050'],
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],

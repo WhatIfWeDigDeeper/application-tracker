@@ -139,6 +139,12 @@ export interface SortState {
   sortDir: "asc" | "desc";
 }
 
+export interface ImportResult {
+  imported: number;
+  skipped: number;
+  errors: Array<{ row: number; message: string }>;
+}
+
 export interface ErrorResponse {
   code: "validation_error" | "not_found" | "internal_error";
   message: string;

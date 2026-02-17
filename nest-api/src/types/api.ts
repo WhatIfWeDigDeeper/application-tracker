@@ -96,7 +96,7 @@ export const ApplicationSchema = z.object({
   skillsMatch: z.number().int().min(1).max(5).nullable(),
   jobSource: JobSourceSchema.nullable(),
   coverLetterRequired: z.boolean().nullable(),
-  specialRequirements: z.string().max(1000).nullable(),
+  specialRequirements: z.string().max(5000).nullable(),
   salaryMin: z.number().int().min(0).nullable(),
   salaryMax: z.number().int().min(0).nullable(),
   notes: z.string().max(5000).nullable(),
@@ -117,7 +117,7 @@ export const CreateApplicationSchema = z.object({
   skillsMatch: z.number().int().min(1).max(5).optional(),
   jobSource: JobSourceSchema.optional(),
   coverLetterRequired: z.boolean().optional(),
-  specialRequirements: z.string().max(1000).optional(),
+  specialRequirements: z.string().max(5000).optional(),
   salaryMin: z.number().int().min(0).optional(),
   salaryMax: z.number().int().min(0).optional(),
   notes: z.string().max(5000).optional(),
@@ -136,7 +136,7 @@ export const UpdateApplicationSchema = z.object({
   skillsMatch: z.number().int().min(1).max(5).nullable().optional(),
   jobSource: JobSourceSchema.nullable().optional(),
   coverLetterRequired: z.boolean().nullable().optional(),
-  specialRequirements: z.string().max(1000).nullable().optional(),
+  specialRequirements: z.string().max(5000).nullable().optional(),
   salaryMin: z.number().int().min(0).nullable().optional(),
   salaryMax: z.number().int().min(0).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
@@ -196,6 +196,44 @@ export type PaginatedHistoryResponse = z.infer<typeof PaginatedHistorySchema>;
 export const RestoreRequestSchema = z.object({
   sequence: z.number().int().min(1),
 });
+
+// CSV Import types
+export const CsvRowSchema = z.object({
+  companyName: z.string().min(1).max(200),
+  positionTitle: z.string().min(1).max(200),
+  dateApplied: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD format').optional(),
+  status: ApplicationStatusSchema.optional(),
+  companyUrl: z.string().url().optional(),
+  jobPostingUrl: z.string().url().optional(),
+  companyCareerUrl: z.string().url().optional(),
+  companyCategory: CompanyCategorySchema.optional(),
+  skillsMatch: z.coerce.number().int().min(1).max(5).optional(),
+  jobSource: JobSourceSchema.optional(),
+  coverLetterRequired: z.preprocess(
+    (val) => {
+      if (typeof val === 'string') {
+        const lower = val.toLowerCase();
+        if (lower === 'true') return true;
+        if (lower === 'false') return false;
+      }
+      return val;
+    },
+    z.boolean().optional(),
+  ),
+  specialRequirements: z.string().max(5000).optional(),
+  salaryMin: z.coerce.number().int().min(0).optional(),
+  salaryMax: z.coerce.number().int().min(0).optional(),
+  notes: z.string().max(5000).optional(),
+  offerDueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD format').optional(),
+});
+
+export type CsvRow = z.infer<typeof CsvRowSchema>;
+
+export interface ImportResult {
+  imported: number;
+  skipped: number;
+  errors: Array<{ row: number; message: string }>;
+}
 
 // Error response
 export const ErrorResponseSchema = z.object({

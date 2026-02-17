@@ -210,7 +210,7 @@ describe('Validation Service', () => {
         const input: CreateApplicationInput = {
           companyName: 'Acme',
           positionTitle: 'Engineer',
-          specialRequirements: 'A'.repeat(1001),
+          specialRequirements: 'A'.repeat(5001),
         };
 
         const result = validateApplication(input, true);

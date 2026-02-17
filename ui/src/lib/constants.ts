@@ -141,7 +141,7 @@ export const VALIDATION_LIMITS = {
   companyName: { max: 200 },
   positionTitle: { max: 200 },
   stageName: { max: 100 },
-  specialRequirements: { max: 1000 },
+  specialRequirements: { max: 5000 },
   notes: { max: 5000 },
   stageNotes: { max: 2000 },
   skillsMatch: { min: 1, max: 5 },

@@ -9,6 +9,7 @@ import type {
   ListApplicationsParams,
   ErrorResponse,
   PaginatedHistoryResponse,
+  ImportResult,
 } from "../types/application";
 
 const API_BASE_URL = "/api";
@@ -191,6 +192,25 @@ export async function restoreToVersion(
     }
   );
   return handleResponse(response);
+}
+
+// CSV Import/Export
+export async function importApplicationsCsv(file: File): Promise<ImportResult> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await fetch(`${API_BASE_URL}/applications/import`, {
+    method: 'POST',
+    body: formData,
+  });
+  return handleResponse<ImportResult>(response);
+}
+
+export function getExportUrl(): string {
+  return `${API_BASE_URL}/applications/export`;
+}
+
+export function getSampleCsvUrl(): string {
+  return `${API_BASE_URL}/applications/sample-csv`;
 }
 
 export { ApiError };

@@ -11,6 +11,7 @@ import {
   COMPANY_CATEGORIES,
   JOB_SOURCES,
 } from "../../lib/constants";
+import { getExportUrl, getSampleCsvUrl } from "../../services/api";
 
 interface FilterBarProps {
   filters: FilterState;
@@ -27,6 +28,7 @@ interface FilterBarProps {
   onClearFilters: () => void;
   hasActiveFilters: boolean;
   activeFilterCount: number;
+  onImportClick: () => void;
 }
 
 const SORT_OPTIONS = [
@@ -58,6 +60,7 @@ export function FilterBar({
   onClearFilters,
   hasActiveFilters,
   activeFilterCount,
+  onImportClick,
 }: FilterBarProps) {
   return (
     <div className="space-y-4">
@@ -147,6 +150,24 @@ export function FilterBar({
         </div>
 
         <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={onImportClick}>
+            Import CSV
+          </Button>
+          <a
+            href={getExportUrl()}
+            download
+            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 text-sm"
+          >
+            Export CSV
+          </a>
+          <a
+            href={getSampleCsvUrl()}
+            download
+            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 text-sm"
+          >
+            Template
+          </a>
+          <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
           <Select
             value={sorting.sortBy}
             onChange={(e) =>
