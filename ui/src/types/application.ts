@@ -65,7 +65,7 @@ export interface JobApplication {
   id: string;
   companyName: string;
   positionTitle: string;
-  dateApplied: string;
+  dateApplied: string | null;
   status: ApplicationStatus;
   createdAt: string;
   updatedAt: string;
@@ -102,7 +102,7 @@ export interface StorageSchema {
 export interface CreateApplicationInput {
   companyName: string;
   positionTitle: string;
-  dateApplied?: string;
+  dateApplied?: string | null;
   companyUrl?: string;
   jobPostingUrl?: string;
   companyCareerUrl?: string;
@@ -119,7 +119,7 @@ export interface CreateApplicationInput {
 export interface UpdateApplicationInput {
   companyName?: string;
   positionTitle?: string;
-  dateApplied?: string;
+  dateApplied?: string | null;
   status?: ApplicationStatus;
   companyUrl?: string;
   jobPostingUrl?: string;

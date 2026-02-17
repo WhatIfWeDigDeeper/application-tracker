@@ -80,9 +80,12 @@ export class ApplicationsService {
     const total = Number(countResult[0]?.count || 0);
 
     const offset = (page - 1) * limit;
+    const orderExpr = sortBy === 'dateApplied'
+      ? sql`${sortColumn} ${sql.raw(sortDir === 'asc' ? 'ASC' : 'DESC')} NULLS LAST`
+      : orderFn(sortColumn);
     const apps = await this.db.query.applications.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
-      orderBy: [orderFn(sortColumn)],
+      orderBy: [orderExpr],
       limit,
       offset,
       with: {
@@ -111,7 +114,7 @@ export class ApplicationsService {
   }
 
   async createApplication(input: CreateApplicationInput): Promise<ApplicationResponse> {
-    const dateApplied = input.dateApplied || new Date().toISOString().split('T')[0];
+    const dateApplied = input.dateApplied || null;
 
     const [app] = await this.db
       .insert(applications)

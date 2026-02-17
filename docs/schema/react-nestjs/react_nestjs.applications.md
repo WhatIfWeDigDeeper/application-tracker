@@ -9,7 +9,7 @@
 | id | uuid |  | false | [react_nestjs.application_history](react_nestjs.application_history.md) [react_nestjs.interview_stages](react_nestjs.interview_stages.md) |  |  |
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
-| date_applied | date |  | false |  |  |  |
+| date_applied | date |  | true |  |  |  |
 | status | react_nestjs.application_status | 'applied'::react_nestjs.application_status | false |  |  |  |
 | company_url | text |  | true |  |  |  |
 | job_posting_url | text |  | true |  |  |  |
@@ -33,7 +33,6 @@
 | ---- | ---- | ---------- |
 | applications_company_name_not_null | n | NOT NULL company_name |
 | applications_created_at_not_null | n | NOT NULL created_at |
-| applications_date_applied_not_null | n | NOT NULL date_applied |
 | applications_id_not_null | n | NOT NULL id |
 | applications_is_archived_not_null | n | NOT NULL is_archived |
 | applications_position_title_not_null | n | NOT NULL position_title |

@@ -118,7 +118,7 @@
   function populateFromApplication(app: Application) {
     companyName = app.companyName;
     positionTitle = app.positionTitle;
-    dateApplied = app.dateApplied;
+    dateApplied = app.dateApplied || '';
     status = app.status;
     companyUrl = app.companyUrl || '';
     jobPostingUrl = app.jobPostingUrl || '';
@@ -237,7 +237,7 @@
 
     try {
       if (isEditMode && application) {
-        const input = buildInput();
+        const input = { ...buildInput(), dateApplied: dateApplied || null };
         const updated = await api.updateApplication(application.id, input);
         application = updated;
         recaptureSnapshot();
@@ -475,8 +475,8 @@
         loading = false;
       }
     } else {
-      // Create mode: default date to today
-      dateApplied = new Date().toISOString().split('T')[0];
+      // Create mode: no default date
+      dateApplied = '';
     }
 
     recaptureSnapshot();

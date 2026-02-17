@@ -9,7 +9,7 @@
 | id | uuid |  | false | [vue_nuxt.interview_stages](vue_nuxt.interview_stages.md) [vue_nuxt.application_events](vue_nuxt.application_events.md) [vue_nuxt.application_snapshots](vue_nuxt.application_snapshots.md) |  |  |
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
-| date_applied | date |  | false |  |  |  |
+| date_applied | date |  | true |  |  |  |
 | status | vue_nuxt.application_status | 'applied'::vue_nuxt.application_status | false |  |  |  |
 | company_url | text |  | true |  |  |  |
 | job_posting_url | text |  | true |  |  |  |
@@ -33,7 +33,6 @@
 | ---- | ---- | ---------- |
 | applications_company_name_not_null | n | NOT NULL company_name |
 | applications_created_at_not_null | n | NOT NULL created_at |
-| applications_date_applied_not_null | n | NOT NULL date_applied |
 | applications_id_not_null | n | NOT NULL id |
 | applications_is_archived_not_null | n | NOT NULL is_archived |
 | applications_position_title_not_null | n | NOT NULL position_title |

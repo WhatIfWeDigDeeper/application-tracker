@@ -39,7 +39,7 @@ classDiagram
     +id: string
     +companyName: string
     +positionTitle: string
-    +dateApplied: string
+    +dateApplied: string or null
     +status: ApplicationStatus
     +createdAt: string
     +updatedAt: string
@@ -63,7 +63,7 @@ classDiagram
     <<interface>>
     +companyName: string
     +positionTitle: string
-    -dateApplied?: string
+    -dateApplied?: string or null
     -companyUrl?: string
     -jobPostingUrl?: string
     -companyCareerUrl?: string
@@ -81,7 +81,7 @@ classDiagram
     <<interface>>
     -companyName?: string
     -positionTitle?: string
-    -dateApplied?: string
+    -dateApplied?: string or null
     -status?: ApplicationStatus
     -companyUrl?: string or null
     -jobPostingUrl?: string or null

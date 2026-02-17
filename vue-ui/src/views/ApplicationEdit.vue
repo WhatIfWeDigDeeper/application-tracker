@@ -121,7 +121,7 @@ function recaptureSnapshot() {
 function populateFromApplication(app: Application) {
   companyName.value = app.companyName;
   positionTitle.value = app.positionTitle;
-  dateApplied.value = app.dateApplied;
+  dateApplied.value = app.dateApplied || '';
   status.value = app.status;
   companyUrl.value = app.companyUrl || '';
   jobPostingUrl.value = app.jobPostingUrl || '';
@@ -212,7 +212,7 @@ function buildInput(): CreateApplicationInput & { status?: ApplicationStatus; of
   return {
     companyName: companyName.value.trim(),
     positionTitle: positionTitle.value.trim(),
-    dateApplied: dateApplied.value || undefined,
+    dateApplied: dateApplied.value || null,
     status: status.value,
     companyUrl: companyUrl.value || undefined,
     jobPostingUrl: jobPostingUrl.value || undefined,
@@ -500,9 +500,6 @@ async function loadApplication() {
     if (application.value) {
       populateFromApplication(application.value);
     }
-  } else {
-    // Create mode: default date to today
-    dateApplied.value = new Date().toISOString().split('T')[0];
   }
 
   recaptureSnapshot();

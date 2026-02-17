@@ -39,7 +39,7 @@ classDiagram
     +id: string
     +companyName: string
     +positionTitle: string
-    +dateApplied: string
+    +dateApplied: string or null
     +status: ApplicationStatus
     +createdAt: string
     +updatedAt: string
@@ -81,7 +81,7 @@ classDiagram
     <<interface>>
     -companyName?: string
     -positionTitle?: string
-    -dateApplied?: string
+    -dateApplied?: string or null
     -status?: ApplicationStatus
     -companyUrl?: string or null
     -jobPostingUrl?: string or null
@@ -145,6 +145,31 @@ classDiagram
     -details?: Array~Object~
   }
 
+  class FieldChange {
+    <<interface>>
+    +field: string
+    +label: string
+    +oldValue: unknown
+    +newValue: unknown
+  }
+
+  class HistoryEntry {
+    <<interface>>
+    +id: string
+    +sequence: number
+    +description: string
+    +changes: FieldChangeArray~~
+    +createdAt: string
+  }
+
+  class PaginatedHistoryResponse {
+    <<interface>>
+    +entries: HistoryEntryArray~~
+    +total: number
+    +page: number
+    +limit: number
+  }
+
   Application --* ApplicationStatus : status
   Application --* InterviewStage : interviewStages
   CreateApplicationInput --* CompanyCategory : companyCategory
@@ -152,3 +177,5 @@ classDiagram
   UpdateApplicationInput --* ApplicationStatus : status
   FilterState --* CompanyCategory : companyCategory
   FilterState --* JobSource : jobSource
+  HistoryEntry --* FieldChange : changes
+  PaginatedHistoryResponse --* HistoryEntry : entries

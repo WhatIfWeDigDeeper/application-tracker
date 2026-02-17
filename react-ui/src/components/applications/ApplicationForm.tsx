@@ -13,7 +13,7 @@ import {
   COMPANY_CATEGORIES,
   JOB_SOURCES,
 } from "../../lib/constants";
-import { getTodayDate } from "../../lib/utils";
+
 
 interface ApplicationFormProps {
   application?: Application | null;
@@ -56,7 +56,7 @@ export function ApplicationForm({
   const [formData, setFormData] = useState<FormData>({
     companyName: "",
     positionTitle: "",
-    dateApplied: getTodayDate(),
+    dateApplied: "",
     status: "applied",
     companyUrl: "",
     jobPostingUrl: "",
@@ -80,7 +80,7 @@ export function ApplicationForm({
       setFormData({
         companyName: application.companyName,
         positionTitle: application.positionTitle,
-        dateApplied: application.dateApplied,
+        dateApplied: application.dateApplied || "",
         status: application.status,
         companyUrl: application.companyUrl || "",
         jobPostingUrl: application.jobPostingUrl || "",

@@ -14,7 +14,7 @@
   // Form state
   let companyName = $state(application?.companyName || '');
   let positionTitle = $state(application?.positionTitle || '');
-  let dateApplied = $state(application?.dateApplied || new Date().toISOString().split('T')[0]);
+  let dateApplied = $state(application?.dateApplied || '');
   let companyUrl = $state(application?.companyUrl || '');
   let jobPostingUrl = $state(application?.jobPostingUrl || '');
   let companyCareerUrl = $state(application?.companyCareerUrl || '');
@@ -42,7 +42,7 @@
         const input: UpdateApplicationInput = {
           companyName,
           positionTitle,
-          dateApplied,
+          dateApplied: dateApplied || null,
           companyUrl: companyUrl || null,
           jobPostingUrl: jobPostingUrl || null,
           companyCareerUrl: companyCareerUrl || null,
@@ -60,7 +60,7 @@
         const input: CreateApplicationInput = {
           companyName,
           positionTitle,
-          dateApplied,
+          dateApplied: dateApplied || undefined,
           companyUrl: companyUrl || undefined,
           jobPostingUrl: jobPostingUrl || undefined,
           companyCareerUrl: companyCareerUrl || undefined,

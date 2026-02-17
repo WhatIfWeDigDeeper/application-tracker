@@ -49,7 +49,7 @@ export const JobSourceSchema = z.enum([
 export const CreateApplicationSchema = z.object({
   companyName: z.string().min(1).max(200),
   positionTitle: z.string().min(1).max(200),
-  dateApplied: z.string().optional(),
+  dateApplied: z.string().nullable().optional(),
   companyUrl: z.string().url().optional(),
   jobPostingUrl: z.string().url().optional(),
   companyCareerUrl: z.string().url().optional(),
@@ -67,7 +67,7 @@ export const CreateApplicationSchema = z.object({
 export const UpdateApplicationSchema = z.object({
   companyName: z.string().min(1).max(200).optional(),
   positionTitle: z.string().min(1).max(200).optional(),
-  dateApplied: z.string().optional(),
+  dateApplied: z.string().nullable().optional(),
   status: ApplicationStatusSchema.optional(),
   companyUrl: z.string().url().nullable().optional(),
   jobPostingUrl: z.string().url().nullable().optional(),

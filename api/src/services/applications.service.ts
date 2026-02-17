@@ -20,15 +20,16 @@ interface ListApplicationsResult {
 }
 
 // Convert date-only strings (YYYY-MM-DD) to ISO datetime for Prisma
-function toISODateTime(dateStr: string | undefined): Date | undefined {
+function toISODateTime(dateStr: string | null | undefined): Date | null | undefined {
+  if (dateStr === null) return null;
   if (!dateStr) return undefined;
   return new Date(`${dateStr}T00:00:00.000Z`);
 }
 
 function prepareDateFields<T extends Record<string, unknown>>(input: T): T {
   const result = { ...input };
-  if ('dateApplied' in result && typeof result.dateApplied === 'string') {
-    (result as Record<string, unknown>).dateApplied = toISODateTime(result.dateApplied as string);
+  if ('dateApplied' in result && (typeof result.dateApplied === 'string' || result.dateApplied === null)) {
+    (result as Record<string, unknown>).dateApplied = toISODateTime(result.dateApplied as string | null);
   }
   if ('offerDueDate' in result && typeof result.offerDueDate === 'string') {
     (result as Record<string, unknown>).offerDueDate = toISODateTime(result.offerDueDate as string);

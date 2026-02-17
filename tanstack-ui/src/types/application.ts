@@ -52,7 +52,7 @@ export interface Application {
   id: string;
   companyName: string;
   positionTitle: string;
-  dateApplied: string;
+  dateApplied: string | null;
   status: ApplicationStatus;
   createdAt: string;
   updatedAt: string;

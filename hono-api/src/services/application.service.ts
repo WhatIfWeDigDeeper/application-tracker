@@ -65,6 +65,7 @@ export async function listApplications(query: ListApplicationsQuery): Promise<Pa
   }[sortBy];
 
   const orderFn = sortDir === 'asc' ? asc : desc;
+  const nullsLast = (col: typeof sortColumn): ReturnType<typeof sql> => sql`${orderFn(col)} NULLS LAST`;
 
   // Get total count
   const countResult = await db
@@ -78,7 +79,7 @@ export async function listApplications(query: ListApplicationsQuery): Promise<Pa
   const offset = (page - 1) * limit;
   const apps = await db.query.applications.findMany({
     where: conditions.length > 0 ? and(...conditions) : undefined,
-    orderBy: [orderFn(sortColumn)],
+    orderBy: [sortBy === 'dateApplied' ? nullsLast(sortColumn) : orderFn(sortColumn)],
     limit,
     offset,
     with: {
@@ -107,7 +108,7 @@ export async function getApplication(id: string): Promise<ApplicationResponse | 
 }
 
 export async function createApplication(input: CreateApplicationInput): Promise<ApplicationResponse> {
-  const dateApplied = input.dateApplied || new Date().toISOString().split('T')[0];
+  const dateApplied = input.dateApplied || null;
 
   const [app] = await db
     .insert(applications)

@@ -14,8 +14,8 @@ export function generateId(): string {
 /**
  * Format an ISO date string for display
  */
-export function formatDate(isoString: string): string {
-  if (!isoString) return '';
+export function formatDate(isoString: string | null | undefined): string {
+  if (!isoString) return '\u2014';
   return new Date(isoString).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',

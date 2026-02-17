@@ -16,7 +16,7 @@ interface ApplicationRow {
   id: string;
   company_name: string;
   position_title: string;
-  date_applied: Date;
+  date_applied: Date | null;
   status: string;
   created_at: Date;
   updated_at: Date;
@@ -61,7 +61,7 @@ function toApplication(row: ApplicationRow, stages: InterviewStage[] = []): Appl
     id: row.id,
     companyName: row.company_name,
     positionTitle: row.position_title,
-    dateApplied: formatDate(row.date_applied)!,
+    dateApplied: formatDate(row.date_applied),
     status: row.status as Application["status"],
     createdAt: formatDateTime(row.created_at),
     updatedAt: formatDateTime(row.updated_at),
@@ -168,7 +168,7 @@ export class ApplicationService {
       updatedAt: "updated_at",
     };
     const sortColumn = sortColumnMap[sortBy] || "date_applied";
-    const orderClause = `ORDER BY ${sortColumn} ${sortDir.toUpperCase()}`;
+    const orderClause = `ORDER BY ${sortColumn} ${sortDir.toUpperCase()} NULLS LAST`;
 
     // Count query
     const countResult = await query<{ count: string }>(
@@ -233,8 +233,7 @@ export class ApplicationService {
 
   async createApplication(input: CreateApplicationInput): Promise<Application> {
     const id = uuid();
-    const now = new Date();
-    const dateApplied = input.dateApplied || now.toISOString().split("T")[0];
+    const dateApplied = input.dateApplied || null;
 
     const result = await query<ApplicationRow>(
       `INSERT INTO applications (
