@@ -36,12 +36,13 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 ## Code Quality Requirements
 
-**Always complete the full validation chain before committing**. Re-run the entire chain after every round of changes — not just the initial implementation. Fixing a bug introduced during review still requires the full chain.
+**Always complete the full validation chain before committing** — `tsc --noEmit` alone is not sufficient. Re-run the entire chain after every round of changes — not just the initial implementation. Fixing a bug introduced during review still requires the full chain.
 
 1. **Add tests** - Create or update tests for new functionality
-2. **Run tests** - Execute `npm test` to verify all tests pass
-3. **Run linting** - Execute `npm run lint` to check code style
-4. **Run build** - Execute `npm run build` to verify compilation
+2. **Build** - `npm run build` (runs per-package build; catches compilation errors)
+3. **Lint** - `npm run lint` (ESLint across all packages)
+4. **Test** - `npm test` (unit/integration tests — catches logic errors `tsc` misses)
+5. **E2E** *(when UI/API behavior changed)* - `npm run test:e2e` (or stack-specific variant)
 
 **Skip when:** trivial changes (all steps), test-only changes (step 1), docs-only changes (all steps).
 
@@ -65,6 +66,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Svelte 5 bind:value**: Doesn't propagate with callback `onchange` — use local `$state` + `$effect`, call callback in `oninput`
 - **Shared E2E history tests**: `history.spec.ts` has a single `History Panel` block shared by Vue and Svelte; stacks without history use `--grep-invert 'History Panel'`
 - **Avoid absolute positioning for sibling elements**: When multiple elements share the same corner (e.g., badge + action menu), use flexbox flow instead of `absolute` — prevents overlap
+- **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
 
 ## Vue.js Patterns
 

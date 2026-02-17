@@ -27,6 +27,9 @@
 - Skills index (reuse Claude skills): `.github/agents/skills-index.md`
 - Agent operating guide: `.github/agents/AGENT.md`
 
+## Cross-Cutting Patterns
+- **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
+
 ## When in Doubt
 - Mirror existing implementations; prefer incremental changes with tests.
 - Link to `.claude/skills` via the skills index instead of rewriting guidance.
