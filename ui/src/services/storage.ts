@@ -122,9 +122,11 @@ export function getApplications(
 
       switch (sort.field) {
         case 'dateApplied': {
-          const aTime = a.dateApplied ? new Date(a.dateApplied).getTime() : -Infinity;
-          const bTime = b.dateApplied ? new Date(b.dateApplied).getTime() : -Infinity;
-          comparison = aTime - bTime;
+          const aNull = !a.dateApplied;
+          const bNull = !b.dateApplied;
+          if (aNull !== bNull) return aNull ? 1 : -1; // nulls always last
+          if (aNull) return 0;
+          comparison = new Date(a.dateApplied!).getTime() - new Date(b.dateApplied!).getTime();
           break;
         }
         case 'companyName':
@@ -142,13 +144,13 @@ export function getApplications(
     });
   } else {
     // Default: sort by date applied, newest first
-    applications.sort(
-      (a, b) => {
-        const aTime = a.dateApplied ? new Date(a.dateApplied).getTime() : -Infinity;
-        const bTime = b.dateApplied ? new Date(b.dateApplied).getTime() : -Infinity;
-        return bTime - aTime;
-      }
-    );
+    applications.sort((a, b) => {
+      const aNull = !a.dateApplied;
+      const bNull = !b.dateApplied;
+      if (aNull !== bNull) return aNull ? 1 : -1; // nulls always last
+      if (aNull) return 0;
+      return new Date(b.dateApplied!).getTime() - new Date(a.dateApplied!).getTime();
+    });
   }
 
   return applications;
