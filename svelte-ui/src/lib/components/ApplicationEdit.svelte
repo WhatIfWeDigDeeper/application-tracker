@@ -120,7 +120,7 @@
     status = newStatus;
     if (newStatus === 'unsubmitted') {
       dateApplied = '';
-    } else if (oldStatus === 'unsubmitted') {
+    } else if (oldStatus === 'unsubmitted' && !dateApplied) {
       dateApplied = new Date().toISOString().split('T')[0];
     }
   }

@@ -108,7 +108,7 @@ export function ApplicationForm({
       if (field === "status") {
         if (value === "unsubmitted") {
           updated.dateApplied = "";
-        } else if (prev.status === "unsubmitted" && value !== "unsubmitted") {
+        } else if (prev.status === "unsubmitted" && value !== "unsubmitted" && !prev.dateApplied) {
           updated.dateApplied = new Date().toISOString().split("T")[0];
         }
       }
