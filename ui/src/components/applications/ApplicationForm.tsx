@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent, type ChangeEvent } from 'react';
 import type { CreateApplicationInput, UpdateApplicationInput, ApplicationStatus } from '@/types/application';
+import { getCurrentDateISO } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select, type SelectOption } from '@/components/ui/Select';
@@ -101,6 +102,16 @@ export function ApplicationForm({
         ...prev,
         [name]: parsedValue,
       };
+
+      // Handle status change: sync dateApplied with unsubmitted status
+      if (name === 'status') {
+        if (value === 'unsubmitted') {
+          updated.dateApplied = '';
+        } else if (prev.status === 'unsubmitted' && !prev.dateApplied) {
+          // Transitioning FROM unsubmitted: auto-fill today's date
+          updated.dateApplied = getCurrentDateISO();
+        }
+      }
 
       return updated;
     });
@@ -208,6 +219,7 @@ export function ApplicationForm({
               value={formData.dateApplied ?? ''}
               onChange={handleChange}
               error={errors.dateApplied}
+              disabled={formData.status === 'unsubmitted'}
             />
           </div>
         )}
@@ -220,6 +232,7 @@ export function ApplicationForm({
             value={formData.dateApplied ?? ''}
             onChange={handleChange}
             error={errors.dateApplied}
+            disabled={formData.status === 'unsubmitted'}
           />
         )}
 

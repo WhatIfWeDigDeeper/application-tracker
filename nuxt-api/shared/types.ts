@@ -1,5 +1,6 @@
 // Application Status enum
 export type ApplicationStatus =
+  | 'unsubmitted'
   | 'applied'
   | 'rejected'
   | 'interviewing'
@@ -158,6 +159,7 @@ export interface FilterState {
 
 // Constants
 export const APPLICATION_STATUSES: { value: ApplicationStatus; label: string }[] = [
+  { value: 'unsubmitted', label: 'Unsubmitted' },
   { value: 'applied', label: 'Applied' },
   { value: 'interviewing', label: 'Interviewing' },
   { value: 'given offer', label: 'Given Offer' },

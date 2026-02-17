@@ -8,8 +8,8 @@ test.describe.serial('History Panel', () => {
   const uniqueCompany = `History Co ${Date.now()}`;
   const uniquePosition = `Engineer ${Date.now()}`;
 
-  const panel = (page: Page) => page.locator('.fixed.inset-y-0.right-0');
-  const entries = (page: Page) => panel(page).locator('.space-y-1 > div');
+  const panel = (page: Page): ReturnType<Page['locator']> => page.locator('.fixed.inset-y-0.right-0');
+  const entries = (page: Page): ReturnType<Page['locator']> => panel(page).locator('.space-y-1 > div');
 
   async function createApplication(page: Page, company: string, position: string): Promise<string> {
     await page.goto('/applications/new');
@@ -21,7 +21,7 @@ test.describe.serial('History Panel', () => {
     return page.url();
   }
 
-  async function editAndSave(page: Page, selector: string, newValue: string) {
+  async function editAndSave(page: Page, selector: string, newValue: string): Promise<void> {
     const input = page.locator(selector);
     await input.clear();
     await input.fill(newValue);
@@ -29,12 +29,12 @@ test.describe.serial('History Panel', () => {
     await expect(page.locator('button:has-text("Save Changes")')).toBeDisabled({ timeout: 10000 });
   }
 
-  async function openHistory(page: Page) {
+  async function openHistory(page: Page): Promise<void> {
     await page.click('button:has-text("History")');
     await expect(panel(page).locator('h2:has-text("History")')).toBeVisible({ timeout: 5000 });
   }
 
-  async function closeHistory(page: Page) {
+  async function closeHistory(page: Page): Promise<void> {
     // Close button is the first button in the panel header (XMarkIcon / SVG)
     await panel(page).locator('button').first().click();
     await expect(panel(page)).not.toBeVisible({ timeout: 5000 });

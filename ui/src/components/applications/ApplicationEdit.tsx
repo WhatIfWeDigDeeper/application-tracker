@@ -68,7 +68,7 @@ function createDefaultFormState(): FormState {
     companyName: '',
     positionTitle: '',
     dateApplied: '',
-    status: 'applied',
+    status: 'unsubmitted',
     companyUrl: '',
     jobPostingUrl: '',
     companyCareerUrl: '',
@@ -203,6 +203,16 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
       }
       if (name === 'skillsMatch') {
         return { ...prev, [name]: value === '' ? null : Number(value) };
+      }
+      // Handle status change: sync dateApplied with unsubmitted status
+      if (name === 'status') {
+        if (value === 'unsubmitted') {
+          return { ...prev, status: value as ApplicationStatus, dateApplied: '' };
+        }
+        // Transitioning FROM unsubmitted to another status: auto-fill today's date
+        if (prev.status === 'unsubmitted' && !prev.dateApplied) {
+          return { ...prev, status: value as ApplicationStatus, dateApplied: getCurrentDateISO() };
+        }
       }
       return { ...prev, [name]: value };
     });
@@ -684,10 +694,12 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
               name="dateApplied"
               value={form.dateApplied}
               onChange={handleChange}
+              disabled={form.status === 'unsubmitted'}
               className={cn(
                 'block w-full rounded-md shadow-sm',
                 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
                 'dark:border-slate-600 dark:focus:border-blue-400 dark:focus:ring-blue-400',
+                'disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-slate-800',
                 'px-3 py-2 text-base text-gray-900 bg-white',
                 'dark:text-slate-100 dark:bg-slate-800'
               )}

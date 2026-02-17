@@ -2,6 +2,7 @@ import { z } from "zod";
 
 // Enums matching the OpenAPI spec
 export const ApplicationStatusSchema = z.enum([
+  "unsubmitted",
   "applied",
   "rejected",
   "interviewing",

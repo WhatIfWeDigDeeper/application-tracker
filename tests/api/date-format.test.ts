@@ -19,14 +19,13 @@ describe("Date Format Integration Tests", () => {
     }
   });
 
-  it("should accept date-only format (YYYY-MM-DD) for dateApplied on create", async () => {
+  it("should default to unsubmitted status with null dateApplied on create", async () => {
     const response = await fetch(`${API_BASE}/applications`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         companyName: "Test Company",
         positionTitle: "Test Position",
-        dateApplied: "2026-01-05",
         companyCategory: "education",
         skillsMatch: 5,
         jobSource: "recruiter",
@@ -39,11 +38,31 @@ describe("Date Format Integration Tests", () => {
 
     expect(data.companyName).toBe("Test Company");
     expect(data.positionTitle).toBe("Test Position");
-    // The API stores as full datetime but should preserve the date
-    expect(data.dateApplied).toContain("2026-01-05");
+    expect(data.status).toBe("unsubmitted");
+    expect(data.dateApplied).toBeNull();
   });
 
   it("should accept date-only format (YYYY-MM-DD) for dateApplied on update", async () => {
+    expect(createdApplicationId).not.toBeNull();
+
+    const response = await fetch(`${API_BASE}/applications/${createdApplicationId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        dateApplied: "2026-01-05",
+        status: "applied",
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    const data = await response.json();
+
+    // The API stores as full datetime but should preserve the date
+    expect(data.dateApplied).toContain("2026-01-05");
+    expect(data.status).toBe("applied");
+  });
+
+  it("should accept date-only format (YYYY-MM-DD) for dateApplied on second update", async () => {
     expect(createdApplicationId).not.toBeNull();
 
     const response = await fetch(`${API_BASE}/applications/${createdApplicationId}`, {

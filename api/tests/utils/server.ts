@@ -47,6 +47,6 @@ export function createTestApp(): Express {
   return app;
 }
 
-export function getRequest(app: Express) {
+export function getRequest(app: Express): request.Agent {
   return request(app);
 }

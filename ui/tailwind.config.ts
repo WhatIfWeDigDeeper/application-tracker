@@ -11,6 +11,7 @@ const config: Config = {
     extend: {
       colors: {
         status: {
+          unsubmitted: '#9CA3AF',  // gray-400
           applied: '#3B82F6',      // blue-500
           interviewing: '#F59E0B', // amber-500
           offered: '#10B981',      // emerald-500

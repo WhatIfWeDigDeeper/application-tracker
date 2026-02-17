@@ -57,7 +57,7 @@ export function ApplicationForm({
     companyName: "",
     positionTitle: "",
     dateApplied: "",
-    status: "applied",
+    status: "unsubmitted",
     companyUrl: "",
     jobPostingUrl: "",
     companyCareerUrl: "",
@@ -102,7 +102,18 @@ export function ApplicationForm({
     field: keyof FormData,
     value: string | number | boolean | null
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const updated = { ...prev, [field]: value };
+      // Date-status enforcement
+      if (field === "status") {
+        if (value === "unsubmitted") {
+          updated.dateApplied = "";
+        } else if (prev.status === "unsubmitted" && value !== "unsubmitted" && !prev.dateApplied) {
+          updated.dateApplied = new Date().toISOString().split("T")[0];
+        }
+      }
+      return updated;
+    });
     setIsDirty(true);
     // Clear error when field changes
     if (errors[field]) {
@@ -236,6 +247,7 @@ export function ApplicationForm({
             type="date"
             value={formData.dateApplied}
             onChange={(e) => handleChange("dateApplied", e.target.value)}
+            disabled={formData.status === "unsubmitted"}
           />
 
           {isEdit && (

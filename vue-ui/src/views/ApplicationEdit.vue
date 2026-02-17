@@ -50,7 +50,7 @@ const isEditMode = computed(() => !!props.id);
 const companyName = ref('');
 const positionTitle = ref('');
 const dateApplied = ref('');
-const status = ref<ApplicationStatus>('applied');
+const status = ref<ApplicationStatus>('unsubmitted');
 const companyUrl = ref('');
 const jobPostingUrl = ref('');
 const companyCareerUrl = ref('');
@@ -458,6 +458,17 @@ function handleKeyDown(e: KeyboardEvent) {
 }
 
 // ---------------------------------------------------------------------------
+// Watch status for date↔status logic
+// ---------------------------------------------------------------------------
+watch(status, (newStatus, oldStatus) => {
+  if (newStatus === 'unsubmitted') {
+    dateApplied.value = '';
+  } else if (oldStatus === 'unsubmitted' && !dateApplied.value) {
+    dateApplied.value = new Date().toISOString().split('T')[0];
+  }
+});
+
+// ---------------------------------------------------------------------------
 // Watch detailStore.application for undo/redo sync
 // ---------------------------------------------------------------------------
 watch(
@@ -698,6 +709,7 @@ onUnmounted(() => {
               v-model="dateApplied"
               type="date"
               class="input mt-1"
+              :disabled="status === 'unsubmitted'"
             >
           </div>
 

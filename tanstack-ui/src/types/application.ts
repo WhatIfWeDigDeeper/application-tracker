@@ -1,4 +1,5 @@
 export type ApplicationStatus =
+  | "unsubmitted"
   | "applied"
   | "rejected"
   | "interviewing"

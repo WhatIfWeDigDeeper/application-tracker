@@ -165,4 +165,29 @@ test.describe('CSV Import/Export', () => {
 
     await page.click('button:has-text("Close")');
   });
+
+  // Clean up all E2E-created applications via the API
+  const e2eCompanyNames = ['E2E Import Corp', 'Valid E2E Corp', 'Dedup E2E Corp'];
+
+  test.afterAll(async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // Fetch all applications and find the ones created by these tests
+    const response = await page.request.get('/api/applications?limit=100');
+    if (!response.ok()) {
+      await context.close();
+      return;
+    }
+
+    const body = await response.json();
+    const applications = Array.isArray(body) ? body : body.items ?? [];
+    for (const app of applications) {
+      if (e2eCompanyNames.includes(app.companyName)) {
+        await page.request.delete(`/api/applications/${app.id}`);
+      }
+    }
+
+    await context.close();
+  });
 });
