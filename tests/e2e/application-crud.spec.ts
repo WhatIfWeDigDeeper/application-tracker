@@ -245,6 +245,18 @@ test.describe('Application CRUD - Inline Edit', () => {
     await expect(page.locator('#salaryMax')).toHaveValue('150000');
   });
 
+  test('textareas should be vertically resizable', async ({ page }) => {
+    await page.goto('/applications/new');
+    await page.waitForLoadState('domcontentloaded');
+
+    for (const id of ['#specialRequirements', '#notes']) {
+      const resize = await page.locator(id).evaluate(
+        (el) => getComputedStyle(el).resize
+      );
+      expect(resize).toBe('vertical');
+    }
+  });
+
   test('should show error when salary min exceeds max', async ({ page }) => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
