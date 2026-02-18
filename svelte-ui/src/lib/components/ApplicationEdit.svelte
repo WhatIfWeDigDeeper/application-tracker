@@ -794,7 +794,7 @@
             <textarea
               id="specialRequirements"
               rows="3"
-              class="input mt-1"
+              class="input mt-1 resize-y"
               placeholder="Portfolio required, specific skills..."
               bind:value={specialRequirements}
             ></textarea>
@@ -806,7 +806,7 @@
             <textarea
               id="notes"
               rows="4"
-              class="input mt-1"
+              class="input mt-1 resize-y"
               placeholder="Referral info, interview prep notes..."
               bind:value={notes}
             ></textarea>

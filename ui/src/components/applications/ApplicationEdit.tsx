@@ -945,7 +945,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
               value={form.specialRequirements}
               onChange={handleChange}
               className={cn(
-                'block w-full rounded-md shadow-sm',
+                'block w-full rounded-md shadow-sm resize-y',
                 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
                 'dark:border-slate-600 dark:focus:border-blue-400 dark:focus:ring-blue-400',
                 'placeholder:text-gray-400 dark:placeholder:text-slate-500',
@@ -968,7 +968,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
               value={form.notes}
               onChange={handleChange}
               className={cn(
-                'block w-full rounded-md shadow-sm',
+                'block w-full rounded-md shadow-sm resize-y',
                 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
                 'dark:border-slate-600 dark:focus:border-blue-400 dark:focus:ring-blue-400',
                 'placeholder:text-gray-400 dark:placeholder:text-slate-500',

@@ -928,7 +928,7 @@ export function ApplicationEdit() {
                 updateField("specialRequirements", e.target.value)
               }
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors resize-none focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors resize-y focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               placeholder="Portfolio required, specific skills..."
             />
           </div>
@@ -946,7 +946,7 @@ export function ApplicationEdit() {
               value={form.notes}
               onChange={(e) => updateField("notes", e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors resize-none focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-xs transition-colors resize-y focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               placeholder="Referral info, interview prep notes..."
             />
           </div>
