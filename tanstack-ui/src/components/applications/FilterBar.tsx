@@ -150,20 +150,20 @@ export function FilterBar({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={onImportClick}>
+          <Button variant="secondary" size="sm" onClick={onImportClick} className="h-[38px] whitespace-nowrap px-5">
             Import CSV
           </Button>
           <a
             href={getExportUrl()}
             download
-            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 text-sm"
+            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 h-[38px] whitespace-nowrap px-5 text-sm"
           >
             Export CSV
           </a>
           <a
             href={getSampleCsvUrl()}
             download
-            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 text-sm"
+            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 h-[38px] whitespace-nowrap px-4 text-sm"
           >
             Template
           </a>
@@ -174,7 +174,7 @@ export function FilterBar({
               onSortByChange(e.target.value as SortState["sortBy"])
             }
             options={SORT_OPTIONS}
-            className="w-36"
+            className="w-36 h-[38px]"
           />
           <Button
             variant="ghost"
