@@ -67,7 +67,7 @@ export function FilterBar({
       {/* Filter Controls */}
       <div className="flex flex-wrap items-end gap-4">
         {/* Status Filter */}
-        <div className="w-40">
+        <div className="w-full min-[480px]:w-40">
           <Select
             label="Status"
             value={filters.status[0] || ""}
@@ -81,7 +81,7 @@ export function FilterBar({
         </div>
 
         {/* Category Filter */}
-        <div className="w-44">
+        <div className="w-full min-[480px]:w-44">
           <Select
             label="Category"
             value={filters.companyCategory || ""}
@@ -96,7 +96,7 @@ export function FilterBar({
         </div>
 
         {/* Source Filter */}
-        <div className="w-40">
+        <div className="w-full min-[480px]:w-40">
           <Select
             label="Source"
             value={filters.jobSource || ""}
@@ -109,7 +109,7 @@ export function FilterBar({
         </div>
 
         {/* Skills Match Filter */}
-        <div className="w-32">
+        <div className="w-full min-[480px]:w-32">
           <Select
             label="Skills"
             value={filters.skillsMatchMin?.toString() || ""}
@@ -142,80 +142,84 @@ export function FilterBar({
       </div>
 
       {/* Sort Controls and Results Count */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="text-sm text-gray-500 dark:text-gray-400">
           {resultCount === totalCount
             ? `${totalCount} application${totalCount !== 1 ? "s" : ""}`
             : `${resultCount} of ${totalCount} applications`}
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={onImportClick} className="h-[38px] whitespace-nowrap px-5">
-            Import CSV
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={onImportClick} className="h-[38px] whitespace-nowrap px-3 sm:px-5">
+            <span className="sm:hidden">Import</span>
+            <span className="hidden sm:inline">Import CSV</span>
           </Button>
           <a
             href={getExportUrl()}
             download
-            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 h-[38px] whitespace-nowrap px-5 text-sm"
+            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 h-[38px] whitespace-nowrap px-3 sm:px-5 text-sm"
           >
-            Export CSV
+            <span className="sm:hidden">Export</span>
+            <span className="hidden sm:inline">Export CSV</span>
           </a>
           <a
             href={getSampleCsvUrl()}
             download
-            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 h-[38px] whitespace-nowrap px-4 text-sm"
+            className="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 h-[38px] whitespace-nowrap px-3 sm:px-4 text-sm"
           >
             Template
           </a>
-          <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-          <Select
-            value={sorting.sortBy}
-            onChange={(e) =>
-              onSortByChange(e.target.value as SortState["sortBy"])
-            }
-            options={SORT_OPTIONS}
-            className="w-36 h-[38px]"
-          />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onSortDirToggle}
-            aria-label={
-              sorting.sortDir === "asc"
-                ? "Sort ascending"
-                : "Sort descending"
-            }
-          >
-            {sorting.sortDir === "asc" ? (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"
-                />
-              </svg>
-            )}
-          </Button>
+          <div className="hidden sm:block w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+          <div className="flex items-center gap-2">
+            <Select
+              value={sorting.sortBy}
+              onChange={(e) =>
+                onSortByChange(e.target.value as SortState["sortBy"])
+              }
+              options={SORT_OPTIONS}
+              className="w-36 h-[38px]"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSortDirToggle}
+              aria-label={
+                sorting.sortDir === "asc"
+                  ? "Sort ascending"
+                  : "Sort descending"
+              }
+            >
+              {sorting.sortDir === "asc" ? (
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"
+                  />
+                </svg>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

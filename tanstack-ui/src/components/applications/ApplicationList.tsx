@@ -101,7 +101,7 @@ export function ApplicationList({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4">
+      <div className="grid gap-4 min-w-0">
         {applications.map((application) => (
           <ApplicationCard
             key={application.id}

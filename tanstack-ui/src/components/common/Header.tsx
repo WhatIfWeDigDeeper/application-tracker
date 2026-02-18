@@ -30,9 +30,9 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo / Title */}
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3 min-w-0">
             <svg
-              className="w-8 h-8 text-primary-600"
+              className="w-8 h-8 flex-shrink-0 text-primary-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -44,13 +44,16 @@ export function Header() {
                 d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Job Application Tracker (React - NestJS - Drizzle)
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white truncate">
+              Job Application Tracker{" "}
+              <span className="hidden sm:inline text-sm font-normal text-gray-500 dark:text-gray-400">
+                (React - NestJS - Drizzle)
+              </span>
             </h1>
           </Link>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink-0">
             {/* Theme Toggle */}
             <button
               onClick={() => setIsDark(!isDark)}
@@ -91,7 +94,7 @@ export function Header() {
             {/* Add Application Button */}
             <Button onClick={() => navigate({ to: "/applications/new" })}>
               <svg
-                className="w-4 h-4 mr-2"
+                className="w-4 h-4 sm:mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -103,7 +106,7 @@ export function Header() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              Add Application
+              <span className="hidden sm:inline">Add Application</span>
             </Button>
           </div>
         </div>
