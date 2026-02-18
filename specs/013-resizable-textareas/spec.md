@@ -1,7 +1,7 @@
 # Feature Specification: Resizable Textareas
 
 **Created**: 2026-02-18
-**Status**: Draft
+**Status**: Complete
 **Input**: User requirement: "Special Requirements and Notes textareas should be expandable with the usual draggable right corner."
 
 ## User Scenarios
