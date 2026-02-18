@@ -8,7 +8,7 @@ const defaultFilters: FilterState = {
   jobSource: undefined,
   skillsMatchMin: undefined,
   includeArchived: false,
-  sortBy: 'dateApplied',
+  sortBy: 'updatedAt',
   sortDir: 'desc',
   page: 1,
   limit: 20,

@@ -156,7 +156,7 @@ export const ListApplicationsQuerySchema = z.object({
     .string()
     .optional()
     .transform((v) => v === "true"),
-  sortBy: SortBySchema.optional().default("dateApplied"),
+  sortBy: SortBySchema.optional().default("updatedAt"),
   sortDir: SortDirSchema.optional().default("desc"),
   page: z
     .string()

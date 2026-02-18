@@ -107,7 +107,7 @@ export class ApplicationService {
       jobSource,
       skillsMatchMin,
       includeArchived = false,
-      sortBy = "dateApplied",
+      sortBy = "updatedAt",
       sortDir = "desc",
     } = queryParams;
 

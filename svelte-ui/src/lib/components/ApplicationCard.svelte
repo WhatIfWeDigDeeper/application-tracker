@@ -37,17 +37,20 @@
   }
 
   function handleMenuClick(e: MouseEvent) {
+    e.preventDefault();
     e.stopPropagation();
     menuOpen = !menuOpen;
   }
 
   function handleArchiveClick(e: MouseEvent) {
+    e.preventDefault();
     e.stopPropagation();
     menuOpen = false;
     onarchive();
   }
 
   function handleDeleteClick(e: MouseEvent) {
+    e.preventDefault();
     e.stopPropagation();
     menuOpen = false;
     ondelete();

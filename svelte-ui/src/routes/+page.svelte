@@ -99,14 +99,12 @@
     <!-- Application List -->
     <div class="grid gap-4">
       {#each applicationStore.applications as app (app.id)}
-        <a href="/applications/{app.id}" class="block">
-          <ApplicationCard
-            application={app}
-            onclick={() => {}}
-            onarchive={() => handleArchive(app)}
-            ondelete={() => (deleteTarget = app)}
-          />
-        </a>
+        <ApplicationCard
+          application={app}
+          onclick={() => goto(`/applications/${app.id}`)}
+          onarchive={() => handleArchive(app)}
+          ondelete={() => (deleteTarget = app)}
+        />
       {/each}
     </div>
 
