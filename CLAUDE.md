@@ -67,6 +67,8 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Shared E2E history tests**: `history.spec.ts` has a single `History Panel` block shared by Vue and Svelte; stacks without history use `--grep-invert 'History Panel'`
 - **Avoid absolute positioning for sibling elements**: When multiple elements share the same corner (e.g., badge + action menu), use flexbox flow instead of `absolute` — prevents overlap
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
+- **Svelte 5 event delegation**: `stopPropagation()` doesn't prevent parent `<a>` navigation — avoid wrapping interactive cards in `<a>` tags; use `onclick` with `goto()` instead
+- **Zod boolean coercion**: `z.coerce.boolean()` treats any non-empty string (including `"false"`) as `true` — use `z.preprocess((val) => val === 'true' || val === true, z.boolean())` for query params
 
 ## Vue.js Patterns
 
@@ -83,6 +85,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Interactive sessions**: Do not commit unless explicitly asked
 - **Worktree/subagent sessions**: Auto-commit before returning (worktree is ephemeral)
 - **After every push to a PR branch**: Check whether the new commit(s) change the PR's scope. If so, immediately update the PR body via `gh pr edit <number> --body` — do not wait to be asked
+- **Spec status**: When a feature has a spec file in `specs/`, update its `Status` to `Complete` before merging the PR
 - **Post-merge cleanup**: After squash merging a PR, immediately switch to main, pull, and delete the local branch (`git checkout main && git pull && git branch -d <branch>`)
 - **Documentation**: Update `README.md` and `CLAUDE.md` as part of completing tasks that add scripts/tools/infrastructure
 
@@ -97,3 +100,5 @@ npm run test:e2e:tanstack  # React+TanStack-NestJS (port 3050)
 ```
 
 Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
+
+**E2E test data cleanup**: Tests that create data must clean up in `afterAll` using API calls (e.g., `page.request.delete('/api/applications/${id}')`) — not fragile UI interactions. Cleanup must run even if individual tests fail.

@@ -61,7 +61,7 @@ export interface UseApplicationsReturn {
 }
 
 const DEFAULT_SORT: SortOptions = {
-  field: 'dateApplied',
+  field: 'updatedAt',
   direction: 'desc',
 };
 

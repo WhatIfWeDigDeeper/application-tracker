@@ -64,7 +64,7 @@ export class ApplicationService {
         skip,
         take: Math.min(limit, 100),
         include: { interviewStages: { orderBy: { order: "asc" } } },
-        orderBy: { createdAt: "desc" },
+        orderBy: { updatedAt: "desc" },
       }),
       prisma.application.count({ where }),
     ]);

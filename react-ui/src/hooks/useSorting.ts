@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import type { SortState } from "../types/application";
 
 const defaultSort: SortState = {
-  sortBy: "dateApplied",
+  sortBy: "updatedAt",
   sortDir: "desc",
 };
 
