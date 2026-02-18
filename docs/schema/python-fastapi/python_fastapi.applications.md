@@ -1,4 +1,4 @@
-# react_nestjs.applications
+# python_fastapi.applications
 
 ## Description
 
@@ -6,17 +6,17 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | uuid |  | false | [react_nestjs.application_history](react_nestjs.application_history.md) [react_nestjs.interview_stages](react_nestjs.interview_stages.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [python_fastapi.interview_stages](python_fastapi.interview_stages.md) [python_fastapi.application_history](python_fastapi.application_history.md) |  |  |
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
 | date_applied | date |  | true |  |  |  |
-| status | react_nestjs.application_status | 'unsubmitted'::react_nestjs.application_status | false |  |  |  |
+| status | python_fastapi.application_status | 'unsubmitted'::python_fastapi.application_status | false |  |  |  |
 | company_url | text |  | true |  |  |  |
 | job_posting_url | text |  | true |  |  |  |
 | company_career_url | text |  | true |  |  |  |
-| company_category | react_nestjs.company_category |  | true |  |  |  |
+| company_category | python_fastapi.company_category |  | true |  |  |  |
 | skills_match | integer |  | true |  |  |  |
-| job_source | react_nestjs.job_source |  | true |  |  |  |
+| job_source | python_fastapi.job_source |  | true |  |  |  |
 | cover_letter_required | boolean |  | true |  |  |  |
 | special_requirements | text |  | true |  |  |  |
 | salary_min | integer |  | true |  |  |  |
@@ -44,28 +44,28 @@
 
 | Name | Definition |
 | ---- | ---------- |
-| applications_pkey | CREATE UNIQUE INDEX applications_pkey ON react_nestjs.applications USING btree (id) |
+| applications_pkey | CREATE UNIQUE INDEX applications_pkey ON python_fastapi.applications USING btree (id) |
 
 ## Relations
 
 ```mermaid
 erDiagram
 
-"react_nestjs.application_history" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
-"react_nestjs.interview_stages" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
+"python_fastapi.interview_stages" }o--|| "python_fastapi.applications" : "FOREIGN KEY (application_id) REFERENCES python_fastapi.applications(id) ON DELETE CASCADE"
+"python_fastapi.application_history" }o--|| "python_fastapi.applications" : "FOREIGN KEY (application_id) REFERENCES python_fastapi.applications(id) ON DELETE CASCADE"
 
-"react_nestjs.applications" {
+"python_fastapi.applications" {
   id uuid
   company_name varchar_200_
   position_title varchar_200_
   date_applied date
-  status react_nestjs_application_status
+  status python_fastapi_application_status
   company_url text
   job_posting_url text
   company_career_url text
-  company_category react_nestjs_company_category
+  company_category python_fastapi_company_category
   skills_match integer
-  job_source react_nestjs_job_source
+  job_source python_fastapi_job_source
   cover_letter_required boolean
   special_requirements text
   salary_min integer
@@ -76,15 +76,7 @@ erDiagram
   created_at timestamp_with_time_zone
   updated_at timestamp_with_time_zone
 }
-"react_nestjs.application_history" {
-  id uuid
-  application_id uuid FK
-  sequence integer
-  description varchar_500_
-  snapshot jsonb
-  created_at timestamp_with_time_zone
-}
-"react_nestjs.interview_stages" {
+"python_fastapi.interview_stages" {
   id uuid
   application_id uuid FK
   name varchar_100_
@@ -93,6 +85,14 @@ erDiagram
   completed_date date
   notes text
   performance_rating integer
+}
+"python_fastapi.application_history" {
+  id uuid
+  application_id uuid FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  created_at timestamp_with_time_zone
 }
 ```
 

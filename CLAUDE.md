@@ -11,10 +11,12 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`
 - **Validation Chain**: `build` → `lint` → `test` → `test:e2e`
 - **Parallel Execution**: 3+ items use Task tool subagents
+- **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 
 ## Active Technologies
 
 - TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite
+- Python 3.12+ with FastAPI, asyncpg, Pydantic v2, uv
 - PostgreSQL 18 (single database with multiple schemas)
 
 ## Documentation Guidelines
@@ -29,6 +31,7 @@ Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolat
 - **svelte_hono** — `hono-api/src/db/schema.ts` (Drizzle)
 - **vue_nuxt** — `nuxt-api/server/db/schema.ts` (Drizzle), shared types via `@shared` alias
 - **react_nestjs** — `nest-api/src/database/schema.ts` (Drizzle)
+- **python_fastapi** — `fastapi/migrations/001_initial.sql` (asyncpg, raw SQL)
 
 Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 

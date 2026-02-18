@@ -2,13 +2,14 @@
   "name": "app_tracker",
   "tables": [
     {
-      "name": "vue_nuxt.applications",
+      "name": "python_fastapi.applications",
       "type": "BASE TABLE",
       "columns": [
         {
           "name": "id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "default": "gen_random_uuid()"
         },
         {
           "name": "company_name",
@@ -27,9 +28,9 @@
         },
         {
           "name": "status",
-          "type": "vue_nuxt.application_status",
+          "type": "python_fastapi.application_status",
           "nullable": false,
-          "default": "'unsubmitted'::vue_nuxt.application_status"
+          "default": "'unsubmitted'::python_fastapi.application_status"
         },
         {
           "name": "company_url",
@@ -48,7 +49,7 @@
         },
         {
           "name": "company_category",
-          "type": "vue_nuxt.company_category",
+          "type": "python_fastapi.company_category",
           "nullable": true
         },
         {
@@ -58,7 +59,7 @@
         },
         {
           "name": "job_source",
-          "type": "vue_nuxt.job_source",
+          "type": "python_fastapi.job_source",
           "nullable": true
         },
         {
@@ -113,8 +114,8 @@
       "indexes": [
         {
           "name": "applications_pkey",
-          "def": "CREATE UNIQUE INDEX applications_pkey ON vue_nuxt.applications USING btree (id)",
-          "table": "vue_nuxt.applications",
+          "def": "CREATE UNIQUE INDEX applications_pkey ON python_fastapi.applications USING btree (id)",
+          "table": "python_fastapi.applications",
           "columns": [
             "id"
           ]
@@ -125,7 +126,7 @@
           "name": "applications_company_name_not_null",
           "type": "n",
           "def": "NOT NULL company_name",
-          "table": "vue_nuxt.applications",
+          "table": "python_fastapi.applications",
           "referenced_table": "",
           "columns": [
             "company_name"
@@ -135,7 +136,7 @@
           "name": "applications_created_at_not_null",
           "type": "n",
           "def": "NOT NULL created_at",
-          "table": "vue_nuxt.applications",
+          "table": "python_fastapi.applications",
           "referenced_table": "",
           "columns": [
             "created_at"
@@ -145,7 +146,7 @@
           "name": "applications_id_not_null",
           "type": "n",
           "def": "NOT NULL id",
-          "table": "vue_nuxt.applications",
+          "table": "python_fastapi.applications",
           "referenced_table": "",
           "columns": [
             "id"
@@ -155,7 +156,7 @@
           "name": "applications_is_archived_not_null",
           "type": "n",
           "def": "NOT NULL is_archived",
-          "table": "vue_nuxt.applications",
+          "table": "python_fastapi.applications",
           "referenced_table": "",
           "columns": [
             "is_archived"
@@ -165,7 +166,7 @@
           "name": "applications_position_title_not_null",
           "type": "n",
           "def": "NOT NULL position_title",
-          "table": "vue_nuxt.applications",
+          "table": "python_fastapi.applications",
           "referenced_table": "",
           "columns": [
             "position_title"
@@ -175,7 +176,7 @@
           "name": "applications_status_not_null",
           "type": "n",
           "def": "NOT NULL status",
-          "table": "vue_nuxt.applications",
+          "table": "python_fastapi.applications",
           "referenced_table": "",
           "columns": [
             "status"
@@ -185,7 +186,7 @@
           "name": "applications_updated_at_not_null",
           "type": "n",
           "def": "NOT NULL updated_at",
-          "table": "vue_nuxt.applications",
+          "table": "python_fastapi.applications",
           "referenced_table": "",
           "columns": [
             "updated_at"
@@ -195,7 +196,7 @@
           "name": "applications_pkey",
           "type": "PRIMARY KEY",
           "def": "PRIMARY KEY (id)",
-          "table": "vue_nuxt.applications",
+          "table": "python_fastapi.applications",
           "referenced_table": "",
           "columns": [
             "id"
@@ -204,13 +205,14 @@
       ]
     },
     {
-      "name": "vue_nuxt.interview_stages",
+      "name": "python_fastapi.interview_stages",
       "type": "BASE TABLE",
       "columns": [
         {
           "name": "id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "default": "gen_random_uuid()"
         },
         {
           "name": "application_id",
@@ -252,8 +254,8 @@
       "indexes": [
         {
           "name": "interview_stages_pkey",
-          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON vue_nuxt.interview_stages USING btree (id)",
-          "table": "vue_nuxt.interview_stages",
+          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON python_fastapi.interview_stages USING btree (id)",
+          "table": "python_fastapi.interview_stages",
           "columns": [
             "id"
           ]
@@ -264,7 +266,7 @@
           "name": "interview_stages_application_id_not_null",
           "type": "n",
           "def": "NOT NULL application_id",
-          "table": "vue_nuxt.interview_stages",
+          "table": "python_fastapi.interview_stages",
           "referenced_table": "",
           "columns": [
             "application_id"
@@ -274,7 +276,7 @@
           "name": "interview_stages_id_not_null",
           "type": "n",
           "def": "NOT NULL id",
-          "table": "vue_nuxt.interview_stages",
+          "table": "python_fastapi.interview_stages",
           "referenced_table": "",
           "columns": [
             "id"
@@ -284,7 +286,7 @@
           "name": "interview_stages_is_completed_not_null",
           "type": "n",
           "def": "NOT NULL is_completed",
-          "table": "vue_nuxt.interview_stages",
+          "table": "python_fastapi.interview_stages",
           "referenced_table": "",
           "columns": [
             "is_completed"
@@ -294,7 +296,7 @@
           "name": "interview_stages_name_not_null",
           "type": "n",
           "def": "NOT NULL name",
-          "table": "vue_nuxt.interview_stages",
+          "table": "python_fastapi.interview_stages",
           "referenced_table": "",
           "columns": [
             "name"
@@ -304,17 +306,17 @@
           "name": "interview_stages_order_not_null",
           "type": "n",
           "def": "NOT NULL \"order\"",
-          "table": "vue_nuxt.interview_stages",
+          "table": "python_fastapi.interview_stages",
           "referenced_table": "",
           "columns": [
             "order"
           ]
         },
         {
-          "name": "interview_stages_application_id_applications_id_fk",
+          "name": "interview_stages_application_id_fkey",
           "type": "FOREIGN KEY",
-          "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE",
-          "table": "vue_nuxt.interview_stages",
+          "def": "FOREIGN KEY (application_id) REFERENCES python_fastapi.applications(id) ON DELETE CASCADE",
+          "table": "python_fastapi.interview_stages",
           "referenced_table": "applications",
           "columns": [
             "application_id"
@@ -327,7 +329,7 @@
           "name": "interview_stages_pkey",
           "type": "PRIMARY KEY",
           "def": "PRIMARY KEY (id)",
-          "table": "vue_nuxt.interview_stages",
+          "table": "python_fastapi.interview_stages",
           "referenced_table": "",
           "columns": [
             "id"
@@ -336,13 +338,14 @@
       ]
     },
     {
-      "name": "vue_nuxt.application_events",
+      "name": "python_fastapi.application_history",
       "type": "BASE TABLE",
       "columns": [
         {
           "name": "id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "default": "gen_random_uuid()"
         },
         {
           "name": "application_id",
@@ -360,17 +363,7 @@
           "nullable": false
         },
         {
-          "name": "changes",
-          "type": "jsonb",
-          "nullable": false
-        },
-        {
-          "name": "patches",
-          "type": "jsonb",
-          "nullable": false
-        },
-        {
-          "name": "inverse_patches",
+          "name": "snapshot",
           "type": "jsonb",
           "nullable": false
         },
@@ -383,109 +376,80 @@
       ],
       "indexes": [
         {
-          "name": "application_events_pkey",
-          "def": "CREATE UNIQUE INDEX application_events_pkey ON vue_nuxt.application_events USING btree (id)",
-          "table": "vue_nuxt.application_events",
+          "name": "application_history_pkey",
+          "def": "CREATE UNIQUE INDEX application_history_pkey ON python_fastapi.application_history USING btree (id)",
+          "table": "python_fastapi.application_history",
           "columns": [
             "id"
-          ]
-        },
-        {
-          "name": "application_events_application_id_sequence_unique",
-          "def": "CREATE UNIQUE INDEX application_events_application_id_sequence_unique ON vue_nuxt.application_events USING btree (application_id, sequence)",
-          "table": "vue_nuxt.application_events",
-          "columns": [
-            "application_id",
-            "sequence"
           ]
         }
       ],
       "constraints": [
         {
-          "name": "application_events_application_id_not_null",
+          "name": "application_history_application_id_not_null",
           "type": "n",
           "def": "NOT NULL application_id",
-          "table": "vue_nuxt.application_events",
+          "table": "python_fastapi.application_history",
           "referenced_table": "",
           "columns": [
             "application_id"
           ]
         },
         {
-          "name": "application_events_changes_not_null",
-          "type": "n",
-          "def": "NOT NULL changes",
-          "table": "vue_nuxt.application_events",
-          "referenced_table": "",
-          "columns": [
-            "changes"
-          ]
-        },
-        {
-          "name": "application_events_created_at_not_null",
+          "name": "application_history_created_at_not_null",
           "type": "n",
           "def": "NOT NULL created_at",
-          "table": "vue_nuxt.application_events",
+          "table": "python_fastapi.application_history",
           "referenced_table": "",
           "columns": [
             "created_at"
           ]
         },
         {
-          "name": "application_events_description_not_null",
+          "name": "application_history_description_not_null",
           "type": "n",
           "def": "NOT NULL description",
-          "table": "vue_nuxt.application_events",
+          "table": "python_fastapi.application_history",
           "referenced_table": "",
           "columns": [
             "description"
           ]
         },
         {
-          "name": "application_events_id_not_null",
+          "name": "application_history_id_not_null",
           "type": "n",
           "def": "NOT NULL id",
-          "table": "vue_nuxt.application_events",
+          "table": "python_fastapi.application_history",
           "referenced_table": "",
           "columns": [
             "id"
           ]
         },
         {
-          "name": "application_events_inverse_patches_not_null",
-          "type": "n",
-          "def": "NOT NULL inverse_patches",
-          "table": "vue_nuxt.application_events",
-          "referenced_table": "",
-          "columns": [
-            "inverse_patches"
-          ]
-        },
-        {
-          "name": "application_events_patches_not_null",
-          "type": "n",
-          "def": "NOT NULL patches",
-          "table": "vue_nuxt.application_events",
-          "referenced_table": "",
-          "columns": [
-            "patches"
-          ]
-        },
-        {
-          "name": "application_events_sequence_not_null",
+          "name": "application_history_sequence_not_null",
           "type": "n",
           "def": "NOT NULL sequence",
-          "table": "vue_nuxt.application_events",
+          "table": "python_fastapi.application_history",
           "referenced_table": "",
           "columns": [
             "sequence"
           ]
         },
         {
-          "name": "application_events_application_id_applications_id_fk",
+          "name": "application_history_snapshot_not_null",
+          "type": "n",
+          "def": "NOT NULL snapshot",
+          "table": "python_fastapi.application_history",
+          "referenced_table": "",
+          "columns": [
+            "snapshot"
+          ]
+        },
+        {
+          "name": "application_history_application_id_fkey",
           "type": "FOREIGN KEY",
-          "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE",
-          "table": "vue_nuxt.application_events",
+          "def": "FOREIGN KEY (application_id) REFERENCES python_fastapi.applications(id) ON DELETE CASCADE",
+          "table": "python_fastapi.application_history",
           "referenced_table": "applications",
           "columns": [
             "application_id"
@@ -495,161 +459,13 @@
           ]
         },
         {
-          "name": "application_events_pkey",
+          "name": "application_history_pkey",
           "type": "PRIMARY KEY",
           "def": "PRIMARY KEY (id)",
-          "table": "vue_nuxt.application_events",
+          "table": "python_fastapi.application_history",
           "referenced_table": "",
           "columns": [
             "id"
-          ]
-        },
-        {
-          "name": "application_events_application_id_sequence_unique",
-          "type": "UNIQUE",
-          "def": "UNIQUE (application_id, sequence)",
-          "table": "vue_nuxt.application_events",
-          "referenced_table": "",
-          "columns": [
-            "application_id",
-            "sequence"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "vue_nuxt.application_snapshots",
-      "type": "BASE TABLE",
-      "columns": [
-        {
-          "name": "id",
-          "type": "uuid",
-          "nullable": false
-        },
-        {
-          "name": "application_id",
-          "type": "uuid",
-          "nullable": false
-        },
-        {
-          "name": "at_sequence",
-          "type": "integer",
-          "nullable": false
-        },
-        {
-          "name": "state",
-          "type": "jsonb",
-          "nullable": false
-        },
-        {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "nullable": false,
-          "default": "now()"
-        }
-      ],
-      "indexes": [
-        {
-          "name": "application_snapshots_pkey",
-          "def": "CREATE UNIQUE INDEX application_snapshots_pkey ON vue_nuxt.application_snapshots USING btree (id)",
-          "table": "vue_nuxt.application_snapshots",
-          "columns": [
-            "id"
-          ]
-        },
-        {
-          "name": "application_snapshots_application_id_at_sequence_unique",
-          "def": "CREATE UNIQUE INDEX application_snapshots_application_id_at_sequence_unique ON vue_nuxt.application_snapshots USING btree (application_id, at_sequence)",
-          "table": "vue_nuxt.application_snapshots",
-          "columns": [
-            "application_id",
-            "at_sequence"
-          ]
-        }
-      ],
-      "constraints": [
-        {
-          "name": "application_snapshots_application_id_not_null",
-          "type": "n",
-          "def": "NOT NULL application_id",
-          "table": "vue_nuxt.application_snapshots",
-          "referenced_table": "",
-          "columns": [
-            "application_id"
-          ]
-        },
-        {
-          "name": "application_snapshots_at_sequence_not_null",
-          "type": "n",
-          "def": "NOT NULL at_sequence",
-          "table": "vue_nuxt.application_snapshots",
-          "referenced_table": "",
-          "columns": [
-            "at_sequence"
-          ]
-        },
-        {
-          "name": "application_snapshots_created_at_not_null",
-          "type": "n",
-          "def": "NOT NULL created_at",
-          "table": "vue_nuxt.application_snapshots",
-          "referenced_table": "",
-          "columns": [
-            "created_at"
-          ]
-        },
-        {
-          "name": "application_snapshots_id_not_null",
-          "type": "n",
-          "def": "NOT NULL id",
-          "table": "vue_nuxt.application_snapshots",
-          "referenced_table": "",
-          "columns": [
-            "id"
-          ]
-        },
-        {
-          "name": "application_snapshots_state_not_null",
-          "type": "n",
-          "def": "NOT NULL state",
-          "table": "vue_nuxt.application_snapshots",
-          "referenced_table": "",
-          "columns": [
-            "state"
-          ]
-        },
-        {
-          "name": "application_snapshots_application_id_applications_id_fk",
-          "type": "FOREIGN KEY",
-          "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE",
-          "table": "vue_nuxt.application_snapshots",
-          "referenced_table": "applications",
-          "columns": [
-            "application_id"
-          ],
-          "referenced_columns": [
-            "id"
-          ]
-        },
-        {
-          "name": "application_snapshots_pkey",
-          "type": "PRIMARY KEY",
-          "def": "PRIMARY KEY (id)",
-          "table": "vue_nuxt.application_snapshots",
-          "referenced_table": "",
-          "columns": [
-            "id"
-          ]
-        },
-        {
-          "name": "application_snapshots_application_id_at_sequence_unique",
-          "type": "UNIQUE",
-          "def": "UNIQUE (application_id, at_sequence)",
-          "table": "vue_nuxt.application_snapshots",
-          "referenced_table": "",
-          "columns": [
-            "application_id",
-            "at_sequence"
           ]
         }
       ]
@@ -657,43 +473,30 @@
   ],
   "relations": [
     {
-      "table": "vue_nuxt.interview_stages",
+      "table": "python_fastapi.interview_stages",
       "columns": [
         "application_id"
       ],
       "cardinality": "zero_or_more",
-      "parent_table": "vue_nuxt.applications",
+      "parent_table": "python_fastapi.applications",
       "parent_columns": [
         "id"
       ],
       "parent_cardinality": "exactly_one",
-      "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE"
+      "def": "FOREIGN KEY (application_id) REFERENCES python_fastapi.applications(id) ON DELETE CASCADE"
     },
     {
-      "table": "vue_nuxt.application_events",
+      "table": "python_fastapi.application_history",
       "columns": [
         "application_id"
       ],
       "cardinality": "zero_or_more",
-      "parent_table": "vue_nuxt.applications",
+      "parent_table": "python_fastapi.applications",
       "parent_columns": [
         "id"
       ],
       "parent_cardinality": "exactly_one",
-      "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE"
-    },
-    {
-      "table": "vue_nuxt.application_snapshots",
-      "columns": [
-        "application_id"
-      ],
-      "cardinality": "zero_or_more",
-      "parent_table": "vue_nuxt.applications",
-      "parent_columns": [
-        "id"
-      ],
-      "parent_cardinality": "exactly_one",
-      "def": "FOREIGN KEY (application_id) REFERENCES vue_nuxt.applications(id) ON DELETE CASCADE"
+      "def": "FOREIGN KEY (application_id) REFERENCES python_fastapi.applications(id) ON DELETE CASCADE"
     }
   ],
   "enums": [

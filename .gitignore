@@ -177,3 +177,9 @@ Thumbs.db
 
 # Script temp files
 scripts/.tmp/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/

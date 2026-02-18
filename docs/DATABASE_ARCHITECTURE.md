@@ -36,3 +36,10 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - Uses Drizzle's `pgSchema('react_nestjs')`
 - Config in: `nest-api/drizzle.config.ts` with `schemaFilter: ['react_nestjs']`
 - Snapshot-based history (like Express, Koa, Hono)
+
+**Python-FastAPI-asyncpg:**
+- Schema defined in: `fastapi/migrations/001_initial.sql`
+- Raw SQL migration with `CREATE SCHEMA IF NOT EXISTS python_fastapi`
+- asyncpg pool configured with `server_settings={"search_path": "python_fastapi"}`
+- Snapshot-based history (like Hono, NestJS)
+- No ORM — uses raw SQL queries with asyncpg

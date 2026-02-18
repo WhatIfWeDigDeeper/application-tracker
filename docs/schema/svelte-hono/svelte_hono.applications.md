@@ -10,7 +10,7 @@
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
 | date_applied | date |  | true |  |  |  |
-| status | svelte_hono.application_status | 'applied'::svelte_hono.application_status | false |  |  |  |
+| status | svelte_hono.application_status | 'unsubmitted'::svelte_hono.application_status | false |  |  |  |
 | company_url | text |  | true |  |  |  |
 | job_posting_url | text |  | true |  |  |  |
 | company_career_url | text |  | true |  |  |  |

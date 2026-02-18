@@ -1,0 +1,38 @@
+[project]
+name = "fastapi-application-tracker"
+version = "0.1.0"
+description = "Application Tracker API - FastAPI + asyncpg"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.129.0",
+    "uvicorn[standard]==0.34.2",
+    "asyncpg==0.31.0",
+    "pydantic==2.12.5",
+    "python-dotenv==1.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.15.1",
+    "mypy==1.19.1",
+    "pytest==8.4.0",
+    "pytest-asyncio==1.0.0",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+
+[[tool.mypy.overrides]]
+module = "asyncpg.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -4,9 +4,9 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
-| [react_nestjs.application_history](react_nestjs.application_history.md) | 6 |  | BASE TABLE |
-| [react_nestjs.applications](react_nestjs.applications.md) | 20 |  | BASE TABLE |
-| [react_nestjs.interview_stages](react_nestjs.interview_stages.md) | 8 |  | BASE TABLE |
+| [python_fastapi.applications](python_fastapi.applications.md) | 20 |  | BASE TABLE |
+| [python_fastapi.interview_stages](python_fastapi.interview_stages.md) | 8 |  | BASE TABLE |
+| [python_fastapi.application_history](python_fastapi.application_history.md) | 6 |  | BASE TABLE |
 
 ## Enums
 
@@ -36,29 +36,21 @@
 ```mermaid
 erDiagram
 
-"react_nestjs.application_history" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
-"react_nestjs.interview_stages" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
+"python_fastapi.interview_stages" }o--|| "python_fastapi.applications" : "FOREIGN KEY (application_id) REFERENCES python_fastapi.applications(id) ON DELETE CASCADE"
+"python_fastapi.application_history" }o--|| "python_fastapi.applications" : "FOREIGN KEY (application_id) REFERENCES python_fastapi.applications(id) ON DELETE CASCADE"
 
-"react_nestjs.application_history" {
-  id uuid
-  application_id uuid FK
-  sequence integer
-  description varchar_500_
-  snapshot jsonb
-  created_at timestamp_with_time_zone
-}
-"react_nestjs.applications" {
+"python_fastapi.applications" {
   id uuid
   company_name varchar_200_
   position_title varchar_200_
   date_applied date
-  status react_nestjs_application_status
+  status python_fastapi_application_status
   company_url text
   job_posting_url text
   company_career_url text
-  company_category react_nestjs_company_category
+  company_category python_fastapi_company_category
   skills_match integer
-  job_source react_nestjs_job_source
+  job_source python_fastapi_job_source
   cover_letter_required boolean
   special_requirements text
   salary_min integer
@@ -69,7 +61,7 @@ erDiagram
   created_at timestamp_with_time_zone
   updated_at timestamp_with_time_zone
 }
-"react_nestjs.interview_stages" {
+"python_fastapi.interview_stages" {
   id uuid
   application_id uuid FK
   name varchar_100_
@@ -78,6 +70,14 @@ erDiagram
   completed_date date
   notes text
   performance_rating integer
+}
+"python_fastapi.application_history" {
+  id uuid
+  application_id uuid FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  created_at timestamp_with_time_zone
 }
 ```
 
