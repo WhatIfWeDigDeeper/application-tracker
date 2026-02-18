@@ -86,6 +86,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Worktree/subagent sessions**: Auto-commit before returning (worktree is ephemeral)
 - **After every push to a PR branch**: Check whether the new commit(s) change the PR's scope. If so, immediately update the PR body via `gh pr edit <number> --body` — do not wait to be asked
 - **Spec status**: When a feature has a spec file in `specs/`, update its `Status` to `Complete` before merging the PR
+- **Wait for CI before merging**: Always check `gh pr checks <number>` and wait for all checks to pass before squash merging. Do not use `--admin` to bypass branch protection unless explicitly asked.
 - **Post-merge cleanup**: After squash merging a PR, immediately switch to main, pull, and delete the local branch (`git checkout main && git pull && git branch -d <branch>`)
 - **Documentation**: Update `README.md` and `CLAUDE.md` as part of completing tasks that add scripts/tools/infrastructure
 
