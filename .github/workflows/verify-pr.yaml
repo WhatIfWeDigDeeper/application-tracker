@@ -43,6 +43,16 @@ jobs:
         with:
           node-version-file: '.node-version'
 
+      - name: Install uv and Python
+        if: steps.docs-check.outputs.only_changed == 'false'
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install Python dependencies
+        if: steps.docs-check.outputs.only_changed == 'false'
+        run: cd fastapi && uv sync --extra dev
+
       - name: Run Security Audit
         if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run audit:ci:all
