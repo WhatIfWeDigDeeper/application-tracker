@@ -9,18 +9,23 @@ This document defines the valid state transitions for domain entities and their 
 ### State Diagram
 
 ```
-                         ┌─────────────┐
-                         │   applied   │ (initial state)
-                         └──────┬──────┘
-                                │
-               ┌────────────────┼────────────────┐
-               ▼                ▼                ▼
-        ┌─────────────┐  ┌───────────┐    ┌───────────┐
-        │interviewing │  │ rejected  │    │  (any)    │
-        └──────┬──────┘  └───────────┘    │ archived  │
-               │                          └───────────┘
-       ┌───────┼───────────┐
-       ▼       ▼           ▼
+                       ┌───────────────┐
+                       │ unsubmitted  │ (initial state)
+                       └──────┬────────┘
+                              │
+                              ▼
+                       ┌─────────────┐
+                       │   applied   │
+                       └──────┬──────┘
+                              │
+             ┌────────────────┼────────────────┐
+             ▼                ▼                ▼
+      ┌─────────────┐  ┌───────────┐    ┌───────────┐
+      │interviewing │  │ rejected  │    │  (any)    │
+      └──────┬──────┘  └───────────┘    │ archived  │
+             │                          └───────────┘
+     ┌───────┼───────────┐
+     ▼       ▼           ▼
 ┌─────────────┐ ┌─────────┐ ┌─────────┐
 │ given offer │ │no offer │ │ applied │ (revert)
 └─────┬───────┘ └─────────┘ └─────────┘
@@ -37,6 +42,11 @@ This document defines the valid state transitions for domain entities and their 
 
 | From | To | Allowed | Side Effects |
 |------|-----|---------|--------------|
+| unsubmitted | applied | Yes | Auto-populate dateApplied with today if null |
+| unsubmitted | interviewing | Yes | Auto-populate dateApplied; create default stages if none |
+| unsubmitted | rejected | Yes | Auto-populate dateApplied with today if null |
+| unsubmitted | given offer | Yes | Auto-populate dateApplied with today if null |
+| (any non-terminal) | unsubmitted | Yes | Clear dateApplied to null |
 | applied | rejected | Yes | None |
 | applied | interviewing | Yes | Create default interview stages if none exist |
 | applied | given offer | Yes | None (rare: direct offer) |
@@ -56,6 +66,21 @@ This document defines the valid state transitions for domain entities and their 
 | no offer | interviewing | Yes | New interview process |
 
 ### Side Effects Detail
+
+#### Transition: unsubmitted → (any status)
+
+When an application moves away from "unsubmitted":
+
+1. **Check** if dateApplied is null
+2. **If null**, auto-populate with today's date
+3. **If already set**, preserve existing value
+
+#### Transition: (any) → unsubmitted
+
+When an application reverts to "unsubmitted":
+
+1. **Clear** dateApplied to null
+2. Preserve all other application data
 
 #### Transition: applied → interviewing
 

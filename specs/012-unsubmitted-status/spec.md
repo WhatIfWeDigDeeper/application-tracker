@@ -1,7 +1,7 @@
 # Feature Specification: Unsubmitted Default Status
 
 **Created**: 2026-02-17
-**Status**: Draft
+**Status**: Complete
 **Depends on**: [011-csv-import-export](../011-csv-import-export/spec.md)
 **Input**: User requirement: "Add a new 'unsubmitted' status as the default. When unsubmitted, dateApplied should be null and disabled."
 

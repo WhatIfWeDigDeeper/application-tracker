@@ -2,7 +2,7 @@
 
 **Feature Branch**: `008-history-react-koa`
 **Created**: 2026-02-15
-**Status**: Draft
+**Status**: Complete
 **Input**: Add version history and restore functionality to the React-Koa stack, using a snapshot-based approach matching the Hono implementation.
 
 - [Context](#context)

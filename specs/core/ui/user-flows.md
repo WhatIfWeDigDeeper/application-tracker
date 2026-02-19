@@ -28,8 +28,8 @@ flowchart TD
 
 1. User is on the Application List screen
 2. User clicks "Add Application" button
-3. Modal opens with empty form
-4. User enters required fields (company name, position title)
+3. Modal opens with empty form (status defaults to Unsubmitted, date applied is empty)
+4. User enters required fields (company name, position title); date applied and status can be changed from defaults
 5. User optionally fills additional fields
 6. User clicks "Save"
 7. System validates input
@@ -317,6 +317,95 @@ flowchart TD
 4. User adds their first application
 5. Application appears in list
 6. User understands the basic workflow
+
+---
+
+## Flow 10: View and Restore Application History
+
+**Goal**: User reviews past changes to an application and optionally restores a previous version.
+
+```mermaid
+flowchart TD
+    A[View Application Detail] --> B[Click History Button]
+    B --> C[History Panel Slides Open]
+    C --> D[See Timeline of Changes]
+    D --> E[Click Entry to Expand]
+    E --> F[See Field-Level Diffs]
+    F --> G{Want to Restore?}
+    G -->|No| H[Close Panel]
+    G -->|Yes| I[Click Restore to This Point]
+    I --> J[Confirmation Dialog]
+    J -->|Confirm| K[Application Restored]
+    K --> L[New History Entry Created]
+    J -->|Cancel| D
+```
+
+### Steps
+
+1. User views an application detail page
+2. User clicks "History" button in the header
+3. Side panel slides open showing change timeline (newest first)
+4. User clicks an entry to expand field-level diffs
+5. User sees old values (struck-through) and new values
+6. User optionally clicks "Restore to this point"
+7. Confirmation dialog appears
+8. On confirm: application reverts to that snapshot's state
+9. New "Restored to version N" entry appears in history
+10. History panel updates to show the restore entry
+
+---
+
+## Flow 11: Import Applications from CSV
+
+**Goal**: User bulk-creates applications by uploading a CSV file.
+
+```mermaid
+flowchart TD
+    A[View Application List] --> B[Click Import]
+    B --> C[Import Modal Opens]
+    C --> D{Has Template?}
+    D -->|No| E[Download Template]
+    E --> F[Fill in CSV Data]
+    D -->|Yes| F
+    F --> G[Select CSV File]
+    G --> H[Click Upload]
+    H --> I[Processing...]
+    I --> J[Results Displayed]
+    J --> K[Close Modal]
+    K --> L[List Refreshes with New Apps]
+```
+
+### Steps
+
+1. User clicks "Import" button on the application list
+2. Import modal opens with file picker
+3. Optionally: user downloads template CSV for reference
+4. User selects a CSV file from their computer
+5. System uploads and processes the file row-by-row
+6. Modal displays results: N imported, N skipped (duplicates), N errors
+7. Errors show row number and description
+8. User closes modal
+9. Application list refreshes to include newly imported applications
+
+---
+
+## Flow 12: Export Applications to CSV
+
+**Goal**: User downloads all applications as a CSV file.
+
+```mermaid
+flowchart TD
+    A[View Application List] --> B[Click Export]
+    B --> C[Browser Downloads CSV]
+    C --> D[File: applications-YYYY-MM-DD.csv]
+```
+
+### Steps
+
+1. User clicks "Export" button on the application list
+2. Browser downloads a CSV file named `applications-YYYY-MM-DD.csv`
+3. CSV contains all applications (active and archived) with 16 columns
+4. Interview stages are excluded from the export (too complex for flat CSV)
 
 ---
 

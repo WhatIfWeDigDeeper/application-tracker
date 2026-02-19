@@ -2,7 +2,7 @@
 
 **Feature Branch**: `007-history-nextjs-express`
 **Created**: 2026-02-15
-**Status**: Draft
+**Status**: Complete
 **Input**: Add version history and restore functionality to the Next.js+Express stack, using a snapshot-based approach matching the Hono implementation.
 
 - [Context](#context)
