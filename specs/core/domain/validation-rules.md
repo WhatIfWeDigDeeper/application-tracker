@@ -45,6 +45,8 @@ This document defines validation rules for domain entities, independent of any v
 | Rule | Error Message |
 |------|---------------|
 | If both salaryMin and salaryMax provided, salaryMin <= salaryMax | "Minimum salary cannot exceed maximum salary" |
+| If status is "unsubmitted", dateApplied must be null | "Date applied must be empty when status is unsubmitted" |
+| If status is not "unsubmitted" and dateApplied transitions from null, auto-populate with today | (Auto-correction, not error) |
 
 ### Enum Validation
 
@@ -58,7 +60,7 @@ This document defines validation rules for domain entities, independent of any v
 
 | Field | Rule | Error Message |
 |-------|------|---------------|
-| dateApplied | Must be valid date format | "Invalid date format" |
+| dateApplied | If provided, must be valid date format. May be null. | "Invalid date format" |
 | offerDueDate | If provided, must be valid date format | "Invalid offer due date format" |
 
 ---
@@ -105,6 +107,7 @@ This document defines validation rules for domain entities, independent of any v
 
 - All required field validations apply
 - Default values are applied before validation where specified
+- Default status is `unsubmitted` with `dateApplied` as null
 - Invalid input prevents creation and returns validation errors
 
 ### On Update (Partial)

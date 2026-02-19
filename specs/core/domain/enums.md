@@ -10,6 +10,7 @@ The current state of a job application in the hiring pipeline.
 
 | Value | Display Name | Description |
 |-------|--------------|-------------|
+| `unsubmitted` | Unsubmitted | Application saved as draft, not yet submitted |
 | `applied` | Applied | Application submitted, awaiting response |
 | `rejected` | Rejected | Application was rejected |
 | `interviewing` | Interviewing | Active interview process |
@@ -27,6 +28,7 @@ For filtering and display purposes, statuses can be grouped:
 | Active | applied, interviewing, given offer |
 | Closed - Positive | accepted offer |
 | Closed - Negative | rejected, declined offer, no offer |
+| Draft | unsubmitted |
 | Terminal | accepted offer, declined offer |
 
 ---
@@ -121,6 +123,8 @@ Available fields for sorting application lists.
 | `companyName` | Company Name | Alphabetical by company |
 | `status` | Status | Grouped by application status |
 | `updatedAt` | Last Updated | Most recently modified |
+
+**Default sort**: `updatedAt` descending. When sorting by `dateApplied`, null values sort last regardless of direction.
 
 ## Sort Directions
 

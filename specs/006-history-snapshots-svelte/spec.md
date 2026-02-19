@@ -2,7 +2,7 @@
 
 **Feature Branch**: `006-history-snapshots-svelte`
 **Created**: 2026-02-15
-**Status**: Draft
+**Status**: Complete
 **Input**: Add version history and restore functionality to the Svelte+Hono stack, using a snapshot-based approach idiomatic to Drizzle's service-layer patterns.
 
 - [Context](#context)

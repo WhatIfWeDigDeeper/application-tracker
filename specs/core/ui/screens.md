@@ -26,7 +26,7 @@ Note: This is a single-page application with most interactions via modals. Alter
 ┌─────────────────────────────────────────────────────────────────┐
 │ HEADER                                                          │
 │ ┌─────────────────────────────────┐  ┌───────────────────────┐ │
-│ │ Job Application Tracker         │  │ [Theme Toggle] [+ Add]│ │
+│ │ Job Application Tracker         │  │ [Theme] [Import] [Export] [+ Add]│ │
 │ └─────────────────────────────────┘  └───────────────────────┘ │
 ├─────────────────────────────────────────────────────────────────┤
 │ FILTERS & SORT BAR                                              │
@@ -106,7 +106,7 @@ Note: This is a single-page application with most interactions via modals. Alter
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ HEADER                                                          │
-│ ← Back to List                              [Edit] [Archive]   │
+│ ← Back to List                     [History] [Edit] [Archive]   │
 ├─────────────────────────────────────────────────────────────────┤
 │ APPLICATION HEADER                                              │
 │ ┌─────────────────────────────────────────────────────────────┐ │
@@ -149,6 +149,19 @@ Note: This is a single-page application with most interactions via modals. Alter
 │ SPECIAL REQUIREMENTS                                            │
 │ ┌─────────────────────────────────────────────────────────────┐ │
 │ │ Portfolio required. Code sample in Python or TypeScript.   │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────────────────┤
+│ HISTORY PANEL (slides from right when History clicked)           │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ Change History                                    [X Close] │ │
+│ │                                                             │ │
+│ │ ● Status changed to "interviewing"         2 hours ago     │ │
+│ │   ▸ Click to expand diffs                                  │ │
+│ │                                                             │ │
+│ │ ● Application created                          yesterday   │ │
+│ │   status: — → applied                                      │ │
+│ │   companyName: — → Acme Corp                               │ │
+│ │   [Restore to this point]                                  │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 ├─────────────────────────────────────────────────────────────────┤
 │ FOOTER                                                          │
@@ -216,8 +229,8 @@ Note: This is a single-page application with most interactions via modals. Alter
 │ REQUIRED FIELDS                                                 │
 │ Company Name*     [________________________]                    │
 │ Position Title*   [________________________]                    │
-│ Date Applied      [____/____/____] (defaults to today)         │
-│ Status            [Applied ▼]                                   │
+│ Date Applied      [____/____/____] (empty by default)          │
+│ Status            [Unsubmitted ▼]                               │
 ├─────────────────────────────────────────────────────────────────┤
 │ COMPANY DETAILS                                                 │
 │ Company Website   [________________________]                    │
@@ -301,6 +314,38 @@ Note: This is a single-page application with most interactions via modals. Alter
 │ notes will be permanently removed.                              │
 ├─────────────────────────────────────────────────────────────────┤
 │                                         [Cancel]  [Delete]      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Modal: Import CSV
+
+**Purpose**: Upload a CSV file to bulk-create applications.
+
+### Layout
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Import Applications from CSV                             [X Close]│
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ Upload a CSV file to create multiple applications at once.      │
+│ [Download Template] to see the expected format.                 │
+│                                                                 │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │  📂 Choose CSV file...                          [Browse]   │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│ RESULTS (shown after upload)                                    │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ ✓ 8 imported  |  ⊘ 2 skipped (duplicates)  |  ✗ 1 error  │ │
+│ │                                                             │ │
+│ │ Errors:                                                     │ │
+│ │ • Row 5: Invalid status "pending"                           │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│                                                      [Close]    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 

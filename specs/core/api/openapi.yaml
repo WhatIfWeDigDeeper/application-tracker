@@ -34,6 +34,10 @@ tags:
     description: Interview progress tracking
   - name: System
     description: Health and status
+  - name: History
+    description: Application change history and restore
+  - name: Import/Export
+    description: CSV import and export
 
 paths:
   /health:
@@ -103,7 +107,7 @@ paths:
           schema:
             type: string
             enum: [dateApplied, companyName, updatedAt]
-            default: dateApplied
+            default: updatedAt
         - name: sortDir
           in: query
           description: Sort direction
@@ -409,6 +413,132 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /applications/{id}/history:
+    parameters:
+      - $ref: '#/components/parameters/ApplicationId'
+
+    get:
+      tags: [History]
+      summary: Get application history
+      description: Returns chronological list of snapshots for an application, newest first
+      operationId: getApplicationHistory
+      responses:
+        '200':
+          description: List of history entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoryEntry'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /applications/{id}/history/{historyId}/restore:
+    parameters:
+      - $ref: '#/components/parameters/ApplicationId'
+      - name: historyId
+        in: path
+        required: true
+        description: History entry UUID
+        schema:
+          type: string
+          format: uuid
+
+    post:
+      tags: [History]
+      summary: Restore to historical version
+      description: Restores the application to the state captured in the specified history entry
+      operationId: restoreApplicationVersion
+      responses:
+        '200':
+          description: Application restored to historical state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /applications/import:
+    post:
+      tags: [Import/Export]
+      summary: Import applications from CSV
+      description: |
+        Uploads a CSV file and creates applications for each valid row.
+        Rows are processed independently - partial success is possible.
+        Duplicate detection uses jobPostingUrl.
+      operationId: importApplicationsCsv
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file with application data
+      responses:
+        '200':
+          description: Import results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /applications/export:
+    get:
+      tags: [Import/Export]
+      summary: Export applications as CSV
+      description: Downloads all applications (including archived) as a CSV file
+      operationId: exportApplicationsCsv
+      responses:
+        '200':
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: 'attachment; filename="applications-YYYY-MM-DD.csv"'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /applications/sample-csv:
+    get:
+      tags: [Import/Export]
+      summary: Download CSV template
+      description: Downloads a CSV template with headers and one example row
+      operationId: getSampleCsv
+      responses:
+        '200':
+          description: CSV template download
+          content:
+            text/csv:
+              schema:
+                type: string
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: 'attachment; filename="application-tracker-template.csv"'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 components:
   parameters:
     ApplicationId:
@@ -518,7 +648,6 @@ components:
         - id
         - companyName
         - positionTitle
-        - dateApplied
         - status
         - createdAt
         - updatedAt
@@ -537,6 +666,7 @@ components:
         dateApplied:
           type: string
           format: date
+          nullable: true
         status:
           $ref: '#/components/schemas/ApplicationStatus'
         createdAt:
@@ -628,6 +758,7 @@ components:
     ApplicationStatus:
       type: string
       enum:
+        - unsubmitted
         - applied
         - rejected
         - interviewing
@@ -687,6 +818,7 @@ components:
         dateApplied:
           type: string
           format: date
+          nullable: true
         companyUrl:
           type: string
           format: uri
@@ -733,6 +865,7 @@ components:
         dateApplied:
           type: string
           format: date
+          nullable: true
         status:
           $ref: '#/components/schemas/ApplicationStatus'
         companyUrl:
@@ -830,3 +963,50 @@ components:
           minimum: 1
           maximum: 5
           nullable: true
+
+    HistoryEntry:
+      type: object
+      required: [id, applicationId, sequenceNumber, snapshot, description, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        applicationId:
+          type: string
+          format: uuid
+        sequenceNumber:
+          type: integer
+          description: Monotonically increasing per application
+        snapshot:
+          type: object
+          description: Full application state at this point in time
+        description:
+          type: string
+          description: Human-readable change summary
+        createdAt:
+          type: string
+          format: date-time
+
+    ImportResult:
+      type: object
+      required: [imported, skipped, errors]
+      properties:
+        imported:
+          type: integer
+          description: Number of successfully imported applications
+        skipped:
+          type: integer
+          description: Number of rows skipped (duplicates)
+        errors:
+          type: array
+          description: Per-row error details
+          items:
+            type: object
+            required: [row, message]
+            properties:
+              row:
+                type: integer
+                description: 1-indexed row number in the CSV
+              message:
+                type: string
+                description: Error description

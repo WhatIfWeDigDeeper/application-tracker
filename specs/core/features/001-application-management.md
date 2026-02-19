@@ -28,7 +28,7 @@ Users need to record job applications they submit, capturing essential details l
 
 2. **Given** I am filling out the new application form
    **When** I enter a company name and position title and submit
-   **Then** the application is created with status "applied" and today's date
+   **Then** the application is created with status "unsubmitted" and no date applied
 
 3. **Given** I am filling out the new application form
    **When** I leave required fields empty and submit
@@ -145,8 +145,8 @@ Process:
   1. Validate required fields present and valid
   2. Validate optional fields if provided
   3. Generate unique ID
-  4. Set dateApplied to today if not provided
-  5. Set status to "applied"
+  4. Leave dateApplied as null if not provided
+  5. Set status to "unsubmitted"
   6. Set createdAt and updatedAt to now
   7. Set isArchived to false
   8. Initialize interviewStages to empty array

@@ -20,6 +20,10 @@ These specifications define **what** the application does without prescribing **
 - [003-offer-management.md](features/003-offer-management.md) - Manage offers and deadlines
 - [004-filtering-sorting.md](features/004-filtering-sorting.md) - Filter and sort the list
 - [005-archive-delete.md](features/005-archive-delete.md) - Archive and delete applications
+- [006-history.md](features/006-history.md) - Application change history and restore
+- [007-csv-import-export.md](features/007-csv-import-export.md) - CSV import and export
+- [008-inline-editing.md](features/008-inline-editing.md) - Inline field editing
+- [009-resizable-textareas.md](features/009-resizable-textareas.md) - Resizable textarea fields
 
 ### API Contract
 - [openapi.yaml](api/openapi.yaml) - RESTful API specification (OpenAPI 3.0)
@@ -74,9 +78,18 @@ Adapt UI specs for mobile patterns.
 This `core/` directory contains technology-agnostic specifications.
 
 The sibling directories contain technology-specific implementation details:
-- `001-job-application-tracker/` - React + Next.js + localStorage implementation
-- `002-dark-mode/` - Tailwind CSS dark mode implementation
+- `001-job-application-tracker/` - React + Next.js initial implementation
+- `002-dark-mode/` - Dark mode theme support
 - `003-express-api-prisma/` - Express + Prisma + PostgreSQL backend
+- `004-event-sourcing-undo-redo/` - Vue + Nuxt event sourcing
+- `005-inline-edit-*` - Inline editing implementations
+- `006-008-history-*` - History implementations per stack
+- `009-react-nestjs/` - React + TanStack + NestJS implementation
+- `010-nullable-date-applied/` - Nullable dateApplied
+- `011-csv-import-export/` - CSV import/export for NestJS
+- `012-unsubmitted-status/` - Unsubmitted default status
+- `013-resizable-textareas/` - Resizable textareas
+- `014-python-fastapi/` - Python FastAPI backend
 
 The core specs were extracted from these implementation specs to enable alternative implementations.
 
@@ -129,3 +142,6 @@ Optional for full completion:
 - Responsive design works on mobile
 - Dark mode supported
 - Accessibility requirements met
+- History panel with restore functionality
+- CSV import/export
+- Inline editing (alternative to modal)
