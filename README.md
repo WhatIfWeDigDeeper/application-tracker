@@ -284,6 +284,16 @@ npx skills add -y whatifwedigdeeper/agent-skills
 
 See [.claude/](.claude/) for all available commands and skills.
 
+### Notifications (Optional)
+
+Claude Code hooks in `.claude/settings.json` send macOS notifications when Claude needs input (permission prompts, questions, idle). This requires [terminal-notifier](https://github.com/julienXX/terminal-notifier):
+
+```bash
+brew install terminal-notifier
+```
+
+No configuration needed — the hooks are already in `.claude/settings.json`. If you don't install it, hooks fail silently with no impact.
+
 ## License
 
 MIT

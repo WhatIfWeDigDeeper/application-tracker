@@ -2,8 +2,9 @@
 name: js-deps
 description: >
   Maintain JavaScript/Node.js packages through security audits or dependency updates on a dedicated branch.
-  Supports npm, yarn, pnpm, and bun. Use for: security audits, CVE fixes, vulnerability checks,
-  dependency updates, package upgrades, or when user types "/js-deps" with or without specific package names or glob patterns. Use "help" or "--help" to show update options.
+  Supports npm, yarn, pnpm, and bun. Use for: security audits, CVE fixes, vulnerability checks, dependency updates,
+  package upgrades, outdated packages, bump versions, fix npm vulnerabilities, modernize node_modules, or when user
+  types "/js-deps" with or without specific package names or glob patterns. Use "help" or "--help" to show options.
 license: MIT
 compatibility: Requires git, a JavaScript package manager (npm, yarn, pnpm, or bun), and network access to package registries
 metadata:
