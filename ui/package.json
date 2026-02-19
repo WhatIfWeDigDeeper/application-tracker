@@ -20,6 +20,14 @@
     "react-dom": "^19.2.4",
     "uuid": "^13.0.0"
   },
+  "overrides": {
+    "eslint-plugin-react-hooks": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-react": {
+      "eslint": "$eslint"
+    }
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^10.0.1",

@@ -16,6 +16,11 @@
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
+  "overrides": {
+    "eslint-plugin-react-hooks": {
+      "eslint": "$eslint"
+    }
+  },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@tailwindcss/postcss": "4.1.18",

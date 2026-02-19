@@ -16,6 +16,11 @@
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.0"
   },
+  "overrides": {
+    "eslint-plugin-react-hooks": {
+      "eslint": "$eslint"
+    }
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.2.0",

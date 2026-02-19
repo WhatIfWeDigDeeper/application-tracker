@@ -99,3 +99,6 @@ fi
 
 - **Glob matches nothing**: Warn and list available packages
 - **Unsupported package manager**: Prompt user for guidance
+- **Peer dep conflicts after major upgrades**: When a plugin doesn't declare support for the new major version of its host (e.g., `eslint-plugin-react-hooks` not supporting eslint 10), add `"overrides"` to `package.json` rather than using `--legacy-peer-deps`. Example: `"overrides": { "eslint-plugin-react-hooks": { "eslint": "$eslint" } }`. The `$eslint` syntax references the version already declared in the package's own dependencies
+- **Lockfile sync**: After all package.json changes, run `$PM install` in every modified directory and commit lockfiles — CI tools like `npm ci` require exact sync between package.json and the lockfile
+- **Verify devDependencies placement**: After bulk installs across directories, verify that linting/testing packages (eslint, typescript-eslint, etc.) ended up in `devDependencies`, not `dependencies` — easy to misplace when running install commands across many directories
