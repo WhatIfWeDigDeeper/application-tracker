@@ -90,9 +90,9 @@ async def list_applications(
         *params,
     )
 
-    # Sort
+    # Sort — whitelist direction to prevent SQL injection
     sort_column = SORT_COLUMN_MAP.get(sort_by, "updated_at")
-    direction = "ASC" if sort_dir.lower() == "asc" else "DESC"
+    direction = "ASC" if sort_dir.lower() == "asc" else "DESC"  # only ASC or DESC possible
     nulls = " NULLS LAST" if sort_column == "date_applied" else ""
     order_clause = f"{sort_column} {direction}{nulls}"
 

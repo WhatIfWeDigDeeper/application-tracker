@@ -78,6 +78,7 @@ async def update_interview_stage(
     params: list[object] = [stage_id]  # $1 is stage_id
     param_idx = 2
 
+    # Column names come from this trusted static map — safe for f-string SQL interpolation
     field_column_map = {
         "name": "name",
         "order": '"order"',

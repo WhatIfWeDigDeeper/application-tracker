@@ -22,9 +22,12 @@ def format_date(d: date | str | None) -> str | None:
 
 
 def format_datetime(dt: datetime | None) -> str:
-    """Format a datetime to ISO 8601 string."""
+    """Format a datetime to ISO 8601 string.
+
+    Raises ValueError if dt is None, since created_at/updated_at are NOT NULL columns.
+    """
     if dt is None:
-        return datetime.now().isoformat()
+        raise ValueError("Expected a datetime value but got None")
     return dt.isoformat()
 
 

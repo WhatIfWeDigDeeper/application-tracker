@@ -66,12 +66,9 @@ class TestFormatDatetime:
         dt = datetime(2026, 2, 18, 14, 30, 0)
         assert format_datetime(dt) == "2026-02-18T14:30:00"
 
-    def test_none_returns_current_time(self) -> None:
-        result = format_datetime(None)
-        # Should be a valid ISO datetime string (not empty)
-        assert "T" in result
-        # Should parse back to a datetime
-        datetime.fromisoformat(result)
+    def test_none_raises_value_error(self) -> None:
+        with pytest.raises(ValueError, match="Expected a datetime"):
+            format_datetime(None)
 
     def test_datetime_with_microseconds(self) -> None:
         dt = datetime(2026, 2, 18, 14, 30, 0, 123456)
