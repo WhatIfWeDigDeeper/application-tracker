@@ -124,3 +124,12 @@ Collect results from all agents before generating final report.
 - Provide specific remediation steps for unfixable vulnerabilities
 - If partially successful, still create PR with remaining issues noted
 
+### Upstream-Unfixable Vulnerabilities
+
+When transitive dependencies have vulnerabilities that no direct dependency update can resolve:
+
+1. Check if the project uses `audit-ci` or similar CI audit tools (look for `.auditconfig.json` or audit scripts in `package.json`)
+2. If so, add the advisory ID (e.g., `GHSA-xxxx-xxxx-xxxx`) to the `allowlist` array in each package's audit config
+3. Document the upstream blockers in the PR description — list which packages hold the vulnerable transitive dependency and why no fix is available
+4. Include the allowlist change in the same commit/PR as the fixable updates
+

@@ -10,7 +10,7 @@
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
 | date_applied | date |  | true |  |  |  |
-| status | react_koa.application_status | 'applied'::react_koa.application_status | false |  |  |  |
+| status | react_koa.application_status | 'unsubmitted'::react_koa.application_status | false |  |  |  |
 | created_at | timestamp with time zone | now() | false |  |  |  |
 | updated_at | timestamp with time zone | now() | false |  |  |  |
 | company_url | text |  | true |  |  |  |

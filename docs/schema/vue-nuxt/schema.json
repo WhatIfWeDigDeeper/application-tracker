@@ -29,7 +29,7 @@
           "name": "status",
           "type": "vue_nuxt.application_status",
           "nullable": false,
-          "default": "'applied'::vue_nuxt.application_status"
+          "default": "'unsubmitted'::vue_nuxt.application_status"
         },
         {
           "name": "company_url",
@@ -729,6 +729,55 @@
       ]
     },
     {
+      "name": "python_fastapi.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "python_fastapi.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "python_fastapi.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
       "name": "react_koa.application_status",
       "values": [
         "accepted offer",
@@ -737,7 +786,8 @@
         "given offer",
         "interviewing",
         "no offer",
-        "rejected"
+        "rejected",
+        "unsubmitted"
       ]
     },
     {
@@ -785,7 +835,8 @@
         "given offer",
         "interviewing",
         "no offer",
-        "rejected"
+        "rejected",
+        "unsubmitted"
       ]
     },
     {
@@ -833,7 +884,8 @@
         "given offer",
         "interviewing",
         "no offer",
-        "rejected"
+        "rejected",
+        "unsubmitted"
       ]
     },
     {
@@ -881,7 +933,8 @@
         "given offer",
         "interviewing",
         "no offer",
-        "rejected"
+        "rejected",
+        "unsubmitted"
       ]
     },
     {

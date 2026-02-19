@@ -53,6 +53,7 @@ SCHEMAS=(
   "svelte_hono:svelte-hono"
   "vue_nuxt:vue-nuxt"
   "react_nestjs:react-nestjs"
+  "python_fastapi:python-fastapi"
 )
 
 for entry in "${SCHEMAS[@]}"; do

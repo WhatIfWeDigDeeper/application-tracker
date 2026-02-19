@@ -1,0 +1,13 @@
+version: "0.2"
+ignorePaths: []
+dictionaryDefinitions: []
+dictionaries: []
+words:
+  - auditconfig
+  - fastapi
+  - mypy
+  - pyproject
+  - pytest
+  - venv
+ignoreWords: []
+import: []

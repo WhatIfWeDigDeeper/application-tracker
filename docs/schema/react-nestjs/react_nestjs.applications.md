@@ -10,7 +10,7 @@
 | company_name | varchar(200) |  | false |  |  |  |
 | position_title | varchar(200) |  | false |  |  |  |
 | date_applied | date |  | true |  |  |  |
-| status | react_nestjs.application_status | 'applied'::react_nestjs.application_status | false |  |  |  |
+| status | react_nestjs.application_status | 'unsubmitted'::react_nestjs.application_status | false |  |  |  |
 | company_url | text |  | true |  |  |  |
 | job_posting_url | text |  | true |  |  |  |
 | company_career_url | text |  | true |  |  |  |

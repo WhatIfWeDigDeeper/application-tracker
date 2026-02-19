@@ -10,6 +10,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [3. React + Koa + PostgreSQL](#3-react--koa--postgresql)
   - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
   - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
+  - [6. Python + FastAPI + asyncpg](#6-python--fastapi--asyncpg)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -29,7 +30,7 @@ A full-stack job application tracking system with multiple technology stack impl
 
 ## Overview
 
-This repository contains a complete job application tracker built with five different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
+This repository contains a complete job application tracker built with six different backend implementations (five with paired frontends, one API-only). Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
 
 ### Sample Editing screen
 
@@ -76,6 +77,14 @@ Please note that the UI is still being refined.
 - Database: Drizzle ORM + PostgreSQL
 - Snapshot-based history with field diffs and restore
 
+### 6. Python + FastAPI + asyncpg
+**Directory**: `fastapi/`
+**Stack**:
+- Backend: Python 3.14 + FastAPI + Pydantic v2
+- Database: asyncpg (raw SQL, no ORM)
+- API-only (pairs with any existing frontend by changing its proxy target)
+- Snapshot-based history with field diffs and restore
+
 ## Core Features
 
 All implementations provide:
@@ -99,6 +108,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `react_koa` | React + Koa + PostgreSQL | [schema docs](docs/schema/react-koa/README.md) |
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
+| `python_fastapi` | Python + FastAPI + asyncpg | [schema docs](docs/schema/python-fastapi/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -127,6 +137,7 @@ Regenerate with `npm run docs:types`.
 ├── tanstack-ui/                  # React + TanStack Query/Router UI
 ├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
+├── fastapi/                      # Python FastAPI API
 ├── specs/                        # Feature specifications
 ├── docs/                         # Documentation
 ├── .claude/                      # Claude Code skills and commands
@@ -139,6 +150,7 @@ Regenerate with `npm run docs:types`.
 ### Prerequisites
 
 - Node.js (v18+)
+- Python 3.14+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
 - Docker and Docker Compose (for PostgreSQL)
 - [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
@@ -183,6 +195,9 @@ cd hono-api && npm run dev
 # React + TanStack + NestJS (UI 3050 + API 5050)
 cd tanstack-ui && npm run dev
 cd nest-api && npm run dev
+
+# Python FastAPI (API 5160)
+npm run dev:fastapi
 ```
 
 ### Schema Documentation
@@ -210,6 +225,7 @@ npm run test:svelte-ui    # Svelte UI tests
 npm run test:vue-ui       # Vue UI tests
 npm run test:nest-api     # NestJS API tests
 npm run test:tanstack-ui  # TanStack UI tests
+npm run test:fastapi      # FastAPI pytest unit tests
 ```
 
 Run all unit tests:

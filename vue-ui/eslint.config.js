@@ -46,7 +46,8 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       'vue/multi-word-component-names': 'off',
-      'no-undef': 'off' // TypeScript handles this
+      'no-undef': 'off', // TypeScript handles this
+      'no-useless-assignment': 'off' // False positives in Vue <script setup>
     }
   },
   {
