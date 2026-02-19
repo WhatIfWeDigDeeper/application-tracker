@@ -33,6 +33,9 @@ jobs:
             .github/**/*.md
             .specifykit/**
             .vscode/**
+            .gitignore
+            docker-compose.yml
+            cspell.config.yaml
           files_ignore: |
             package.json
             **/package.json
