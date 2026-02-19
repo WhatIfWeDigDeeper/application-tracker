@@ -1,7 +1,7 @@
 # Feature Specification: CSV Import/Export
 
 **Created**: 2026-02-16
-**Status**: Draft
+**Status**: Complete
 **Depends on**: [010-nullable-date-applied](../010-nullable-date-applied/spec.md)
 **Input**: User requirement: "Add CSV import with duplicate detection on job posting URL, CSV export, and a downloadable sample template. Start with nest-api + tanstack-ui."
 

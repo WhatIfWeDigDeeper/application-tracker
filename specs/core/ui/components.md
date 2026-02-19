@@ -21,6 +21,8 @@ This document defines reusable UI components and their behaviors, independent of
 | ConfirmDialog | Confirmation modal |
 | EmptyState | No data placeholder |
 | Pagination | Page navigation |
+| HistoryPanel | Sliding panel showing application change timeline |
+| ImportModal | CSV file upload dialog with results display |
 
 ---
 
@@ -42,7 +44,7 @@ This document defines reusable UI components and their behaviors, independent of
 - Company name (primary text)
 - Position title (secondary text)
 - Status badge
-- Date applied
+- Date applied (displays '—' when null)
 - Company category (if set)
 - Skills match rating (if set)
 - Interview progress "X/Y stages" (if interviewing)
@@ -257,6 +259,7 @@ See [validation-rules.md](../domain/validation-rules.md).
 
 | Status | Color Category |
 |--------|----------------|
+| unsubmitted | Draft (gray) |
 | applied | Neutral (gray/blue) |
 | interviewing | Active (blue/purple) |
 | given offer | Warning (yellow/orange) |
@@ -387,6 +390,92 @@ See [validation-rules.md](../domain/validation-rules.md).
 - Click Previous → go to previous page (disabled on page 1)
 - Click Next → go to next page (disabled on last page)
 - Show subset of pages with ellipsis for large page counts
+
+---
+
+## Component: HistoryPanel
+
+**Purpose**: Sliding side panel showing the history of changes to an application.
+
+### Props/Inputs
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| applicationId | UUID | yes | Application to show history for |
+| isOpen | boolean | yes | Whether the panel is visible |
+| onClose | function | yes | Handler for closing the panel |
+| onRestore | function | yes | Handler for restoring to a version |
+
+### Display Elements
+
+- Panel title "Change History" with close button
+- Timeline list of history entries, newest first
+- Each entry shows:
+  - Human-readable description (e.g., "Status changed to interviewing")
+  - Relative timestamp (e.g., "2 hours ago")
+  - Expand/collapse toggle for field-level diffs
+- Expanded entry shows:
+  - List of changed fields
+  - Old value (struck-through, red/muted)
+  - New value (green/highlighted)
+  - "Restore to this point" button (except on most recent entry)
+
+### Interactions
+
+- Click entry → expand/collapse field diffs
+- Click "Restore to this point" → confirm dialog → restore application
+- Click close or click outside → panel closes
+- Escape key → panel closes
+
+### Variants
+
+| State | Visual Treatment |
+|-------|------------------|
+| Loading | Skeleton placeholder entries |
+| Empty | "No history available" message |
+| Entry expanded | Diffs visible below description |
+| Current version | Marked "(current)" with no restore button |
+
+---
+
+## Component: ImportModal
+
+**Purpose**: Dialog for uploading a CSV file and viewing import results.
+
+### Props/Inputs
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| isOpen | boolean | yes | Whether the modal is visible |
+| onClose | function | yes | Handler for closing |
+| onImportComplete | function | yes | Handler called after successful import |
+
+### Display Elements
+
+- Modal title "Import Applications from CSV"
+- Download template link
+- File input accepting .csv files only
+- Upload/import button
+- Results section (shown after upload):
+  - Imported count (success)
+  - Skipped count (duplicates)
+  - Error count with per-row details
+
+### Interactions
+
+- Select file → enable upload button
+- Click upload → show loading, process file, show results
+- Click "Download Template" → browser downloads template CSV
+- Click close → dismiss modal, refresh application list if imports occurred
+
+### States
+
+| State | Behavior |
+|-------|----------|
+| Initial | File picker shown, no results |
+| Uploading | Loading indicator, controls disabled |
+| Results | Counts shown, file picker reset for another import |
+| Error | Upload-level error message (e.g., not a CSV file) |
 
 ---
 

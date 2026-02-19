@@ -1,7 +1,7 @@
 # Feature Specification: Nullable Date Applied
 
 **Created**: 2026-02-16
-**Status**: Draft
+**Status**: Complete
 **Input**: User requirement: "Make dateApplied nullable — I frequently create application records before actually applying, so the date field shouldn't auto-fill with today's date"
 
 - [Clarifications](#clarifications)
