@@ -8,6 +8,7 @@ words:
   - mypy
   - pyproject
   - pytest
+  - uvx
   - venv
 ignoreWords: []
 import: []
