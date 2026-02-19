@@ -6,6 +6,8 @@ words:
   - auditconfig
   - fastapi
   - mypy
+  - pyproject
   - pytest
+  - venv
 ignoreWords: []
 import: []

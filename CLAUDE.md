@@ -9,9 +9,11 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 ## Key Patterns
 
 - **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`
-- **Validation Chain**: `build` → `lint` → `test` → `test:e2e`
+- **Validation Chain**: `build:*` → `lint:*` → `test:*` → `test:e2e:*`
+- **Script Naming**: Every composite script uses a stack suffix (e.g., `build:express`, `test:e2e:tanstack`) — no bare/unnamed scripts. Use `:all` suffix for cross-stack scripts. When adding a new implementation, add its scripts to all groups (`dev`, `build`, `lint`, `test`, `*:all`) and to `scripts/stop-all.sh`.
 - **Parallel Execution**: 3+ items use Task tool subagents
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
+- **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
 
 ## Active Technologies
 
@@ -42,18 +44,20 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 **Always complete the full validation chain before committing** — `tsc --noEmit` alone is not sufficient. Re-run the entire chain after every round of changes — not just the initial implementation. Fixing a bug introduced during review still requires the full chain.
 
 1. **Add tests** - Create or update tests for new functionality
-2. **Build** - `npm run build` (runs per-package build; catches compilation errors)
-3. **Lint** - `npm run lint` (ESLint across all packages)
-4. **Test** - `npm test` (unit/integration tests — catches logic errors `tsc` misses)
-5. **E2E** *(when UI/API behavior changed)* - `npm run test:e2e` (or stack-specific variant)
+2. **Build** - `npm run build:<stack>` (runs per-package build; catches compilation errors)
+3. **Lint** - `npm run lint:<stack>` (ESLint/ruff across packages)
+4. **Test** - `npm run test:<stack>` (unit/integration tests — catches logic errors `tsc` misses)
+5. **E2E** *(when UI/API behavior changed)* - `npm run test:e2e:<stack>` (e.g., `test:e2e:express`)
 
 **Skip when:** trivial changes (all steps), test-only changes (step 1), docs-only changes (all steps).
 
 ## Dependency Management
 
-When installing **new packages**: use latest stable version, exact versions (no ^ or ~), install `@types/*` if needed.
+When installing **new npm packages**: use latest stable version, exact versions (no ^ or ~), install `@types/*` if needed.
 
-When **updating**: use the `update-deps` skill, then run the full validation chain.
+When installing **new Python packages**: `cd fastapi && uv add <package>` (or `uv add --dev <package>` for dev deps). Use exact versions in `pyproject.toml`.
+
+When **updating**: use the `update-deps` skill (npm only), then run the full validation chain. For Python deps, use `uv lock --upgrade-package <package>`.
 
 ## API Design Patterns
 
@@ -95,13 +99,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 ## Running E2E Tests
 
-```bash
-npm run test:e2e           # Next.js (port 3000)
-npm run test:e2e:react-koa # React-Koa (port 3010)
-npm run test:e2e:vue       # Vue-Nuxt (port 3020)
-npm run test:e2e:svelte    # Svelte-Hono (port 3030)
-npm run test:e2e:tanstack  # React+TanStack-NestJS (port 3050)
-```
+Run all: `npm run test:e2e:all`. Run one stack: `npm run test:e2e:<stack>` where stack is `express`, `react-koa`, `vue`, `svelte`, or `tanstack`.
 
 Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
 
