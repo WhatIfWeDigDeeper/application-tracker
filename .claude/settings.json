@@ -83,7 +83,8 @@
       "npm",
       "npx",
       "playwright",
-      "redis-cli"
+      "redis-cli",
+      "uv"
     ]
   }
 }

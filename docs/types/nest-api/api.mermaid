@@ -1,0 +1,81 @@
+classDiagram
+  %% Legend
+  %% --|> : Inheritance (extends)
+  %% ..|> : Implementation (implements)
+  %% --* : Composition (has/contains)
+  %% -- : Association
+
+  %% Errors encountered during conversion:
+  %% - TS2307: Cannot find module 'zod' or its corresponding type declarations.
+
+  class ApplicationStatus {
+    +value: z.infer~typeof ApplicationStatusSchema~
+  }
+
+  class CompanyCategory {
+    +value: z.infer~typeof CompanyCategorySchema~
+  }
+
+  class JobSource {
+    +value: z.infer~typeof JobSourceSchema~
+  }
+
+  class InterviewStageResponse {
+    +value: z.infer~typeof InterviewStageSchema~
+  }
+
+  class CreateInterviewStageInput {
+    +value: z.infer~typeof CreateInterviewStageSchema~
+  }
+
+  class UpdateInterviewStageInput {
+    +value: z.infer~typeof UpdateInterviewStageSchema~
+  }
+
+  class ApplicationResponse {
+    +value: z.infer~typeof ApplicationSchema~
+  }
+
+  class CreateApplicationInput {
+    +value: z.infer~typeof CreateApplicationSchema~
+  }
+
+  class UpdateApplicationInput {
+    +value: z.infer~typeof UpdateApplicationSchema~
+  }
+
+  class ListApplicationsQuery {
+    +value: z.infer~typeof ListApplicationsQuerySchema~
+  }
+
+  class PaginatedApplicationsResponse {
+    +value: z.infer~typeof PaginatedApplicationsSchema~
+  }
+
+  class FieldChange {
+    +value: z.infer~typeof FieldChangeSchema~
+  }
+
+  class HistoryEntryResponse {
+    +value: z.infer~typeof HistoryEntrySchema~
+  }
+
+  class PaginatedHistoryResponse {
+    +value: z.infer~typeof PaginatedHistorySchema~
+  }
+
+  class CsvRow {
+    +value: z.infer~typeof CsvRowSchema~
+  }
+
+  class ImportResult {
+    <<interface>>
+    +imported: number
+    +skipped: number
+    +errors: Array~Object~
+  }
+
+  class ErrorResponse {
+    +value: z.infer~typeof ErrorResponseSchema~
+  }
+
