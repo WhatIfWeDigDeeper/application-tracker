@@ -30,7 +30,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "@types/koa": "^3.0.1",
     "@types/koa__cors": "^5.0.0",
@@ -40,14 +40,14 @@
     "@types/pg": "^8.10.9",
     "@typescript-eslint/eslint-plugin": "^8.55.0",
     "@typescript-eslint/parser": "^8.55.0",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "jest": "^30.2.0",
     "prettier": "^3.1.1",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.6",
     "tsx": "^4.21.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "^8.55.0"
+    "typescript-eslint": "^8.56.0"
   },
   "overrides": {
     "is-generator-function": "1.0.10"
