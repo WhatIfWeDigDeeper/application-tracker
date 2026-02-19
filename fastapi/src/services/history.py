@@ -70,13 +70,20 @@ async def record_history(
     pool: asyncpg.Pool,
     application_id: UUID,
     description: str,
+    conn: asyncpg.Connection | None = None,
 ) -> None:
-    """Capture current application state as a snapshot and record a history entry."""
-    app_row = await pool.fetchrow("SELECT * FROM applications WHERE id = $1", application_id)
+    """Capture current application state as a snapshot and record a history entry.
+
+    If ``conn`` is provided it is used for all DB calls (e.g. inside an open
+    transaction).  Otherwise a new connection is acquired from ``pool``.
+    """
+    executor: asyncpg.Pool | asyncpg.Connection = conn if conn is not None else pool
+
+    app_row = await executor.fetchrow("SELECT * FROM applications WHERE id = $1", application_id)
     if app_row is None:
         return
 
-    stage_rows = await pool.fetch(
+    stage_rows = await executor.fetch(
         'SELECT * FROM interview_stages WHERE application_id = $1 ORDER BY "order"',
         application_id,
     )
@@ -84,12 +91,12 @@ async def record_history(
     response = row_to_application_response(app_row, stage_rows)
     snapshot_json = json.dumps(response.model_dump(by_alias=True), default=str)
 
-    next_seq = await pool.fetchval(
+    next_seq = await executor.fetchval(
         "SELECT coalesce(max(sequence), 0) + 1 FROM application_history WHERE application_id = $1",
         application_id,
     )
 
-    await pool.execute(
+    await executor.execute(
         "INSERT INTO application_history (application_id, sequence, description, snapshot) "
         "VALUES ($1, $2, $3, $4::jsonb)",
         application_id,
@@ -177,80 +184,82 @@ async def restore_to_version(
         else json.loads(history_row["snapshot"])
     )
 
-    # Update the applications row from the snapshot
-    await pool.execute(
-        """
-        UPDATE applications SET
-            company_name = $2,
-            position_title = $3,
-            date_applied = $4,
-            status = $5::python_fastapi.application_status,
-            company_url = $6,
-            job_posting_url = $7,
-            company_career_url = $8,
-            company_category = $9::python_fastapi.company_category,
-            skills_match = $10,
-            job_source = $11::python_fastapi.job_source,
-            cover_letter_required = $12,
-            special_requirements = $13,
-            salary_min = $14,
-            salary_max = $15,
-            notes = $16,
-            offer_due_date = $17,
-            is_archived = $18,
-            updated_at = now()
-        WHERE id = $1
-        """,
-        application_id,
-        snapshot.get("companyName"),
-        snapshot.get("positionTitle"),
-        parse_date(snapshot.get("dateApplied")),
-        snapshot.get("status"),
-        snapshot.get("companyUrl"),
-        snapshot.get("jobPostingUrl"),
-        snapshot.get("companyCareerUrl"),
-        snapshot.get("companyCategory"),
-        snapshot.get("skillsMatch"),
-        snapshot.get("jobSource"),
-        snapshot.get("coverLetterRequired"),
-        snapshot.get("specialRequirements"),
-        snapshot.get("salaryMin"),
-        snapshot.get("salaryMax"),
-        snapshot.get("notes"),
-        parse_date(snapshot.get("offerDueDate")),
-        snapshot.get("isArchived"),
-    )
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            # Update the applications row from the snapshot
+            await conn.execute(
+                """
+                UPDATE applications SET
+                    company_name = $2,
+                    position_title = $3,
+                    date_applied = $4,
+                    status = $5::python_fastapi.application_status,
+                    company_url = $6,
+                    job_posting_url = $7,
+                    company_career_url = $8,
+                    company_category = $9::python_fastapi.company_category,
+                    skills_match = $10,
+                    job_source = $11::python_fastapi.job_source,
+                    cover_letter_required = $12,
+                    special_requirements = $13,
+                    salary_min = $14,
+                    salary_max = $15,
+                    notes = $16,
+                    offer_due_date = $17,
+                    is_archived = $18,
+                    updated_at = now()
+                WHERE id = $1
+                """,
+                application_id,
+                snapshot.get("companyName"),
+                snapshot.get("positionTitle"),
+                parse_date(snapshot.get("dateApplied")),
+                snapshot.get("status"),
+                snapshot.get("companyUrl"),
+                snapshot.get("jobPostingUrl"),
+                snapshot.get("companyCareerUrl"),
+                snapshot.get("companyCategory"),
+                snapshot.get("skillsMatch"),
+                snapshot.get("jobSource"),
+                snapshot.get("coverLetterRequired"),
+                snapshot.get("specialRequirements"),
+                snapshot.get("salaryMin"),
+                snapshot.get("salaryMax"),
+                snapshot.get("notes"),
+                parse_date(snapshot.get("offerDueDate")),
+                snapshot.get("isArchived"),
+            )
 
-    # Delete existing stages and re-insert from snapshot
-    await pool.execute(
-        "DELETE FROM interview_stages WHERE application_id = $1",
-        application_id,
-    )
+            # Delete existing stages and re-insert from snapshot
+            await conn.execute(
+                "DELETE FROM interview_stages WHERE application_id = $1",
+                application_id,
+            )
 
-    for stage in snapshot.get("interviewStages", []):
-        await pool.execute(
-            """
-            INSERT INTO interview_stages
-                (application_id, name, "order", is_completed, completed_date, notes, performance_rating)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            """,
-            application_id,
-            stage["name"],
-            stage["order"],
-            stage["isCompleted"],
-            parse_date(stage.get("completedDate")),
-            stage.get("notes"),
-            stage.get("performanceRating"),
-        )
+            for stage in snapshot.get("interviewStages", []):
+                await conn.execute(
+                    """
+                    INSERT INTO interview_stages
+                        (application_id, name, "order", is_completed, completed_date, notes, performance_rating)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    """,
+                    application_id,
+                    stage["name"],
+                    stage["order"],
+                    stage["isCompleted"],
+                    parse_date(stage.get("completedDate")),
+                    stage.get("notes"),
+                    stage.get("performanceRating"),
+                )
 
-    # Record history for the restore action
-    description = f"Restored to version {target_sequence}"
-    await record_history(pool, application_id, description)
+            # Record history for the restore action
+            description = f"Restored to version {target_sequence}"
+            await record_history(pool, application_id, description, conn=conn)
 
-    # Fetch and return the updated application
-    app_row = await pool.fetchrow("SELECT * FROM applications WHERE id = $1", application_id)
-    stage_rows = await pool.fetch(
-        'SELECT * FROM interview_stages WHERE application_id = $1 ORDER BY "order"',
-        application_id,
-    )
-    return row_to_application_response(app_row, stage_rows)
+            # Fetch and return the updated application
+            app_row = await conn.fetchrow("SELECT * FROM applications WHERE id = $1", application_id)
+            stage_rows = await conn.fetch(
+                'SELECT * FROM interview_stages WHERE application_id = $1 ORDER BY "order"',
+                application_id,
+            )
+            return row_to_application_response(app_row, stage_rows)

@@ -1,3 +1,4 @@
+import logging
 import re
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -10,6 +11,8 @@ from fastapi.responses import JSONResponse
 from .db import close_pool, create_pool
 from .routes.applications import router as applications_router
 from .routes.health import router as health_router
+
+logger = logging.getLogger(__name__)
 
 
 def _to_camel_case(name: str) -> str:
@@ -74,6 +77,7 @@ async def validation_exception_handler(
 
 @app.exception_handler(500)
 async def internal_error_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Unhandled exception for %s %s", request.method, request.url)
     return JSONResponse(
         status_code=500,
         content={

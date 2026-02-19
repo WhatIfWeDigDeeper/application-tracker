@@ -9,7 +9,7 @@ Add a 6th backend implementation to the monorepo: Python FastAPI API (`fastapi/`
 
 ## Technology Stack
 
-### Backend (`fastapi/` — port 5060)
+### Backend (`fastapi/` — port 5160, 5060 is reserved by macOS SIP)
 - Python 3.12+
 - FastAPI (async web framework)
 - asyncpg (raw SQL, no ORM — functional style)
