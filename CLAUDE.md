@@ -91,7 +91,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Spec status**: When a feature has a spec file in `specs/`, update its `Status` to `Complete` before merging the PR
 - **Wait for CI before merging**: Always check `gh pr checks <number>` and wait for all checks to pass before squash merging. Do not use `--admin` to bypass branch protection unless explicitly asked.
 - **Post-merge cleanup**: After squash merging a PR, immediately switch to main, pull, and delete the local branch (`git checkout main && git pull && git branch -d <branch>`)
-- **Documentation**: Update `README.md` and `CLAUDE.md` as part of completing tasks that add scripts/tools/infrastructure
+- **Documentation**: When adding a new implementation update: `README.md` (TOC, implementations, running instructions, test commands), and as needed `CLAUDE.md`. When DB schema changes are involved, update `docs/DATABASE_ARCHITECTURE.md`, `scripts/generate-schema-docs.sh`, and run `npm run docs:schema`. If Typescript changes run `npm run docs:types` or new ts implementations add script. Do not wait to be asked — include docs in the implementation plan.
 
 ## Running E2E Tests
 
