@@ -157,6 +157,13 @@ classDiagram
     +sortDir: "asc" or "desc"
   }
 
+  class ImportResult {
+    <<interface>>
+    +imported: number
+    +skipped: number
+    +errors: Array~Object~
+  }
+
   class ErrorResponse {
     <<interface>>
     +code: "validation_error" or "not_found" or "internal_error"
