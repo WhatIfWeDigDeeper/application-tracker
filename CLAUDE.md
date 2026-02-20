@@ -33,7 +33,7 @@ Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolat
 - **svelte_hono** — `hono-api/src/db/schema.ts` (Drizzle)
 - **vue_nuxt** — `nuxt-api/server/db/schema.ts` (Drizzle), shared types via `@shared` alias
 - **react_nestjs** — `nest-api/src/database/schema.ts` (Drizzle)
-- **python_fastapi** — `fastapi/migrations/001_initial.sql` (asyncpg, raw SQL)
+- **python_fastapi** — `fastapi/migrations/001_initial.sql` (asyncpg, raw SQL); also used by `tanstack-start-ui/` (React SSR via TanStack Start, port 3040)
 
 Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 
@@ -42,6 +42,8 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 ## Code Quality Requirements
 
 **Always complete the full validation chain before committing** — `tsc --noEmit` alone is not sufficient. Re-run the entire chain after every round of changes — not just the initial implementation. Fixing a bug introduced during review still requires the full chain.
+
+**When fixing a bug or test failure, automatically run the relevant tests after applying the fix** — do not wait for the user to ask. Use the most targeted test command available (e.g., `test:e2e:react-koa` for a react-koa failure). Report pass/fail results immediately.
 
 1. **Add tests** - Create or update tests for new functionality
 2. **Build** - `npm run build:<stack>` (runs per-package build; catches compilation errors)

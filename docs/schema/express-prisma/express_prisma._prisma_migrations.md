@@ -39,14 +39,14 @@ erDiagram
 
 
 "express_prisma._prisma_migrations" {
-  varchar_36_ id
-  varchar_64_ checksum
-  timestamp_with_time_zone finished_at
-  varchar_255_ migration_name
-  text logs
-  timestamp_with_time_zone rolled_back_at
-  timestamp_with_time_zone started_at
-  integer applied_steps_count
+  id varchar_36_
+  checksum varchar_64_
+  finished_at timestamp_with_time_zone
+  migration_name varchar_255_
+  logs text
+  rolled_back_at timestamp_with_time_zone
+  started_at timestamp_with_time_zone
+  applied_steps_count integer
 }
 ```
 

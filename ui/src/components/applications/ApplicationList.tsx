@@ -23,6 +23,7 @@ export function ApplicationList({
   onAddNew,
   onSelectApplication,
   onArchiveApplication,
+  onDeleteApplication,
   onRestoreApplication,
 }: ApplicationListProps): React.ReactElement {
   if (isLoading) {
@@ -71,6 +72,7 @@ export function ApplicationList({
           application={application}
           onClick={() => onSelectApplication(application)}
           onArchive={onArchiveApplication ? (): void => onArchiveApplication(application.id) : undefined}
+          onDelete={onDeleteApplication ? (): void => onDeleteApplication(application.id) : undefined}
           onRestore={onRestoreApplication ? (): void => onRestoreApplication(application.id) : undefined}
         />
       ))}

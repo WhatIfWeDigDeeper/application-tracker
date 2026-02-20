@@ -38,16 +38,24 @@
   }
 </script>
 
-<div class="min-h-full">
+<div class="min-h-full overflow-x-hidden">
   <nav class="bg-white dark:bg-gray-800 shadow-xs border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
-          <a href="/" class="flex items-center gap-2">
-            <svg class="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          <a href="/" class="flex items-center gap-2 min-w-0">
+            <svg class="h-8 w-8 flex-shrink-0" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M26.5 5.5C23.5 1 17 0.5 13 4L7 8.5c-3.5 3-4.5 8-2 12" fill="none" stroke="#ff3e00" stroke-width="2.5" stroke-linecap="round" />
+              <path d="M5.5 26.5C8.5 31 15 31.5 19 28l6-4.5c3.5-3 4.5-8 2-12" fill="none" stroke="#ff3e00" stroke-width="2.5" stroke-linecap="round" />
+              <path d="M20 10c-2-1.5-5-1-6.5 1" stroke="#ff3e00" stroke-width="2" stroke-linecap="round" />
+              <path d="M12 22c2 1.5 5 1 6.5-1" stroke="#ff3e00" stroke-width="2" stroke-linecap="round" />
             </svg>
-            <span class="text-xl font-bold text-gray-900 dark:text-gray-100">Application Tracker</span>
+            <span class="text-xl font-bold text-gray-900 dark:text-gray-100 truncate">
+              Application Tracker
+              <span class="hidden sm:inline text-sm font-normal text-gray-500 dark:text-gray-400">
+                Svelte 5 + Hono + Drizzle
+              </span>
+            </span>
           </a>
         </div>
         <div class="flex items-center gap-4">
@@ -69,9 +77,6 @@
               </svg>
             {/if}
           </button>
-          <span class="text-sm text-gray-500 dark:text-gray-400">
-            Svelte 5 + Hono + Drizzle
-          </span>
         </div>
       </div>
     </div>

@@ -22,6 +22,7 @@ export default function Home(): React.ReactElement {
     error,
     archiveApplication,
     restoreApplication,
+    deleteApplication,
     setFilters: setHookFilters,
     setSort: setHookSort,
   } = useApplications();
@@ -52,6 +53,10 @@ export default function Home(): React.ReactElement {
 
   const handleRestoreApplication = (id: string): void => {
     restoreApplication(id);
+  };
+
+  const handleDeleteApplication = (id: string): void => {
+    void deleteApplication(id);
   };
 
   return (
@@ -92,6 +97,7 @@ export default function Home(): React.ReactElement {
           onAddNew={handleAddNew}
           onSelectApplication={handleSelectApplication}
           onArchiveApplication={handleArchiveApplication}
+          onDeleteApplication={handleDeleteApplication}
           onRestoreApplication={handleRestoreApplication}
         />
       </main>

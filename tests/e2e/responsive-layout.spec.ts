@@ -8,7 +8,34 @@ const VIEWPORTS = [
   { name: 'Desktop', width: 1440, height: 900 },
 ];
 
+const TEST_COMPANY = 'Responsive Layout Test Co';
+
 test.describe('Responsive layout', () => {
+  let createdAppId: string;
+
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/applications/new');
+    await page.waitForLoadState('domcontentloaded');
+    await page.fill('input[placeholder="Company Name *"]', TEST_COMPANY);
+    await page.fill('input[placeholder="Position Title *"]', 'Test Engineer');
+    await page.selectOption('#status', 'applied');
+    await page.click('button:has-text("Create Application")');
+    await page.waitForURL(/\/applications\/([a-f0-9-]+)$/);
+    const match = page.url().match(/\/applications\/([a-f0-9-]+)$/);
+    createdAppId = match![1];
+    await context.close();
+  });
+
+  test.afterAll(async ({ browser }) => {
+    if (!createdAppId) return;
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.request.delete(`/api/applications/${createdAppId}`);
+    await context.close();
+  });
+
   for (const viewport of VIEWPORTS) {
     test(`action menu button is visible and not clipped at ${viewport.name} (${viewport.width}x${viewport.height})`, async ({
       browser,
