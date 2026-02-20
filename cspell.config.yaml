@@ -3,14 +3,18 @@ ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
 words:
+  - asyncpg
   - auditconfig
   - dedup
   - Dedup
   - fastapi
   - mypy
+  - Pydantic
   - pyproject
   - pytest
+  - tbls
   - uvx
   - venv
+  - whatifwedigdeeper
 ignoreWords: []
 import: []

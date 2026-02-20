@@ -10,8 +10,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [3. React + Koa + PostgreSQL](#3-react--koa--postgresql)
   - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
   - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
-  - [6. Python + FastAPI + asyncpg](#6-python--fastapi--asyncpg)
-  - [7. React SSR + TanStack Start + FastAPI](#7-react-ssr--tanstack-start--fastapi)
+  - [6. React SSR + TanStack Start + FastAPI](#6-react-ssr--tanstack-start--fastapi)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -31,7 +30,7 @@ A full-stack job application tracking system with multiple technology stack impl
 
 ## Overview
 
-This repository contains a complete job application tracker built with seven different implementations (six with paired frontends, one API-only). Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
+This repository contains a complete job application tracker built with six different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
 
 ### Sample Editing screen
 
@@ -78,20 +77,12 @@ Please note that the UI is still being refined.
 - Database: Drizzle ORM + PostgreSQL
 - Snapshot-based history with field diffs and restore
 
-### 6. Python + FastAPI + asyncpg
-**Directory**: `fastapi/`
-**Stack**:
-- Backend: Python 3.14 + FastAPI + Pydantic v2
-- Database: asyncpg (raw SQL, no ORM)
-- API-only (pairs with any existing frontend by changing its proxy target)
-- Snapshot-based history with field diffs and restore
-
-### 7. React SSR + TanStack Start + FastAPI
+### 6. React SSR + TanStack Start + FastAPI
 **Directories**: `tanstack-start-ui/` + `fastapi/`
 **Stack**:
 - Frontend: React 19 + TanStack Start (SSR) + TanStack Query v5 + TanStack Router + Tailwind CSS
-- Backend: Python FastAPI (shared with implementation #6)
-- Database: asyncpg via `python_fastapi` schema (shared)
+- Backend: Python 3.14 + FastAPI + Pydantic v2
+- Database: asyncpg (raw SQL, no ORM) via `python_fastapi` schema
 - Server-side rendering with route loaders and `createServerFn` server functions
 - Snapshot-based history with field diffs and restore
 
@@ -118,8 +109,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `react_koa` | React + Koa + PostgreSQL | [schema docs](docs/schema/react-koa/README.md) |
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
-| `python_fastapi` | Python + FastAPI + asyncpg | [schema docs](docs/schema/python-fastapi/README.md) |
-| `python_fastapi` | React SSR + TanStack Start (shared) | (same schema as above) |
+| `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -131,6 +121,9 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [react-ui](docs/types/react-ui/application.mermaid) - React + Koa
 - [koa-api](docs/types/koa-api/index.mermaid) - Koa API (partial - Zod-inferred types unresolved)
 - [svelte-ui](docs/types/svelte-ui/index.mermaid) - Svelte + Hono
+- [tanstack-ui](docs/types/tanstack-ui/application.mermaid) - React + TanStack + NestJS
+- [nest-api](docs/types/nest-api/api.mermaid) - NestJS API
+- [tanstack-start-ui](docs/types/tanstack-start-ui/application.mermaid) - React SSR + TanStack Start
 
 Regenerate with `npm run docs:types`.
 
@@ -190,29 +183,26 @@ Each implementation can be run independently:
 
 ```bash
 # Next.js + Express (UI 3000 + API 3001)
-npm run dev
+npm run dev:express
 
 # React + Koa (UI 3010 + API 5010)
-cd react-ui && npm run dev
-cd koa-api && npm run dev
+npm run dev:react-ui
+npm run dev:koa-api
 
 # Vue + Nuxt (UI 3020 + API 5040)
-cd vue-ui && npm run dev
-cd nuxt-api && npm run dev
+npm run dev:vue-ui
+npm run dev:nuxt-api
 
 # Svelte + Hono (UI 3030 + API 5030)
-cd svelte-ui && npm run dev
-cd hono-api && npm run dev
+npm run dev:svelte-ui
+npm run dev:hono-api
 
 # React + TanStack + NestJS (UI 3050 + API 5050)
-cd tanstack-ui && npm run dev
-cd nest-api && npm run dev
+npm run dev:tanstack-ui
+npm run dev:nest-api
 
 # React SSR + TanStack Start + FastAPI (UI 3040 + API 5160)
-cd tanstack-start-ui && npm run dev
-npm run dev:fastapi
-
-# Python FastAPI (API 5160)
+npm run dev:tanstack-start-ui
 npm run dev:fastapi
 ```
 
@@ -233,8 +223,8 @@ This generates Mermaid ERDs and per-table documentation under `docs/schema/` for
 Run tests for individual implementations:
 
 ```bash
-npm run test:api          # Express + Prisma API tests
-npm run test:ui           # Next.js UI tests
+npm run test:express-api  # Express + Prisma API tests
+npm run test:react-next   # Next.js UI tests
 npm run test:koa-api      # Koa API tests
 npm run test:react-ui     # React UI tests
 npm run test:svelte-ui    # Svelte UI tests
@@ -248,7 +238,6 @@ npm run test:fastapi      # FastAPI pytest unit tests
 Run all unit tests:
 
 ```bash
-npm run test              # Run api + ui tests only
 npm run test:all          # Run all implementation tests
 ```
 
@@ -273,7 +262,6 @@ To clean up leftover test data from interrupted runs, see [Test Data Cleanup](do
 Build all implementations:
 
 ```bash
-npm run build             # Build api + ui
 npm run build:all         # Build all implementations
 ```
 
@@ -291,7 +279,8 @@ Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIf
 | Skill | Description |
 |-------|-------------|
 | `learn` | Extract lessons from conversations |
-| `js-deps` | Update dependencies and/or fix audit errors |
+| `js-deps` | Update npm dependencies and/or fix audit errors |
+| `uv-deps` | Audit and update Python dependencies |
 | `ship-it` | Branch, commit, push, and open a PR |
 
 Since `npx skills check` and `npx skills update` apparently do not work with the above repo at this time, you may force update all skills:
