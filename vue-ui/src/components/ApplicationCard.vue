@@ -110,6 +110,7 @@ function handleAction(action: 'archive' | 'restore' | 'delete') {
         <button
           type="button"
           class="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+          aria-label="Actions"
           @click="handleMenuClick"
         >
           <EllipsisVerticalIcon class="h-5 w-5" />

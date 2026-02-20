@@ -18,9 +18,9 @@
 </script>
 
 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
-  <div class="flex flex-wrap gap-4 items-end">
+  <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 items-end">
     <!-- Status Filter -->
-    <div class="flex-1 min-w-[150px]">
+    <div>
       <label for="status" class="label mb-1">Status</label>
       <select
         id="status"
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Category Filter -->
-    <div class="flex-1 min-w-[150px]">
+    <div>
       <label for="category" class="label mb-1">Category</label>
       <select
         id="category"
@@ -52,7 +52,7 @@
     </div>
 
     <!-- Source Filter -->
-    <div class="flex-1 min-w-[150px]">
+    <div>
       <label for="source" class="label mb-1">Source</label>
       <select
         id="source"
@@ -68,7 +68,7 @@
     </div>
 
     <!-- Skills Match Filter -->
-    <div class="flex-1 min-w-[150px]">
+    <div>
       <label for="skills" class="label mb-1">Min Skills Match</label>
       <select
         id="skills"
@@ -85,7 +85,7 @@
     </div>
 
     <!-- Sort -->
-    <div class="flex-1 min-w-[200px]">
+    <div class="sm:col-span-2 lg:col-span-1">
       <label for="sort" class="label mb-1">Sort By</label>
       <div class="flex gap-2">
         <select

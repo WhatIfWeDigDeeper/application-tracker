@@ -9,6 +9,7 @@ dependencies = [
     "asyncpg==0.31.0",
     "pydantic==2.12.5",
     "python-dotenv==1.1.0",
+    "python-multipart==0.0.20",
 ]
 
 [project.optional-dependencies]

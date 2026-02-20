@@ -66,18 +66,18 @@
 >
   <div class="flex items-start justify-between gap-4">
     <div class="flex-1 min-w-0">
-      <div class="flex items-center gap-2 mb-1">
+      <div class="flex items-center gap-2 mb-1 flex-wrap">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
           {application.companyName}
         </h3>
+        <StatusBadge status={application.status} />
         {#if application.isArchived}
           <span class="text-xs text-gray-500 dark:text-gray-400">(Archived)</span>
         {/if}
       </div>
       <p class="text-gray-600 dark:text-gray-400 truncate">{application.positionTitle}</p>
     </div>
-    <div class="flex items-center gap-2">
-      <StatusBadge status={application.status} />
+    <div class="flex-shrink-0">
       <div class="relative">
         <button
           type="button"

@@ -1,7 +1,8 @@
+from datetime import date
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, File, Query, UploadFile
 from fastapi.responses import JSONResponse, Response
 
 from ..db import get_pool
@@ -15,12 +16,43 @@ from ..schemas import (
 from ..services import application as app_service
 from ..services import history as history_service
 from ..services import interview_stage as stage_service
+from ..services.csv import export_to_csv, get_sample_csv, import_from_csv
 
 router = APIRouter()
 
 NOT_FOUND_APP: dict[str, str] = {"code": "not_found", "message": "Application not found"}
 NOT_FOUND_STAGE: dict[str, str] = {"code": "not_found", "message": "Interview stage not found"}
 NOT_FOUND_HISTORY: dict[str, str] = {"code": "not_found", "message": "History entry not found"}
+
+
+@router.get("/sample-csv")
+async def sample_csv() -> Response:
+    content = get_sample_csv()
+    return Response(
+        content,
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="applications-template.csv"'},
+    )
+
+
+@router.get("/export")
+async def export_csv() -> Response:
+    pool = get_pool()
+    content = await export_to_csv(pool)
+    today = date.today().isoformat()
+    return Response(
+        content,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="applications-{today}.csv"'},
+    )
+
+
+@router.post("/import")
+async def import_csv(file: UploadFile = File(...)) -> dict[str, object]:
+    content = await file.read()
+    pool = get_pool()
+    result = await import_from_csv(pool, content)
+    return result.model_dump()
 
 
 @router.get("/")

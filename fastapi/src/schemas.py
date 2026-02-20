@@ -1,7 +1,7 @@
-from typing import Any
+from typing import Annotated, Any
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 from .enums import ApplicationStatus, CompanyCategory, JobSource
@@ -145,6 +145,68 @@ class PaginatedHistoryResponse(CamelModel):
 
 class RestoreRequest(CamelModel):
     sequence: int = Field(ge=1)
+
+
+# --- CSV Import/Export ---
+
+
+def _coerce_int(v: object) -> object:
+    """Coerce numeric strings from CSV to int; pass through None and existing ints."""
+    if isinstance(v, str) and v != "":
+        try:
+            return int(v)
+        except ValueError:
+            return v
+    return v
+
+
+def _coerce_bool(v: object) -> object:
+    """Coerce 'true'/'false' strings from CSV to bool; pass through None."""
+    if v == "true":
+        return True
+    if v == "false":
+        return False
+    return v
+
+
+class CsvRow(BaseModel):
+    company_name: str = Field(alias="companyName", min_length=1, max_length=200)
+    position_title: str = Field(alias="positionTitle", min_length=1, max_length=200)
+    date_applied: str | None = Field(default=None, alias="dateApplied", pattern=r"^\d{4}-\d{2}-\d{2}$")
+    status: ApplicationStatus | None = Field(default=None)
+    company_url: str | None = Field(default=None, alias="companyUrl")
+    job_posting_url: str | None = Field(default=None, alias="jobPostingUrl")
+    company_career_url: str | None = Field(default=None, alias="companyCareerUrl")
+    company_category: CompanyCategory | None = Field(default=None, alias="companyCategory")
+    skills_match: Annotated[int | None, BeforeValidator(_coerce_int)] = Field(
+        default=None, alias="skillsMatch", ge=1, le=5
+    )
+    job_source: JobSource | None = Field(default=None, alias="jobSource")
+    cover_letter_required: Annotated[bool | None, BeforeValidator(_coerce_bool)] = Field(
+        default=None, alias="coverLetterRequired"
+    )
+    special_requirements: str | None = Field(default=None, alias="specialRequirements", max_length=5000)
+    salary_min: Annotated[int | None, BeforeValidator(_coerce_int)] = Field(
+        default=None, alias="salaryMin", ge=0
+    )
+    salary_max: Annotated[int | None, BeforeValidator(_coerce_int)] = Field(
+        default=None, alias="salaryMax", ge=0
+    )
+    notes: str | None = Field(default=None, max_length=5000)
+    offer_due_date: str | None = Field(default=None, alias="offerDueDate", pattern=r"^\d{4}-\d{2}-\d{2}$")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class ImportError(BaseModel):
+    row: int
+    message: str
+
+
+class ImportResult(BaseModel):
+    imported: int
+    skipped: int
+    errors: list[ImportError]
 
 
 # --- Errors ---

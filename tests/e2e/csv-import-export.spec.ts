@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// CSV import/export tests only run for tanstack-ui (port 3050)
+// CSV import/export tests only run for tanstack-ui (port 3050) and tanstack-start-ui (port 3040)
 const port = Number(process.env.TEST_UI_PORT || 3000);
-const isTargetUI = port === 3050;
+const isTargetUI = port === 3050 || port === 3040;
 
 test.describe('CSV Import/Export', () => {
-  test.skip(!isTargetUI, 'CSV import/export only available on tanstack-ui (port 3050)');
+  test.skip(!isTargetUI, 'CSV import/export only available on tanstack-ui (3050) and tanstack-start-ui (3040)');
 
   const tmpDir = '/tmp/claude/e2e-csv-tests';
 
@@ -126,7 +126,7 @@ test.describe('CSV Import/Export', () => {
     const importedSection = page.locator('text=Imported').locator('..');
     await expect(importedSection).toContainText('1');
 
-    const errorsSection = page.locator('text=Errors').locator('..');
+    const errorsSection = page.locator('[data-testid="import-result-errors"]');
     await expect(errorsSection).toContainText('1');
 
     // Should show error row details
@@ -135,14 +135,15 @@ test.describe('CSV Import/Export', () => {
     await page.click('button:has-text("Close")');
   });
 
-  test('should show skipped count for duplicate URLs', async ({ page }) => {
-    // Import a CSV with a unique URL
+  test('should show skipped count for duplicate URLs', async ({ page }, testInfo) => {
+    // Use a unique URL per worker to avoid cross-browser race conditions
+    const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${testInfo.workerIndex}-${Date.now()}`;
     const csv1 = [
       'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate',
-      'Dedup E2E Corp,Dedup Role,,,,https://e2e-dedup-test-unique.com/jobs/1,,,,,,,,,,'
+      `Dedup E2E Corp,Dedup Role,,,,${uniqueUrl},,,,,,,,,,`
     ].join('\n');
 
-    const csvPath1 = path.join(tmpDir, 'dedup-test1.csv');
+    const csvPath1 = path.join(tmpDir, `dedup-test-${testInfo.workerIndex}.csv`);
     fs.writeFileSync(csvPath1, csv1);
 
     // First import

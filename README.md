@@ -11,6 +11,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
   - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
   - [6. Python + FastAPI + asyncpg](#6-python--fastapi--asyncpg)
+  - [7. React SSR + TanStack Start + FastAPI](#7-react-ssr--tanstack-start--fastapi)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -30,7 +31,7 @@ A full-stack job application tracking system with multiple technology stack impl
 
 ## Overview
 
-This repository contains a complete job application tracker built with six different backend implementations (five with paired frontends, one API-only). Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
+This repository contains a complete job application tracker built with seven different implementations (six with paired frontends, one API-only). Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
 
 ### Sample Editing screen
 
@@ -85,6 +86,15 @@ Please note that the UI is still being refined.
 - API-only (pairs with any existing frontend by changing its proxy target)
 - Snapshot-based history with field diffs and restore
 
+### 7. React SSR + TanStack Start + FastAPI
+**Directories**: `tanstack-start-ui/` + `fastapi/`
+**Stack**:
+- Frontend: React 19 + TanStack Start (SSR) + TanStack Query v5 + TanStack Router + Tailwind CSS
+- Backend: Python FastAPI (shared with implementation #6)
+- Database: asyncpg via `python_fastapi` schema (shared)
+- Server-side rendering with route loaders and `createServerFn` server functions
+- Snapshot-based history with field diffs and restore
+
 ## Core Features
 
 All implementations provide:
@@ -109,6 +119,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
 | `python_fastapi` | Python + FastAPI + asyncpg | [schema docs](docs/schema/python-fastapi/README.md) |
+| `python_fastapi` | React SSR + TanStack Start (shared) | (same schema as above) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -135,6 +146,7 @@ Regenerate with `npm run docs:types`.
 ├── hono-api/                     # Hono API
 ├── vue-ui/                       # Vue + Vite UI
 ├── tanstack-ui/                  # React + TanStack Query/Router UI
+├── tanstack-start-ui/            # React SSR + TanStack Start UI
 ├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
@@ -196,6 +208,10 @@ cd hono-api && npm run dev
 cd tanstack-ui && npm run dev
 cd nest-api && npm run dev
 
+# React SSR + TanStack Start + FastAPI (UI 3040 + API 5160)
+cd tanstack-start-ui && npm run dev
+npm run dev:fastapi
+
 # Python FastAPI (API 5160)
 npm run dev:fastapi
 ```
@@ -225,6 +241,7 @@ npm run test:svelte-ui    # Svelte UI tests
 npm run test:vue-ui       # Vue UI tests
 npm run test:nest-api     # NestJS API tests
 npm run test:tanstack-ui  # TanStack UI tests
+npm run test:tanstack-start-ui  # TanStack Start UI tests
 npm run test:fastapi      # FastAPI pytest unit tests
 ```
 
@@ -245,6 +262,7 @@ npm run test:e2e:vue      # Vue + Vite (port 3020)
 npm run test:e2e:svelte   # Svelte + Hono (port 3030)
 npm run test:e2e:react-koa # React + Koa (port 3010)
 npm run test:e2e:tanstack  # React + TanStack + NestJS (port 3050)
+npm run test:e2e:tanstack-start  # React SSR + TanStack Start + FastAPI (port 3040)
 npm run test:e2e:all      # Run all e2e tests
 ```
 
