@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "uv-deps": {
+      "source": "whatifwedigdeeper/agent-skills",
+      "sourceType": "github",
+      "computedHash": "aeaa8e0f1daba5fae85a0735584cc478d023af06555ccc04801a7cf9167bb95f"
+    }
+  }
+}
