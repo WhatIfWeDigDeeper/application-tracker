@@ -14,9 +14,9 @@
       "Skill(playwright-cli:*)"
     ],
     "deny": [
-      "Read(.env*)",
-      "Write(.env*)",
-      "Edit(.env*)",
+      "Read(.env)",
+      "Write(.env)",
+      "Edit(.env)",
       "Bash(rm -rf /)",
       "Bash(sudo *)",
       "Bash(chmod 777 *)"

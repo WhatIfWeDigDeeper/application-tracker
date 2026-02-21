@@ -34,8 +34,6 @@ This repository contains a complete job application tracker built with six diffe
 
 ### Sample Editing screen
 
-Please note that the UI is still being refined.
-
 ![Sample Edit Job Application with history](docs/imgs/vue-app-details.png)
 
 ## Implementations
@@ -155,13 +153,18 @@ Regenerate with `npm run docs:types`.
 ### Prerequisites
 
 - Node.js (v18+)
-- Python 3.14+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
+- Python 3.12+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
 - Docker and Docker Compose (for PostgreSQL)
 - [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
 ### Installation
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/WhatIfWeDigDeeper/application-tracker.git
+   cd application-tracker
+   ```
+
 2. Install dependencies for all implementations:
    ```bash
    npm run ci:all
@@ -172,9 +175,17 @@ Regenerate with `npm run docs:types`.
    docker-compose up -d postgres
    ```
 
-4. Run database migrations:
+4. Run database migrations for each implementation you intend to use:
    ```bash
-   npm run prisma:migrate:dev
+   npm run migrate:express        # Express + Prisma
+   npm run migrate:koa-api        # Koa (raw SQL)
+   npm run migrate:hono-api       # Hono + Drizzle
+   npm run migrate:nuxt-api       # Nuxt + Drizzle
+   npm run migrate:nest-api       # NestJS + Drizzle
+   npm run migrate:fastapi        # FastAPI (asyncpg)
+
+   # or all at once:
+   npm run migrate:all
    ```
 
 ### Running Applications
@@ -183,7 +194,8 @@ Each implementation can be run independently:
 
 ```bash
 # Next.js + Express (UI 3000 + API 3001)
-npm run dev:express
+npm run dev:react-next
+npm run dev:express-api
 
 # React + Koa (UI 3010 + API 5010)
 npm run dev:react-ui
@@ -246,7 +258,7 @@ npm run test:all          # Run all implementation tests
 E2E tests use Playwright and run against each implementation:
 
 ```bash
-npm run test:e2e          # Next.js + Express (port 3000)
+npm run test:e2e:express  # Next.js + Express (port 3000)
 npm run test:e2e:vue      # Vue + Vite (port 3020)
 npm run test:e2e:svelte   # Svelte + Hono (port 3030)
 npm run test:e2e:react-koa # React + Koa (port 3010)
@@ -272,7 +284,6 @@ This repository includes Claude Code commands and skills for common development 
 - `/commit` - Generate commit messages
 - `/pr` - Create pull requests
 - `/fix-build` - Fix build errors
-- `/ship-it` - Create branch, commit, push, and open a PR
 
 Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation):
 
