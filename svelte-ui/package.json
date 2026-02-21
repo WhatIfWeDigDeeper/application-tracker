@@ -29,7 +29,7 @@
     "happy-dom": "^20.6.1",
     "jsdom": "^28.0.0",
     "postcss": "^8.4.49",
-    "svelte": "^5.51.1",
+    "svelte": "^5.53.1",
     "svelte-check": "^4.4.0",
     "svelte-eslint-parser": "1.4.1",
     "tailwindcss": "^4.1.18",
