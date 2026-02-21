@@ -155,8 +155,8 @@
     "@eslint/js": "10.0.1",
     "@playwright/test": "^1.58.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.2.3",
-    "eslint": "10.0.0",
+    "@types/node": "^25.3.0",
+    "eslint": "10.0.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.0"
   },
