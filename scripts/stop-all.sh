@@ -15,6 +15,7 @@ PORTS=(
   5040  # Nuxt API
   5050  # Nest API
   5160  # FastAPI
+  5070  # Go API
 )
 
 stopped=0

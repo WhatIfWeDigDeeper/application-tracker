@@ -50,6 +50,19 @@ services:
     networks:
       - app_tracker_network
 
+  go-api:
+    build:
+      context: ./go-api
+      dockerfile: Dockerfile
+    ports:
+      - "5070:5070"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/app_tracker?search_path=go_gin
+      - PORT=5070
+      - CORS_ORIGIN=http://localhost:3060
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data:
 
