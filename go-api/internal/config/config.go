@@ -17,8 +17,11 @@ type Config struct {
 // Load reads configuration from environment variables (and optionally a .env file).
 // It returns an error if DATABASE_URL is not set.
 func Load() (*Config, error) {
-	// Load .env if present (ignore error if not found)
-	_ = godotenv.Load()
+	// Load .env if present — try local go-api/.env first, then fall back to
+	// the monorepo root ../.env (where DATABASE_URL typically lives).
+	if err := godotenv.Load(); err != nil {
+		_ = godotenv.Load("../.env")
+	}
 
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
