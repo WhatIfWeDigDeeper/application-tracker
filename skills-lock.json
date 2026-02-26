@@ -1,10 +1,25 @@
 {
   "version": 1,
   "skills": {
+    "js-deps": {
+      "source": "whatifwedigdeeper/agent-skills",
+      "sourceType": "github",
+      "computedHash": "4ec92eb6ace92623313f558bc79c8ff210cfea03fc2870ee0f1fed89345163b2"
+    },
+    "learn": {
+      "source": "whatifwedigdeeper/agent-skills",
+      "sourceType": "github",
+      "computedHash": "f5ceaf17d0aeebfaf15db5980c0fa63e27a65ba9fa52caccd7d3f45190da10bc"
+    },
+    "ship-it": {
+      "source": "whatifwedigdeeper/agent-skills",
+      "sourceType": "github",
+      "computedHash": "391bb1480e99f38b18fda1eddaefb36d767e930ebfb2ce915f28eb643731c71e"
+    },
     "uv-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "aeaa8e0f1daba5fae85a0735584cc478d023af06555ccc04801a7cf9167bb95f"
+      "computedHash": "751e4d056aa8841709c6065aa688ce704c25e1b054f14bfffb83a8727f0cab40"
     }
   }
 }
