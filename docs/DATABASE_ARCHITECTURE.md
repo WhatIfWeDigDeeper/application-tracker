@@ -43,3 +43,10 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - asyncpg pool configured with `server_settings={"search_path": "python_fastapi"}`
 - Snapshot-based history (like Hono, NestJS)
 - No ORM — uses raw SQL queries with asyncpg
+
+**Go-Gin-pgx:**
+- Schema defined in: `go-api/migrations/001_initial.sql`
+- Raw SQL migration with `CREATE SCHEMA IF NOT EXISTS go_gin`
+- pgx v5 pool configured with `search_path=go_gin` in the connection string
+- Snapshot-based history (like Hono, NestJS, FastAPI)
+- No ORM — uses raw SQL queries via pgx v5

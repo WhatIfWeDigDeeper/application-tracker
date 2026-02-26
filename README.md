@@ -11,6 +11,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
   - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
   - [6. React SSR + TanStack Start + FastAPI](#6-react-ssr--tanstack-start--fastapi)
+- [7. Go Gin API](#7-go-gin-api)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -30,7 +31,7 @@ A full-stack job application tracking system with multiple technology stack impl
 
 ## Overview
 
-This repository contains a complete job application tracker built with six different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
+This repository contains a complete job application tracker built with multiple full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
 
 ### Sample Editing screen
 
@@ -84,6 +85,15 @@ This repository contains a complete job application tracker built with six diffe
 - Server-side rendering with route loaders and `createServerFn` server functions
 - Snapshot-based history with field diffs and restore
 
+### 7. Go Gin API
+**Directory**: `go-api/`
+**Stack**:
+- Backend: Go 1.23 + Gin web framework + pgx v5
+- Database: PostgreSQL via `go_gin` schema (raw SQL, no ORM)
+- Port: 5070
+- Full CRUD, interview stages, snapshot-based history, CSV import/export
+- testcontainers-go integration tests
+
 ## Core Features
 
 All implementations provide:
@@ -108,6 +118,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
 | `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
+| `go_gin` | Go Gin API | — |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -141,6 +152,7 @@ Regenerate with `npm run docs:types`.
 ├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
+├── go-api/                       # Go Gin API
 ├── specs/                        # Feature specifications
 ├── docs/                         # Documentation
 ├── .claude/                      # Claude Code skills and commands
@@ -154,6 +166,7 @@ Regenerate with `npm run docs:types`.
 
 - Node.js (v18+)
 - Python 3.12+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
+- Go 1.23+ (for the Go Gin API implementation)
 - Docker and Docker Compose (for PostgreSQL)
 - [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
@@ -183,6 +196,7 @@ Regenerate with `npm run docs:types`.
    npm run migrate:nuxt-api       # Nuxt + Drizzle
    npm run migrate:nest-api       # NestJS + Drizzle
    npm run migrate:fastapi        # FastAPI (asyncpg)
+   npm run migrate:go             # Go Gin API (raw SQL)
 
    # or all at once:
    npm run migrate:all
@@ -216,6 +230,9 @@ npm run dev:nest-api
 # React SSR + TanStack Start + FastAPI (UI 3040 + API 5160)
 npm run dev:tanstack-start-ui
 npm run dev:fastapi
+
+# Go Gin API (API 5070)
+npm run dev:go-api
 ```
 
 ### Schema Documentation
@@ -245,6 +262,7 @@ npm run test:nest-api     # NestJS API tests
 npm run test:tanstack-ui  # TanStack UI tests
 npm run test:tanstack-start-ui  # TanStack Start UI tests
 npm run test:fastapi      # FastAPI pytest unit tests
+npm run test:go-api       # Go Gin API integration tests
 ```
 
 Run all unit tests:
