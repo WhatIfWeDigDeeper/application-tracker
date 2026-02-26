@@ -62,6 +62,20 @@ services:
       - CORS_ORIGIN=http://localhost:3060
     depends_on:
       - postgres
+    networks:
+      - app_tracker_network
+
+  angular-ui:
+    build:
+      context: ./angular-ui
+      dockerfile: Dockerfile
+    container_name: app_tracker_angular_ui
+    ports:
+      - "${ANGULAR_UI_PORT:-3060}:3060"
+    depends_on:
+      - go-api
+    networks:
+      - app_tracker_network
 
 volumes:
   postgres_data:

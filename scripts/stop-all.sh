@@ -9,6 +9,7 @@ PORTS=(
   3030  # Svelte UI
   3040  # TanStack Start UI
   3050  # TanStack UI
+  3060  # Angular UI
   5001  # Hono API
   5010  # Koa API
   5030  # (reserved)

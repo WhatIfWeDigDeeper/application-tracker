@@ -11,7 +11,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
   - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
   - [6. React SSR + TanStack Start + FastAPI](#6-react-ssr--tanstack-start--fastapi)
-- [7. Go Gin API](#7-go-gin-api)
+  - [7. Angular + Go Gin + pgx/sqlc](#7-angular--go-gin--pgxsqlc)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -85,13 +85,14 @@ This repository contains a complete job application tracker built with multiple 
 - Server-side rendering with route loaders and `createServerFn` server functions
 - Snapshot-based history with field diffs and restore
 
-### 7. Go Gin API
-**Directory**: `go-api/`
+### 7. Angular + Go Gin + pgx/sqlc
+**Directories**: `angular-ui/` + `go-api/`
 **Stack**:
-- Backend: Go 1.23 + Gin web framework + pgx v5
+- Frontend: Angular 19 + standalone components + Angular Signals + Tailwind CSS 4.x — port 3060
+- Backend: Go 1.23 + Gin framework + pgx v5 + sqlc for type-safe SQL — port 5070
 - Database: PostgreSQL via `go_gin` schema (raw SQL, no ORM)
-- Port: 5070
-- Full CRUD, interview stages, snapshot-based history, CSV import/export
+- Angular Signals for reactive state, CanDeactivate guard for unsaved changes
+- Snapshot-based history with field diffs and restore
 - testcontainers-go integration tests
 
 ## Core Features
@@ -149,6 +150,7 @@ Regenerate with `npm run docs:types`.
 ├── vue-ui/                       # Vue + Vite UI
 ├── tanstack-ui/                  # React + TanStack Query/Router UI
 ├── tanstack-start-ui/            # React SSR + TanStack Start UI
+├── angular-ui/                   # Angular 19 UI
 ├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
@@ -231,8 +233,9 @@ npm run dev:nest-api
 npm run dev:tanstack-start-ui
 npm run dev:fastapi
 
-# Go Gin API (API 5070)
+# Angular + Go Gin (UI 3060 + API 5070)
 npm run dev:go-api
+npm run dev:angular-ui
 ```
 
 ### Schema Documentation
@@ -262,7 +265,8 @@ npm run test:nest-api     # NestJS API tests
 npm run test:tanstack-ui  # TanStack UI tests
 npm run test:tanstack-start-ui  # TanStack Start UI tests
 npm run test:fastapi      # FastAPI pytest unit tests
-npm run test:go-api       # Go Gin API integration tests
+npm run test:go-api       # Go Gin API integration tests (testcontainers-go)
+npm run test:angular-ui   # Angular UI tests (Jest + @testing-library/angular)
 ```
 
 Run all unit tests:
@@ -282,6 +286,7 @@ npm run test:e2e:svelte   # Svelte + Hono (port 3030)
 npm run test:e2e:react-koa # React + Koa (port 3010)
 npm run test:e2e:tanstack  # React + TanStack + NestJS (port 3050)
 npm run test:e2e:tanstack-start  # React SSR + TanStack Start + FastAPI (port 3040)
+npm run test:e2e:angular  # Angular + Go Gin (port 3060)
 npm run test:e2e:all      # Run all e2e tests
 ```
 

@@ -1,0 +1,232 @@
+<div class="space-y-4">
+  <!-- Toolbar -->
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-bold text-gray-900">Applications</h1>
+    <div class="flex items-center gap-2">
+      <app-csv-export />
+      <button
+        type="button"
+        (click)="showImport.set(!showImport())"
+        class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-sm rounded border border-gray-300"
+      >
+        Import CSV
+      </button>
+      <a
+        routerLink="/applications/new"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded"
+      >
+        Add Application
+      </a>
+    </div>
+  </div>
+
+  <!-- Import section -->
+  @if (showImport()) {
+    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+      <h3 class="text-sm font-medium text-gray-700 mb-2">Import Applications from CSV</h3>
+      <app-csv-import />
+    </div>
+  }
+
+  <!-- Filters -->
+  <div class="bg-white border border-gray-200 rounded-lg p-4">
+    <div class="flex flex-wrap gap-3">
+      <!-- Status filter -->
+      <select
+        [ngModel]="statusFilter()"
+        (ngModelChange)="onStatusFilterChange($event)"
+        class="px-3 py-1.5 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">All Statuses</option>
+        @for (s of statusOptions; track s.value) {
+          <option [value]="s.value">{{ s.label }}</option>
+        }
+      </select>
+
+      <!-- Category filter -->
+      <select
+        [ngModel]="categoryFilter()"
+        (ngModelChange)="onCategoryFilterChange($event)"
+        class="px-3 py-1.5 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">All Categories</option>
+        @for (c of categoryOptions; track c.value) {
+          <option [value]="c.value">{{ c.label }}</option>
+        }
+      </select>
+
+      <!-- Source filter -->
+      <select
+        [ngModel]="sourceFilter()"
+        (ngModelChange)="onSourceFilterChange($event)"
+        class="px-3 py-1.5 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">All Sources</option>
+        @for (s of sourceOptions; track s.value) {
+          <option [value]="s.value">{{ s.label }}</option>
+        }
+      </select>
+
+      <!-- Archived toggle -->
+      <label class="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
+        <input
+          type="checkbox"
+          [ngModel]="includeArchived()"
+          (ngModelChange)="onArchivedChange($event)"
+          class="rounded border-gray-300"
+        />
+        Show Archived
+      </label>
+    </div>
+  </div>
+
+  <!-- Results info -->
+  <div class="flex items-center justify-between text-sm text-gray-500">
+    <span>{{ total() }} application{{ total() !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    @if (loading()) {
+      <div class="flex justify-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    } @else if (applications().length === 0) {
+      <div class="text-center py-12 text-gray-500">
+        <p class="text-lg font-medium">No applications found</p>
+        <p class="text-sm mt-1">
+          <a routerLink="/applications/new" class="text-blue-600 hover:underline">Add your first application</a>
+        </p>
+      </div>
+    } @else {
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th
+              class="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900"
+              (click)="onSortChange('companyName')"
+            >
+              Company {{ getSortIcon('companyName') }}
+            </th>
+            <th
+              class="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900"
+              (click)="onSortChange('positionTitle')"
+            >
+              Position {{ getSortIcon('positionTitle') }}
+            </th>
+            <th class="px-4 py-3 text-left font-medium text-gray-600">Status</th>
+            <th
+              class="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900"
+              (click)="onSortChange('dateApplied')"
+            >
+              Applied {{ getSortIcon('dateApplied') }}
+            </th>
+            <th
+              class="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900"
+              (click)="onSortChange('updatedAt')"
+            >
+              Updated {{ getSortIcon('updatedAt') }}
+            </th>
+            <th class="px-4 py-3 text-right font-medium text-gray-600">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (app of applications(); track app.id) {
+            <tr class="hover:bg-gray-50" [class.opacity-60]="app.isArchived">
+              <td class="px-4 py-3">
+                <app-inline-edit
+                  [value]="app.companyName"
+                  (saved)="onCompanyNameSaved(app.id, $event)"
+                />
+                <span
+                  class="cursor-pointer text-blue-600 hover:underline hidden"
+                  [routerLink]="['/applications', app.id]"
+                >{{ app.companyName }}</span>
+              </td>
+              <td class="px-4 py-3">
+                <a [routerLink]="['/applications', app.id]" class="text-blue-600 hover:underline">
+                  {{ app.positionTitle }}
+                </a>
+              </td>
+              <td class="px-4 py-3">
+                <span
+                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                  [class]="getStatusColor(app.status)"
+                >
+                  {{ app.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-gray-600">
+                {{ app.dateApplied ? app.dateApplied : '—' }}
+              </td>
+              <td class="px-4 py-3 text-gray-600">
+                {{ app.updatedAt | relativeDate }}
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-1">
+                  <a
+                    [routerLink]="['/applications', app.id]"
+                    class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded text-gray-700"
+                  >
+                    Edit
+                  </a>
+                  @if (app.isArchived) {
+                    <button
+                      type="button"
+                      (click)="onRestore(app.id)"
+                      class="px-2 py-1 text-xs bg-blue-50 hover:bg-blue-100 rounded text-blue-700"
+                    >
+                      Restore
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      (click)="onArchive(app.id)"
+                      class="px-2 py-1 text-xs bg-yellow-50 hover:bg-yellow-100 rounded text-yellow-700"
+                    >
+                      Archive
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    (click)="onDelete(app.id)"
+                    class="px-2 py-1 text-xs bg-red-50 hover:bg-red-100 rounded text-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
+          <p class="text-sm text-gray-500">
+            Page {{ currentPage }} of {{ totalPages }} &bull; {{ total() }} total
+          </p>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              (click)="onPageChange(currentPage - 1)"
+              [disabled]="currentPage <= 1"
+              class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              (click)="onPageChange(currentPage + 1)"
+              [disabled]="currentPage >= totalPages"
+              class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

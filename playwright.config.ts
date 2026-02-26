@@ -10,6 +10,7 @@ const webServerCommands: Record<number, string> = {
   3030: 'cd svelte-ui && npm run dev',
   3040: 'cd tanstack-start-ui && npm run dev',
   3050: 'cd tanstack-ui && npm run dev',
+  3060: 'cd angular-ui && npm run start',
 };
 
 export default defineConfig({
