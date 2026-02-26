@@ -6,7 +6,7 @@
 |---------|----------|
 | `uv --version` | CLI availability |
 | `uvx --version` | uvx tool runner availability |
-| `uv pip index versions pip` | PyPI connectivity |
+| `uv index versions pip` | PyPI connectivity |
 
 ## Environment Management
 
@@ -27,7 +27,7 @@
 | `uv remove <pkg>` | Remove a package |
 | `uv pip list --outdated` | Show outdated packages in current environment |
 | `uv pip show <pkg>` | Show installed package info (version, location, deps) |
-| `uv pip index versions <pkg>` | Show all available versions on PyPI |
+| `uv index versions <pkg>` | Show all available versions on PyPI |
 
 ## Security Audit (via pip-audit)
 
@@ -36,10 +36,10 @@ pip-audit is run via `uvx` to avoid installing it as a project dependency. Becau
 > **Version pinning:** `uvx pip-audit` runs the latest release unpinned. If your security policy requires pinning, use `uvx 'pip-audit>=2,<3'` and update the bound on major releases.
 
 ```bash
-uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps
+uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null
 ```
 
-The `--disable-pip` flag skips pip-audit's internal venv creation (requires hashed requirements, which `uv export` provides by default). The `--no-deps` flag skips dependency resolution since the lockfile already contains the full dependency tree. Use `--format json --desc` for machine-parseable output with vulnerability descriptions.
+`uv export` includes hashes by default — no extra flag needed. `2>/dev/null` suppresses pip-audit progress noise.
 
 ### pip-audit Flags
 
@@ -67,6 +67,6 @@ Detect available tools from `pyproject.toml` dependencies and run via `uv run`:
 | `uv run ruff check <paths>` | ruff | Linting and formatting checks |
 | `uv run pytest` | pytest | Unit and integration tests |
 
-Determine `<paths>` by checking `pyproject.toml` tool config sections (e.g., `[tool.mypy]`, `[tool.ruff]`) for configured paths, then fall back to the project directory structure.
+Determine `<paths>` by checking `pyproject.toml` tool config sections (e.g., `[tool.mypy]` `files` or `packages` key). For ruff, pass `.` or `src/` — ruff auto-detects project layout and the `[tool.ruff]` `include` key is a glob pattern list, not a directory path. Fall back to `src/` if it exists, otherwise the project root (`.`).
 
 If the project uses a task runner (e.g., `Makefile`, `tox.ini`, `noxfile.py`, or `[project.scripts]` in pyproject.toml), prefer those instead.

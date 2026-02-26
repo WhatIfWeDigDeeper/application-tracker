@@ -6,13 +6,58 @@ Use `uv` and `uvx` for all commands. See [uv-commands.md](uv-commands.md) for co
 
 ### Run Security Audit on Each Directory
 
-For each directory containing pyproject.toml, use the `uv export` pipeline pattern (required for Python 3.14 compatibility — see [uv-commands.md](uv-commands.md)):
+For each directory containing pyproject.toml, use the `uv export` pipeline pattern (required for pip-audit compatibility across all Python versions — see [uv-commands.md](uv-commands.md)). Capture the output into a variable — do **not** echo raw JSON to the user.
+
+`<directory>` is relative to `$WORKTREE_PATH` (use `"$WORKTREE_PATH"` directly for a root project).
+
 ```bash
-cd <directory>
-uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps
+cd "$WORKTREE_PATH/<directory>"
+AUDIT_JSON=$(uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+AUDIT_EXIT=$?
+# Extract only packages with vulnerabilities
+VULN_JSON=$(echo "$AUDIT_JSON" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    vulns = [d for d in data['dependencies'] if d['vulns']]
+    print(json.dumps(vulns, indent=2))
+except (json.JSONDecodeError, KeyError) as e:
+    print(f'Warning: failed to parse pip-audit output: {e}', file=sys.stderr)
+    print('[]')
+")
+# If VULN_JSON is empty but AUDIT_EXIT indicates vulnerabilities, the JSON was malformed
+if [ "$AUDIT_EXIT" -ne 0 ] && [ "$VULN_JSON" = "[]" ]; then
+  echo "Warning: pip-audit reported vulnerabilities but output could not be parsed. Check raw output." >&2
+fi
 ```
 
-Parse the JSON output directly from stdout. Collect all audit results into a consolidated report.
+`uv export` includes hashes by default, which satisfies pip-audit's hash requirement. `2>/dev/null` drops remaining pip-audit progress noise. pip-audit exits 1 if vulnerabilities are found, 0 if the environment is clean. `uv export --frozen` requires a `uv.lock` to exist — this is ensured by running `uv sync` in SKILL.md step 4.
+
+> **Note on `--strict`:** This flag causes pip-audit to exit non-zero on warnings (e.g., packages with no OSV/PyPI safety DB entry). If the audit exits non-zero but `VULN_JSON` parses as empty, the warning above will fire. Retry without `--strict` to distinguish true vulnerabilities from database-coverage warnings:
+> ```bash
+> AUDIT_JSON=$(uv export --frozen | uvx pip-audit --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+> AUDIT_EXIT=$?
+> VULN_JSON=$(echo "$AUDIT_JSON" | python3 -c "
+> import json, sys
+> try:
+>     data = json.load(sys.stdin)
+>     vulns = [d for d in data['dependencies'] if d['vulns']]
+>     print(json.dumps(vulns, indent=2))
+> except (json.JSONDecodeError, KeyError):
+>     print('[]')
+> ")
+> ```
+> If this also exits non-zero with non-empty `VULN_JSON`, the packages have genuine vulnerabilities.
+
+Use `AUDIT_EXIT` to skip further processing when a directory is clean:
+```bash
+if [ "$AUDIT_EXIT" -eq 0 ]; then
+  echo "No vulnerabilities in this directory."
+  # continue to next directory
+fi
+```
+
+Collect all audit results into a consolidated report. Present only the vulnerable packages — never dump the full dependency list or raw JSON to the user.
 
 ### Categorize by Severity
 
@@ -39,30 +84,95 @@ Parse the JSON output. Each dependency entry contains a `vulns` array with vulne
 Map to severity by looking up the GHSA alias from each vulnerability entry. Collect all GHSA IDs first, then look them up before making any file changes (to avoid interleaving API calls with edits):
 
 ```bash
-for GHSA_ID in <ghsa-id-1> <ghsa-id-2> ...; do
-  gh api /advisories/$GHSA_ID --jq '{id:.ghsa_id,severity:.severity}'
+# Extract GHSA IDs from vulnerability JSON, look up severity for each
+# Use a temp file — `| while read` runs in a subshell and cannot set parent variables
+SEVERITY_MAP_FILE=$(mktemp)
+echo "$VULN_JSON" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for pkg in data:
+    for vuln in pkg['vulns']:
+        for alias in vuln.get('aliases', []):
+            if alias.startswith('GHSA-'):
+                print(alias)
+" | while read GHSA_ID; do
+  # Use jq's '//' operator to default null to "high" (handles rate-limit responses that return null)
+  SEVERITY=$(gh api /advisories/$GHSA_ID --jq '.severity // "high"' 2>/dev/null || echo "high")
+  # Normalize "low" to "moderate" to match the filter option labels
+  # (GitHub Advisory API returns: low, moderate, high, critical — "medium" is not used)
+  SEVERITY=$(echo "$SEVERITY" | sed -E 's/^low$/moderate/')
+  echo "$GHSA_ID: $SEVERITY" >> "$SEVERITY_MAP_FILE"
 done
+SEVERITY_MAP=$(cat "$SEVERITY_MAP_FILE")
+rm -f "$SEVERITY_MAP_FILE"
 ```
 
-If no GHSA alias exists or the lookup fails, treat as "High" by default.
+If no GHSA alias exists or the lookup fails, treat as "high" by default.
 
 ### Apply Severity Filter
 
-Filter audit results by the selected severity levels before applying fixes. If no severity filter was selected, include all severities.
+If the user selected specific severity levels (not "All vulnerabilities"), build a map of vuln ID → severity from the GHSA lookups above, then filter `VULN_JSON`:
+
+```bash
+# SELECTED_SEVERITIES: space-separated lowercase severity names derived from the user's
+# multiSelect answers in interactive-help.md (e.g. "critical high" or "moderate").
+# Leave empty (unset) to include all severities — do not set it when "All vulnerabilities" is selected.
+# Valid values match the normalized GitHub API severities: critical, high, moderate (includes low).
+if [ -n "$SELECTED_SEVERITIES" ]; then
+  VULN_JSON=$(echo "$VULN_JSON" | SELECTED_SEVERITIES="$SELECTED_SEVERITIES" SEVERITY_MAP="$SEVERITY_MAP" python3 -c "
+import json, sys, os
+selected = set(os.environ.get('SELECTED_SEVERITIES', '').lower().split())
+# severity_map built from GHSA lookups: {'GHSA-xxxx-xxxx-xxxx': 'high', ...}
+severity_map = {}
+for line in os.environ.get('SEVERITY_MAP', '').strip().split('\n'):
+    if ': ' in line:
+        ghsa_id, sev = line.split(': ', 1)
+        severity_map[ghsa_id.strip()] = sev.strip().lower()
+data = json.load(sys.stdin)
+def pkg_matches(pkg):
+    for vuln in pkg['vulns']:
+        for alias in vuln.get('aliases', []):
+            if alias.startswith('GHSA-') and severity_map.get(alias, 'high') in selected:
+                return True
+    return False
+print(json.dumps([p for p in data if pkg_matches(p)], indent=2))
+")
+fi
+```
+
+`SEVERITY_MAP` is built by the GHSA lookup above and is ready for use here.
+
+Capture the vulnerability count within the selected filter before making any fixes:
+```bash
+# TARGET_COUNT: count of vulnerabilities matching the selected severity filter (not total audit count)
+TARGET_COUNT=$(echo "$VULN_JSON" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+print(sum(len(p['vulns']) for p in data))
+")
+```
 
 ### Determine Strategy
 
-Per directory:
-- **1-3 packages**: Update sequentially
-- **4+ packages**: Use parallel Task subagents (2 packages per agent)
+Always update packages **sequentially within a directory** to avoid lock file races.
 
-If multiple directories have vulnerabilities, process them in parallel using separate Task subagents (general-purpose), running in background. Collect results from all agents before generating the final report.
+Parallelize **across directories** only: if multiple directories have vulnerabilities, launch a separate Task subagent (general-purpose, background) per directory. Each subagent handles package updates and validation for its directory only — **do not commit from subagents**. The main agent commits all changes after all subagents complete. Include `TARGET_COUNT`, `WORKTREE_PATH`, `BRANCH_NAME`, and the target directory path in each subagent's task prompt.
+
+Each subagent must return a structured summary containing:
+- List of files modified (relative to `$WORKTREE_PATH`) so the main agent can stage them
+- Vulnerability counts before and after fixes
+- Packages fixed with old → new versions
+- Validation results (pass/fail per tool)
+
+When consolidating results:
+- Use the returned file lists to stage changes: `git add <files>` before committing
+- Merge into a single report; if any subagent fails, still include partial results for the others
 
 ### Update Packages
 
 For each vulnerable package, pin to the fix version:
 ```bash
-cd <directory>
+cd "$WORKTREE_PATH/<directory>"
 uv add <package>==<fix_version>
 uv sync  # add --extra dev or --group dev as appropriate — see uv-commands.md
 ```
@@ -75,11 +185,26 @@ Validate after each update per SKILL.md step 6. If validation fails, revert (see
 
 Re-run the audit to confirm fixes:
 ```bash
-cd <directory>
-uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps
+cd "$WORKTREE_PATH/<directory>"
+# REAUDIT_JSON is raw pip-audit output (a dict with a 'dependencies' key),
+# unlike VULN_JSON above which is a pre-filtered list of dicts.
+REAUDIT_JSON=$(uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+REAUDIT_EXIT=$?
+REMAINING=$(echo "$REAUDIT_JSON" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    remaining = sum(len(d['vulns']) for d in data['dependencies'])
+    print(remaining)
+except (json.JSONDecodeError, KeyError):
+    print('unknown')
+")
+if [ "$REMAINING" = "unknown" ]; then
+  echo "Warning: re-audit output could not be parsed — fix status unknown" >&2
+else
+  echo "Fixed $((TARGET_COUNT - REMAINING)) of $TARGET_COUNT vulnerabilities ($REMAINING remaining)"
+fi
 ```
-
-Compare before/after JSON output to confirm vulnerability counts decreased.
 
 ## Handle Results
 

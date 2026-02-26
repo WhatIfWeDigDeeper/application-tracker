@@ -7,26 +7,38 @@ Use `uv` for all commands. See [uv-commands.md](uv-commands.md) for command refe
 ### Check Outdated Packages
 
 ```bash
-cd <directory>
+cd "$WORKTREE_PATH/<directory>"
 uv pip list --outdated
 ```
+
+> **Prerequisite:** `uv sync` must have run first (SKILL.md step 4) so the environment is populated and `uv pip list --outdated` can compare installed vs. PyPI versions.
 
 > **Note:** `uv pip list --outdated` compares installed versions to PyPI latest and does not account for version range constraints in `pyproject.toml`. A package may appear outdated but be unupgradable given its constraints — the update step handles this.
 
 For specific packages, check available versions:
 ```bash
-uv pip index versions <package>
+uv index versions <package>
 ```
 
 ### Apply Version Filters
 
-Compare each outdated package's current and latest versions to determine its update type, then include only packages matching the selected filters:
+Compare each outdated package's current and latest versions to determine its update type, then include only packages matching the Q2a version scope:
 
-- **Major selected**: Include packages where the new major version differs from the current.
-- **Minor selected**: Include packages where the new minor version differs (major is the same).
-- **Patch selected**: Include packages where only the patch version differs.
-- **None selected**: Default to including all (major, minor, and patch).
-- **Skip x.y.0 releases**: If the latest version has patch=0 (e.g. `2.1.0`, `3.0.0`), skip it and keep the current version — wait for the first bugfix release (x.y.1+).
+- **"Patch only"**: Include packages where only the patch version differs (major and minor are the same).
+- **"Patch + Minor" (default)**: Include packages where the patch or minor version differs (major is the same).
+- **"Patch + Minor + Major"**: Include all updates regardless of which version component changed.
+
+**Skip x.y.0 releases (Q3):** This option is only presented when Q2a was "Patch + Minor" or "Patch + Minor + Major" (i.e. when minor updates are in scope). If the user selected "Yes, skip x.y.0", exclude any package whose latest version has patch=0 **and minor>0** (e.g. `2.1.0`) — wait for `x.y.1+`. Do **not** apply this filter to `x.0.0` major releases (e.g. `3.0.0`).
+
+  Implementation check:
+  ```python
+  # latest_version is a tuple (major, minor, patch)
+  should_skip = (
+      skip_x_y_0_selected
+      and latest_version[2] == 0   # patch is 0
+      and latest_version[1] > 0    # minor > 0 (not a major release)
+  )
+  ```
 
 ### Determine Strategy
 
@@ -41,14 +53,14 @@ If multiple directories have outdated packages, process them in parallel using s
 Update both pyproject.toml and the lockfile. First, check the project's existing version specifier style in `pyproject.toml`:
 
 - **Exact pins** (`==1.2.3`): Use `uv add <pkg>==<latest_version>`
-- **Range constraints** (`>=1.2,<2.0` or `~=1.2`): Edit `pyproject.toml` manually to update the range bounds, then run `uv lock --upgrade-package <pkg>` and `uv sync`
+- **Range constraints** (`>=1.2,<2.0` or `~=1.2`): Edit `pyproject.toml` using file editing tools to update the range bounds, then run `uv lock --upgrade-package <pkg>` and `uv sync`
 - **Unpinned** (`requests` with no specifier): Use `uv add <pkg>` (no version) to pull latest and let uv resolve
 
 ```bash
-cd <directory>
+cd "$WORKTREE_PATH/<directory>"
 
 # Check latest version
-uv pip index versions <package>
+uv index versions <package>
 
 # For exact-pinned projects:
 uv add <package>==<latest_version>
@@ -67,6 +79,12 @@ uv sync
 #   [dependency-groups] (PEP 735)   → uv sync --group dev
 ```
 
+If `uv add <pkg>==<latest_version>` fails due to version constraints, try letting uv resolve the best compatible version:
+```bash
+uv add <package>  # no version pin — uv picks latest compatible with existing constraints
+```
+If that also fails, document the constraint conflict in the PR description and skip this package.
+
 Validate after each update per SKILL.md step 6. If validation fails, revert (see SKILL.md step 6) before continuing.
 
 ### Update Documentation for Major Version Changes
@@ -81,9 +99,13 @@ For uv workspaces (`[tool.uv.workspace]` in root `pyproject.toml`), run all `uv 
 
 After updating, check for new vulnerabilities (see [uv-commands.md](uv-commands.md) for details on this pattern):
 ```bash
-cd <directory>
-uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps
+cd "$WORKTREE_PATH/<directory>"
+AUDIT_JSON=$(uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+AUDIT_EXIT=$?
+VULN_COUNT=$(echo "$AUDIT_JSON" | python3 -c "import json,sys; data=json.load(sys.stdin); print(sum(len(d['vulns']) for d in data['dependencies']))" 2>/dev/null || echo "unknown")
 ```
+
+Report a clean/vulnerable summary (e.g. "0 vulnerabilities" or "2 vulnerabilities found") — do not print raw JSON.
 
 ## Handle Results
 
@@ -94,10 +116,11 @@ uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin -
    ```bash
    git push -u origin "$BRANCH_NAME"
    ```
-3. Check for existing dependency update PRs:
+3. Check for existing dependency update PRs on this branch:
    ```bash
-   gh pr list --search "chore: Update Python dependencies" --state open
+   gh pr list --head "$BRANCH_NAME" --state open
    ```
+   If an open PR exists for this branch, update it with `gh pr edit` instead of creating a new one.
 4. Create PR using gh CLI. Write the PR body to a temp file first (subshell heredocs `$(cat <<'EOF'...)` fail in sandbox):
    ```bash
    BODY_FILE=$(mktemp)
@@ -119,7 +142,7 @@ uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin -
 
    Generated with [Claude Code](https://claude.com/claude-code)
    PREOF
-   gh pr create --title "chore: Update Python dependencies" --body-file "$BODY_FILE"
+   gh pr create --title "chore: update Python dependencies" --body-file "$BODY_FILE"
    rm -f "$BODY_FILE"
    ```
 5. Return the PR URL to the user
@@ -128,5 +151,5 @@ uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin -
 
 - Categorize errors (type check/lint/test/audit)
 - Provide specific remediation steps
-- Offer options: isolate problem, revert specific updates, or abandon
-- If partially successful, still create PR with failing checks noted
+- If partially successful (some packages updated successfully): push the branch and create PR with failing checks noted in the PR description
+- If nothing was successfully updated: offer options (isolate problem, revert specific updates, or abandon) rather than creating an empty PR
