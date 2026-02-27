@@ -3,9 +3,9 @@ SELECT * FROM go_gin.applications
 WHERE
   (sqlc.narg('status')::go_gin.application_status IS NULL OR status = sqlc.narg('status')::go_gin.application_status)
   AND (sqlc.narg('is_archived')::boolean IS NULL OR is_archived = sqlc.narg('is_archived')::boolean)
-  AND (sqlc.narg('company_category')::go_gin.company_category IS NULL OR company_category = sqlc.narg('company_category')::go_gin.company_category)
-  AND (sqlc.narg('job_source')::go_gin.job_source IS NULL OR job_source = sqlc.narg('job_source')::go_gin.job_source)
-  AND (sqlc.narg('skills_match')::go_gin.skills_match IS NULL OR skills_match = sqlc.narg('skills_match')::go_gin.skills_match)
+  AND (sqlc.narg('company_category')::text IS NULL OR company_category = sqlc.narg('company_category')::text)
+  AND (sqlc.narg('job_source')::text IS NULL OR job_source = sqlc.narg('job_source')::text)
+  AND (sqlc.narg('skills_match')::int IS NULL OR skills_match = sqlc.narg('skills_match')::int)
 ORDER BY updated_at DESC
 LIMIT sqlc.arg('limit')::integer
 OFFSET sqlc.arg('offset')::integer;
@@ -15,9 +15,9 @@ SELECT COUNT(*) FROM go_gin.applications
 WHERE
   (sqlc.narg('status')::go_gin.application_status IS NULL OR status = sqlc.narg('status')::go_gin.application_status)
   AND (sqlc.narg('is_archived')::boolean IS NULL OR is_archived = sqlc.narg('is_archived')::boolean)
-  AND (sqlc.narg('company_category')::go_gin.company_category IS NULL OR company_category = sqlc.narg('company_category')::go_gin.company_category)
-  AND (sqlc.narg('job_source')::go_gin.job_source IS NULL OR job_source = sqlc.narg('job_source')::go_gin.job_source)
-  AND (sqlc.narg('skills_match')::go_gin.skills_match IS NULL OR skills_match = sqlc.narg('skills_match')::go_gin.skills_match);
+  AND (sqlc.narg('company_category')::text IS NULL OR company_category = sqlc.narg('company_category')::text)
+  AND (sqlc.narg('job_source')::text IS NULL OR job_source = sqlc.narg('job_source')::text)
+  AND (sqlc.narg('skills_match')::int IS NULL OR skills_match = sqlc.narg('skills_match')::int);
 
 -- name: GetApplication :one
 SELECT * FROM go_gin.applications WHERE id = $1;

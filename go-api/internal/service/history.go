@@ -152,7 +152,7 @@ func RestoreToVersion(ctx context.Context, pool *pgxpool.Pool, applicationID, sn
 		JobPostingURL:       toNullableText(app.JobPostingURL),
 		CompanyCareerURL:    toNullableText(app.CompanyCareerURL),
 		CompanyCategory:     toNullableText(app.CompanyCategory),
-		SkillsMatch:         toNullableText(app.SkillsMatch),
+		SkillsMatch:         toNullableInt4(app.SkillsMatch),
 		JobSource:           toNullableText(app.JobSource),
 		SalaryMin:           toNullableInt4(app.SalaryMin),
 		SalaryMax:           toNullableInt4(app.SalaryMax),

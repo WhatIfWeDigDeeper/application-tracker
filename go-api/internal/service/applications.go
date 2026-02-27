@@ -21,7 +21,7 @@ type ApplicationInput struct {
 	JobPostingURL       *string `json:"jobPostingUrl"`
 	CompanyCareerURL    *string `json:"companyCareerUrl"`
 	CompanyCategory     *string `json:"companyCategory"`
-	SkillsMatch         *string `json:"skillsMatch"`
+	SkillsMatch         *int32  `json:"skillsMatch"`
 	JobSource           *string `json:"jobSource"`
 	SalaryMin           *int32  `json:"salaryMin"`
 	SalaryMax           *int32  `json:"salaryMax"`
@@ -42,7 +42,7 @@ type ApplicationResponse struct {
 	JobPostingURL       *string                  `json:"jobPostingUrl"`
 	CompanyCareerURL    *string                  `json:"companyCareerUrl"`
 	CompanyCategory     *string                  `json:"companyCategory"`
-	SkillsMatch         *string                  `json:"skillsMatch"`
+	SkillsMatch         *int32                   `json:"skillsMatch"`
 	JobSource           *string                  `json:"jobSource"`
 	SalaryMin           *int32                   `json:"salaryMin"`
 	SalaryMax           *int32                   `json:"salaryMax"`
@@ -75,7 +75,7 @@ type ListParams struct {
 	IsArchived      *bool
 	CompanyCategory *string
 	JobSource       *string
-	SkillsMatch     *string
+	SkillsMatch     *int32
 	SortBy          string
 	SortDir         string
 	Page            int
@@ -133,7 +133,7 @@ func toAppResponse(app *db.Application, stages []db.InterviewStage) ApplicationR
 		JobPostingURL:       textToStringPtr(app.JobPostingURL),
 		CompanyCareerURL:    textToStringPtr(app.CompanyCareerURL),
 		CompanyCategory:     textToStringPtr(app.CompanyCategory),
-		SkillsMatch:         textToStringPtr(app.SkillsMatch),
+		SkillsMatch:         int4ToInt32Ptr(app.SkillsMatch),
 		JobSource:           textToStringPtr(app.JobSource),
 		SalaryMin:           int4ToInt32Ptr(app.SalaryMin),
 		SalaryMax:           int4ToInt32Ptr(app.SalaryMax),
@@ -308,7 +308,7 @@ func CreateApplication(ctx context.Context, pool *pgxpool.Pool, input Applicatio
 		JobPostingURL:       toNullableText(input.JobPostingURL),
 		CompanyCareerURL:    toNullableText(input.CompanyCareerURL),
 		CompanyCategory:     toNullableText(input.CompanyCategory),
-		SkillsMatch:         toNullableText(input.SkillsMatch),
+		SkillsMatch:         toNullableInt4(input.SkillsMatch),
 		JobSource:           toNullableText(input.JobSource),
 		SalaryMin:           toNullableInt4(input.SalaryMin),
 		SalaryMax:           toNullableInt4(input.SalaryMax),
@@ -362,7 +362,7 @@ func UpdateApplication(ctx context.Context, pool *pgxpool.Pool, id string, input
 		JobPostingURL:       toNullableText(input.JobPostingURL),
 		CompanyCareerURL:    toNullableText(input.CompanyCareerURL),
 		CompanyCategory:     toNullableText(input.CompanyCategory),
-		SkillsMatch:         toNullableText(input.SkillsMatch),
+		SkillsMatch:         toNullableInt4(input.SkillsMatch),
 		JobSource:           toNullableText(input.JobSource),
 		SalaryMin:           toNullableInt4(input.SalaryMin),
 		SalaryMax:           toNullableInt4(input.SalaryMax),

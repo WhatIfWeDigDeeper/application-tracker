@@ -81,6 +81,24 @@ Engineer,applied`
 	assert.Contains(t, string(body), "companyName")
 }
 
+func TestImportCSV_CrossImplementationValues(t *testing.T) {
+	pool := setupTestDB(t)
+	srv := newTestServer(pool)
+	defer srv.Close()
+
+	// NestJS exports sector-based company_category and numeric skills_match (1-5).
+	// Verify these import successfully into Go Gin.
+	csvContent := `companyName,positionTitle,status,dateApplied,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,salaryMin,salaryMax,coverLetterRequired,offerDueDate,specialRequirements,notes
+Cross Impl Corp,Engineer,applied,2026-01-01,,https://cross.com/job1,,ai,4,linkedin,,,false,,,`
+
+	status, body := uploadCSV(t, srv.URL, csvContent)
+	assert.Equal(t, http.StatusOK, status)
+
+	bodyStr := string(body)
+	assert.Contains(t, bodyStr, `"imported":1`)
+	assert.Contains(t, bodyStr, `"errors":[]`)
+}
+
 func TestExportCSV(t *testing.T) {
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)

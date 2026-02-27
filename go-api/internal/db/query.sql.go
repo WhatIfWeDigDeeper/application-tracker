@@ -17,7 +17,7 @@ type ListApplicationsParams struct {
 	IsArchived      *bool
 	CompanyCategory *string
 	JobSource       *string
-	SkillsMatch     *string
+	SkillsMatch     *int32
 	SortBy          string
 	SortDir         string
 	Limit           int32
@@ -53,7 +53,7 @@ func ListApplications(ctx context.Context, pool *pgxpool.Pool, params ListApplic
 		  AND ($2::boolean IS NULL OR is_archived = $2::boolean)
 		  AND ($3::text IS NULL OR company_category = $3)
 		  AND ($4::text IS NULL OR job_source = $4)
-		  AND ($5::text IS NULL OR skills_match = $5)
+		  AND ($5::int IS NULL OR skills_match = $5)
 		ORDER BY %s %s
 		LIMIT $6 OFFSET $7`, sortBy, sortDir)
 
@@ -79,7 +79,7 @@ func CountApplications(ctx context.Context, pool *pgxpool.Pool, params ListAppli
 		  AND ($2::boolean IS NULL OR is_archived = $2::boolean)
 		  AND ($3::text IS NULL OR company_category = $3)
 		  AND ($4::text IS NULL OR job_source = $4)
-		  AND ($5::text IS NULL OR skills_match = $5)`
+		  AND ($5::int IS NULL OR skills_match = $5)`
 
 	var count int64
 	err := pool.QueryRow(ctx, query,
@@ -118,7 +118,7 @@ type CreateApplicationParams struct {
 	JobPostingURL       pgtype.Text
 	CompanyCareerURL    pgtype.Text
 	CompanyCategory     pgtype.Text
-	SkillsMatch         pgtype.Text
+	SkillsMatch         pgtype.Int4
 	JobSource           pgtype.Text
 	SalaryMin           pgtype.Int4
 	SalaryMax           pgtype.Int4
@@ -172,7 +172,7 @@ type UpdateApplicationParams struct {
 	JobPostingURL       pgtype.Text
 	CompanyCareerURL    pgtype.Text
 	CompanyCategory     pgtype.Text
-	SkillsMatch         pgtype.Text
+	SkillsMatch         pgtype.Int4
 	JobSource           pgtype.Text
 	SalaryMin           pgtype.Int4
 	SalaryMax           pgtype.Int4

@@ -37,7 +37,7 @@ type Application struct {
 	JobPostingURL       pgtype.Text        `json:"jobPostingUrl"`
 	CompanyCareerURL    pgtype.Text        `json:"companyCareerUrl"`
 	CompanyCategory     pgtype.Text        `json:"companyCategory"`
-	SkillsMatch         pgtype.Text        `json:"skillsMatch"`
+	SkillsMatch         pgtype.Int4        `json:"skillsMatch"`
 	JobSource           pgtype.Text        `json:"jobSource"`
 	SalaryMin           pgtype.Int4        `json:"salaryMin"`
 	SalaryMax           pgtype.Int4        `json:"salaryMax"`

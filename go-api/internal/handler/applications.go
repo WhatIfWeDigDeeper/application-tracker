@@ -51,7 +51,10 @@ func listApplications(pool *pgxpool.Pool) gin.HandlerFunc {
 			params.JobSource = &js
 		}
 		if sm := c.Query("skillsMatch"); sm != "" {
-			params.SkillsMatch = &sm
+			if n, err := strconv.ParseInt(sm, 10, 32); err == nil {
+				v := int32(n)
+				params.SkillsMatch = &v
+			}
 		}
 
 		if p := c.Query("page"); p != "" {

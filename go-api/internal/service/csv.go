@@ -164,10 +164,12 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 		if companyCategory != "" {
 			companyCategoryPtr = &companyCategory
 		}
-		skillsMatch := getField("skillsMatch")
-		var skillsMatchPtr *string
-		if skillsMatch != "" {
-			skillsMatchPtr = &skillsMatch
+		var skillsMatchPtr *int32
+		if s := getField("skillsMatch"); s != "" {
+			if n, err := strconv.ParseInt(s, 10, 32); err == nil {
+				v := int32(n)
+				skillsMatchPtr = &v
+			}
 		}
 		jobSource := getField("jobSource")
 		var jobSourcePtr *string
@@ -290,8 +292,8 @@ func GetTemplate() []byte {
 		"https://acme.com",
 		"https://acme.com/jobs/123",
 		"https://acme.com/careers",
-		"large_company",
-		"strong_match",
+		"enterprise-software",
+		"4",
 		"linkedin",
 		"100000",
 		"150000",
@@ -329,7 +331,7 @@ func appToCSVRow(app db.Application) []string {
 	}
 	skillsMatch := ""
 	if app.SkillsMatch.Valid {
-		skillsMatch = app.SkillsMatch.String
+		skillsMatch = strconv.Itoa(int(app.SkillsMatch.Int32))
 	}
 	jobSource := ""
 	if app.JobSource.Valid {
