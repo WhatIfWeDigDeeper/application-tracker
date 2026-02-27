@@ -24,7 +24,8 @@ describe('CsvImportComponent', () => {
     await render(CsvImportComponent, {
       providers: [{ provide: ApplicationService, useValue: mockService }],
     });
-    expect(screen.getByText('Choose CSV File')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Import Applications' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy();
   });
 
   it('should display result summary after import', async () => {

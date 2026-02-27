@@ -18,8 +18,7 @@
   <!-- Import section -->
   @if (showImport()) {
   <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
-    <h3 class="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Import Applications from CSV</h3>
-    <app-csv-import />
+    <app-csv-import (closeImport)="showImport.set(false)" />
   </div>
   }
 
