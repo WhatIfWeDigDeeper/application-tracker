@@ -48,13 +48,11 @@ import { ImportResult } from '../../core/models/application.model';
           <p class="font-medium text-green-800 dark:text-green-400">Skipped: {{ result()!.skipped }}</p>
           <div data-testid="import-result-errors" class="font-medium text-green-800 dark:text-green-400">
             Errors: {{ result()!.errors.length }}
-            @if (result()!.errors.length > 0) {
-              <ul class="mt-1 space-y-1">
-                @for (err of result()!.errors; track err.row) {
-                  <li class="text-red-700 dark:text-red-400">Row {{ err.row }}: {{ err.message }}</li>
-                }
-              </ul>
-            }
+            <ul class="mt-1 space-y-1">
+              @for (err of result()!.errors; track err.row) {
+                <li class="text-red-700 dark:text-red-400">Row {{ err.row }}: {{ err.message }}</li>
+              }
+            </ul>
           </div>
         </div>
       }
