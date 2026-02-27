@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
+    "isolatedModules": true,
     "types": ["jest"]
   },
   "include": ["src/**/*.spec.ts", "src/**/*.d.ts", "src/test.ts"]
