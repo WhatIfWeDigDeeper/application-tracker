@@ -1,4 +1,4 @@
-import { Component, inject, signal, Output, EventEmitter } from '@angular/core';
+import { Component, computed, inject, signal, Output, EventEmitter } from '@angular/core';
 import { ApplicationService } from '../../core/services/application.service';
 import { ImportResult } from '../../core/models/application.model';
 
@@ -47,11 +47,7 @@ import { ImportResult } from '../../core/models/application.model';
           <p class="font-medium text-green-800 dark:text-green-400">Skipped: {{ result()?.skipped ?? 0 }}</p>
           <div data-testid="import-result-errors" class="font-medium text-green-800 dark:text-green-400">
             Errors: {{ result()?.errors?.length ?? 0 }}
-            <ul class="mt-1 space-y-1">
-              @for (err of result()?.errors ?? []; track err.row) {
-                <li class="text-red-700 dark:text-red-400">Row {{ err.row }}: {{ err.message }}</li>
-              }
-            </ul>
+            <pre [hidden]="!errorLines().length" class="mt-1 whitespace-pre-wrap text-red-700 dark:text-red-400 font-sans text-sm">{{ errorLines().join('\n') }}</pre>
           </div>
         </div>
 
@@ -64,6 +60,10 @@ export class CsvImportComponent {
 
   @Output() closeImport = new EventEmitter<void>();
   @Output() importSuccess = new EventEmitter<void>();
+
+  errorLines = computed(() =>
+    this.result()?.errors?.map(e => `Row ${e.row}: ${e.message}`) ?? []
+  );
 
   selectedFile = signal<File | null>(null);
   importing = signal(false);

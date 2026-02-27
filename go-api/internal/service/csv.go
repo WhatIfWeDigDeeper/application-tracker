@@ -23,17 +23,23 @@ var CSVHeaders = []string{
 	"coverLetterRequired", "offerDueDate", "specialRequirements", "notes",
 }
 
+// ImportError represents a single row-level error during CSV import.
+type ImportError struct {
+	Row     int    `json:"row"`
+	Message string `json:"message"`
+}
+
 // ImportResult holds the result of a CSV import operation.
 type ImportResult struct {
-	Imported int      `json:"imported"`
-	Skipped  int      `json:"skipped"`
-	Errors   []string `json:"errors"`
+	Imported int           `json:"imported"`
+	Skipped  int           `json:"skipped"`
+	Errors   []ImportError `json:"errors"`
 }
 
 // ImportCSV parses and imports applications from a CSV reader.
 func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (ImportResult, error) {
 	result := ImportResult{
-		Errors: []string{},
+		Errors: []ImportError{},
 	}
 
 	r := csv.NewReader(reader)
@@ -79,14 +85,14 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 	seenURLs := make(map[string]bool)
 	seenPairs := make(map[string]bool)
 
-	rowNum := 1
+	rowNum := 2 // header is row 1; data rows start at 2
 	for {
 		row, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			result.Errors = append(result.Errors, fmt.Sprintf("row %d: parse error: %v", rowNum, err))
+			result.Errors = append(result.Errors, ImportError{Row: rowNum, Message: fmt.Sprintf("parse error: %v", err)})
 			rowNum++
 			continue
 		}
@@ -101,14 +107,14 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 
 		companyName := getField("companyName")
 		if companyName == "" {
-			result.Errors = append(result.Errors, fmt.Sprintf("row %d: companyName is required", rowNum))
+			result.Errors = append(result.Errors, ImportError{Row: rowNum, Message: "companyName is required"})
 			rowNum++
 			continue
 		}
 
 		positionTitle := getField("positionTitle")
 		if positionTitle == "" {
-			result.Errors = append(result.Errors, fmt.Sprintf("row %d: positionTitle is required", rowNum))
+			result.Errors = append(result.Errors, ImportError{Row: rowNum, Message: "positionTitle is required"})
 			rowNum++
 			continue
 		}
@@ -233,7 +239,7 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 		}
 
 		if _, err := CreateApplication(ctx, pool, input); err != nil {
-			result.Errors = append(result.Errors, fmt.Sprintf("row %d: %v", rowNum, err))
+			result.Errors = append(result.Errors, ImportError{Row: rowNum, Message: err.Error()})
 		} else {
 			result.Imported++
 			if jobPostingURL != "" {
