@@ -54,6 +54,7 @@ SCHEMAS=(
   "vue_nuxt:vue-nuxt"
   "react_nestjs:react-nestjs"
   "python_fastapi:python-fastapi"
+  "go_gin:go-gin"
 )
 
 for entry in "${SCHEMAS[@]}"; do

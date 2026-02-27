@@ -119,7 +119,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
 | `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
-| `go_gin` | Go Gin API | — |
+| `go_gin` | Angular + Go Gin API | [schema docs](docs/schema/go-gin/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -134,6 +134,7 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [tanstack-ui](docs/types/tanstack-ui/application.mermaid) - React + TanStack + NestJS
 - [nest-api](docs/types/nest-api/api.mermaid) - NestJS API
 - [tanstack-start-ui](docs/types/tanstack-start-ui/application.mermaid) - React SSR + TanStack Start
+- [angular-ui](docs/types/angular-ui/application.model.mermaid) - Angular + Go Gin
 
 Regenerate with `npm run docs:types`.
 

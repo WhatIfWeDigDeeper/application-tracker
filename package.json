@@ -160,7 +160,8 @@
     "docs:types:nest-api": "npx -y ts-to-mermaid nest-api/src/types/api.ts --save docs/types/nest-api/ && echo >> docs/types/nest-api/api.mermaid",
     "docs:types:tanstack-ui": "npx -y ts-to-mermaid tanstack-ui/src/types/application.ts --save docs/types/tanstack-ui/ && echo >> docs/types/tanstack-ui/application.mermaid",
     "docs:types:tanstack-start-ui": "npx -y ts-to-mermaid tanstack-start-ui/src/types/application.ts --save docs/types/tanstack-start-ui/ && echo >> docs/types/tanstack-start-ui/application.mermaid",
-    "docs:types": "npm run docs:types:nuxt && npm run docs:types:react-next && npm run docs:types:react-ui && npm run docs:types:koa-api && npm run docs:types:svelte-ui && npm run docs:types:nest-api && npm run docs:types:tanstack-ui && npm run docs:types:tanstack-start-ui",
+    "docs:types:angular-ui": "npx -y ts-to-mermaid angular-ui/src/app/core/models/application.model.ts --save docs/types/angular-ui/ && echo >> docs/types/angular-ui/application.model.mermaid",
+    "docs:types": "npm run docs:types:nuxt && npm run docs:types:react-next && npm run docs:types:react-ui && npm run docs:types:koa-api && npm run docs:types:svelte-ui && npm run docs:types:nest-api && npm run docs:types:tanstack-ui && npm run docs:types:tanstack-start-ui && npm run docs:types:angular-ui",
     "stop:all": "bash scripts/stop-all.sh",
     "cleanup:test-data": "node scripts/cleanup-test-data.mjs --"
   },
