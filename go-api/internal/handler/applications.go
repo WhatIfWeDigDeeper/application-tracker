@@ -1,3 +1,4 @@
+// Package handler provides HTTP route handlers for the Go Gin API.
 package handler
 
 import (

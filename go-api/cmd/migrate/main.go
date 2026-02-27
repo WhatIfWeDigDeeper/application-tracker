@@ -1,3 +1,4 @@
+// Package main provides the database migration command.
 package main
 
 import (
@@ -29,7 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create migrator: %v", err)
 	}
-	defer m.Close()
+	defer m.Close() //nolint:errcheck
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatalf("failed to run migrations: %v", err)

@@ -1,3 +1,4 @@
+// Package service provides business logic for the Go Gin API.
 package service
 
 import (

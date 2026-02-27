@@ -18,7 +18,7 @@ func importCSV(pool *pgxpool.Pool) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "file field required in multipart/form-data"})
 			return
 		}
-		defer file.Close()
+		defer file.Close() //nolint:errcheck
 
 		result, err := service.ImportCSV(c.Request.Context(), pool, file)
 		if err != nil {

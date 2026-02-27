@@ -1,3 +1,4 @@
+// Package main provides the Go Gin API server entry point.
 package main
 
 import (
@@ -31,7 +32,7 @@ func runMigrations(databaseURL string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create migrator: %w", err)
 	}
-	defer m.Close()
+	defer m.Close() //nolint:errcheck
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		return fmt.Errorf("failed to run migrations: %w", err)

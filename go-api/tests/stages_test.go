@@ -12,10 +12,10 @@ import (
 )
 
 type stageResponse struct {
-	ID        string `json:"id"`
-	StageName string `json:"stageName"`
-	StageOrder int32 `json:"stageOrder"`
-	IsCompleted bool `json:"isCompleted"`
+	ID          string `json:"id"`
+	StageName   string `json:"stageName"`
+	StageOrder  int32  `json:"stageOrder"`
+	IsCompleted bool   `json:"isCompleted"`
 }
 
 type appWithStages struct {

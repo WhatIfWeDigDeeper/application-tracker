@@ -13,12 +13,12 @@ import (
 )
 
 type appResponse struct {
-	ID              string      `json:"id"`
-	CompanyName     string      `json:"companyName"`
-	PositionTitle   string      `json:"positionTitle"`
-	Status          string      `json:"status"`
-	DateApplied     interface{} `json:"dateApplied"`
-	IsArchived      bool        `json:"isArchived"`
+	ID              string        `json:"id"`
+	CompanyName     string        `json:"companyName"`
+	PositionTitle   string        `json:"positionTitle"`
+	Status          string        `json:"status"`
+	DateApplied     interface{}   `json:"dateApplied"`
+	IsArchived      bool          `json:"isArchived"`
 	InterviewStages []interface{} `json:"interviewStages"`
 }
 
