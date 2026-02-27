@@ -373,6 +373,21 @@ Note: This is a single-page application with most interactions via modals. Alter
 
 ---
 
+## App Shell
+
+Browser-level UI that frames the application.
+
+### Page Title
+- `<title>` should be `"Application Tracker"` or include the implementation technology (e.g., `"Application Tracker - Angular"`).
+
+### Favicon
+- Each implementation should provide a technology-inspired SVG favicon (`favicon.svg`).
+- The icon should be visually recognizable as the UI framework or language used (e.g., Angular shield, React atom, Vue "V" chevron, Svelte flame, Python snake).
+- Served from the `public/` (or equivalent static assets) directory.
+- Referenced in `<head>` as `<link rel="icon" type="image/svg+xml" href="favicon.svg">`.
+
+---
+
 ## Accessibility Requirements
 
 - All interactive elements keyboard accessible
