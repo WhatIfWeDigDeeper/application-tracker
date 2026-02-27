@@ -88,8 +88,8 @@ This repository contains a complete job application tracker built with multiple 
 ### 7. Angular + Go Gin + pgx/sqlc
 **Directories**: `angular-ui/` + `go-api/`
 **Stack**:
-- Frontend: Angular 19 + standalone components + Angular Signals + Tailwind CSS 4.x — port 3060
-- Backend: Go 1.23 + Gin framework + pgx v5 + sqlc for type-safe SQL — port 5070
+- Frontend: Angular 21 + standalone components + Angular Signals + Tailwind CSS 4.x — port 3060
+- Backend: Go 1.24 + Gin framework + pgx v5 + sqlc for type-safe SQL — port 5070
 - Database: PostgreSQL via `go_gin` schema (raw SQL, no ORM)
 - Angular Signals for reactive state, CanDeactivate guard for unsaved changes
 - Snapshot-based history with field diffs and restore
@@ -151,7 +151,7 @@ Regenerate with `npm run docs:types`.
 ├── vue-ui/                       # Vue + Vite UI
 ├── tanstack-ui/                  # React + TanStack Query/Router UI
 ├── tanstack-start-ui/            # React SSR + TanStack Start UI
-├── angular-ui/                   # Angular 19 UI
+├── angular-ui/                   # Angular 21 UI
 ├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
@@ -169,7 +169,7 @@ Regenerate with `npm run docs:types`.
 
 - Node.js (v18+)
 - Python 3.12+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
-- Go 1.23+ (for the Go Gin API implementation)
+- Go 1.24+ (for the Go Gin API implementation)
 - Docker and Docker Compose (for PostgreSQL)
 - [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
