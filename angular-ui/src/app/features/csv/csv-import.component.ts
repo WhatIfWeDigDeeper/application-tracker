@@ -9,7 +9,7 @@ import { ImportResult } from '../../core/models/application.model';
     <div class="space-y-3">
       <div class="flex items-center gap-2">
         <label class="cursor-pointer">
-          <span class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded border border-gray-300 cursor-pointer">
+          <span class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded border border-gray-300 cursor-pointer dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 dark:border-gray-600">
             Choose CSV File
           </span>
           <input
@@ -19,7 +19,7 @@ import { ImportResult } from '../../core/models/application.model';
             class="hidden"
           />
         </label>
-        <span class="text-sm text-gray-500">{{ selectedFileName() }}</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400">{{ selectedFileName() }}</span>
         @if (selectedFile()) {
           <button
             type="button"
@@ -33,14 +33,14 @@ import { ImportResult } from '../../core/models/application.model';
       </div>
 
       @if (result()) {
-        <div class="p-3 bg-green-50 border border-green-200 rounded text-sm">
-          <p class="font-medium text-green-800">
+        <div class="p-3 bg-green-50 border border-green-200 rounded text-sm dark:bg-green-900/20 dark:border-green-800">
+          <p class="font-medium text-green-800 dark:text-green-400">
             Imported: {{ result()!.imported }} | Skipped: {{ result()!.skipped }} | Errors: {{ result()!.errors.length }}
           </p>
           @if (result()!.errors.length > 0) {
             <ul class="mt-2 space-y-1">
               @for (err of result()!.errors; track err.row) {
-                <li class="text-red-700">Row {{ err.row }}: {{ err.message }}</li>
+                <li class="text-red-700 dark:text-red-400">Row {{ err.row }}: {{ err.message }}</li>
               }
             </ul>
           }
@@ -48,7 +48,7 @@ import { ImportResult } from '../../core/models/application.model';
       }
 
       @if (error()) {
-        <p class="text-sm text-red-600">{{ error() }}</p>
+        <p class="text-sm text-red-600 dark:text-red-400">{{ error() }}</p>
       }
     </div>
   `,

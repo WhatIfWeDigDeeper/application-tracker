@@ -93,6 +93,7 @@
         </button>
         {#if menuOpen}
           <div
+            data-menu-dropdown
             class="absolute right-0 mt-1 w-36 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-10"
           >
             <button

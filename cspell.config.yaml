@@ -8,7 +8,9 @@ words:
   - dedup
   - Dedup
   - fastapi
+  - Hono
   - mypy
+  - Nuxt
   - Pydantic
   - pyproject
   - pytest

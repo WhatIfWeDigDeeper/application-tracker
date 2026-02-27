@@ -10,7 +10,7 @@ import { ApplicationService } from '../../core/services/application.service';
         type="button"
         (click)="onExport()"
         [disabled]="exporting()"
-        class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-sm rounded border border-gray-300 disabled:opacity-50"
+        class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-sm rounded border border-gray-300 disabled:opacity-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
       >
         {{ exporting() ? 'Exporting...' : 'Export CSV' }}
       </button>
@@ -18,7 +18,7 @@ import { ApplicationService } from '../../core/services/application.service';
         type="button"
         (click)="onDownloadTemplate()"
         [disabled]="downloadingTemplate()"
-        class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-sm rounded border border-gray-300 disabled:opacity-50"
+        class="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-sm rounded border border-gray-300 disabled:opacity-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
       >
         {{ downloadingTemplate() ? 'Downloading...' : 'Download Template' }}
       </button>

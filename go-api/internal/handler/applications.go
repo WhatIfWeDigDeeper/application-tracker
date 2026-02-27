@@ -73,7 +73,7 @@ func listApplications(pool *pgxpool.Pool) gin.HandlerFunc {
 		if apps == nil {
 			apps = []service.ApplicationResponse{}
 		}
-		c.JSON(http.StatusOK, gin.H{"data": apps, "total": total})
+		c.JSON(http.StatusOK, gin.H{"items": apps, "total": total})
 	}
 }
 

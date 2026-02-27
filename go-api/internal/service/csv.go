@@ -58,8 +58,9 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 		return result, fmt.Errorf("missing required column: positionTitle")
 	}
 
-	// Collect existing job_posting_urls from DB for duplicate detection
+	// Collect existing records from DB for duplicate detection
 	existingURLs := make(map[string]bool)
+	existingPairs := make(map[string]bool)
 	allApps, err := db.GetAllApplications(ctx, pool)
 	if err != nil {
 		return result, fmt.Errorf("failed to load existing applications: %w", err)
@@ -67,11 +68,16 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 	for _, app := range allApps {
 		if app.JobPostingURL.Valid && app.JobPostingURL.String != "" {
 			existingURLs[app.JobPostingURL.String] = true
+		} else {
+			// Fallback key for apps without a job posting URL
+			key := strings.ToLower(app.CompanyName) + "|" + strings.ToLower(app.PositionTitle)
+			existingPairs[key] = true
 		}
 	}
 
 	// Track intra-file duplicates
 	seenURLs := make(map[string]bool)
+	seenPairs := make(map[string]bool)
 
 	rowNum := 1
 	for {
@@ -109,7 +115,7 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 
 		jobPostingURL := getField("jobPostingUrl")
 
-		// Duplicate detection
+		// Duplicate detection: use jobPostingUrl if present, else fall back to (companyName, positionTitle)
 		if jobPostingURL != "" {
 			if existingURLs[jobPostingURL] || seenURLs[jobPostingURL] {
 				result.Skipped++
@@ -117,6 +123,14 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 				continue
 			}
 			seenURLs[jobPostingURL] = true
+		} else {
+			pairKey := strings.ToLower(companyName) + "|" + strings.ToLower(positionTitle)
+			if existingPairs[pairKey] || seenPairs[pairKey] {
+				result.Skipped++
+				rowNum++
+				continue
+			}
+			seenPairs[pairKey] = true
 		}
 
 		status := getField("status")
@@ -222,6 +236,9 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 			result.Imported++
 			if jobPostingURL != "" {
 				existingURLs[jobPostingURL] = true
+			} else {
+				pairKey := strings.ToLower(companyName) + "|" + strings.ToLower(positionTitle)
+				existingPairs[pairKey] = true
 			}
 		}
 		rowNum++

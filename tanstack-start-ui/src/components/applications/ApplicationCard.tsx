@@ -134,6 +134,7 @@ export function ApplicationCard({
             onClick={() => setShowMenu(false)}
           />
           <div
+            data-menu-dropdown
             className="fixed z-20 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1"
             style={{ top: menuPosition.top, right: menuPosition.right }}
           >

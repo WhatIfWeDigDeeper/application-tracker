@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -12,6 +13,21 @@ type Config struct {
 	DatabaseURL string
 	Port        string
 	CORSOrigin  string
+}
+
+func withDefaultSearchPath(databaseURL string) string {
+	parsed, err := url.Parse(databaseURL)
+	if err != nil {
+		return databaseURL
+	}
+
+	query := parsed.Query()
+	if query.Get("search_path") == "" && query.Get("schema") == "" {
+		query.Set("search_path", "go_gin")
+		parsed.RawQuery = query.Encode()
+	}
+
+	return parsed.String()
 }
 
 // Load reads configuration from environment variables (and optionally a .env file).
@@ -27,6 +43,7 @@ func Load() (*Config, error) {
 	if databaseURL == "" {
 		return nil, fmt.Errorf("DATABASE_URL environment variable is required")
 	}
+	databaseURL = withDefaultSearchPath(databaseURL)
 
 	port := os.Getenv("PORT")
 	if port == "" {

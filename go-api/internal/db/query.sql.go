@@ -49,11 +49,11 @@ func ListApplications(ctx context.Context, pool *pgxpool.Pool, params ListApplic
 		       is_archived, created_at, updated_at
 		FROM go_gin.applications
 		WHERE
-		  ($1::go_gin.application_status IS NULL OR status = $1::go_gin.application_status)
+		  ($1::text IS NULL OR status = $1)
 		  AND ($2::boolean IS NULL OR is_archived = $2::boolean)
-		  AND ($3::go_gin.company_category IS NULL OR company_category = $3::go_gin.company_category)
-		  AND ($4::go_gin.job_source IS NULL OR job_source = $4::go_gin.job_source)
-		  AND ($5::go_gin.skills_match IS NULL OR skills_match = $5::go_gin.skills_match)
+		  AND ($3::text IS NULL OR company_category = $3)
+		  AND ($4::text IS NULL OR job_source = $4)
+		  AND ($5::text IS NULL OR skills_match = $5)
 		ORDER BY %s %s
 		LIMIT $6 OFFSET $7`, sortBy, sortDir)
 
@@ -75,11 +75,11 @@ func CountApplications(ctx context.Context, pool *pgxpool.Pool, params ListAppli
 	query := `
 		SELECT COUNT(*) FROM go_gin.applications
 		WHERE
-		  ($1::go_gin.application_status IS NULL OR status = $1::go_gin.application_status)
+		  ($1::text IS NULL OR status = $1)
 		  AND ($2::boolean IS NULL OR is_archived = $2::boolean)
-		  AND ($3::go_gin.company_category IS NULL OR company_category = $3::go_gin.company_category)
-		  AND ($4::go_gin.job_source IS NULL OR job_source = $4::go_gin.job_source)
-		  AND ($5::go_gin.skills_match IS NULL OR skills_match = $5::go_gin.skills_match)`
+		  AND ($3::text IS NULL OR company_category = $3)
+		  AND ($4::text IS NULL OR job_source = $4)
+		  AND ($5::text IS NULL OR skills_match = $5)`
 
 	var count int64
 	err := pool.QueryRow(ctx, query,
@@ -138,9 +138,9 @@ func CreateApplication(ctx context.Context, pool *pgxpool.Pool, p CreateApplicat
 		  salary_min, salary_max, cover_letter_required,
 		  offer_due_date, special_requirements, notes
 		) VALUES (
-		  $1, $2, $3::go_gin.application_status, $4,
+		  $1, $2, $3, $4,
 		  $5, $6, $7,
-		  $8::go_gin.company_category, $9::go_gin.skills_match, $10::go_gin.job_source,
+		  $8, $9, $10,
 		  $11, $12, $13,
 		  $14, $15, $16
 		)
@@ -187,11 +187,11 @@ func UpdateApplication(ctx context.Context, pool *pgxpool.Pool, p UpdateApplicat
 	query := `
 		UPDATE go_gin.applications SET
 		  company_name = $2, position_title = $3,
-		  status = $4::go_gin.application_status, date_applied = $5,
+		  status = $4, date_applied = $5,
 		  company_url = $6, job_posting_url = $7, company_career_url = $8,
-		  company_category = $9::go_gin.company_category,
-		  skills_match = $10::go_gin.skills_match,
-		  job_source = $11::go_gin.job_source,
+		  company_category = $9,
+		  skills_match = $10,
+		  job_source = $11,
 		  salary_min = $12, salary_max = $13,
 		  cover_letter_required = $14,
 		  offer_due_date = $15, special_requirements = $16, notes = $17,
@@ -284,7 +284,7 @@ func CreateStage(ctx context.Context, pool *pgxpool.Pool, p CreateStageParams) (
 	query := `
 		INSERT INTO go_gin.interview_stages (
 		  application_id, stage_name, stage_order, is_completed, performance_rating, notes
-		) VALUES ($1, $2, $3, $4, $5::go_gin.performance_rating, $6)
+		) VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id, application_id, stage_name, stage_order, is_completed,
 		          performance_rating, notes, created_at, updated_at`
 
@@ -311,7 +311,7 @@ func UpdateStage(ctx context.Context, pool *pgxpool.Pool, p UpdateStageParams) (
 	query := `
 		UPDATE go_gin.interview_stages SET
 		  stage_name = $3, stage_order = $4, is_completed = $5,
-		  performance_rating = $6::go_gin.performance_rating, notes = $7,
+		  performance_rating = $6, notes = $7,
 		  updated_at = NOW()
 		WHERE id = $2 AND application_id = $1
 		RETURNING id, application_id, stage_name, stage_order, is_completed,

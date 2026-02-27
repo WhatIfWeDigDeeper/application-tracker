@@ -8,7 +8,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
   imports: [RouterOutlet, HeaderComponent],
   template: `
     <app-header />
-    <main class="container mx-auto px-4 py-6 max-w-7xl">
+    <main class="container mx-auto px-4 py-6 max-w-7xl min-h-screen bg-white dark:bg-gray-900">
       <router-outlet />
     </main>
   `,

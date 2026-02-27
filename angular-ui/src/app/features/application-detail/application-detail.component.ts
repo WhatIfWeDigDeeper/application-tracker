@@ -304,6 +304,8 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
           const stages = this.localStages();
           const createStages = (index: number) => {
             if (index >= stages.length) {
+              // Reset dirty state so canDeactivate guard doesn't block navigation
+              this.snapshot.set(JSON.stringify(this.form()));
               void this.router.navigate(['/applications', created.id]);
               return;
             }
@@ -446,7 +448,12 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
 
     const id = this.applicationId();
     if (id) {
-      this.service.updateStage(id, stageId, { name }).subscribe({
+      const existing = this.sortedStages().find((s) => s.id === stageId);
+      this.service.updateStage(id, stageId, {
+        name,
+        order: existing?.order ?? 0,
+        isCompleted: existing?.isCompleted ?? false,
+      }).subscribe({
         next: (app) => {
           this.application.set(app);
           this.editingStageId.set(null);
@@ -475,7 +482,11 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
     const id = this.applicationId();
     const isCompleted = !stage.isCompleted;
     if (id) {
-      this.service.updateStage(id, stage.id, { isCompleted }).subscribe({
+      this.service.updateStage(id, stage.id, {
+        name: stage.name,
+        order: stage.order,
+        isCompleted,
+      }).subscribe({
         next: (app) => this.application.set(app),
       });
     } else {

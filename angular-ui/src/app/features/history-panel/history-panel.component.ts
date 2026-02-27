@@ -24,14 +24,14 @@ import { RelativeDatePipe } from '../../shared/pipes/relative-date.pipe';
 
     <!-- Slide-in panel -->
     <div
-      class="fixed right-0 top-0 h-full w-96 bg-white shadow-xl z-50 flex flex-col"
+      class="fixed inset-y-0 right-0 w-96 bg-white shadow-xl z-50 flex flex-col dark:bg-gray-800"
     >
-      <div class="flex items-center justify-between px-4 py-3 border-b">
-        <h2 class="text-lg font-semibold text-gray-900">History</h2>
+      <div class="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">History</h2>
         <button
           type="button"
           (click)="close()"
-          class="text-gray-400 hover:text-gray-600"
+          class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
         >
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -45,19 +45,24 @@ import { RelativeDatePipe } from '../../shared/pipes/relative-date.pipe';
             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
           </div>
         } @else if (history().length === 0) {
-          <p class="text-gray-500 text-center py-8">No history yet.</p>
+          <p class="text-gray-500 text-center py-8 dark:text-gray-400">No history yet.</p>
         } @else {
-          <div class="space-y-3">
+          <div class="space-y-1">
             @for (entry of history(); track entry.id; let i = $index) {
-              <div class="border border-gray-200 rounded-lg overflow-hidden">
+              <div class="border border-gray-200 rounded-lg overflow-hidden dark:border-gray-700">
                 <button
                   type="button"
                   (click)="toggleEntry(entry.id)"
-                  class="w-full flex items-start justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 text-left"
+                  class="w-full flex items-start justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 text-left dark:bg-gray-700 dark:hover:bg-gray-600"
                 >
                   <div>
-                    <p class="text-sm font-medium text-gray-900">{{ entry.description }}</p>
-                    <p class="text-xs text-gray-500">{{ entry.createdAt | relativeDate }}</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ entry.description }}
+                      @if (i === 0) {
+                        <span class="text-xs text-gray-500 ml-1">(current)</span>
+                      }
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ entry.createdAt | relativeDate }}</p>
                   </div>
                   <svg
                     class="w-4 h-4 text-gray-400 mt-0.5 transition-transform"
@@ -71,23 +76,23 @@ import { RelativeDatePipe } from '../../shared/pipes/relative-date.pipe';
                 </button>
 
                 @if (isExpanded(entry.id)) {
-                  <div class="px-3 py-2 space-y-1">
+                  <div class="px-3 py-2 space-y-1 bg-white dark:bg-gray-800">
                     @for (change of entry.changes; track change.field) {
                       <div class="text-xs">
-                        <span class="font-medium text-gray-700">{{ change.label }}:</span>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">{{ change.label }}:</span>
                         <span class="ml-1 line-through text-red-500">{{ formatValue(change.oldValue) }}</span>
                         <span class="ml-1 text-green-600">{{ formatValue(change.newValue) }}</span>
                       </div>
                     }
                     @if (entry.changes.length === 0) {
-                      <p class="text-xs text-gray-400">No field changes recorded.</p>
+                      <p class="text-xs text-gray-400 dark:text-gray-500">No field changes recorded.</p>
                     }
                     @if (i < history().length - 1) {
                       <div class="pt-2">
                         <button
                           type="button"
                           (click)="onRestore(entry.id)"
-                          class="text-xs text-blue-600 hover:underline"
+                          class="text-xs text-blue-600 hover:underline dark:text-blue-400"
                         >
                           Restore to this point
                         </button>
@@ -152,7 +157,6 @@ export class HistoryPanelComponent implements OnChanges {
   }
 
   onRestore(historyId: string) {
-    if (!confirm('Restore application to this version?')) return;
     this.service.restoreHistory(this.applicationId, historyId).subscribe({
       next: () => {
         this.restored.emit();

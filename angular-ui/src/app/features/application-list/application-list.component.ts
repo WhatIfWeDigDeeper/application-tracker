@@ -1,5 +1,6 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApplicationService } from '../../core/services/application.service';
 import {
@@ -11,7 +12,6 @@ import {
   STATUS_COLORS,
 } from '../../core/models/application.model';
 import { RelativeDatePipe } from '../../shared/pipes/relative-date.pipe';
-import { InlineEditComponent } from '../../shared/components/inline-edit/inline-edit.component';
 import { CsvImportComponent } from '../csv/csv-import.component';
 import { CsvExportComponent } from '../csv/csv-export.component';
 
@@ -21,8 +21,8 @@ import { CsvExportComponent } from '../csv/csv-export.component';
   imports: [
     RouterLink,
     FormsModule,
+    NgStyle,
     RelativeDatePipe,
-    InlineEditComponent,
     CsvImportComponent,
     CsvExportComponent,
   ],
@@ -30,10 +30,13 @@ import { CsvExportComponent } from '../csv/csv-export.component';
 })
 export class ApplicationListComponent implements OnInit {
   private service = inject(ApplicationService);
+  readonly router = inject(Router);
 
   applications = signal<Application[]>([]);
   total = signal(0);
   loading = signal(false);
+  openMenuId = signal<string | null>(null);
+  menuPosition = signal<{ top: number; left: number } | null>(null);
   filters = signal<FilterParams>({
     sortBy: 'updatedAt',
     sortDir: 'desc',
@@ -114,26 +117,51 @@ export class ApplicationListComponent implements OnInit {
     this.loadApplications();
   }
 
+  toggleMenu(id: string, event: MouseEvent) {
+    event.stopPropagation();
+    if (this.openMenuId() === id) {
+      this.openMenuId.set(null);
+      this.menuPosition.set(null);
+    } else {
+      const btn = event.currentTarget as HTMLElement;
+      const rect = btn.getBoundingClientRect();
+      this.openMenuId.set(id);
+      this.menuPosition.set({
+        top: rect.bottom + 4, // 4px gap (mt-1)
+        left: rect.right - 112, // right-align to button; 112px = min-w-28
+      });
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (this.openMenuId() !== null) {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-menu-trigger]') && !target.closest('[data-menu-dropdown]')) {
+        this.openMenuId.set(null);
+        this.menuPosition.set(null);
+      }
+    }
+  }
+
   onArchive(id: string) {
+    this.openMenuId.set(null);
+    this.menuPosition.set(null);
     this.service.archive(id).subscribe(() => this.loadApplications());
   }
 
   onRestore(id: string) {
+    this.openMenuId.set(null);
+    this.menuPosition.set(null);
     this.service.restore(id).subscribe(() => this.loadApplications());
   }
 
   onDelete(id: string) {
+    this.openMenuId.set(null);
+    this.menuPosition.set(null);
     if (confirm('Delete this application?')) {
       this.service.delete(id).subscribe(() => this.loadApplications());
     }
-  }
-
-  onCompanyNameSaved(id: string, name: string) {
-    this.service.update(id, { companyName: name }).subscribe(() => this.loadApplications());
-  }
-
-  onPositionSaved(id: string, position: string) {
-    this.service.update(id, { positionTitle: position }).subscribe(() => this.loadApplications());
   }
 
   get totalPages() {

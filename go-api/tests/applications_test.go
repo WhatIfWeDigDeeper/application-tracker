@@ -23,7 +23,7 @@ type appResponse struct {
 }
 
 type listResponse struct {
-	Data  []appResponse `json:"data"`
+	Data  []appResponse `json:"items"`
 	Total int64         `json:"total"`
 }
 
