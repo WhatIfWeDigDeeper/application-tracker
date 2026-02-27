@@ -32,16 +32,14 @@ import { ImportResult } from '../../core/models/application.model';
           (change)="onFileSelected($event)"
           class="text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border file:border-gray-300 file:bg-white file:text-gray-700 hover:file:bg-gray-50 dark:text-gray-400 dark:file:bg-gray-700 dark:file:text-gray-300 dark:file:border-gray-600"
         />
-        @if (selectedFile()) {
-          <button
-            type="button"
-            (click)="onImport()"
-            [disabled]="importing()"
-            class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50"
-          >
-            {{ importing() ? 'Importing...' : 'Import' }}
-          </button>
-        }
+        <button
+          type="button"
+          (click)="onImport()"
+          [disabled]="!selectedFile() || importing()"
+          class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded disabled:opacity-50"
+        >
+          {{ importing() ? 'Importing...' : 'Import' }}
+        </button>
       </div>
 
       @if (result()) {
@@ -71,6 +69,7 @@ export class CsvImportComponent {
   private service = inject(ApplicationService);
 
   @Output() closeImport = new EventEmitter<void>();
+  @Output() importSuccess = new EventEmitter<void>();
 
   selectedFile = signal<File | null>(null);
   importing = signal(false);
@@ -99,6 +98,7 @@ export class CsvImportComponent {
       next: (res) => {
         this.result.set(res);
         this.importing.set(false);
+        this.importSuccess.emit();
       },
       error: (err: unknown) => {
         this.error.set(err instanceof Error ? err.message : 'Import failed');
