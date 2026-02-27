@@ -31,6 +31,7 @@ func uploadCSV(t *testing.T, baseURL, csvContent string) (int, []byte) {
 }
 
 func TestImportCSV_ValidFile(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -49,6 +50,7 @@ Corp C,Director,applied,2026-01-03,,,,,,,,,false,,,`
 }
 
 func TestImportCSV_Duplicate(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -68,6 +70,7 @@ Dup Corp,Engineer,applied,2026-01-01,,,https://dup.com/job1,,,,,,false,,,`
 }
 
 func TestImportCSV_MissingRequiredColumn(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -82,6 +85,7 @@ Engineer,applied`
 }
 
 func TestImportCSV_CrossImplementationValues(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -100,6 +104,7 @@ Cross Impl Corp,Engineer,applied,2026-01-01,,https://cross.com/job1,,ai,4,linked
 }
 
 func TestExportCSV(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -133,6 +138,7 @@ func TestExportCSV(t *testing.T) {
 }
 
 func TestSampleCSV(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()

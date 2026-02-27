@@ -25,6 +25,7 @@ type appWithStages struct {
 }
 
 func TestAddStage(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -54,6 +55,7 @@ func TestAddStage(t *testing.T) {
 }
 
 func TestUpdateStage(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -101,6 +103,7 @@ func TestUpdateStage(t *testing.T) {
 }
 
 func TestRemoveStage(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()

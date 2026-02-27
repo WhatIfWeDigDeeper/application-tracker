@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -17,10 +18,22 @@ import (
 
 // setupTestDB starts a PostgreSQL container, runs migrations, and returns a connection pool.
 // It registers a cleanup function to terminate the container after the test.
+// The test is skipped if Docker is not available.
 func setupTestDB(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 
 	ctx := context.Background()
+
+	// Recover from testcontainers panicking when Docker socket is not reachable.
+	defer func() {
+		if r := recover(); r != nil {
+			msg := fmt.Sprintf("%v", r)
+			if strings.Contains(msg, "Docker") || strings.Contains(msg, "docker") {
+				t.Skip("Docker not available, skipping integration test: " + msg)
+			}
+			panic(r)
+		}
+	}()
 
 	req := testcontainers.ContainerRequest{
 		Image:        "postgres:18-alpine",
@@ -30,7 +43,7 @@ func setupTestDB(t *testing.T) *pgxpool.Pool {
 			"POSTGRES_PASSWORD": "postgres",
 			"POSTGRES_DB":       "testdb",
 		},
-		WaitingFor: wait.ForListeningPort("5432/tcp"),
+		WaitingFor: wait.ForLog("database system is ready to accept connections").WithOccurrence(2),
 	}
 
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
@@ -38,6 +51,10 @@ func setupTestDB(t *testing.T) *pgxpool.Pool {
 		Started:          true,
 	})
 	if err != nil {
+		msg := err.Error()
+		if strings.Contains(msg, "docker") || strings.Contains(msg, "Docker") || strings.Contains(msg, "daemon") {
+			t.Skipf("Docker not available, skipping integration test: %v", err)
+		}
 		t.Fatalf("failed to start PostgreSQL container: %v", err)
 	}
 
@@ -64,20 +81,25 @@ func setupTestDB(t *testing.T) *pgxpool.Pool {
 		t.Fatalf("failed to create db pool: %v", err)
 	}
 
+	if err := pool.Ping(ctx); err != nil {
+		t.Fatalf("failed to ping db: %v", err)
+	}
+
 	t.Cleanup(func() {
 		pool.Close()
 	})
 
-	// Run migrations
-	if err := runMigrations(t, databaseURL); err != nil {
+	// Run migrations using the established pool (avoids a second connection attempt).
+	if err := runMigrations(t, pool); err != nil {
 		t.Fatalf("failed to run migrations: %v", err)
 	}
 
 	return pool
 }
 
-// runMigrations applies SQL migration files from the migrations directory.
-func runMigrations(t *testing.T, databaseURL string) error {
+// runMigrations applies SQL migration files from the migrations directory
+// using an already-connected pool.
+func runMigrations(t *testing.T, pool *pgxpool.Pool) error {
 	t.Helper()
 	ctx := context.Background()
 
@@ -90,12 +112,6 @@ func runMigrations(t *testing.T, databaseURL string) error {
 	if err != nil {
 		return fmt.Errorf("failed to read migrations dir: %w", err)
 	}
-
-	pool, err := pgxpool.New(ctx, databaseURL)
-	if err != nil {
-		return fmt.Errorf("failed to connect for migrations: %w", err)
-	}
-	defer pool.Close()
 
 	for _, entry := range entries {
 		if entry.IsDir() {

@@ -36,6 +36,7 @@ func getHistory(t *testing.T, baseURL, appID string) []historyEntry {
 }
 
 func TestHistory_SnapshotCreatedOnCreate(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -53,6 +54,7 @@ func TestHistory_SnapshotCreatedOnCreate(t *testing.T) {
 }
 
 func TestHistory_SnapshotCreatedOnUpdate(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -83,6 +85,7 @@ func TestHistory_SnapshotCreatedOnUpdate(t *testing.T) {
 }
 
 func TestHistory_DiffsComputed(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -127,6 +130,7 @@ func TestHistory_DiffsComputed(t *testing.T) {
 }
 
 func TestHistory_RestoreToVersion(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()

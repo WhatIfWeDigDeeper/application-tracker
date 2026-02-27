@@ -48,6 +48,7 @@ func deleteApp(t *testing.T, baseURL, id string) {
 }
 
 func TestCreateApplication(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -67,6 +68,7 @@ func TestCreateApplication(t *testing.T) {
 }
 
 func TestCreateApplication_UnsubmittedForcesNullDate(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -84,6 +86,7 @@ func TestCreateApplication_UnsubmittedForcesNullDate(t *testing.T) {
 }
 
 func TestListApplications_Pagination(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -115,6 +118,7 @@ func TestListApplications_Pagination(t *testing.T) {
 }
 
 func TestListApplications_FilterByStatus(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -144,6 +148,7 @@ func TestListApplications_FilterByStatus(t *testing.T) {
 }
 
 func TestUpdateApplication(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -175,6 +180,7 @@ func TestUpdateApplication(t *testing.T) {
 }
 
 func TestArchiveApplication(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()
@@ -210,6 +216,7 @@ func TestArchiveApplication(t *testing.T) {
 }
 
 func TestDeleteApplication(t *testing.T) {
+	t.Parallel()
 	pool := setupTestDB(t)
 	srv := newTestServer(pool)
 	defer srv.Close()

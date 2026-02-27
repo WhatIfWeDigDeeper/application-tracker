@@ -130,7 +130,7 @@
     "test:tanstack-ui": "cd tanstack-ui && npm test",
     "test:tanstack-start-ui": "cd tanstack-start-ui && npm test",
     "test:fastapi": "cd fastapi && uv run pytest",
-    "test:go-api": "cd go-api && go test ./...",
+    "test:go-api": "cd go-api && DOCKER_HOST=$(docker context inspect --format '{{.Endpoints.docker.Host}}' 2>/dev/null) TESTCONTAINERS_RYUK_DISABLED=true go run gotest.tools/gotestsum@latest --format testname -- -count=1 -parallel 4 ./...",
     "test:angular-ui": "cd angular-ui && npm test -- --passWithNoTests",
     "test:all": "npm run test:express-api && npm run test:react-next && npm run test:koa-api && npm run test:react-ui && npm run test:svelte-ui && npm run test:vue-ui && npm run test:nest-api && npm run test:tanstack-ui && npm run test:tanstack-start-ui && npm run test:fastapi && npm run test:go-api && npm run test:angular-ui",
     "test:coverage": "npm run test:express-api -- --coverage && npm run test:react-next -- --coverage",
