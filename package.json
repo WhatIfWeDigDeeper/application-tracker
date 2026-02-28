@@ -16,7 +16,7 @@
     "audit:ci:tanstack-ui": "cd tanstack-ui && npx -y audit-ci --config .auditconfig.json",
     "audit:ci:tanstack-start-ui": "cd tanstack-start-ui && npx -y audit-ci --config .auditconfig.json",
     "audit:ci:fastapi": "cd fastapi && uv export --frozen | uvx pip-audit --strict -r /dev/stdin --disable-pip --no-deps",
-    "audit:ci:go-api": "cd go-api && govulncheck",
+    "audit:ci:go-api": "cd go-api && govulncheck ./...",
     "audit:ci:angular-ui": "cd angular-ui && npx -y audit-ci --config .auditconfig.json",
     "audit:ci:all": "npm run audit:ci:express-api && npm run audit:ci:react-next && npm run audit:ci:koa-api && npm run audit:ci:react-ui && npm run audit:ci:hono-api && npm run audit:ci:svelte-ui && npm run audit:ci:vue-ui && npm run audit:ci:nuxt-api && npm run audit:ci:nest-api && npm run audit:ci:tanstack-ui && npm run audit:ci:tanstack-start-ui && npm run audit:ci:fastapi && npm run audit:ci:go-api && npm run audit:ci:angular-ui",
     "dev:express-api": "cd api && npm run dev",

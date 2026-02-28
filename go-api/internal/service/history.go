@@ -162,18 +162,24 @@ func RestoreToVersion(ctx context.Context, pool *pgxpool.Pool, applicationID, sn
 		Notes:               toNullableText(app.Notes),
 	}
 
-	_, err = db.UpdateApplication(ctx, pool, updateParams)
+	tx, err := pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	_, err = db.UpdateApplication(ctx, tx, updateParams)
 	if err != nil {
 		return nil, err
 	}
 
 	// Replace all interview stages
-	existingStages, err := db.GetStagesByApplicationID(ctx, pool, uid)
+	existingStages, err := db.GetStagesByApplicationID(ctx, tx, uid)
 	if err != nil {
 		return nil, err
 	}
 	for _, s := range existingStages {
-		if err := db.DeleteStage(ctx, pool, uid, s.ID); err != nil {
+		if _, err := db.DeleteStage(ctx, tx, uid, s.ID); err != nil {
 			return nil, err
 		}
 	}
@@ -186,9 +192,13 @@ func RestoreToVersion(ctx context.Context, pool *pgxpool.Pool, applicationID, sn
 			PerformanceRating: toNullableText(s.PerformanceRating),
 			Notes:             toNullableText(s.Notes),
 		}
-		if _, err := db.CreateStage(ctx, pool, p); err != nil {
+		if _, err := db.CreateStage(ctx, tx, p); err != nil {
 			return nil, err
 		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
 	}
 
 	desc := fmt.Sprintf("Restored to version %d", snap.SequenceNumber)

@@ -7,9 +7,18 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+// querier is satisfied by both *pgxpool.Pool and pgx.Tx, allowing DB functions
+// to be called inside or outside a transaction.
+type querier interface {
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
+}
 
 // ListApplicationsParams holds filter/pagination parameters for listing applications.
 type ListApplicationsParams struct {
@@ -183,7 +192,7 @@ type UpdateApplicationParams struct {
 }
 
 // UpdateApplication updates an application and returns it.
-func UpdateApplication(ctx context.Context, pool *pgxpool.Pool, p UpdateApplicationParams) (*Application, error) {
+func UpdateApplication(ctx context.Context, q querier, p UpdateApplicationParams) (*Application, error) {
 	query := `
 		UPDATE go_gin.applications SET
 		  company_name = $2, position_title = $3,
@@ -204,7 +213,7 @@ func UpdateApplication(ctx context.Context, pool *pgxpool.Pool, p UpdateApplicat
 		          offer_due_date, special_requirements, notes,
 		          is_archived, created_at, updated_at`
 
-	row := pool.QueryRow(ctx, query,
+	row := q.QueryRow(ctx, query,
 		p.ID, p.CompanyName, p.PositionTitle,
 		p.Status, p.DateApplied,
 		p.CompanyURL, p.JobPostingURL, p.CompanyCareerURL,
@@ -252,7 +261,7 @@ func UnarchiveApplication(ctx context.Context, pool *pgxpool.Pool, id pgtype.UUI
 }
 
 // GetStagesByApplicationID returns all interview stages for an application.
-func GetStagesByApplicationID(ctx context.Context, pool *pgxpool.Pool, applicationID pgtype.UUID) ([]InterviewStage, error) {
+func GetStagesByApplicationID(ctx context.Context, q querier, applicationID pgtype.UUID) ([]InterviewStage, error) {
 	query := `
 		SELECT id, application_id, stage_name, stage_order, is_completed,
 		       performance_rating, notes, created_at, updated_at
@@ -260,7 +269,7 @@ func GetStagesByApplicationID(ctx context.Context, pool *pgxpool.Pool, applicati
 		WHERE application_id = $1
 		ORDER BY stage_order ASC, created_at ASC`
 
-	rows, err := pool.Query(ctx, query, applicationID)
+	rows, err := q.Query(ctx, query, applicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -280,7 +289,7 @@ type CreateStageParams struct {
 }
 
 // CreateStage inserts a new interview stage.
-func CreateStage(ctx context.Context, pool *pgxpool.Pool, p CreateStageParams) (*InterviewStage, error) {
+func CreateStage(ctx context.Context, q querier, p CreateStageParams) (*InterviewStage, error) {
 	query := `
 		INSERT INTO go_gin.interview_stages (
 		  application_id, stage_name, stage_order, is_completed, performance_rating, notes
@@ -288,7 +297,7 @@ func CreateStage(ctx context.Context, pool *pgxpool.Pool, p CreateStageParams) (
 		RETURNING id, application_id, stage_name, stage_order, is_completed,
 		          performance_rating, notes, created_at, updated_at`
 
-	row := pool.QueryRow(ctx, query,
+	row := q.QueryRow(ctx, query,
 		p.ApplicationID, p.StageName, p.StageOrder, p.IsCompleted,
 		p.PerformanceRating, p.Notes,
 	)
@@ -324,13 +333,13 @@ func UpdateStage(ctx context.Context, pool *pgxpool.Pool, p UpdateStageParams) (
 	return scanStageRow(row)
 }
 
-// DeleteStage removes an interview stage.
-func DeleteStage(ctx context.Context, pool *pgxpool.Pool, applicationID, id pgtype.UUID) error {
-	_, err := pool.Exec(ctx,
+// DeleteStage removes an interview stage and returns the command tag so callers
+// can check RowsAffected() to detect a missing stage.
+func DeleteStage(ctx context.Context, q querier, applicationID, id pgtype.UUID) (pgconn.CommandTag, error) {
+	return q.Exec(ctx,
 		`DELETE FROM go_gin.interview_stages WHERE id = $2 AND application_id = $1`,
 		applicationID, id,
 	)
-	return err
 }
 
 // CreateSnapshotParams holds input for creating a snapshot.

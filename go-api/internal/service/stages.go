@@ -104,8 +104,12 @@ func RemoveStage(ctx context.Context, pool *pgxpool.Pool, applicationID, stageID
 		return nil, fmt.Errorf("invalid stage UUID: %w", err)
 	}
 
-	if err := db.DeleteStage(ctx, pool, uid, sid); err != nil {
+	tag, err := db.DeleteStage(ctx, pool, uid, sid)
+	if err != nil {
 		return nil, err
+	}
+	if tag.RowsAffected() == 0 {
+		return nil, fmt.Errorf("stage not found")
 	}
 
 	if err := CreateSnapshot(ctx, pool, uid, "Removed interview stage"); err != nil {
