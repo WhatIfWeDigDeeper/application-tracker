@@ -24,7 +24,7 @@ services:
       dockerfile: api/Dockerfile
     container_name: app_tracker_api
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@postgres:5432/app_tracker?schema=express_prisma}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3001
     ports:
@@ -57,7 +57,7 @@ services:
     ports:
       - "5070:5070"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/app_tracker?search_path=go_gin
+      - DATABASE_URL=${DATABASE_URL:?DATABASE_URL is required}
       - PORT=5070
       - CORS_ORIGIN=http://localhost:3060
     depends_on:

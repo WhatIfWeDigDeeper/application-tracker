@@ -8,8 +8,10 @@ words:
   - dedup
   - Dedup
   - fastapi
-  - GOPATH
+  - golangci
   - gopath
+  - GOPATH
+  - gotest
   - gotestsum
   - govulncheck
   - Hono
@@ -18,7 +20,10 @@ words:
   - Pydantic
   - pyproject
   - pytest
+  - RYUK
+  - sqlc
   - tbls
+  - testname
   - uvx
   - venv
   - whatifwedigdeeper
