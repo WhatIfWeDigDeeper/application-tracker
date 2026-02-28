@@ -2,12 +2,16 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/user/application-tracker/go-api/internal/db"
 )
+
+// ErrStageNotFound is returned when a requested interview stage does not exist.
+var ErrStageNotFound = errors.New("stage not found")
 
 // StageInput holds the fields for creating or updating an interview stage.
 type StageInput struct {
@@ -109,7 +113,7 @@ func RemoveStage(ctx context.Context, pool *pgxpool.Pool, applicationID, stageID
 		return nil, err
 	}
 	if tag.RowsAffected() == 0 {
-		return nil, fmt.Errorf("stage not found")
+		return nil, ErrStageNotFound
 	}
 
 	if err := CreateSnapshot(ctx, pool, uid, "Removed interview stage"); err != nil {

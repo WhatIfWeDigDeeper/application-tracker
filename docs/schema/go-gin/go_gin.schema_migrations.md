@@ -30,8 +30,8 @@ erDiagram
 
 
 "go_gin.schema_migrations" {
-  bigint version
-  boolean dirty
+  version bigint
+  dirty boolean
 }
 ```
 

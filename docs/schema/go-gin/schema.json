@@ -216,7 +216,7 @@
         {
           "name": "applications_status_check",
           "type": "CHECK",
-          "def": "CHECK ((status = ANY (ARRAY['unsubmitted'::text, 'applied'::text, 'phone_screen'::text, 'interviewing'::text, 'offer'::text, 'rejected'::text, 'withdrawn'::text, 'accepted'::text])))",
+          "def": "CHECK ((status = ANY (ARRAY['unsubmitted'::text, 'applied'::text, 'interviewing'::text, 'given offer'::text, 'accepted offer'::text, 'declined offer'::text, 'rejected'::text, 'no offer'::text])))",
           "table": "go_gin.applications",
           "referenced_table": "",
           "columns": [

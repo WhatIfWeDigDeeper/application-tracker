@@ -3,6 +3,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 
@@ -19,6 +20,7 @@ type Config struct {
 func withDefaultSearchPath(databaseURL string) string {
 	parsed, err := url.Parse(databaseURL)
 	if err != nil {
+		log.Printf("warn: failed to parse DATABASE_URL: %v", err)
 		return databaseURL
 	}
 

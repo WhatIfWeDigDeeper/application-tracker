@@ -45,37 +45,37 @@ erDiagram
 "go_gin.interview_stages" }o--|| "go_gin.applications" : "FOREIGN KEY (application_id) REFERENCES go_gin.applications(id) ON DELETE CASCADE"
 
 "go_gin.interview_stages" {
-  uuid id
-  uuid application_id FK
-  text stage_name
-  integer stage_order
-  boolean is_completed
-  text performance_rating
-  text notes
-  timestamp_with_time_zone created_at
-  timestamp_with_time_zone updated_at
+  id uuid
+  application_id uuid FK
+  stage_name text
+  stage_order integer
+  is_completed boolean
+  performance_rating text
+  notes text
+  created_at timestamp_with_time_zone
+  updated_at timestamp_with_time_zone
 }
 "go_gin.applications" {
-  uuid id
-  text company_name
-  text position_title
-  text status
-  date date_applied
-  text company_url
-  text job_posting_url
-  text company_career_url
-  text company_category
-  integer skills_match
-  text job_source
-  integer salary_min
-  integer salary_max
-  boolean cover_letter_required
-  date offer_due_date
-  text special_requirements
-  text notes
-  boolean is_archived
-  timestamp_with_time_zone created_at
-  timestamp_with_time_zone updated_at
+  id uuid
+  company_name text
+  position_title text
+  status text
+  date_applied date
+  company_url text
+  job_posting_url text
+  company_career_url text
+  company_category text
+  skills_match integer
+  job_source text
+  salary_min integer
+  salary_max integer
+  cover_letter_required boolean
+  offer_due_date date
+  special_requirements text
+  notes text
+  is_archived boolean
+  created_at timestamp_with_time_zone
+  updated_at timestamp_with_time_zone
 }
 ```
 

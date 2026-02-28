@@ -5,12 +5,12 @@
 
 ## Overview
 
-Add an Angular frontend (`angular-ui/`) that connects to the Go Gin API (port 5070). Completes the "big 4" frontend frameworks in the portfolio (React × 3, Vue, Svelte, Angular). Uses modern Angular 19 patterns: standalone components, Angular Signals for component state, Reactive Forms with typed controls, and `@testing-library/angular` for user-centric unit tests.
+Add an Angular frontend (`angular-ui/`) that connects to the Go Gin API (port 5070). Completes the "big 4" frontend frameworks in the portfolio (React × 3, Vue, Svelte, Angular). Uses modern Angular 21 patterns: standalone components, Angular Signals for component state, Reactive Forms with typed controls, and `@testing-library/angular` for user-centric unit tests.
 
 ## Technology Stack
 
 ### Frontend (`angular-ui/` — port 3060)
-- Angular 19+ (latest stable)
+- Angular 21+ (latest stable)
 - TypeScript 5.x (strict mode)
 - Angular Signals (`signal()`, `computed()`, `effect()`) for component state
 - RxJS — `Observable<T>` for HTTP streams via `HttpClient`

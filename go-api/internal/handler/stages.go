@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -8,8 +9,6 @@ import (
 
 	"github.com/user/application-tracker/go-api/internal/service"
 )
-
-const errStageNotFound = "stage not found"
 
 // addStage handles POST /applications/:id/interview-stages
 func addStage(pool *pgxpool.Pool) gin.HandlerFunc {
@@ -66,7 +65,7 @@ func removeStage(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		app, err := service.RemoveStage(c.Request.Context(), pool, id, stageID)
 		if err != nil {
-			if err.Error() == errStageNotFound {
+			if errors.Is(err, service.ErrStageNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Stage not found"})
 			} else {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

@@ -1,4 +1,5 @@
-import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
+import { Component, DestroyRef, inject, signal, OnInit, HostListener } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -30,6 +31,7 @@ import { CsvExportComponent } from '../csv/csv-export.component';
 })
 export class ApplicationListComponent implements OnInit {
   private service = inject(ApplicationService);
+  private destroyRef = inject(DestroyRef);
   readonly router = inject(Router);
 
   applications = signal<Application[]>([]);
@@ -70,7 +72,7 @@ export class ApplicationListComponent implements OnInit {
       jobSource: this.sourceFilter() || undefined,
       includeArchived: this.includeArchived() || undefined,
     };
-    this.service.list(params).subscribe({
+    this.service.list(params).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.applications.set(res.items);
         this.total.set(res.total);
@@ -147,20 +149,20 @@ export class ApplicationListComponent implements OnInit {
   onArchive(id: string) {
     this.openMenuId.set(null);
     this.menuPosition.set(null);
-    this.service.archive(id).subscribe(() => this.loadApplications());
+    this.service.archive(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadApplications());
   }
 
   onRestore(id: string) {
     this.openMenuId.set(null);
     this.menuPosition.set(null);
-    this.service.restore(id).subscribe(() => this.loadApplications());
+    this.service.restore(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadApplications());
   }
 
   onDelete(id: string) {
     this.openMenuId.set(null);
     this.menuPosition.set(null);
     if (confirm('Delete this application?')) {
-      this.service.delete(id).subscribe(() => this.loadApplications());
+      this.service.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadApplications());
     }
   }
 

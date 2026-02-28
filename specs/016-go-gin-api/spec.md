@@ -10,7 +10,7 @@ Add a 7th backend implementation to the monorepo: a Go API using Gin + sqlc + pg
 ## Technology Stack
 
 ### Backend (`go-api/` — port 5070)
-- Go 1.23+
+- Go 1.24+
 - Gin (web framework — most widely known to employers; v1.x)
 - pgx v5 (PostgreSQL driver with built-in connection pooling)
 - sqlc (type-safe SQL → Go code generation; SQL lives in `.sql` files)

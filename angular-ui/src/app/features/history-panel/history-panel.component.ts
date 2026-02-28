@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   Input,
   Output,
   EventEmitter,
@@ -7,6 +8,7 @@ import {
   signal,
   OnChanges,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApplicationService } from '../../core/services/application.service';
 import { HistoryEntry } from '../../core/models/application.model';
 import { RelativeDatePipe } from '../../shared/pipes/relative-date.pipe';
@@ -114,6 +116,7 @@ export class HistoryPanelComponent implements OnChanges {
   @Output() restored = new EventEmitter<void>();
 
   private service = inject(ApplicationService);
+  private destroyRef = inject(DestroyRef);
 
   loading = signal(false);
   history = signal<HistoryEntry[]>([]);
@@ -127,7 +130,7 @@ export class HistoryPanelComponent implements OnChanges {
 
   loadHistory() {
     this.loading.set(true);
-    this.service.getHistory(this.applicationId).subscribe({
+    this.service.getHistory(this.applicationId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (entries) => {
         this.history.set(entries);
         this.loading.set(false);
@@ -157,7 +160,7 @@ export class HistoryPanelComponent implements OnChanges {
   }
 
   onRestore(historyId: string) {
-    this.service.restoreHistory(this.applicationId, historyId).subscribe({
+    this.service.restoreHistory(this.applicationId, historyId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.restored.emit();
         this.close();

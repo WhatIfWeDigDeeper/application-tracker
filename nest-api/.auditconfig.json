@@ -1,5 +1,5 @@
 {
-  "allowlist": [],
+  "allowlist": ["GHSA-5c6j-r48x-rmvq"],
   "high": true,
   "package-manager": "auto"
 }

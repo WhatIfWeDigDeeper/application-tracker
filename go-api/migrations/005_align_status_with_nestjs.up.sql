@@ -3,7 +3,7 @@ UPDATE go_gin.applications SET status = CASE status
     WHEN 'phone_screen' THEN 'interviewing'
     WHEN 'offer'        THEN 'given offer'
     WHEN 'accepted'     THEN 'accepted offer'
-    WHEN 'withdrawn'    THEN NULL
+    WHEN 'withdrawn'    THEN 'rejected'
     ELSE status
 END;
 

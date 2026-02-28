@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,10 @@ func restoreHistory(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		app, err := service.RestoreToVersion(c.Request.Context(), pool, id, historyID)
 		if err != nil {
+			if errors.Is(err, service.ErrSnapshotNotFound) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Snapshot not found"})
+				return
+			}
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}

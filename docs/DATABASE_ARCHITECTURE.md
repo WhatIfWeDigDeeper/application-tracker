@@ -45,7 +45,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - No ORM — uses raw SQL queries with asyncpg
 
 **Go-Gin-pgx:**
-- Schema defined in: `go-api/migrations/001_initial.sql`
+- Schema defined in: `go-api/migrations/001_initial.up.sql`
 - Raw SQL migration with `CREATE SCHEMA IF NOT EXISTS go_gin`
 - pgx v5 pool configured with `search_path=go_gin` in the connection string
 - Snapshot-based history (like Hono, NestJS, FastAPI)

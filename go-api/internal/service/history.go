@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"reflect"
 	"time"
 
@@ -12,6 +14,9 @@ import (
 
 	"github.com/user/application-tracker/go-api/internal/db"
 )
+
+// ErrSnapshotNotFound is returned when a requested snapshot does not exist.
+var ErrSnapshotNotFound = errors.New("snapshot not found")
 
 // SnapshotData is the full application state serialized into snapshots.
 type SnapshotData struct {
@@ -131,7 +136,7 @@ func RestoreToVersion(ctx context.Context, pool *pgxpool.Pool, applicationID, sn
 		return nil, err
 	}
 	if snap == nil {
-		return nil, fmt.Errorf("snapshot not found")
+		return nil, ErrSnapshotNotFound
 	}
 
 	var data SnapshotData
@@ -203,7 +208,7 @@ func RestoreToVersion(ctx context.Context, pool *pgxpool.Pool, applicationID, sn
 
 	desc := fmt.Sprintf("Restored to version %d", snap.SequenceNumber)
 	if err := CreateSnapshot(ctx, pool, uid, desc); err != nil {
-		return nil, err
+		log.Printf("warn: failed to create snapshot after restore: %v", err)
 	}
 
 	return getApplicationWithStages(ctx, pool, uid)
