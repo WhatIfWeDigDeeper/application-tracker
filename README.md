@@ -11,6 +11,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [4. Svelte + Hono + Drizzle](#4-svelte--hono--drizzle)
   - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
   - [6. React SSR + TanStack Start + FastAPI](#6-react-ssr--tanstack-start--fastapi)
+  - [7. Angular + Go Gin + pgx/sqlc](#7-angular--go-gin--pgxsqlc)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -30,7 +31,7 @@ A full-stack job application tracking system with multiple technology stack impl
 
 ## Overview
 
-This repository contains a complete job application tracker built with six different full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
+This repository contains a complete job application tracker built with multiple full-stack implementations. Each provides the same core functionality and user experience, allowing you to compare technology stacks side by side.
 
 ### Sample Editing screen
 
@@ -84,6 +85,16 @@ This repository contains a complete job application tracker built with six diffe
 - Server-side rendering with route loaders and `createServerFn` server functions
 - Snapshot-based history with field diffs and restore
 
+### 7. Angular + Go Gin + pgx/sqlc
+**Directories**: `angular-ui/` + `go-api/`
+**Stack**:
+- Frontend: Angular 21 + standalone components + Angular Signals + Tailwind CSS 4.x — port 3060
+- Backend: Go 1.24 + Gin framework + pgx v5 + sqlc for type-safe SQL — port 5070
+- Database: PostgreSQL via `go_gin` schema (raw SQL, no ORM)
+- Angular Signals for reactive state, CanDeactivate guard for unsaved changes
+- Snapshot-based history with field diffs and restore
+- testcontainers-go integration tests
+
 ## Core Features
 
 All implementations provide:
@@ -108,6 +119,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
 | `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
+| `go_gin` | Angular + Go Gin API | [schema docs](docs/schema/go-gin/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -122,6 +134,7 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [tanstack-ui](docs/types/tanstack-ui/application.mermaid) - React + TanStack + NestJS
 - [nest-api](docs/types/nest-api/api.mermaid) - NestJS API
 - [tanstack-start-ui](docs/types/tanstack-start-ui/application.mermaid) - React SSR + TanStack Start
+- [angular-ui](docs/types/angular-ui/application.model.mermaid) - Angular + Go Gin
 
 Regenerate with `npm run docs:types`.
 
@@ -138,9 +151,11 @@ Regenerate with `npm run docs:types`.
 ├── vue-ui/                       # Vue + Vite UI
 ├── tanstack-ui/                  # React + TanStack Query/Router UI
 ├── tanstack-start-ui/            # React SSR + TanStack Start UI
+├── angular-ui/                   # Angular 21 UI
 ├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
+├── go-api/                       # Go Gin API
 ├── specs/                        # Feature specifications
 ├── docs/                         # Documentation
 ├── .claude/                      # Claude Code skills and commands
@@ -154,6 +169,7 @@ Regenerate with `npm run docs:types`.
 
 - Node.js (v18+)
 - Python 3.12+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
+- Go 1.24+ (for the Go Gin API implementation) — ensure `$(go env GOPATH)/bin` (typically `~/go/bin`) appears in your `PATH` before system package manager paths so locally-installed Go tools (`govulncheck`, `gotestsum`) take precedence
 - Docker and Docker Compose (for PostgreSQL)
 - [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
@@ -183,6 +199,7 @@ Regenerate with `npm run docs:types`.
    npm run migrate:nuxt-api       # Nuxt + Drizzle
    npm run migrate:nest-api       # NestJS + Drizzle
    npm run migrate:fastapi        # FastAPI (asyncpg)
+   npm run migrate:go             # Go Gin API (raw SQL)
 
    # or all at once:
    npm run migrate:all
@@ -216,6 +233,10 @@ npm run dev:nest-api
 # React SSR + TanStack Start + FastAPI (UI 3040 + API 5160)
 npm run dev:tanstack-start-ui
 npm run dev:fastapi
+
+# Angular + Go Gin (UI 3060 + API 5070)
+npm run dev:go-api
+npm run dev:angular-ui
 ```
 
 ### Schema Documentation
@@ -245,6 +266,8 @@ npm run test:nest-api     # NestJS API tests
 npm run test:tanstack-ui  # TanStack UI tests
 npm run test:tanstack-start-ui  # TanStack Start UI tests
 npm run test:fastapi      # FastAPI pytest unit tests
+npm run test:go-api       # Go Gin API integration tests (testcontainers-go)
+npm run test:angular-ui   # Angular UI tests (Jest + @testing-library/angular)
 ```
 
 Run all unit tests:
@@ -264,6 +287,7 @@ npm run test:e2e:svelte   # Svelte + Hono (port 3030)
 npm run test:e2e:react-koa # React + Koa (port 3010)
 npm run test:e2e:tanstack  # React + TanStack + NestJS (port 3050)
 npm run test:e2e:tanstack-start  # React SSR + TanStack Start + FastAPI (port 3040)
+npm run test:e2e:angular  # Angular + Go Gin (port 3060)
 npm run test:e2e:all      # Run all e2e tests
 ```
 

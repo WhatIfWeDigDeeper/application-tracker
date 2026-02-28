@@ -20,16 +20,18 @@ const DEFAULT_PORT = 5040;
 const PORTS_WITHOUT_API_PREFIX = [3001];
 
 const DEFAULT_KEYWORDS = [
-  'E2E',
-  'Test Co',
-  'Test Company',
-  'History Co',
   'Delete Co',
-  'Stage Co',
-  'Unsaved Co',
   'Discard Test',
+  'E2E',
   'Edit Test',
   'Final Test',
+  'History Co',
+  'No Date Company',
+  'Stage Co',
+  'Test Co',
+  'Test Company',
+  'Test Proxy',
+  'Unsaved Co',
   'Updated Company',
 ];
 

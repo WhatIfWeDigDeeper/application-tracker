@@ -340,6 +340,21 @@ See [validation-rules.md](../domain/validation-rules.md).
 - Clicking outside cancels (optional)
 - Destructive variant: confirm button in red/warning color
 
+### Dialog / Confirmation Patterns
+
+All destructive or irreversible actions (delete, discard unsaved changes, bulk operations) **must** use `ConfirmDialog` — never native browser dialogs.
+
+**Prohibited:**
+- `window.confirm()` — blocks the browser thread, unstyled, cannot be themed
+- `window.alert()` — same issues
+- `window.prompt()` — same issues
+
+**Pattern:**
+1. Maintain a local boolean signal (e.g., `showDeleteConfirm`) to control visibility
+2. For list-level actions that need an ID, also maintain a `pendingId` signal
+3. Pass `onConfirm`/`onCancel` handlers to the component
+4. The dialog closes itself via the cancel handler; the confirm handler performs the action then closes
+
 ---
 
 ## Component: EmptyState

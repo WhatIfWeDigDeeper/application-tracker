@@ -8,7 +8,13 @@ words:
   - dedup
   - Dedup
   - fastapi
+  - GOPATH
+  - gopath
+  - gotestsum
+  - govulncheck
+  - Hono
   - mypy
+  - Nuxt
   - Pydantic
   - pyproject
   - pytest

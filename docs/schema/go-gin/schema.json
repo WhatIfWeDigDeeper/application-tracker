@@ -1,0 +1,941 @@
+{
+  "name": "app_tracker",
+  "tables": [
+    {
+      "name": "go_gin.applications",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "company_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "position_title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "default": "'unsubmitted'::text"
+        },
+        {
+          "name": "date_applied",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "company_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "job_posting_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_career_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_category",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "skills_match",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "job_source",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "salary_min",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "salary_max",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "cover_letter_required",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "offer_due_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "special_requirements",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_archived",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "applications_pkey",
+          "def": "CREATE UNIQUE INDEX applications_pkey ON go_gin.applications USING btree (id)",
+          "table": "go_gin.applications",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "applications_company_category_check",
+          "type": "CHECK",
+          "def": "CHECK ((company_category = ANY (ARRAY['education'::text, 'health'::text, 'climate'::text, 'ai'::text, 'energy'::text, 'finance'::text, 'enterprise-software'::text, 'consumer-tech'::text, 'e-commerce'::text, 'cybersecurity'::text, 'gaming'::text, 'media-entertainment'::text, 'consulting'::text, 'government'::text, 'nonprofit'::text, 'retail'::text, 'restaurant'::text, 'hospitality'::text, 'other'::text])))",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "company_category"
+          ]
+        },
+        {
+          "name": "applications_company_name_not_null",
+          "type": "n",
+          "def": "NOT NULL company_name",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "company_name"
+          ]
+        },
+        {
+          "name": "applications_cover_letter_required_not_null",
+          "type": "n",
+          "def": "NOT NULL cover_letter_required",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "cover_letter_required"
+          ]
+        },
+        {
+          "name": "applications_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "applications_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "applications_is_archived_not_null",
+          "type": "n",
+          "def": "NOT NULL is_archived",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "is_archived"
+          ]
+        },
+        {
+          "name": "applications_job_source_check",
+          "type": "CHECK",
+          "def": "CHECK ((job_source = ANY (ARRAY['recruiter'::text, 'linkedin'::text, 'indeed'::text, 'friend'::text, 'colleague'::text, 'company-website'::text, 'other'::text])))",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "job_source"
+          ]
+        },
+        {
+          "name": "applications_position_title_not_null",
+          "type": "n",
+          "def": "NOT NULL position_title",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "position_title"
+          ]
+        },
+        {
+          "name": "applications_skills_match_check",
+          "type": "CHECK",
+          "def": "CHECK (((skills_match \u003e= 1) AND (skills_match \u003c= 5)))",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "skills_match"
+          ]
+        },
+        {
+          "name": "applications_status_check",
+          "type": "CHECK",
+          "def": "CHECK ((status = ANY (ARRAY['unsubmitted'::text, 'applied'::text, 'interviewing'::text, 'given offer'::text, 'accepted offer'::text, 'declined offer'::text, 'rejected'::text, 'no offer'::text])))",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "applications_status_not_null",
+          "type": "n",
+          "def": "NOT NULL status",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "applications_updated_at_not_null",
+          "type": "n",
+          "def": "NOT NULL updated_at",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "updated_at"
+          ]
+        },
+        {
+          "name": "applications_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "go_gin.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "go_gin.interview_stages",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "stage_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "stage_order",
+          "type": "integer",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "is_completed",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "performance_rating",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "interview_stages_pkey",
+          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON go_gin.interview_stages USING btree (id)",
+          "table": "go_gin.interview_stages",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "interview_stages_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "interview_stages_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "interview_stages_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_is_completed_not_null",
+          "type": "n",
+          "def": "NOT NULL is_completed",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "is_completed"
+          ]
+        },
+        {
+          "name": "interview_stages_performance_rating_check",
+          "type": "CHECK",
+          "def": "CHECK ((performance_rating = ANY (ARRAY['excellent'::text, 'good'::text, 'average'::text, 'poor'::text])))",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "performance_rating"
+          ]
+        },
+        {
+          "name": "interview_stages_stage_name_not_null",
+          "type": "n",
+          "def": "NOT NULL stage_name",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "stage_name"
+          ]
+        },
+        {
+          "name": "interview_stages_stage_order_not_null",
+          "type": "n",
+          "def": "NOT NULL stage_order",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "stage_order"
+          ]
+        },
+        {
+          "name": "interview_stages_updated_at_not_null",
+          "type": "n",
+          "def": "NOT NULL updated_at",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "updated_at"
+          ]
+        },
+        {
+          "name": "interview_stages_application_id_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES go_gin.applications(id) ON DELETE CASCADE",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "go_gin.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "go_gin.application_snapshots",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "sequence_number",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "snapshot_data",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "application_snapshots_pkey",
+          "def": "CREATE UNIQUE INDEX application_snapshots_pkey ON go_gin.application_snapshots USING btree (id)",
+          "table": "go_gin.application_snapshots",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "application_snapshots_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "go_gin.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "application_snapshots_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "go_gin.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "application_snapshots_description_not_null",
+          "type": "n",
+          "def": "NOT NULL description",
+          "table": "go_gin.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "description"
+          ]
+        },
+        {
+          "name": "application_snapshots_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "go_gin.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_snapshots_sequence_number_not_null",
+          "type": "n",
+          "def": "NOT NULL sequence_number",
+          "table": "go_gin.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "sequence_number"
+          ]
+        },
+        {
+          "name": "application_snapshots_snapshot_data_not_null",
+          "type": "n",
+          "def": "NOT NULL snapshot_data",
+          "table": "go_gin.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "snapshot_data"
+          ]
+        },
+        {
+          "name": "application_snapshots_application_id_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES go_gin.applications(id) ON DELETE CASCADE",
+          "table": "go_gin.application_snapshots",
+          "referenced_table": "applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_snapshots_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "go_gin.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "go_gin.schema_migrations",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "dirty",
+          "type": "boolean",
+          "nullable": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "schema_migrations_pkey",
+          "def": "CREATE UNIQUE INDEX schema_migrations_pkey ON go_gin.schema_migrations USING btree (version)",
+          "table": "go_gin.schema_migrations",
+          "columns": [
+            "version"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "schema_migrations_dirty_not_null",
+          "type": "n",
+          "def": "NOT NULL dirty",
+          "table": "go_gin.schema_migrations",
+          "referenced_table": "",
+          "columns": [
+            "dirty"
+          ]
+        },
+        {
+          "name": "schema_migrations_version_not_null",
+          "type": "n",
+          "def": "NOT NULL version",
+          "table": "go_gin.schema_migrations",
+          "referenced_table": "",
+          "columns": [
+            "version"
+          ]
+        },
+        {
+          "name": "schema_migrations_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (version)",
+          "table": "go_gin.schema_migrations",
+          "referenced_table": "",
+          "columns": [
+            "version"
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "table": "go_gin.interview_stages",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "go_gin.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES go_gin.applications(id) ON DELETE CASCADE"
+    },
+    {
+      "table": "go_gin.application_snapshots",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "go_gin.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES go_gin.applications(id) ON DELETE CASCADE"
+    }
+  ],
+  "enums": [
+    {
+      "name": "express_prisma.ApplicationStatus",
+      "values": [
+        "accepted",
+        "applied",
+        "interviewing",
+        "offered",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "express_prisma.CompanyCategory",
+      "values": [
+        "enterprise",
+        "mid_market",
+        "other",
+        "scale_up",
+        "startup"
+      ]
+    },
+    {
+      "name": "express_prisma.JobSource",
+      "values": [
+        "company_website",
+        "job_board",
+        "other",
+        "recruiter",
+        "referral"
+      ]
+    },
+    {
+      "name": "python_fastapi.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "python_fastapi.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "python_fastapi.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_koa.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "react_koa.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_nestjs.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "react_nestjs.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_nestjs.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "svelte_hono.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "svelte_hono.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "svelte_hono.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "vue_nuxt.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "vue_nuxt.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    }
+  ],
+  "driver": {
+    "name": "postgres",
+    "database_version": "PostgreSQL 18.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "meta": {
+      "current_schema": "public",
+      "search_paths": [
+        "postgres",
+        "public"
+      ],
+      "dict": {
+        "Functions": "Stored procedures and functions"
+      }
+    }
+  }
+}

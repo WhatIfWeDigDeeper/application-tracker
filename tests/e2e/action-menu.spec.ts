@@ -53,4 +53,31 @@ test.describe('Action Menu - Card interactions', () => {
     // Verify we're still on the list page after the menu opened
     await expect(page).toHaveURL('/');
   });
+
+  test('action menu dropdown should not be clipped by the table overflow container', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('button[aria-label="Actions"]', { timeout: 10000 });
+
+    const actionsButton = page.locator('button[aria-label="Actions"]').first();
+    await actionsButton.click();
+
+    const dropdown = page.locator('[data-menu-dropdown]').first();
+    await expect(dropdown).toBeVisible({ timeout: 3000 });
+
+    const box = await dropdown.boundingBox();
+    expect(box).not.toBeNull();
+
+    const viewportSize = page.viewportSize();
+    expect(viewportSize).not.toBeNull();
+
+    // Dropdown must be fully within the viewport — if clipped by overflow-x-auto
+    // it would have zero or negative dimensions, or be positioned off-screen
+    expect(box!.width).toBeGreaterThan(0);
+    expect(box!.height).toBeGreaterThan(0);
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.y).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(viewportSize!.width);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(viewportSize!.height);
+  });
 });

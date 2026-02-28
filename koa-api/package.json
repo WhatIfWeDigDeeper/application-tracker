@@ -40,7 +40,7 @@
     "@types/pg": "^8.10.9",
     "@typescript-eslint/eslint-plugin": "^8.55.0",
     "@typescript-eslint/parser": "^8.55.0",
-    "eslint": "^10.0.0",
+    "eslint": "10.0.2",
     "jest": "^30.2.0",
     "prettier": "^3.1.1",
     "supertest": "^7.2.2",

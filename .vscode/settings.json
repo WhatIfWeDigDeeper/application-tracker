@@ -16,7 +16,9 @@
         "/^(git|gh|npm|npx|ls|pwd|cat|head|tail|grep|find|which|echo|wc|diff|tree|file|stat|du|df|env|printenv)(\\s+.*)?$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "go": true,
+        "pkill": true
     }
 }
 
