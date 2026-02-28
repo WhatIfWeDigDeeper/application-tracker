@@ -21,6 +21,7 @@ import {
   JOB_SOURCES,
 } from '../../core/models/application.model';
 import { HistoryPanelComponent } from '../history-panel/history-panel.component';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 
 interface FormState {
   companyName: string;
@@ -160,6 +161,7 @@ function validate(form: FormState): FormErrors {
     RouterLink,
     FormsModule,
     HistoryPanelComponent,
+    ConfirmDialogComponent,
   ],
   templateUrl: './application-detail.component.html',
 })

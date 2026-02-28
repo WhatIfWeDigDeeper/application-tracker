@@ -200,3 +200,14 @@
 }
 }
 }
+
+@if (showDeleteConfirm()) {
+  <app-confirm-dialog
+    title="Delete Application"
+    message="Are you sure you want to delete this application? This action cannot be undone."
+    confirmLabel="Delete"
+    [confirmDanger]="true"
+    (confirmed)="onConfirmDelete()"
+    (cancelled)="showDeleteConfirm.set(false)"
+  />
+}

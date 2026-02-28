@@ -15,6 +15,7 @@ import {
 import { RelativeDatePipe } from '../../shared/pipes/relative-date.pipe';
 import { CsvImportComponent } from '../csv/csv-import.component';
 import { CsvExportComponent } from '../csv/csv-export.component';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-application-list',
@@ -26,6 +27,7 @@ import { CsvExportComponent } from '../csv/csv-export.component';
     RelativeDatePipe,
     CsvImportComponent,
     CsvExportComponent,
+    ConfirmDialogComponent,
   ],
   templateUrl: './application-list.component.html',
 })
@@ -52,6 +54,8 @@ export class ApplicationListComponent implements OnInit {
   readonly statusColors = STATUS_COLORS;
 
   showImport = signal(false);
+  showDeleteConfirm = signal(false);
+  pendingDeleteId = signal<string | null>(null);
 
   // Filter state
   statusFilter = signal('');
@@ -161,9 +165,17 @@ export class ApplicationListComponent implements OnInit {
   onDelete(id: string) {
     this.openMenuId.set(null);
     this.menuPosition.set(null);
-    if (confirm('Delete this application?')) {
-      this.service.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadApplications());
-    }
+    this.pendingDeleteId.set(id);
+    this.showDeleteConfirm.set(true);
+  }
+
+  onConfirmDelete() {
+    const id = this.pendingDeleteId();
+    if (!id) return;
+    this.service.delete(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.showDeleteConfirm.set(false);
+      this.loadApplications();
+    });
   }
 
   get totalPages() {

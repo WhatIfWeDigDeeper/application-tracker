@@ -53,6 +53,14 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 **Skip when:** trivial changes (all steps), test-only changes (step 1), docs-only changes (all steps).
 
+**When adding or changing packages** — run two additional steps before the validation chain:
+- `npm run install:<stack>` — keeps the lockfile in sync
+- `npm run audit:ci:<stack>` — fails on known vulnerabilities (e.g. `audit:ci:angular-ui`, `audit:ci:fastapi`)
+Then proceed with the full build → lint → test → e2e chain as normal.
+
+**When changing public TypeScript types** — regenerate the type diagrams for the affected stack:
+- `npm run docs:types:<stack>` (e.g. `docs:types:angular-ui`, `docs:types:nuxt`)
+
 ## Dependency Management
 
 When installing **new npm packages**: use latest stable version, exact versions (no ^ or ~), install `@types/*` if needed.
