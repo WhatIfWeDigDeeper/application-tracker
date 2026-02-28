@@ -30,7 +30,7 @@ import { ImportResult } from '../../core/models/application.model';
           type="file"
           accept=".csv"
           (change)="onFileSelected($event)"
-          class="text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border file:border-gray-300 file:bg-white file:text-gray-700 hover:file:bg-gray-50 dark:text-gray-400 dark:file:bg-gray-700 dark:file:text-gray-300 dark:file:border-gray-600"
+          class="text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border file:border-gray-300 file:bg-white file:text-gray-700 hover:file:bg-gray-50 dark:text-gray-400 dark:file:bg-gray-700 dark:file:text-gray-300 dark:file:border-gray-600 dark:hover:file:bg-gray-600"
         />
         <button
           type="button"
