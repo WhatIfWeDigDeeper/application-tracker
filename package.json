@@ -147,7 +147,7 @@
     "test:e2e:tanstack": "TEST_UI_PORT=3050 PLAYWRIGHT_HTML_OPEN=never npx -y playwright test",
     "test:e2e:tanstack-start": "TEST_UI_PORT=3040 PLAYWRIGHT_HTML_OPEN=never npx -y playwright test",
     "test:e2e:angular": "TEST_UI_PORT=3060 PLAYWRIGHT_HTML_OPEN=never npx -y playwright test",
-    "test:e2e:all": "npm run test:e2e:express && npm run test:e2e:vue && npm run test:e2e:svelte && npm run test:e2e:react-koa && npm run test:e2e:tanstack && npm run test:e2e:tanstack-start && npm run test:e2e:angular",
+    "test:e2e:all": "bash scripts/run-e2e.sh",
     "test:e2e:ui": "npx -y playwright test --ui",
     "test:e2e:debug": "npx -y playwright test --debug",
     "clean": "rm -rf node_modules api/node_modules ui/node_modules api/dist ui/.next koa-api/node_modules koa-api/dist react-ui/node_modules hono-api/node_modules hono-api/dist svelte-ui/node_modules svelte-ui/.svelte-kit vue-ui/node_modules nuxt-api/node_modules nuxt-api/.nuxt nuxt-api/.output nest-api/node_modules nest-api/dist tanstack-ui/node_modules tanstack-start-ui/node_modules tanstack-start-ui/dist fastapi/.venv",

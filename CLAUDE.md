@@ -113,7 +113,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 ## Running E2E Tests
 
-**Server lifecycle**: Before running E2E, check if the required UI and API are already running. If not, start them first and stop them after tests complete. If they were already running, leave them running after tests.
+**Server lifecycle**: For fully managed runs (API auto-start/stop), use `bash scripts/run-e2e.sh [stack|all]` — `npm run test:e2e:all` also uses this. To run manually when servers are already up, use `npm run test:e2e:<stack>` directly and leave pre-existing servers running afterward.
 
 Run all: `npm run test:e2e:all`. Run one stack: `npm run test:e2e:<stack>` (e.g., `express`, `vue`).
 
