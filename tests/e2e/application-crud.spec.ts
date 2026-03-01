@@ -286,3 +286,47 @@ test.describe('Application CRUD - Inline Edit', () => {
     await context.close();
   });
 });
+
+test.describe('Status label - Not a match', () => {
+  let createdAppId: string;
+
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const createRes = await page.request.post('/api/applications', {
+      data: { companyName: 'Not A Match Co', positionTitle: 'Engineer', status: 'applied' },
+    });
+    const app = await createRes.json();
+    createdAppId = app.id;
+    await page.request.patch(`/api/applications/${createdAppId}`, {
+      data: { status: 'rejected' },
+    });
+    await context.close();
+  });
+
+  test.afterAll(async ({ browser }) => {
+    if (!createdAppId) return;
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.request.delete(`/api/applications/${createdAppId}`);
+    await context.close();
+  });
+
+  test('should show "Not a match" badge for rejected status on list', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('h1', { timeout: 10000 });
+
+    await expect(page.locator('text=Not A Match Co')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Not a match').first()).toBeVisible();
+  });
+
+  test('should show "Not a match" option in status dropdown on edit page', async ({ page }) => {
+    await page.goto(`/applications/${createdAppId}`);
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('#status', { timeout: 10000 });
+
+    const option = page.locator('#status option[value="rejected"]');
+    await expect(option).toHaveText('Not a match');
+  });
+});

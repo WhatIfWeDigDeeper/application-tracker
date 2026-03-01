@@ -4,6 +4,11 @@ dictionaryDefinitions: []
 dictionaries: []
 words:
   - asyncpg
+  - domcontentloaded
+  - textareas
+  - Textareas
+  - unsubmitted
+  - Unsubmitted
   - auditconfig
   - dedup
   - Dedup

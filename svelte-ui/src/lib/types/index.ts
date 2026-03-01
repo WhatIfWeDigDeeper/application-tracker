@@ -180,7 +180,7 @@ export interface PaginatedHistoryResponse {
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   unsubmitted: 'Unsubmitted',
   applied: 'Applied',
-  rejected: 'Rejected',
+  rejected: 'Not a match',
   interviewing: 'Interviewing',
   'given offer': 'Given Offer',
   'accepted offer': 'Accepted Offer',

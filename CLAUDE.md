@@ -14,6 +14,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Parallel Execution**: 3+ items use Task tool subagents
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
+- **Plan Execution**: Plans must end with a statement of how the work will be run — e.g., single session (sequential), parallel subagents, agent team, or isolated worktree — so the approach is visible before implementation begins.
 
 ## Active Technologies
 
@@ -45,11 +46,12 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 **When fixing a bug or test failure, automatically run the relevant tests after applying the fix** — do not wait for the user to ask. Use the most targeted test command available (e.g., `test:e2e:react-koa` for a react-koa failure). Report pass/fail results immediately.
 
-1. **Add tests** - Create or update tests for new functionality
+1. **Add tests** — Create or update tests for new functionality. Include E2E tests when the change affects user-visible behavior (labels, UI interactions, API contracts). **When fixing a bug, write a failing test first that reproduces the issue, then fix it** — this ensures the bug is understood and won't regress.
 2. **Build** - `npm run build:<stack>` (runs per-package build; catches compilation errors)
 3. **Lint** - `npm run lint:<stack>` (ESLint/ruff across packages)
 4. **Test** - `npm run test:<stack>` (unit/integration tests — catches logic errors `tsc` misses)
 5. **E2E** *(when UI/API behavior changed)* - `npm run test:e2e:<stack>` (e.g., `test:e2e:express`)
+6. **Docs** *(when user-visible behavior changes)* — Update `specs/core/domain/` files and `README.md` as needed when labels, statuses, UI text, or API contracts change. Also run generated docs when applicable: `npm run docs:types:<stack>` when public TypeScript types change, `npm run docs:schema` when DB schema changes. Feature specs (`specs/<number>-*/spec.md`) are historical — do not retroactively rewrite them; document changes in the current feature's own spec instead.
 
 **Skip when:** trivial changes (all steps), test-only changes (step 1), docs-only changes (all steps).
 
@@ -111,7 +113,9 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 ## Running E2E Tests
 
-Run all: `npm run test:e2e:all`. Run one stack: `npm run test:e2e:<stack>` where stack is `express`, `react-koa`, `vue`, `svelte`, or `tanstack`.
+**Server lifecycle**: Before running E2E, check if the required UI and API are already running. If not, start them first and stop them after tests complete. If they were already running, leave them running after tests.
+
+Run all: `npm run test:e2e:all`. Run one stack: `npm run test:e2e:<stack>` (e.g., `express`, `vue`).
 
 Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
 
