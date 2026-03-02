@@ -57,9 +57,9 @@ test.describe('Action Menu - Card interactions', () => {
   test('action menu dropdown should not be clipped by the table overflow container', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('button[aria-label="Actions"]', { timeout: 10000 });
-
+    await page.waitForSelector('h1', { timeout: 10000 });
     const actionsButton = page.locator('button[aria-label="Actions"]').first();
+    await expect(actionsButton).toBeVisible({ timeout: 10000 });
     await actionsButton.click();
 
     const dropdown = page.locator('[data-menu-dropdown]').first();

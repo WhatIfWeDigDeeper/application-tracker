@@ -33,7 +33,6 @@
     "dev:fastapi": "cd fastapi && uv run python -m src",
     "dev:go-api": "cd go-api && go run ./cmd/server",
     "dev:angular-ui": "cd angular-ui && npm start",
-    "dev:express": "npm run dev:express-api & npm run dev:react-next",
     "build:express-api": "cd api && npm run build",
     "build:react-next": "cd ui && npm run build",
     "build:koa-api": "cd koa-api && npm run build",

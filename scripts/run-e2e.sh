@@ -10,7 +10,7 @@ api_port() {
     express)        echo 3001 ;;
     react-koa)      echo 5010 ;;
     vue)            echo 5040 ;;
-    svelte)         echo 5001 ;;
+    svelte)         echo 5030 ;;
     tanstack-start) echo 5160 ;;
     tanstack)       echo 5050 ;;
     angular)        echo 5070 ;;
@@ -32,12 +32,15 @@ api_script() {
 port_in_use() { lsof -ti :"$1" >/dev/null 2>&1; }
 
 wait_for_port() {
-  local port=$1 elapsed=0 timeout=30
+  local port=$1 stack=$2 elapsed=0 timeout=20
   printf "  Waiting for :%s" "$port"
   while ! port_in_use "$port"; do
     sleep 1; elapsed=$((elapsed + 1)); printf "."
     if [ "$elapsed" -ge "$timeout" ]; then
-      echo " TIMEOUT after ${timeout}s"; return 1
+      echo " TIMEOUT after ${timeout}s"
+      echo "  Last lines of /tmp/e2e-api-${stack}.log:"
+      tail -10 "/tmp/e2e-api-${stack}.log" 2>/dev/null | sed 's/^/    /'
+      return 1
     fi
   done
   echo " ready (${elapsed}s)"
@@ -51,7 +54,8 @@ ensure_api() {
     echo "[$stack] Starting API on :$port..."
     npm run "$(api_script "$stack")" &>/tmp/e2e-api-"$stack".log &
     STARTED_PORTS+=("$port")
-    wait_for_port "$port"
+    wait_for_port "$port" "$stack"
+    sleep 3  # allow DB pool / runtime to fully initialize after port opens
   fi
 }
 

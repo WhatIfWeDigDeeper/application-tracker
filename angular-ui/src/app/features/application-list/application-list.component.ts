@@ -190,6 +190,10 @@ export class ApplicationListComponent implements OnInit {
     return this.statusColors[status as keyof typeof this.statusColors] ?? 'bg-gray-100 text-gray-800';
   }
 
+  getStatusLabel(status: string): string {
+    return this.statusOptions.find((s) => s.value === status)?.label ?? status;
+  }
+
   getSortIcon(field: string): string {
     const f = this.filters();
     if (f.sortBy !== field) return '↕';

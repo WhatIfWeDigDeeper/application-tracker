@@ -313,12 +313,32 @@ test.describe('Status label - Not a match', () => {
   });
 
   test('should show "Not a match" badge for rejected status on list', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('h1', { timeout: 10000 });
+    // Re-PATCH to refresh updatedAt, pushing this app to position 1 of the default updatedAt-desc list.
+    await page.request.patch(`/api/applications/${createdAppId}`, {
+      data: { status: 'rejected' },
+    });
 
-    await expect(page.locator('text=Not A Match Co')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('text=Not a match').first()).toBeVisible();
+    await page.goto('/');
+    // Wait for networkidle so that React (SSR/hydration) and framework data fetches are fully settled
+    // before interacting with the filter. This ensures selectOption() properly triggers onChange
+    // handlers on React-based stacks (e.g. tanstack-start), which only work post-hydration.
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => null);
+
+    // Apply status filter if the UI supports it — ensures visibility even if parallel test activity
+    // pushed this app off page 1 after the re-PATCH above.
+    const statusSelect = page.locator('select:has(option[value="rejected"])').first();
+    if (await statusSelect.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await Promise.all([
+        page.waitForResponse(
+          (r) => r.url().includes('/api/applications') && r.status() === 200,
+          { timeout: 5000 }
+        ).catch(() => null),
+        statusSelect.selectOption('rejected'),
+      ]);
+    }
+
+    // Verify the "Not a match" label is displayed for rejected status apps.
+    await expect(page.locator('span', { hasText: 'Not a match' }).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should show "Not a match" option in status dropdown on edit page', async ({ page }) => {

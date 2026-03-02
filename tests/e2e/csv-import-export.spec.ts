@@ -152,6 +152,8 @@ test.describe('CSV Import/Export', () => {
     await fileInput1.setInputFiles(csvPath1);
     await page.click('button:has-text("Import"):not(:has-text("CSV"))');
     await expect(page.locator('text=Imported')).toBeVisible({ timeout: 10000 });
+    // Verify the first import actually created the app — if imported=0 the dedup test is invalid
+    await expect(page.locator('text=Imported').locator('..')).toContainText('1');
     await page.click('button:has-text("Close")');
 
     // Second import with same URL — should be skipped

@@ -27,6 +27,7 @@ words:
   - pytest
   - RYUK
   - sqlc
+  - tanstack
   - tbls
   - testname
   - uvx
