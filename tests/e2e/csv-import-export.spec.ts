@@ -78,7 +78,7 @@ test.describe('CSV Import/Export', () => {
 
     // Check result counts
     const importedCount = page.locator('text=Imported').locator('..');
-    await expect(importedCount).toContainText('1');
+    await expect(importedCount).toContainText(/\b1(?!\d)/);
 
     // Close the modal
     await page.click('button:has-text("Close")');
@@ -124,10 +124,10 @@ test.describe('CSV Import/Export', () => {
 
     // Should show 1 imported, 1 error
     const importedSection = page.locator('text=Imported').locator('..');
-    await expect(importedSection).toContainText('1');
+    await expect(importedSection).toContainText(/\b1(?!\d)/);
 
     const errorsSection = page.locator('[data-testid="import-result-errors"]');
-    await expect(errorsSection).toContainText('1');
+    await expect(errorsSection).toContainText(/\b1(?!\d)/);
 
     // Should show error row details
     await expect(page.locator('text=Row 2')).toBeVisible();
@@ -153,7 +153,7 @@ test.describe('CSV Import/Export', () => {
     await page.click('button:has-text("Import"):not(:has-text("CSV"))');
     await expect(page.locator('text=Imported')).toBeVisible({ timeout: 10000 });
     // Verify the first import actually created the app — if imported=0 the dedup test is invalid
-    await expect(page.locator('text=Imported').locator('..')).toContainText('1');
+    await expect(page.locator('text=Imported').locator('..')).toContainText(/\b1(?!\d)/);
     await page.click('button:has-text("Close")');
 
     // Second import with same URL — should be skipped
@@ -164,7 +164,7 @@ test.describe('CSV Import/Export', () => {
     await expect(page.locator('text=Skipped')).toBeVisible({ timeout: 10000 });
 
     const skippedSection = page.locator('text=Skipped').locator('..');
-    await expect(skippedSection).toContainText('1');
+    await expect(skippedSection).toContainText(/\b1(?!\d)/);
 
     await page.click('button:has-text("Close")');
   });
