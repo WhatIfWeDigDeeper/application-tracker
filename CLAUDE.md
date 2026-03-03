@@ -102,6 +102,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 ## Commit and Review Workflow
 
+- **Never push directly to main**: `main` is branch-protected — always create a feature branch, push there, and open a PR. Direct pushes will be rejected.
 - **Interactive sessions**: Do not commit unless explicitly asked
 - **Worktree/subagent sessions**: Auto-commit before returning (worktree is ephemeral)
 - **After every push to a PR branch** *(required, no exceptions)*: Immediately update the PR body via `gh pr edit <number> --body` to reflect all commits now on the branch. Do not wait to be asked. Do not skip because the change "seems minor" — always re-read the current description and update it.
