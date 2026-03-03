@@ -164,7 +164,7 @@ export const APPLICATION_STATUSES: { value: ApplicationStatus; label: string }[]
   { value: 'interviewing', label: 'Interviewing' },
   { value: 'given offer', label: 'Given Offer' },
   { value: 'accepted offer', label: 'Accepted Offer' },
-  { value: 'rejected', label: 'Rejected' },
+  { value: 'rejected', label: 'Not a match' },
   { value: 'declined offer', label: 'Declined Offer' },
   { value: 'no offer', label: 'No Offer' },
 ];

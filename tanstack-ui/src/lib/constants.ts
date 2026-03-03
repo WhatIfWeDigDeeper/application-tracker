@@ -14,7 +14,7 @@ export const APPLICATION_STATUSES: {
   { value: "given offer", label: "Given Offer" },
   { value: "accepted offer", label: "Accepted Offer" },
   { value: "declined offer", label: "Declined Offer" },
-  { value: "rejected", label: "Rejected" },
+  { value: "rejected", label: "Not a match" },
   { value: "no offer", label: "No Offer" },
 ];
 

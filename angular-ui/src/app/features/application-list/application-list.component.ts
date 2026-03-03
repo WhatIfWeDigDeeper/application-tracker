@@ -52,6 +52,9 @@ export class ApplicationListComponent implements OnInit {
   readonly categoryOptions = COMPANY_CATEGORIES;
   readonly sourceOptions = JOB_SOURCES;
   readonly statusColors = STATUS_COLORS;
+  private readonly statusLabelMap: Record<string, string> = Object.fromEntries(
+    APPLICATION_STATUSES.map((s) => [s.value, s.label])
+  );
 
   showImport = signal(false);
   showDeleteConfirm = signal(false);
@@ -188,6 +191,10 @@ export class ApplicationListComponent implements OnInit {
 
   getStatusColor(status: string): string {
     return this.statusColors[status as keyof typeof this.statusColors] ?? 'bg-gray-100 text-gray-800';
+  }
+
+  getStatusLabel(status: string): string {
+    return this.statusLabelMap[status] ?? status;
   }
 
   getSortIcon(field: string): string {

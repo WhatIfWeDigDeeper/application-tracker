@@ -10,7 +10,12 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:5160",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) => {
+          const stripped = path.replace(/^\/api/, "");
+          // FastAPI redirects /applications (no trailing slash) to /applications/ via 307,
+          // producing a cross-origin Location header. Normalize here to avoid the redirect.
+          return stripped === "/applications" ? "/applications/" : stripped;
+        },
       },
     },
   },

@@ -29,7 +29,7 @@ const statusConfig = {
     classes: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   },
   rejected: {
-    label: 'Rejected',
+    label: 'Not a match',
     classes: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
   },
   'declined offer': {
