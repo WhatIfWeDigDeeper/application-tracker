@@ -10,7 +10,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 
 - **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`
 - **Validation Chain**: `build:*` → `lint:*` → `test:*` → `test:e2e:*`
-- **Script Naming**: Every composite script uses a stack suffix (e.g., `build:express`, `test:e2e:tanstack`) — no bare/unnamed scripts. Use `:all` suffix for cross-stack scripts. When adding a new implementation, add its scripts to all groups (`dev`, `build`, `lint`, `test`, `*:all`) and to `scripts/stop-all.sh`.
+- **Script Naming**: Scripts follow `verb:package-name` (e.g., `build:react-next`, `lint:angular-ui`). Use `:all` suffix for scripts that run across all packages. `test:e2e:*` uses stack names (e.g., `test:e2e:express`, `test:e2e:tanstack`). When adding a new implementation, add per-package scripts for every verb (`dev`, `build`, `lint`, `test`) and add each to its `*:all` script and to `scripts/stop-all.sh`.
 - **Parallel Execution**: 3+ items use Task tool subagents
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
