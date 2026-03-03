@@ -17,7 +17,7 @@
     "@fastify/multipart": "9.4.0",
     "@nestjs/common": "11.1.13",
     "@nestjs/core": "11.1.13",
-    "@nestjs/platform-fastify": "11.1.13",
+    "@nestjs/platform-fastify": "11.1.14",
     "dotenv": "17.3.1",
     "drizzle-orm": "0.45.1",
     "papaparse": "5.5.3",
