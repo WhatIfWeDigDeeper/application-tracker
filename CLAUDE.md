@@ -88,6 +88,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
 - **Svelte 5 event delegation**: `stopPropagation()` doesn't prevent parent `<a>` navigation — avoid wrapping interactive cards in `<a>` tags; use `onclick` with `goto()` instead
 - **Zod boolean coercion**: `z.coerce.boolean()` treats any non-empty string (including `"false"`) as `true` — use `z.preprocess((val) => val === 'true' || val === true, z.boolean())` for query params
+- **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
 
 ## Vue.js Patterns
 
@@ -101,10 +102,12 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 ## Commit and Review Workflow
 
+- **Never push directly to main**: `main` is branch-protected — always create a feature branch, push there, and open a PR. Direct pushes will be rejected.
 - **Interactive sessions**: Do not commit unless explicitly asked
 - **Worktree/subagent sessions**: Auto-commit before returning (worktree is ephemeral)
 - **After every push to a PR branch** *(required, no exceptions)*: Immediately update the PR body via `gh pr edit <number> --body` to reflect all commits now on the branch. Do not wait to be asked. Do not skip because the change "seems minor" — always re-read the current description and update it.
 - **Spec status**: When a feature has a spec file in `specs/`, update its `Status` to `Complete` before merging the PR
+- **Before merging**: Mention to the user — "Worth running `/learn` if anything non-obvious came up this session." One sentence, easy to dismiss for small PRs.
 - **Wait for CI before merging**: Always check `gh pr checks <number>` and wait for all checks to pass before squash merging. Do not use `--admin` to bypass branch protection unless explicitly asked.
 - **Post-merge cleanup**: After squash merging a PR, immediately switch to main, pull, and delete the local branch (`git checkout main && git pull && git branch -d <branch>`). Never commit cleanup work (e.g. spec status updates) directly to local main — branch protection will reject the push, and the resulting squash PR will diverge from the local commit, causing a merge commit on the next pull instead of a fast-forward.
 - **Resolving PR review threads**: `gh` CLI has no resolve command. Use `gh api graphql` — fetch thread IDs via `pullRequest.reviewThreads`, resolve with `resolveReviewThread` mutation. Reply to each thread before resolving.
