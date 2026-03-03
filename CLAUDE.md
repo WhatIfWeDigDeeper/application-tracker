@@ -65,7 +65,7 @@ Then proceed with the full build → lint → test → e2e chain as normal.
 
 ## Dependency Management
 
-When installing **new npm packages**: use latest stable version, exact versions (no ^ or ~), install `@types/*` if needed.
+When installing **new npm packages**: use latest stable version, exact versions (no ^ or ~), install `@types/*` if needed. Note: `npm install pkg@x.y.z` silently adds a `^` caret — verify package.json afterward and remove it to restore exact pinning.
 
 When installing **new Python packages**: `cd fastapi && uv add <package>` (or `uv add --dev <package>` for dev deps). Use exact versions in `pyproject.toml`.
 
