@@ -142,7 +142,8 @@
     "docs:types:angular-ui": "npx -y ts-to-mermaid angular-ui/src/app/core/models/application.model.ts --save docs/types/angular-ui/ && echo >> docs/types/angular-ui/application.model.mermaid",
     "docs:types": "npm run docs:types:nuxt && npm run docs:types:react-next && npm run docs:types:react-ui && npm run docs:types:koa-api && npm run docs:types:svelte-ui && npm run docs:types:nest-api && npm run docs:types:tanstack-ui && npm run docs:types:tanstack-start-ui && npm run docs:types:angular-ui",
     "stop:all": "bash scripts/stop-all.sh",
-    "cleanup:test-data": "node scripts/cleanup-test-data.mjs --"
+    "cleanup:test-data": "node scripts/cleanup-test-data.mjs --",
+    "validate:all": "npm run audit:ci:all && npm run lint:all && npm run install:all && npm run build:all && npm run test:all && npm run test:e2e:all"
   },
   "keywords": [],
   "author": "",
@@ -151,10 +152,10 @@
     "@eslint/js": "10.0.1",
     "@playwright/test": "^1.58.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.2.3",
-    "eslint": "10.0.0",
+    "@types/node": "25.3.3",
+    "eslint": "10.0.2",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.56.0"
+    "typescript-eslint": "8.56.1"
   },
   "volta": {
     "node": "24.13.1"
