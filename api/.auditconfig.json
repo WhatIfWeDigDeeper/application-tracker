@@ -1,5 +1,8 @@
 {
-  "allowlist": [],
+  "allowlist": [
+    "GHSA-q5qw-h33p-qvwr",
+    "GHSA-wc8c-qw6v-h7f6"
+  ],
   "high": true,
   "package-manager": "auto"
 }
