@@ -33,6 +33,19 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    val dotenv = file(".env")
+    if (dotenv.exists()) {
+        dotenv.readLines()
+            .filter { it.isNotBlank() && !it.startsWith("#") }
+            .mapNotNull { line ->
+                val idx = line.indexOf('=')
+                if (idx > 0) line.substring(0, idx) to line.substring(idx + 1) else null
+            }
+            .forEach { (key, value) -> environment(key, value) }
+    }
+}
+
 checkstyle {
     toolVersion = "10.21.4"
     configFile = file("config/checkstyle/checkstyle.xml")
