@@ -55,6 +55,7 @@ SCHEMAS=(
   "react_nestjs:react-nestjs"
   "python_fastapi:python-fastapi"
   "go_gin:go-gin"
+  "java_spring:java-spring"
 )
 
 for entry in "${SCHEMAS[@]}"; do

@@ -56,6 +56,17 @@ jobs:
         if: steps.docs-check.outputs.only_changed == 'false'
         run: cd fastapi && uv sync --extra dev
 
+      - name: Set up Java 21
+        if: steps.docs-check.outputs.only_changed == 'false'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        if: steps.docs-check.outputs.only_changed == 'false'
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Set up Go
         if: steps.docs-check.outputs.only_changed == 'false'
         uses: actions/setup-go@v5
@@ -78,6 +89,10 @@ jobs:
       - name: Install npm packages
         if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run ci:all
+
+      - name: Install angular-spring-ui packages
+        if: steps.docs-check.outputs.only_changed == 'false'
+        run: cd angular-spring-ui && npm ci
 
       - name: Lint
         if: steps.docs-check.outputs.only_changed == 'false'

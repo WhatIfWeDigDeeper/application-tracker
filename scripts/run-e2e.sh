@@ -2,7 +2,7 @@
 set -euo pipefail
 
 STACK="${1:-all}"
-STACKS=(express react-koa vue svelte tanstack-start tanstack angular)
+STACKS=(express react-koa vue svelte tanstack-start tanstack angular spring)
 STARTED_PORTS=()
 
 api_port() {
@@ -14,6 +14,7 @@ api_port() {
     tanstack-start) echo 5160 ;;
     tanstack)       echo 5050 ;;
     angular)        echo 5070 ;;
+    spring)         echo 8080 ;;
   esac
 }
 
@@ -26,6 +27,7 @@ api_script() {
     tanstack-start) echo "dev:fastapi" ;;
     tanstack)       echo "dev:nest-api" ;;
     angular)        echo "dev:go-api" ;;
+    spring)         echo "dev:spring-api" ;;
   esac
 }
 

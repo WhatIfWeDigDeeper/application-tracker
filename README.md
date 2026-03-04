@@ -97,6 +97,16 @@ This repository contains a complete job application tracker built with multiple 
 - Snapshot-based history with field diffs and restore
 - testcontainers-go integration tests
 
+### 8. Angular + Spring Boot + JPA/Hibernate
+**Directories**: `angular-spring-ui/` + `spring-api/`
+**Stack**:
+- Frontend: Angular 21 + standalone components + Angular Signals + Tailwind CSS 4.x — port 3070
+- Backend: Java 21 + Spring Boot 3.4.x + Spring Data JPA + Hibernate 6 + Flyway — port 8080
+- Database: PostgreSQL via `java_spring` schema (JPA entities + Flyway migrations)
+- AttributeConverter classes for PostgreSQL enum types with hyphenated values
+- Snapshot-based history with field diffs and restore
+- Gradle 8.x (Kotlin DSL) build system
+
 ## Core Features
 
 All implementations provide:
@@ -122,6 +132,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
 | `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
 | `go_gin` | Angular + Go Gin API | [schema docs](docs/schema/go-gin/README.md) |
+| `java_spring` | Angular + Spring Boot + JPA | [schema docs](docs/schema/java-spring/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -153,7 +164,9 @@ Regenerate with `npm run docs:types`.
 ├── vue-ui/                       # Vue + Vite UI
 ├── tanstack-ui/                  # React + TanStack Query/Router UI
 ├── tanstack-start-ui/            # React SSR + TanStack Start UI
-├── angular-ui/                   # Angular 21 UI
+├── angular-ui/                   # Angular 21 UI (Go Gin backend)
+├── angular-spring-ui/            # Angular 21 UI (Spring Boot backend)
+├── spring-api/                   # Spring Boot 3.4 API
 ├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
@@ -202,6 +215,7 @@ Regenerate with `npm run docs:types`.
    npm run migrate:nest-api       # NestJS + Drizzle
    npm run migrate:fastapi        # FastAPI (asyncpg)
    npm run migrate:go             # Go Gin API (raw SQL)
+   npm run migrate:spring-api     # Spring Boot API (Flyway — auto-run on startup too)
 
    # or all at once:
    npm run migrate:all
@@ -239,6 +253,10 @@ npm run dev:fastapi
 # Angular + Go Gin (UI 3060 + API 5070)
 npm run dev:go-api
 npm run dev:angular-ui
+
+# Angular + Spring Boot (UI 3070 + API 8080)
+npm run dev:spring-api
+npm run dev:angular-spring-ui
 ```
 
 ### Schema Documentation
@@ -270,6 +288,8 @@ npm run test:tanstack-start-ui  # TanStack Start UI tests
 npm run test:fastapi      # FastAPI pytest unit tests
 npm run test:go-api       # Go Gin API integration tests (testcontainers-go)
 npm run test:angular-ui   # Angular UI tests (Jest + @testing-library/angular)
+npm run test:spring-api   # Spring Boot API tests (JUnit 5)
+npm run test:angular-spring-ui  # Angular Spring UI tests (Jest + @testing-library/angular)
 ```
 
 Run all unit tests:
@@ -290,6 +310,7 @@ npm run test:e2e:react-koa # React + Koa (port 3010)
 npm run test:e2e:tanstack  # React + TanStack + NestJS (port 3050)
 npm run test:e2e:tanstack-start  # React SSR + TanStack Start + FastAPI (port 3040)
 npm run test:e2e:angular  # Angular + Go Gin (port 3060)
+npm run test:e2e:spring   # Angular + Spring Boot (port 3070)
 npm run test:e2e:all      # Run all e2e tests
 ```
 
