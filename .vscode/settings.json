@@ -6,6 +6,14 @@
         "speckit.tasks": true,
         "speckit.implement": true
     },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.formatOnSave": true
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.formatOnSave": true
+    },
     "chat.tools.terminal.autoApprove": {
         ".specify/scripts/bash/": true,
         ".specify/scripts/powershell/": true,
@@ -21,4 +29,3 @@
         "pkill": true
     }
 }
-

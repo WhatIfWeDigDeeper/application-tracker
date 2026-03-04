@@ -26,6 +26,8 @@ A full-stack job application tracking system with multiple technology stack impl
   - [End-to-End Tests](#end-to-end-tests)
   - [Build Verification](#build-verification)
 - [Development Tools](#development-tools)
+  - [VS Code Debug Configurations](#vs-code-debug-configurations)
+  - [Notifications (Optional)](#notifications-optional)
 - [License](#license)
 
 
@@ -325,6 +327,22 @@ npx skills add -y whatifwedigdeeper/agent-skills
 ```
 
 See [.claude/](.claude/) for all available commands and skills.
+
+### VS Code Debug Configurations
+
+`.vscode/launch.json` includes debug configurations for all API backends. Open the **Run and Debug** panel (`Ctrl+Shift+D` / `Cmd+Shift+D`) and select the server you want to debug:
+
+| Configuration | Port |
+|---------------|------|
+| Express API | 5000 |
+| Koa API | 5010 |
+| Hono API | 5030 |
+| Nuxt API | 5040 |
+| NestJS API | 5050 |
+| FastAPI | 5160 |
+| Go Gin API | 5070 |
+
+FastAPI debugging requires the [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) extension. Go debugging requires the [Go](https://marketplace.visualstudio.com/items?itemName=golang.go) extension.
 
 ### Notifications (Optional)
 

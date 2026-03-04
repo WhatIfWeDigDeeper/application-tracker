@@ -12,7 +12,7 @@ The current state of a job application in the hiring pipeline.
 |-------|--------------|-------------|
 | `unsubmitted` | Unsubmitted | Application saved as draft, not yet submitted |
 | `applied` | Applied | Application submitted, awaiting response |
-| `rejected` | Rejected | Application was rejected |
+| `rejected` | Not a match | Application was rejected |
 | `interviewing` | Interviewing | Active interview process |
 | `given offer` | Given Offer | Received an offer, pending decision |
 | `accepted offer` | Accepted Offer | Offer accepted (terminal state) |

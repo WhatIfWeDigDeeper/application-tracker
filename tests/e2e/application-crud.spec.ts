@@ -286,3 +286,67 @@ test.describe('Application CRUD - Inline Edit', () => {
     await context.close();
   });
 });
+
+test.describe('Status label - Not a match', () => {
+  let createdAppId: string;
+
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const createRes = await page.request.post('/api/applications', {
+      data: { companyName: 'Not A Match Co', positionTitle: 'Engineer', status: 'applied' },
+    });
+    const app = await createRes.json();
+    createdAppId = app.id;
+    await page.request.patch(`/api/applications/${createdAppId}`, {
+      data: { status: 'rejected' },
+    });
+    await context.close();
+  });
+
+  test.afterAll(async ({ browser }) => {
+    if (!createdAppId) return;
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.request.delete(`/api/applications/${createdAppId}`);
+    await context.close();
+  });
+
+  test('should show "Not a match" badge for rejected status on list', async ({ page }) => {
+    // Re-PATCH to refresh updatedAt, pushing this app to position 1 of the default updatedAt-desc list.
+    await page.request.patch(`/api/applications/${createdAppId}`, {
+      data: { status: 'rejected' },
+    });
+
+    await page.goto('/');
+    // Wait for networkidle so that React (SSR/hydration) and framework data fetches are fully settled
+    // before interacting with the filter. This ensures selectOption() properly triggers onChange
+    // handlers on React-based stacks (e.g. tanstack-start), which only work post-hydration.
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => null);
+
+    // Apply status filter if the UI supports it — ensures visibility even if parallel test activity
+    // pushed this app off page 1 after the re-PATCH above.
+    const statusSelect = page.locator('select:has(option[value="rejected"])').first();
+    if (await statusSelect.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await Promise.all([
+        page.waitForResponse(
+          (r) => r.url().includes('/api/applications') && r.status() === 200,
+          { timeout: 5000 }
+        ).catch(() => null),
+        statusSelect.selectOption('rejected'),
+      ]);
+    }
+
+    // Verify the "Not a match" label is displayed for rejected status apps.
+    await expect(page.locator('span', { hasText: 'Not a match' }).first()).toBeVisible({ timeout: 10000 });
+  });
+
+  test('should show "Not a match" option in status dropdown on edit page', async ({ page }) => {
+    await page.goto(`/applications/${createdAppId}`);
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('#status', { timeout: 10000 });
+
+    const option = page.locator('#status option[value="rejected"]');
+    await expect(option).toHaveText('Not a match');
+  });
+});
