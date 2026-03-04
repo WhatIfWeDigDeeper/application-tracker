@@ -185,6 +185,7 @@ Regenerate with `npm run docs:types`.
 - Node.js (v18+)
 - Python 3.12+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
 - Go 1.24+ (for the Go Gin API implementation) — ensure `$(go env GOPATH)/bin` (typically `~/go/bin`) appears in your `PATH` before system package manager paths so locally-installed Go tools (`govulncheck`, `gotestsum`) take precedence
+- Java 21 (for the Spring Boot implementation) — Eclipse Temurin is recommended: `brew install --cask temurin@21`
 - Docker and Docker Compose (for PostgreSQL)
 - [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
