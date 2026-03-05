@@ -105,7 +105,7 @@ public class ApplicationService {
         Application app = new Application();
         applyRequest(app, req);
         applicationRepository.saveAndFlush(app);
-        captureSnapshot(app, "Created");
+        captureSnapshot(app, "Created application");
         return toResponse(app);
     }
 

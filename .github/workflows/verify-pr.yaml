@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
 jobs:
   build:

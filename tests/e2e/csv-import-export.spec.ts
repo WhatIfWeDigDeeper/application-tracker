@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// CSV import/export tests only run for tanstack-ui (port 3050), tanstack-start-ui (port 3040), and angular-ui (port 3060)
+// CSV import/export tests only run for tanstack-ui (port 3050), tanstack-start-ui (port 3040), angular-ui (port 3060), and angular-spring-ui (port 3070)
 const port = Number(process.env.TEST_UI_PORT || 3000);
-const isTargetUI = port === 3050 || port === 3040 || port === 3060;
+const isTargetUI = port === 3050 || port === 3040 || port === 3060 || port === 3070;
 
 test.describe('CSV Import/Export', () => {
-  test.skip(!isTargetUI, 'CSV import/export only available on tanstack-ui (3050), tanstack-start-ui (3040), and angular-ui (3060)');
+  test.skip(!isTargetUI, 'CSV import/export only available on tanstack-ui (3050), tanstack-start-ui (3040), angular-ui (3060), and angular-spring-ui (3070)');
 
   const tmpDir = '/tmp/claude/e2e-csv-tests';
 

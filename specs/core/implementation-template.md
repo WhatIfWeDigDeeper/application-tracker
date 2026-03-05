@@ -213,6 +213,16 @@ YYYY: 'npm run dev:<ui>',
 
 Note: The API backend must be started separately (or via `run-e2e.sh`) before Playwright runs.
 
+### `tests/e2e/csv-import-export.spec.ts`
+
+If the implementation includes CSV import/export (feature 007), add the UI port to the `isTargetUI` check near the top of the file:
+
+```ts
+const isTargetUI = port === 3050 || port === 3040 || port === 3060 || port === YYYY;
+```
+
+Also update the `test.skip` message string to include the new stack name and port.
+
 ### `scripts/run-e2e.sh`
 
 Add `<stack>` to `STACKS`. `api_port=XXXX`, `api_script=dev:<api>`, `ui_port=YYYY`, `ui_script=dev:<ui>`.

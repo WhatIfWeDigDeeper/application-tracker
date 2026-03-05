@@ -33,8 +33,15 @@ api_script() {
 
 port_in_use() { lsof -ti :"$1" >/dev/null 2>&1; }
 
+api_timeout() {
+  case "$1" in
+    spring) echo 90 ;;  # Spring Boot + Gradle compile can take 60-90s cold start
+    *)      echo 20 ;;
+  esac
+}
+
 wait_for_port() {
-  local port=$1 stack=$2 elapsed=0 timeout=20
+  local port=$1 stack=$2 elapsed=0 timeout; timeout=$(api_timeout "$stack")
   printf "  Waiting for :%s" "$port"
   while ! port_in_use "$port"; do
     sleep 1; elapsed=$((elapsed + 1)); printf "."

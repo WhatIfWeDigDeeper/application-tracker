@@ -9,6 +9,7 @@ import com.example.tracker.dto.PaginatedResponse;
 import com.example.tracker.service.ApplicationService;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpHeaders;
@@ -113,8 +114,9 @@ public class ApplicationController {
     @GetMapping("/export")
     public ResponseEntity<String> exportCsv() {
         String csv = service.exportCsv();
+        String filename = "applications-" + LocalDate.now() + ".csv";
         return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"applications.csv\"")
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
             .contentType(MediaType.parseMediaType("text/csv"))
             .body(csv);
     }

@@ -56,7 +56,9 @@
         "stat": true,
         "du": true,
         "df": true,
-        "xargs": true
+        "xargs": true,
+        "brew": true,
+        "gradle wrapper": true
     },
     "java.compile.nullAnalysis.mode": "automatic"
 }
