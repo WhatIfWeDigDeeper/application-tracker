@@ -136,14 +136,16 @@ test.describe('CSV Import/Export', () => {
   });
 
   test('should show skipped count for duplicate URLs', async ({ page }, testInfo) => {
-    // Use a unique URL per worker to avoid cross-browser race conditions
-    const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${testInfo.workerIndex}-${Date.now()}`;
+    // Use a unique ID per worker+run for both the URL and filename to avoid cross-browser
+    // race conditions — multiple browser projects can share the same workerIndex
+    const uniqueId = `${testInfo.workerIndex}-${Date.now()}`;
+    const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${uniqueId}`;
     const csv1 = [
       'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate',
       `Dedup E2E Corp,Dedup Role,,,,${uniqueUrl},,,,,,,,,,`
     ].join('\n');
 
-    const csvPath1 = path.join(tmpDir, `dedup-test-${testInfo.workerIndex}.csv`);
+    const csvPath1 = path.join(tmpDir, `dedup-test-${uniqueId}.csv`);
     fs.writeFileSync(csvPath1, csv1);
 
     // First import

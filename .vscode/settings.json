@@ -58,7 +58,9 @@
         "df": true,
         "xargs": true,
         "brew": true,
-        "gradle wrapper": true
+        "gradle wrapper": true,
+        "docker": true,
+        "docker-compose": true
     },
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive"
