@@ -44,7 +44,7 @@ jobs:
 
       - name: Use Node.js from .node-version
         if: steps.docs-check.outputs.only_changed == 'false'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.node-version'
 
