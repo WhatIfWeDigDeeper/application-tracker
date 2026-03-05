@@ -203,7 +203,13 @@ Migration `V1__initial.sql` (or equivalent) creates:
 "test:e2e:<stack>":     "TEST_UI_PORT=YYYY PLAYWRIGHT_HTML_OPEN=never npx -y playwright test"
 ```
 
-Add each to its `:all` counterpart. Add ports XXXX and YYYY to `scripts/stop-all.sh`.
+**TypeScript implementations only** — add a type diagram script for each TypeScript implementation (UI and/or API):
+
+```json
+"docs:types:<impl>": "npx -y ts-to-mermaid <impl-dir>/src/<path-to-models> --save docs/types/<impl>/ && echo >> docs/types/<impl>/<model-file>.mermaid"
+```
+
+Add each to its `:all` counterpart. Add `docs:types:<impl>` to the `docs:types` aggregate. Add ports XXXX and YYYY to `scripts/stop-all.sh`.
 
 ### `playwright.config.ts`
 
@@ -256,8 +262,9 @@ Before merging, all of the following must pass:
 
 When complete, the following must be updated:
 
-- `README.md` — add stack to TOC, implementations list, dev/test commands
+- `README.md` — add stack to TOC, implementations list, dev/test commands; for TypeScript implementations, also add an entry to the **Type Diagrams** section
 - `docs/DATABASE_ARCHITECTURE.md` — add schema name and config details
+- `docs/types/<impl>/` — run `npm run docs:types:<impl>` to generate type diagrams (TypeScript implementations only)
 - `scripts/generate-schema-docs.sh` — add new schema; run `npm run docs:schema`
 - `CLAUDE.md` — add port mappings and any new patterns discovered
 

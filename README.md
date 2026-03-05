@@ -12,6 +12,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
   - [6. React SSR + TanStack Start + FastAPI](#6-react-ssr--tanstack-start--fastapi)
   - [7. Angular + Go Gin + pgx/sqlc](#7-angular--go-gin--pgxsqlc)
+  - [8. Angular + Spring Boot + JPA/Hibernate](#8-angular--spring-boot--jpahibernate)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -149,6 +150,7 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [nest-api](docs/types/nest-api/api.mermaid) - NestJS API
 - [tanstack-start-ui](docs/types/tanstack-start-ui/application.mermaid) - React SSR + TanStack Start
 - [angular-ui](docs/types/angular-ui/application.model.mermaid) - Angular + Go Gin
+- [angular-spring-ui](docs/types/angular-spring-ui/application.model.mermaid) - Angular + Spring Boot
 
 Regenerate with `npm run docs:types`.
 
@@ -229,7 +231,7 @@ Each implementation can be run independently:
 
 ```bash
 # Next.js + Express (UI 3000 + API 3001)
-npm run dev:react-next
+npm run dev:react-next-ui
 npm run dev:express-api
 
 # React + Koa (UI 3010 + API 5010)
@@ -279,7 +281,7 @@ Run tests for individual implementations:
 
 ```bash
 npm run test:express-api  # Express + Prisma API tests
-npm run test:react-next   # Next.js UI tests
+npm run test:react-next-ui  # Next.js UI tests
 npm run test:koa-api      # Koa API tests
 npm run test:react-ui     # React UI tests
 npm run test:svelte-ui    # Svelte UI tests
@@ -305,15 +307,15 @@ npm run test:all          # Run all implementation tests
 E2E tests use Playwright and run against each implementation:
 
 ```bash
-npm run test:e2e:express  # Next.js + Express (port 3000)
-npm run test:e2e:vue      # Vue + Vite (port 3020)
-npm run test:e2e:svelte   # Svelte + Hono (port 3030)
-npm run test:e2e:react-koa # React + Koa (port 3010)
-npm run test:e2e:tanstack  # React + TanStack + NestJS (port 3050)
-npm run test:e2e:tanstack-start  # React SSR + TanStack Start + FastAPI (port 3040)
-npm run test:e2e:angular  # Angular + Go Gin (port 3060)
-npm run test:e2e:spring   # Angular + Spring Boot (port 3070)
-npm run test:e2e:all      # Run all e2e tests
+npm run test:e2e:react-next-ui      # Next.js + Express (port 3000)
+npm run test:e2e:react-ui           # React + Koa (port 3010)
+npm run test:e2e:vue-ui             # Vue + Nuxt (port 3020)
+npm run test:e2e:svelte-ui          # Svelte + Hono (port 3030)
+npm run test:e2e:tanstack-start-ui  # React SSR + TanStack Start + FastAPI (port 3040)
+npm run test:e2e:tanstack-ui        # React + TanStack + NestJS (port 3050)
+npm run test:e2e:angular-ui         # Angular + Go Gin (port 3060)
+npm run test:e2e:angular-spring-ui  # Angular + Spring Boot (port 3070)
+npm run test:e2e:all                # Run all e2e tests
 ```
 
 To clean up leftover test data from interrupted runs, see [Test Data Cleanup](docs/TESTING_REFERENCE.md#test-data-cleanup).

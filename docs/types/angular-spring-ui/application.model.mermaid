@@ -1,0 +1,145 @@
+classDiagram
+  %% Legend
+  %% --|> : Inheritance (extends)
+  %% ..|> : Implementation (implements)
+  %% --* : Composition (has/contains)
+  %% -- : Association
+
+  class ApplicationStatus {
+    <<enumeration>>
+    'accepted offer'
+    'applied'
+    'declined offer'
+    'given offer'
+    'interviewing'
+    'no offer'
+    'rejected'
+    'unsubmitted'
+  }
+
+  class CompanyCategory {
+    <<enumeration>>
+    'ai'
+    'climate'
+    'consulting'
+    'consumer-tech'
+    'cybersecurity'
+    'e-commerce'
+    'education'
+    'energy'
+    'enterprise-software'
+    'finance'
+    'gaming'
+    'government'
+    'health'
+    'hospitality'
+    'media-entertainment'
+    'nonprofit'
+    'other'
+    'restaurant'
+    'retail'
+  }
+
+  class JobSource {
+    <<enumeration>>
+    'colleague'
+    'company-website'
+    'friend'
+    'indeed'
+    'linkedin'
+    'other'
+    'recruiter'
+  }
+
+  class InterviewStage {
+    <<interface>>
+    +id: string
+    -applicationId?: string
+    +name: string
+    +order: number
+    +isCompleted: boolean
+    +completedDate: string or null
+    +notes: string or null
+    +performanceRating: number or null
+  }
+
+  class Application {
+    <<interface>>
+    +id: string
+    +companyName: string
+    +positionTitle: string
+    +status: ApplicationStatus
+    +dateApplied: string or null
+    +companyUrl: string or null
+    +jobPostingUrl: string or null
+    +companyCareerUrl: string or null
+    +companyCategory: ComplexUnion
+    +skillsMatch: number or null
+    +jobSource: ComplexUnion
+    +salaryMin: number or null
+    +salaryMax: number or null
+    +coverLetterRequired: boolean or null
+    +offerDueDate: string or null
+    +specialRequirements: string or null
+    +notes: string or null
+    +isArchived: boolean
+    +interviewStages: InterviewStageArray~~
+    +createdAt: string
+    +updatedAt: string
+  }
+
+  class PaginatedResponse {
+    <<interface>>
+    +items: TArray~~
+    +total: number
+    +page: number
+    +limit: number
+  }
+
+  class FieldChange {
+    <<interface>>
+    +field: string
+    +label: string
+    +oldValue: unknown
+    +newValue: unknown
+  }
+
+  class HistoryEntry {
+    <<interface>>
+    +id: string
+    +sequence: number
+    +description: string
+    +changes: FieldChangeArray~~
+    +createdAt: string
+  }
+
+  class ImportError {
+    <<interface>>
+    +row: number
+    +message: string
+  }
+
+  class ImportResult {
+    <<interface>>
+    +imported: number
+    +skipped: number
+    +errors: ImportErrorArray~~
+  }
+
+  class FilterParams {
+    <<interface>>
+    -status?: string
+    -companyCategory?: string
+    -jobSource?: string
+    -skillsMatchMin?: number
+    -includeArchived?: boolean
+    -sortBy?: string
+    -sortDir?: 'asc' or 'desc'
+    -page?: number
+    -limit?: number
+  }
+
+  Application --* ApplicationStatus : status
+  Application --* InterviewStage : interviewStages
+  HistoryEntry --* FieldChange : changes
+  ImportResult --* ImportError : errors

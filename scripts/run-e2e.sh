@@ -2,32 +2,32 @@
 set -euo pipefail
 
 STACK="${1:-all}"
-STACKS=(express react-koa vue svelte tanstack-start tanstack angular spring)
+STACKS=(react-next-ui react-ui vue-ui svelte-ui tanstack-start-ui tanstack-ui angular-ui angular-spring-ui)
 STARTED_PORTS=()
 
 api_port() {
   case "$1" in
-    express)        echo 3001 ;;
-    react-koa)      echo 5010 ;;
-    vue)            echo 5040 ;;
-    svelte)         echo 5030 ;;
-    tanstack-start) echo 5160 ;;
-    tanstack)       echo 5050 ;;
-    angular)        echo 5070 ;;
-    spring)         echo 8080 ;;
+    react-next-ui)       echo 3001 ;;
+    react-ui)            echo 5010 ;;
+    vue-ui)              echo 5040 ;;
+    svelte-ui)           echo 5030 ;;
+    tanstack-start-ui)   echo 5160 ;;
+    tanstack-ui)         echo 5050 ;;
+    angular-ui)          echo 5070 ;;
+    angular-spring-ui)   echo 8080 ;;
   esac
 }
 
 api_script() {
   case "$1" in
-    express)        echo "dev:express-api" ;;
-    react-koa)      echo "dev:koa-api" ;;
-    vue)            echo "dev:nuxt-api" ;;
-    svelte)         echo "dev:hono-api" ;;
-    tanstack-start) echo "dev:fastapi" ;;
-    tanstack)       echo "dev:nest-api" ;;
-    angular)        echo "dev:go-api" ;;
-    spring)         echo "dev:spring-api" ;;
+    react-next-ui)       echo "dev:express-api" ;;
+    react-ui)            echo "dev:koa-api" ;;
+    vue-ui)              echo "dev:nuxt-api" ;;
+    svelte-ui)           echo "dev:hono-api" ;;
+    tanstack-start-ui)   echo "dev:fastapi" ;;
+    tanstack-ui)         echo "dev:nest-api" ;;
+    angular-ui)          echo "dev:go-api" ;;
+    angular-spring-ui)   echo "dev:spring-api" ;;
   esac
 }
 
@@ -35,8 +35,8 @@ port_in_use() { lsof -ti :"$1" >/dev/null 2>&1; }
 
 api_timeout() {
   case "$1" in
-    spring) echo 90 ;;  # Spring Boot + Gradle compile can take 60-90s cold start
-    *)      echo 20 ;;
+    angular-spring-ui) echo 90 ;;  # Spring Boot + Gradle compile can take 60-90s cold start
+    *)                 echo 20 ;;
   esac
 }
 

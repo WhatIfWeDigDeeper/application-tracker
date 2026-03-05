@@ -8,7 +8,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 
 - **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`. After a worktree agent completes, always verify the commit landed on a feature branch — not on `main` — by checking `git log --oneline --decorate -3`. If the commit is on `main`, first create a feature branch from it and push it (`git checkout -b <branch> && git push -u origin <branch>`), then reset local main (`git checkout main && git reset --hard origin/main`).
 - **Validation Chain**: `build:*` → `lint:*` → `test:*` → `test:e2e:*`
-- **Script Naming**: Scripts follow `verb:package-name` (e.g., `build:react-next`, `lint:angular-ui`). Use `:all` suffix for scripts that run across all packages. `test:e2e:*` uses stack names (e.g., `test:e2e:express`, `test:e2e:tanstack`). When adding a new implementation, add per-package scripts for every verb (`dev`, `build`, `lint`, `test`) and add each to its `*:all` script and to `scripts/stop-all.sh`. When adding a new script group (new verb pattern like `validate:*`), also update `README.md` — add a TOC entry and a usage section so the pattern is discoverable. Do not wait to be asked.
+- **Script Naming**: Scripts follow `verb:package-name` (e.g., `build:react-next-ui`, `lint:angular-ui`). Use `:all` suffix for scripts that run across all packages. `test:e2e:*` uses the UI package name (e.g., `test:e2e:react-next-ui`, `test:e2e:tanstack-ui`). When adding a new implementation, add per-package scripts for every verb (`dev`, `build`, `lint`, `test`) and add each to its `*:all` script and to `scripts/stop-all.sh`. When adding a new script group (new verb pattern like `validate:*`), also update `README.md` — add a TOC entry and a usage section so the pattern is discoverable. Do not wait to be asked.
 - **Parallel Execution**: 3+ items use Task tool subagents
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
@@ -43,13 +43,13 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 **Always complete the full validation chain before committing** — `tsc --noEmit` alone is not sufficient. Re-run the entire chain after every round of changes — not just the initial implementation. Fixing a bug introduced during review still requires the full chain.
 
-**When fixing a bug or test failure, automatically run the relevant tests after applying the fix** — do not wait for the user to ask. Use the most targeted test command available (e.g., `test:e2e:react-koa` for a react-koa failure). Report pass/fail results immediately.
+**When fixing a bug or test failure, automatically run the relevant tests after applying the fix** — do not wait for the user to ask. Use the most targeted test command available (e.g., `test:e2e:react-ui` for a react-ui failure). Report pass/fail results immediately.
 
 1. **Add tests** — Create or update tests for new functionality. Include E2E tests when the change affects user-visible behavior (labels, UI interactions, API contracts). **When fixing a bug, write a failing test first that reproduces the issue, then fix it** — this ensures the bug is understood and won't regress.
 2. **Build** - `npm run build:<stack>` (runs per-package build; catches compilation errors)
 3. **Lint** - `npm run lint:<stack>` (ESLint/ruff across packages)
 4. **Test** - `npm run test:<stack>` (unit/integration tests — catches logic errors `tsc` misses)
-5. **E2E** *(when UI/API behavior changed)* - `npm run test:e2e:<stack>` (e.g., `test:e2e:express`)
+5. **E2E** *(when UI/API behavior changed)* - `npm run test:e2e:<stack>` (e.g., `test:e2e:react-next-ui`)
 6. **Docs** *(when user-visible behavior changes)* — Update `specs/core/domain/` files and `README.md` as needed when labels, statuses, UI text, or API contracts change. Also run generated docs when applicable: `npm run docs:types:<stack>` when public TypeScript types change, `npm run docs:schema` when DB schema changes. Feature specs (`specs/<number>-*/spec.md`) are historical — do not retroactively rewrite them; document changes in the current feature's own spec instead.
 
 **Skip when:** trivial changes (all steps), test-only changes (step 1), docs-only changes (all steps).
@@ -99,12 +99,17 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 - **Spring Boot port**: 8080 (`spring-api/`), Angular Spring UI port: 3070 (`angular-spring-ui/`)
 - **JPA enum with PostgreSQL custom types**: PostgreSQL enum values with spaces/hyphens (e.g. "given offer", "enterprise-software") require `AttributeConverter<MyEnum, String>` — `@Enumerated(EnumType.STRING)` alone won't work correctly
+- **`@Converter` without `autoApply`**: `@Converter` without `autoApply = true` is silently inert if no entity field references it directly — verify usage before writing a new Converter when entities already use `@Type(XxxUserType.class)`
+- **UserType.fromDbValue delegation**: `fromDbValue()` in each `PostgreSQLEnumType` subclass should delegate to the enum's own `fromValue()` — don't re-implement the same lookup loop
+- **TypeReference for diff maps**: In diff/compare methods that deserialize JSON to a map, use `objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {})` instead of raw `Map.class` — avoids `key.toString()` casts and compiler warnings
+- **Immutable constants**: Use `Set.of()` for excluded-field constant sets in diff logic; use `List.of()` (not `Arrays.asList()`) when the list is truly immutable by intent
+- **GlobalExceptionHandler catch-all**: Always include `@ExceptionHandler(RuntimeException.class)` in `@RestControllerAdvice` — without it, `RuntimeException` wrappers around `JsonProcessingException` surface as empty 500 responses to clients
 - **JSONB snapshots**: Use `@JdbcTypeCode(SqlTypes.JSON)` from `org.hibernate.annotations` with Hibernate 6 for JSONB columns
 - **Spring Data JPA filtering**: `Specification<T>` + `JpaSpecificationExecutor<T>` for multi-criteria filters; compose with `Specification.where().and()`
 - **`isXxx` field naming**: JPA boolean fields named `isXxx` conflict with getter naming; name the field `archived` (not `isArchived`) — getter `isArchived()`, setter `setArchived()`
 - **Flyway auto-migration**: Flyway runs on startup — `./gradlew flywayMigrate` is only needed for manual runs; migrations live in `classpath:db/migration/`
 - **Gradle Kotlin DSL**: Uses `build.gradle.kts` — Kotlin syntax for plugin/dependency blocks
-- **CSV import with embedded newlines**: `split("\n")` breaks RFC 4180 CSV where quoted fields contain embedded newlines — parse character-by-character tracking quote state across the entire content, not per-line
+- **Commit message file**: Multi-line `git commit -m` strings cause a `dquote>` hang in zsh. Write the message with `create_file` to `/tmp/commit-msg.txt`, then run `git commit -F /tmp/commit-msg.txt`
 - **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
 - **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
 - **Jackson date serialization**: `LocalDate`/`LocalDateTime` serialize as arrays (e.g. `[2026,3,5]`) by default — add `.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)` to `ObjectMapper` config to get ISO strings (`"2026-03-05"`, `"2026-03-05T13:00:00Z"`)
@@ -132,7 +137,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 **Server lifecycle**: For fully managed runs (API auto-start/stop), use `bash scripts/run-e2e.sh [stack|all]` — `npm run test:e2e:all` also uses this. To run manually when servers are already up, use `npm run test:e2e:<stack>` directly and leave pre-existing servers running afterward.
 
-Run all: `npm run test:e2e:all`. Run one stack: `npm run test:e2e:<stack>` (e.g., `express`, `vue`).
+Run all: `npm run test:e2e:all`. Run one stack: `npm run test:e2e:<stack>` (e.g., `react-next-ui`, `vue-ui`).
 
 Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
 
