@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface ApplicationRepository extends JpaRepository<Application, UUID>,
         JpaSpecificationExecutor<Application> {
+    boolean existsByJobPostingUrl(String jobPostingUrl);
 }

@@ -30,4 +30,11 @@ public enum CompanyCategory {
     public String getValue() {
         return value;
     }
+
+    public static CompanyCategory fromValue(String v) {
+        for (CompanyCategory c : values()) {
+            if (c.value.equals(v)) return c;
+        }
+        throw new IllegalArgumentException("Unknown category: " + v);
+    }
 }

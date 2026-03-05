@@ -19,4 +19,11 @@ public enum ApplicationStatus {
     public String getValue() {
         return value;
     }
+
+    public static ApplicationStatus fromValue(String v) {
+        for (ApplicationStatus s : values()) {
+            if (s.value.equals(v)) return s;
+        }
+        throw new IllegalArgumentException("Unknown status: " + v);
+    }
 }

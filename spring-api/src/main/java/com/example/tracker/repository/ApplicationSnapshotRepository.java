@@ -4,6 +4,7 @@ import com.example.tracker.entity.ApplicationSnapshot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ApplicationSnapshotRepository extends JpaRepository<ApplicationSnapshot, UUID> {
@@ -11,4 +12,7 @@ public interface ApplicationSnapshotRepository extends JpaRepository<Application
 
     @Query("SELECT COALESCE(MAX(s.sequenceNumber), 0) FROM ApplicationSnapshot s WHERE s.applicationId = :applicationId")
     int findMaxSequenceNumber(UUID applicationId);
+
+    Optional<ApplicationSnapshot> findFirstByApplicationIdAndSequenceNumberLessThanOrderBySequenceNumberDesc(
+        UUID applicationId, int sequenceNumber);
 }

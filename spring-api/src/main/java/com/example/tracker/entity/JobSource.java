@@ -18,4 +18,11 @@ public enum JobSource {
     public String getValue() {
         return value;
     }
+
+    public static JobSource fromValue(String v) {
+        for (JobSource s : values()) {
+            if (s.value.equals(v)) return s;
+        }
+        throw new IllegalArgumentException("Unknown source: " + v);
+    }
 }

@@ -13,10 +13,6 @@ public class JobSourceUserType extends PostgreSQLEnumType<JobSource> {
 
     @Override
     protected JobSource fromDbValue(String dbValue) {
-        if (dbValue == null) return null;
-        for (JobSource s : JobSource.values()) {
-            if (s.getValue().equals(dbValue)) return s;
-        }
-        throw new IllegalArgumentException("Unknown job source: " + dbValue);
+        return dbValue == null ? null : JobSource.fromValue(dbValue);
     }
 }

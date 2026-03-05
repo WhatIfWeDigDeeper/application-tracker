@@ -27,7 +27,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArg(IllegalArgumentException ex) {
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleServerError(RuntimeException ex) {
+        return ResponseEntity.internalServerError().body(Map.of("error", "An internal error occurred"));
     }
 }

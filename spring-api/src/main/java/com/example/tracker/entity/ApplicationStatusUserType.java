@@ -13,10 +13,6 @@ public class ApplicationStatusUserType extends PostgreSQLEnumType<ApplicationSta
 
     @Override
     protected ApplicationStatus fromDbValue(String dbValue) {
-        if (dbValue == null) return null;
-        for (ApplicationStatus s : ApplicationStatus.values()) {
-            if (s.getValue().equals(dbValue)) return s;
-        }
-        throw new IllegalArgumentException("Unknown application status: " + dbValue);
+        return dbValue == null ? null : ApplicationStatus.fromValue(dbValue);
     }
 }
