@@ -320,6 +320,8 @@ npm run test:e2e:all                # Run all e2e tests
 
 To clean up leftover test data from interrupted runs, see [Test Data Cleanup](docs/TESTING_REFERENCE.md#test-data-cleanup).
 
+To remove orphaned Docker containers left behind by Go test runs (`TESTCONTAINERS_RYUK_DISABLED=true`), run `npm run cleanup:docker`.
+
 ### Build Verification
 
 Build all implementations:
