@@ -88,6 +88,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Svelte 5 event delegation**: `stopPropagation()` doesn't prevent parent `<a>` navigation — avoid wrapping interactive cards in `<a>` tags; use `onclick` with `goto()` instead
 - **Zod boolean coercion**: `z.coerce.boolean()` treats any non-empty string (including `"false"`) as `true` — use `z.preprocess((val) => val === 'true' || val === true, z.boolean())` for query params
 - **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
+- **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
 
 ## Vue.js Patterns
 
@@ -106,6 +107,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **CSV import with embedded newlines**: `split("\n")` breaks RFC 4180 CSV where quoted fields contain embedded newlines — parse character-by-character tracking quote state across the entire content, not per-line
 - **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
 - **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
+- **Jackson date serialization**: `LocalDate`/`LocalDateTime` serialize as arrays (e.g. `[2026,3,5]`) by default — add `.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)` to `ObjectMapper` config to get ISO strings (`"2026-03-05"`, `"2026-03-05T13:00:00Z"`)
 
 ## Subagent Usage
 

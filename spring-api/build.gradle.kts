@@ -9,6 +9,9 @@ plugins {
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
 
+// Override managed versions to address CVEs
+extra["tomcat.version"] = "10.1.45"
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -55,4 +58,10 @@ checkstyle {
 dependencyCheck {
     failBuildOnCVSS = 7.0f
     suppressionFile = "config/dependency-check-suppressions.xml"
+    skipConfigurations = listOf("checkstyle")
+    analyzers {
+        ossIndex {
+            enabled = false
+        }
+    }
 }

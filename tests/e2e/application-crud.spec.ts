@@ -350,3 +350,70 @@ test.describe('Status label - Not a match', () => {
     await expect(option).toHaveText('Not a match');
   });
 });
+
+test.describe('Date display in list - angular-spring-ui', () => {
+  const port = Number(process.env.TEST_UI_PORT || 3000);
+  test.skip(port !== 3070, 'Date format test only applies to angular-spring-ui (port 3070)');
+
+  let createdAppId: string;
+
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/');
+    const today = new Date().toISOString().split('T')[0];
+    const res = await page.request.post('/api/applications', {
+      data: {
+        companyName: 'Date Format Test Co',
+        positionTitle: 'Engineer',
+        status: 'applied',
+        dateApplied: today,
+      },
+    });
+    const app = await res.json();
+    createdAppId = app.id;
+    await context.close();
+  });
+
+  test.afterAll(async ({ browser }) => {
+    if (!createdAppId) return;
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/');
+    await page.request.delete(`/api/applications/${createdAppId}`);
+    await context.close();
+  });
+
+  test('Applied column should show YYYY-MM-DD, not a comma-separated array', async ({ page }) => {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Re-PATCH to push to top of updatedAt-desc list
+    await page.request.patch(`/api/applications/${createdAppId}`, {
+      data: { status: 'applied' },
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('table', { timeout: 10000 });
+
+    const row = page.locator('tr', { hasText: 'Date Format Test Co' });
+    const appliedCell = row.locator('td').nth(3);
+
+    // Should display ISO date string, not array notation like "2026,3,5"
+    await expect(appliedCell).toHaveText(today);
+  });
+
+  test('Updated column should show a recent relative time, not "56 years ago"', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('table', { timeout: 10000 });
+
+    const row = page.locator('tr', { hasText: 'Date Format Test Co' });
+    const updatedCell = row.locator('td').nth(4);
+
+    // Should show recent relative time (just now / minutes ago / hours ago)
+    // NOT "56 years ago" which indicates epoch/array date parsing failure
+    await expect(updatedCell).not.toContainText('years ago');
+    await expect(updatedCell).toContainText(/just now|\d+ (minute|hour)s? ago/);
+  });
+});
