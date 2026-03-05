@@ -50,3 +50,13 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - pgx v5 pool configured with `search_path=go_gin` in the connection string
 - Snapshot-based history (like Hono, NestJS, FastAPI)
 - No ORM — uses raw SQL queries via pgx v5
+
+**Java-Spring-JPA:**
+- Schema defined in: `spring-api/src/main/resources/db/migration/V1__initial.sql`
+- Flyway migration runs automatically on startup; creates `java_spring` schema and PostgreSQL enum types
+- Spring Data JPA + Hibernate 6; `spring.jpa.properties.hibernate.default_schema=java_spring`
+- Connection string: `jdbc:postgresql://localhost:5432/app_tracker?currentSchema=java_spring`
+- PostgreSQL enum types use `AttributeConverter` classes (values like "given offer", "enterprise-software" contain spaces/hyphens)
+- JSONB snapshots via `@JdbcTypeCode(SqlTypes.JSON)` with Hibernate 6
+- Snapshot-based history (like Hono, NestJS, FastAPI, Go)
+- Spring Data JPA `Specification<T>` + `JpaSpecificationExecutor` for multi-criteria filters

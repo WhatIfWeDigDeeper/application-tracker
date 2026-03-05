@@ -3,7 +3,12 @@ import { defineConfig, devices } from '@playwright/test';
 const port = process.env.TEST_UI_PORT ? Number(process.env.TEST_UI_PORT) : 3000;
 const baseURL = `http://localhost:${port}`;
 
-const webServerCommands: Record<number, string> = {
+interface WebServerConfig {
+  command: string;
+  timeout?: number;
+}
+
+const webServerCommands: Record<number, WebServerConfig | string> = {
   3000: 'cd ui && npm run dev',
   3010: 'cd react-ui && npm run dev',
   3020: 'cd vue-ui && npm run dev',
@@ -11,6 +16,7 @@ const webServerCommands: Record<number, string> = {
   3040: 'cd tanstack-start-ui && npm run dev',
   3050: 'cd tanstack-ui && npm run dev',
   3060: 'cd angular-ui && npm run start',
+  3070: { command: 'npm run dev:angular-spring-ui', timeout: 120_000 },
 };
 
 export default defineConfig({
@@ -30,9 +36,15 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
   ],
-  webServer: webServerCommands[port] ? {
-    command: webServerCommands[port],
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-  } : undefined,
+  webServer: webServerCommands[port] ? (() => {
+    const cfg = webServerCommands[port];
+    const command = typeof cfg === 'string' ? cfg : cfg.command;
+    const timeout = typeof cfg === 'string' ? undefined : cfg.timeout;
+    return {
+      command,
+      url: baseURL,
+      reuseExistingServer: !process.env.CI,
+      ...(timeout !== undefined ? { timeout } : {}),
+    };
+  })() : undefined,
 });

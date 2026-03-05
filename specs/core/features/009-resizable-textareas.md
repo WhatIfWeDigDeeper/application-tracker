@@ -10,6 +10,8 @@ Allow users to vertically resize textarea fields with persisted height across pa
 
 Textarea fields vary in how much content users write. Some users write detailed notes while others keep them brief. This feature lets users drag a resize handle to adjust textarea height, and remembers their preference via localStorage so the height is restored on subsequent visits.
 
+> **Conformance**: This is a **P3 (Optional)** feature. Implementations are not required to include it. **Every implementation spec must explicitly declare this feature as in scope or deferred** — it must not be silently omitted. If included, the spec must state which fields get the resize handle (at minimum: `notes`, `specialRequirements`, and interview stage `notes`).
+
 ---
 
 ## User Stories

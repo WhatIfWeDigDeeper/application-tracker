@@ -41,11 +41,44 @@ These specifications define **what** the application does without prescribing **
 
 To implement the Job Application Tracker with a different technology stack:
 
-1. **Read the domain model** to understand entities and their relationships
-2. **Review feature specs** for user stories and acceptance criteria
-3. **Implement the API** following the OpenAPI contract
-4. **Build the UI** following screens and component specs
-5. **Validate** against the user flows
+1. **Copy [`implementation-template.md`](implementation-template.md)** to `specs/<NNN>-<name>/spec.md` and fill in every section — especially the Feature Scope table (see below). Do not leave feature rows blank; every feature must be marked in scope, deferred, or out of scope with a reason.
+2. **Read the domain model** to understand entities, validation rules, and state transitions
+3. **Review feature specs** for the features declared in scope
+4. **Implement the API** following the OpenAPI contract
+5. **Build the UI** following screens and component specs
+6. **Validate** against the user flows and the conformance checklist below
+
+### Conformance Requirements
+
+An implementation is **conformant** when all P1 features and the declared P2/P3 features are complete.
+
+| Feature | Priority | Required for conformance | What the implementation spec must declare |
+|---------|----------|--------------------------|-------------------------------------------|
+| [001 Application Management](features/001-application-management.md) | P1 | Yes | Edit flow (separate form / modal / inline); unsaved-changes guard approach |
+| [002 Interview Tracking](features/002-interview-tracking.md) | P1 | Yes | Default stage creation behavior; whether reorder is supported |
+| [003 Offer Management](features/003-offer-management.md) | P2 | Recommended | Overdue/urgency UI indicators; whether due-date prompt appears on status change |
+| [004 Filtering & Sorting](features/004-filtering-sorting.md) | P1 | Yes | Which filters are supported; sort fields; pagination approach |
+| [005 Archive & Delete](features/005-archive-delete.md) | P2 | Recommended | Archive/restore UI placement; delete confirmation approach |
+| [006 History](features/006-history.md) | P2 | Recommended | Snapshot strategy; `data` column type (JSONB vs TEXT); history panel placement |
+| [007 CSV Import/Export](features/007-csv-import-export.md) | P2 | Recommended | Confirm 16-column format; duplicate detection by `jobPostingUrl` |
+| [008 Inline Editing](features/008-inline-editing.md) | P3 | Optional | Must be explicitly declared in scope or deferred; if in scope, state save trigger |
+| [009 Resizable Textareas](features/009-resizable-textareas.md) | P3 | Optional | Must be explicitly declared in scope or deferred; if in scope, state which fields |
+
+> **P1 (Critical)** — Required for the implementation to be usable.
+> **P2 (Recommended)** — Required for the implementation to match the current feature set of other stacks in the monorepo. May be deferred with a reason.
+> **P3 (Optional)** — Enhancements. Must be explicitly declared in scope or deferred — never silently omitted.
+
+### Behaviors Enforced Across All Implementations
+
+These behaviors are defined in the domain specs and must be consistent regardless of technology:
+
+- **Default interview stages**: 6 stages created automatically when status transitions to "interviewing" and no stages exist (see [state-transitions.md](domain/state-transitions.md))
+- **`dateApplied` auto-populate**: Set to today when status transitions away from "unsubmitted" and `dateApplied` is null; cleared to null when reverting to "unsubmitted"
+- **Terminal status lock**: `accepted offer` and `declined offer` — no further transitions allowed
+- **Default sort**: `updatedAt` descending
+- **Archive default**: `includeArchived=false` on list queries
+- **Snapshot on every mutation**: History snapshot created on every create, update, archive, restore, and stage change
+- **Validation rules**: All constraints in [validation-rules.md](domain/validation-rules.md) enforced both client-side and server-side
 
 ### Example Implementation Prompts
 
@@ -132,16 +165,17 @@ Output: Result
 An implementation is complete when:
 
 1. All P1 user stories pass their acceptance criteria
-2. API conforms to the OpenAPI specification
-3. Validation rules are enforced (client and server)
-4. State transitions follow the state machine
-5. UI supports the documented user flows
+2. All declared P2/P3 features pass their acceptance criteria
+3. API conforms to the OpenAPI specification
+4. Validation rules from [validation-rules.md](domain/validation-rules.md) are enforced client-side and server-side
+5. State transitions follow the state machine in [state-transitions.md](domain/state-transitions.md)
+6. UI supports the documented user flows
+7. Shared Playwright E2E tests pass (all 13 tests)
+8. No regression across other stacks (`bash scripts/run-e2e.sh`)
 
-Optional for full completion:
-- P2 and P3 features implemented
-- Responsive design works on mobile
-- Dark mode supported
-- Accessibility requirements met
-- History panel with restore functionality
-- CSV import/export
-- Inline editing (alternative to modal)
+Optional enhancements (not required for conformance):
+- Responsive design on mobile
+- Dark mode
+- Accessibility (ARIA, keyboard navigation)
+- Inline editing (feature 008) — if not declared in scope
+- Resizable textareas (feature 009) — if not declared in scope
