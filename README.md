@@ -25,6 +25,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [Unit Tests](#unit-tests)
   - [End-to-End Tests](#end-to-end-tests)
   - [Build Verification](#build-verification)
+  - [Per-Stack Validation](#per-stack-validation)
 - [Development Tools](#development-tools)
   - [VS Code Debug Configurations](#vs-code-debug-configurations)
   - [Notifications (Optional)](#notifications-optional)
@@ -323,6 +324,23 @@ Build all implementations:
 
 ```bash
 npm run build:all         # Build all implementations
+```
+
+### Per-Stack Validation
+
+Run the full validation chain (audit → build → lint → test) for a single stack:
+
+```bash
+npm run validate:tanstack-ui      # audit:ci → build → lint → test
+npm run validate:express-api
+npm run validate:spring-api
+# ... validate:<stack> available for all 14 stacks
+```
+
+Run everything across all stacks:
+
+```bash
+npm run validate:all
 ```
 
 ## Development Tools
