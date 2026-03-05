@@ -2,7 +2,6 @@ package com.example.tracker.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +12,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.Type;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -27,37 +27,37 @@ public class Application {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "company_name", nullable = false, length = 200)
+    @Column(name = "company_name", nullable = false, length = 500)
     private String companyName;
 
-    @Column(name = "position_title", nullable = false, length = 200)
+    @Column(name = "position_title", nullable = false, length = 500)
     private String positionTitle;
 
-    @Convert(converter = ApplicationStatusConverter.class)
-    @Column(name = "status", nullable = false, columnDefinition = "java_spring.application_status")
+    @Type(ApplicationStatusUserType.class)
+    @Column(name = "status", nullable = false)
     private ApplicationStatus status = ApplicationStatus.UNSUBMITTED;
 
     @Column(name = "date_applied")
     private LocalDate dateApplied;
 
-    @Column(name = "company_url", length = 500)
+    @Column(name = "company_url", columnDefinition = "TEXT")
     private String companyUrl;
 
-    @Column(name = "job_posting_url", length = 500)
+    @Column(name = "job_posting_url", columnDefinition = "TEXT")
     private String jobPostingUrl;
 
-    @Column(name = "company_career_url", length = 500)
+    @Column(name = "company_career_url", columnDefinition = "TEXT")
     private String companyCareerUrl;
 
-    @Convert(converter = CompanyCategoryConverter.class)
-    @Column(name = "company_category", columnDefinition = "java_spring.company_category")
+    @Type(CompanyCategoryUserType.class)
+    @Column(name = "company_category")
     private CompanyCategory companyCategory;
 
     @Column(name = "skills_match")
     private Integer skillsMatch;
 
-    @Convert(converter = JobSourceConverter.class)
-    @Column(name = "job_source", columnDefinition = "java_spring.job_source")
+    @Type(JobSourceUserType.class)
+    @Column(name = "job_source")
     private JobSource jobSource;
 
     @Column(name = "salary_min")

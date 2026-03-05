@@ -131,6 +131,34 @@ CORS: API allows requests from `http://localhost:YYYY`.
 
 ---
 
+## Required Tests
+
+Unit tests are a **required deliverable** of every implementation — not just a validation step. The validation chain will not pass without them, but more importantly, they must be written as part of the implementation, not added only when asked.
+
+### Backend Tests
+
+Use a real test database — a dedicated test schema within the shared PostgreSQL instance (or an in-memory equivalent where the framework supports it, e.g., H2 for Spring). Do **not** mock the service or repository layers; test the full stack from HTTP request through to the database. Verify results by making follow-up API calls (e.g., GET after POST/PATCH) — do not query the DB directly in tests.
+
+| Test class | What to cover |
+|-----------|---------------|
+| `[Controller/Integration]Test` | Each HTTP endpoint: success path, 404, validation error — against a real DB. For Spring: `@SpringBootTest` + `MockMvc` + test schema. For Node.js stacks: `supertest` against a running app pointed at a test DB. |
+| Status transitions | All status paths — POST/PATCH the transition, then GET the resource and assert the returned status. |
+| Side effects | Default stage creation on `→ interviewing`, archive/restore flag changes, snapshot capture — all asserted by calling the relevant GET endpoint after the mutation. |
+
+### Frontend Tests
+
+Use real service instances — do **not** mock service classes or inject fake implementations. Intercept at the HTTP transport layer instead (e.g., Angular `HttpTestingController`, MSW for React/Vue, `nock` for Node.js SSR), so the actual service code runs.
+
+| Test | What to cover |
+|------|---------------|
+| List component | Renders applications from real service + intercepted HTTP, applies status filter, triggers sort change |
+| Form component | Create flow, edit flow, unsaved-changes guard, validation errors shown |
+| Service/API client | HTTP methods called with correct URLs and payloads — verified via transport-layer interceptor |
+
+**Minimum bar:** every service method and every controller endpoint has at least one passing test before the implementation is declared complete.
+
+---
+
 ## Database: Schema `<schema_name>`
 
 Migration `V1__initial.sql` (or equivalent) creates:

@@ -26,6 +26,25 @@
             "matchCommandLine": true
         },
         "go": true,
-        "pkill": true
+        "pkill": true,
+        "npx jest": true,
+        "./gradlew": true,
+        "find": true,
+        "ls": true,
+        "pwd": true,
+        "cat": true,
+        "head": true,
+        "tail": true,
+        "grep": true,
+        "which": true,
+        "echo": true,
+        "wc": true,
+        "diff": true,
+        "tree": true,
+        "file": true,
+        "stat": true,
+        "du": true,
+        "df": true,
+        "xargs": true
     }
 }

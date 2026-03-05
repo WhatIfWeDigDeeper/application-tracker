@@ -16,9 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +39,8 @@ class ApplicationServiceTest {
     @BeforeEach
     void setUp() {
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        service = new ApplicationService(applicationRepository, stageRepository, snapshotRepository, mapper);
+        PlatformTransactionManager txManager = mock(PlatformTransactionManager.class);
+        service = new ApplicationService(applicationRepository, stageRepository, snapshotRepository, mapper, txManager);
     }
 
     @Test
@@ -49,7 +52,7 @@ class ApplicationServiceTest {
         saved.setStatus(ApplicationStatus.UNSUBMITTED);
         saved.setInterviewStages(new ArrayList<>());
 
-        when(applicationRepository.save(any())).thenReturn(saved);
+        when(applicationRepository.saveAndFlush(any())).thenReturn(saved);
         when(snapshotRepository.findMaxSequenceNumber(any())).thenReturn(0);
         when(snapshotRepository.save(any())).thenReturn(null);
 
@@ -71,7 +74,7 @@ class ApplicationServiceTest {
         app.setInterviewStages(new ArrayList<>());
 
         when(applicationRepository.findById(any())).thenReturn(Optional.of(app));
-        when(applicationRepository.save(any())).thenReturn(app);
+        when(applicationRepository.saveAndFlush(any())).thenReturn(app);
         when(snapshotRepository.findMaxSequenceNumber(any())).thenReturn(0);
         when(snapshotRepository.save(any())).thenReturn(null);
 

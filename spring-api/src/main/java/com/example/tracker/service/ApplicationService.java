@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @Transactional
@@ -52,17 +56,20 @@ public class ApplicationService {
     private final InterviewStageRepository stageRepository;
     private final ApplicationSnapshotRepository snapshotRepository;
     private final ObjectMapper objectMapper;
+    private final TransactionTemplate transactionTemplate;
 
     public ApplicationService(
         ApplicationRepository applicationRepository,
         InterviewStageRepository stageRepository,
         ApplicationSnapshotRepository snapshotRepository,
-        ObjectMapper objectMapper
+        ObjectMapper objectMapper,
+        PlatformTransactionManager transactionManager
     ) {
         this.applicationRepository = applicationRepository;
         this.stageRepository = stageRepository;
         this.snapshotRepository = snapshotRepository;
         this.objectMapper = objectMapper;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
     public PaginatedResponse<ApplicationResponse> list(
@@ -97,7 +104,7 @@ public class ApplicationService {
     public ApplicationResponse create(ApplicationRequest req) {
         Application app = new Application();
         applyRequest(app, req);
-        applicationRepository.save(app);
+        applicationRepository.saveAndFlush(app);
         captureSnapshot(app, "Created");
         return toResponse(app);
     }
@@ -122,7 +129,7 @@ public class ApplicationService {
             createDefaultStages(app);
         }
 
-        applicationRepository.save(app);
+        applicationRepository.saveAndFlush(app);
         captureSnapshot(app, "Updated");
         return toResponse(app);
     }
@@ -135,7 +142,7 @@ public class ApplicationService {
     public ApplicationResponse archive(UUID id) {
         Application app = findById(id);
         app.setArchived(true);
-        applicationRepository.save(app);
+        applicationRepository.saveAndFlush(app);
         captureSnapshot(app, "Archived");
         return toResponse(app);
     }
@@ -143,7 +150,7 @@ public class ApplicationService {
     public ApplicationResponse restore(UUID id) {
         Application app = findById(id);
         app.setArchived(false);
-        applicationRepository.save(app);
+        applicationRepository.saveAndFlush(app);
         captureSnapshot(app, "Restored from archive");
         return toResponse(app);
     }
@@ -161,7 +168,7 @@ public class ApplicationService {
         stage.setNotes(req.notes());
         stage.setPerformanceRating(req.performanceRating());
         app.getInterviewStages().add(stage);
-        applicationRepository.save(app);
+        applicationRepository.saveAndFlush(app);
         captureSnapshot(app, "Stage added");
         return toResponse(app);
     }
@@ -182,7 +189,7 @@ public class ApplicationService {
         }
         stage.setNotes(req.notes());
         stage.setPerformanceRating(req.performanceRating());
-        applicationRepository.save(app);
+        applicationRepository.saveAndFlush(app);
         captureSnapshot(app, "Stage updated");
         return toResponse(app);
     }
@@ -190,7 +197,7 @@ public class ApplicationService {
     public ApplicationResponse deleteStage(UUID appId, UUID stageId) {
         Application app = findById(appId);
         app.getInterviewStages().removeIf(s -> s.getId().equals(stageId));
-        applicationRepository.save(app);
+        applicationRepository.saveAndFlush(app);
         captureSnapshot(app, "Stage removed");
         return toResponse(app);
     }
@@ -231,7 +238,7 @@ public class ApplicationService {
             app.setOfferDueDate(restoredData.offerDueDate());
             app.setSpecialRequirements(restoredData.specialRequirements());
             app.setNotes(restoredData.notes());
-            applicationRepository.save(app);
+            applicationRepository.saveAndFlush(app);
             captureSnapshot(app, "Restored to version " + snapshot.getSequenceNumber());
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to restore snapshot", e);
@@ -272,26 +279,34 @@ public class ApplicationService {
             + "Acme Corp,Software Engineer,applied,2024-01-15,https://acme.com,https://acme.com/jobs/123,,ai,8,linkedin,120000,160000,false,,Java Spring experience preferred,Great team culture\n";
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ImportResult importCsv(String csvContent) {
-        String[] lines = csvContent.split("\n");
+        List<String[]> rows = parseCsvContent(csvContent);
         int imported = 0;
         int skipped = 0;
         List<ImportError> errors = new ArrayList<>();
         Set<String> seenUrls = new HashSet<>();
 
-        for (int i = 1; i < lines.length; i++) {
-            String line = lines[i].trim();
-            if (line.isEmpty()) continue;
+        if (rows.isEmpty()) return new ImportResult(imported, skipped, errors);
+
+        // Parse header row to determine column positions dynamically
+        String[] headers = rows.get(0);
+        Map<String, Integer> headerMap = new HashMap<>();
+        for (int j = 0; j < headers.length; j++) {
+            headerMap.put(headers[j].trim(), j);
+        }
+
+        for (int i = 1; i < rows.size(); i++) {
+            String[] cols = rows.get(i);
             int rowNum = i + 1;
             try {
-                String[] cols = parseCsvLine(line);
                 if (cols.length < 2) {
                     errors.add(new ImportError(rowNum, "Insufficient columns"));
                     continue;
                 }
-                String companyName = cols.length > 0 ? cols[0].trim() : "";
-                String positionTitle = cols.length > 1 ? cols[1].trim() : "";
-                String jobPostingUrl = cols.length > 5 ? cols[5].trim() : "";
+                String companyName = getCol(headerMap, cols, "companyName");
+                String positionTitle = getCol(headerMap, cols, "positionTitle");
+                String jobPostingUrl = getCol(headerMap, cols, "jobPostingUrl");
 
                 if (companyName.isEmpty()) {
                     errors.add(new ImportError(rowNum, "Company name is required"));
@@ -319,51 +334,122 @@ public class ApplicationService {
                 Application app = new Application();
                 app.setCompanyName(companyName);
                 app.setPositionTitle(positionTitle);
-                if (cols.length > 2 && !cols[2].trim().isEmpty()) {
-                    try {
-                        app.setStatus(statusFromValue(cols[2].trim()));
-                    } catch (Exception e) {
-                        app.setStatus(ApplicationStatus.UNSUBMITTED);
-                    }
-                }
-                if (cols.length > 3 && !cols[3].trim().isEmpty()) {
-                    try { app.setDateApplied(LocalDate.parse(cols[3].trim())); } catch (Exception ignored) {}
-                }
-                if (cols.length > 4 && !cols[4].trim().isEmpty()) app.setCompanyUrl(cols[4].trim());
-                if (!jobPostingUrl.isEmpty()) app.setJobPostingUrl(jobPostingUrl);
-                if (cols.length > 6 && !cols[6].trim().isEmpty()) app.setCompanyCareerUrl(cols[6].trim());
-                if (cols.length > 7 && !cols[7].trim().isEmpty()) {
-                    try { app.setCompanyCategory(categoryFromValue(cols[7].trim())); } catch (Exception ignored) {}
-                }
-                if (cols.length > 8 && !cols[8].trim().isEmpty()) {
-                    try { app.setSkillsMatch(Integer.parseInt(cols[8].trim())); } catch (Exception ignored) {}
-                }
-                if (cols.length > 9 && !cols[9].trim().isEmpty()) {
-                    try { app.setJobSource(sourceFromValue(cols[9].trim())); } catch (Exception ignored) {}
-                }
-                if (cols.length > 10 && !cols[10].trim().isEmpty()) {
-                    try { app.setSalaryMin(Integer.parseInt(cols[10].trim())); } catch (Exception ignored) {}
-                }
-                if (cols.length > 11 && !cols[11].trim().isEmpty()) {
-                    try { app.setSalaryMax(Integer.parseInt(cols[11].trim())); } catch (Exception ignored) {}
-                }
-                if (cols.length > 12 && !cols[12].trim().isEmpty()) {
-                    app.setCoverLetterRequired(Boolean.parseBoolean(cols[12].trim()));
-                }
-                if (cols.length > 13 && !cols[13].trim().isEmpty()) {
-                    try { app.setOfferDueDate(LocalDate.parse(cols[13].trim())); } catch (Exception ignored) {}
-                }
-                if (cols.length > 14 && !cols[14].trim().isEmpty()) app.setSpecialRequirements(cols[14].trim());
-                if (cols.length > 15 && !cols[15].trim().isEmpty()) app.setNotes(cols[15].trim());
 
-                applicationRepository.save(app);
-                captureSnapshot(app, "Imported from CSV");
-                imported++;
+                String statusVal = getCol(headerMap, cols, "status");
+                if (!statusVal.isEmpty()) {
+                    try { app.setStatus(statusFromValue(statusVal)); }
+                    catch (Exception e) { app.setStatus(ApplicationStatus.UNSUBMITTED); }
+                }
+                String dateAppliedVal = getCol(headerMap, cols, "dateApplied");
+                if (!dateAppliedVal.isEmpty()) {
+                    try { app.setDateApplied(LocalDate.parse(dateAppliedVal)); } catch (Exception ignored) {}
+                }
+                String companyUrl = getCol(headerMap, cols, "companyUrl");
+                if (!companyUrl.isEmpty()) app.setCompanyUrl(companyUrl);
+                if (!jobPostingUrl.isEmpty()) app.setJobPostingUrl(jobPostingUrl);
+                String companyCareerUrl = getCol(headerMap, cols, "companyCareerUrl");
+                if (!companyCareerUrl.isEmpty()) app.setCompanyCareerUrl(companyCareerUrl);
+                String companyCategoryVal = getCol(headerMap, cols, "companyCategory");
+                if (!companyCategoryVal.isEmpty()) {
+                    try { app.setCompanyCategory(categoryFromValue(companyCategoryVal)); } catch (Exception ignored) {}
+                }
+                String skillsMatchVal = getCol(headerMap, cols, "skillsMatch");
+                if (!skillsMatchVal.isEmpty()) {
+                    try { app.setSkillsMatch(Integer.parseInt(skillsMatchVal)); } catch (Exception ignored) {}
+                }
+                String jobSourceVal = getCol(headerMap, cols, "jobSource");
+                if (!jobSourceVal.isEmpty()) {
+                    try { app.setJobSource(sourceFromValue(jobSourceVal)); } catch (Exception ignored) {}
+                }
+                String salaryMinVal = getCol(headerMap, cols, "salaryMin");
+                if (!salaryMinVal.isEmpty()) {
+                    try { app.setSalaryMin(Integer.parseInt(salaryMinVal)); } catch (Exception ignored) {}
+                }
+                String salaryMaxVal = getCol(headerMap, cols, "salaryMax");
+                if (!salaryMaxVal.isEmpty()) {
+                    try { app.setSalaryMax(Integer.parseInt(salaryMaxVal)); } catch (Exception ignored) {}
+                }
+                String coverLetterVal = getCol(headerMap, cols, "coverLetterRequired");
+                if (!coverLetterVal.isEmpty()) {
+                    app.setCoverLetterRequired(Boolean.parseBoolean(coverLetterVal));
+                }
+                String offerDueDateVal = getCol(headerMap, cols, "offerDueDate");
+                if (!offerDueDateVal.isEmpty()) {
+                    try { app.setOfferDueDate(LocalDate.parse(offerDueDateVal)); } catch (Exception ignored) {}
+                }
+                String specialRequirements = getCol(headerMap, cols, "specialRequirements");
+                if (!specialRequirements.isEmpty()) app.setSpecialRequirements(specialRequirements);
+                String notes = getCol(headerMap, cols, "notes");
+                if (!notes.isEmpty()) app.setNotes(notes);
+
+                try {
+                    transactionTemplate.executeWithoutResult(txStatus -> {
+                        applicationRepository.saveAndFlush(app);
+                        captureSnapshot(app, "Imported from CSV");
+                    });
+                    imported++;
+                } catch (Exception e) {
+                    errors.add(new ImportError(rowNum, e.getMessage()));
+                }
             } catch (Exception e) {
                 errors.add(new ImportError(rowNum, e.getMessage()));
             }
         }
         return new ImportResult(imported, skipped, errors);
+    }
+
+    private String getCol(Map<String, Integer> headerMap, String[] cols, String name) {
+        Integer idx = headerMap.get(name);
+        return (idx != null && idx < cols.length) ? cols[idx].trim() : "";
+    }
+
+    private List<String[]> parseCsvContent(String content) {
+        List<String[]> rows = new ArrayList<>();
+        List<String> currentRow = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '"') {
+                if (inQuotes && i + 1 < content.length() && content.charAt(i + 1) == '"') {
+                    current.append('"');
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (c == ',' && !inQuotes) {
+                currentRow.add(current.toString());
+                current = new StringBuilder();
+            } else if (c == '\r' && !inQuotes) {
+                if (i + 1 < content.length() && content.charAt(i + 1) == '\n') {
+                    i++;
+                }
+                currentRow.add(current.toString());
+                current = new StringBuilder();
+                if (!(currentRow.size() == 1 && currentRow.get(0).isEmpty())) {
+                    rows.add(currentRow.toArray(new String[0]));
+                }
+                currentRow = new ArrayList<>();
+            } else if (c == '\n' && !inQuotes) {
+                currentRow.add(current.toString());
+                current = new StringBuilder();
+                if (!(currentRow.size() == 1 && currentRow.get(0).isEmpty())) {
+                    rows.add(currentRow.toArray(new String[0]));
+                }
+                currentRow = new ArrayList<>();
+            } else {
+                current.append(c);
+            }
+        }
+        // Handle trailing content without newline
+        if (!currentRow.isEmpty() || current.length() > 0) {
+            currentRow.add(current.toString());
+            if (!(currentRow.size() == 1 && currentRow.get(0).isEmpty())) {
+                rows.add(currentRow.toArray(new String[0]));
+            }
+        }
+        return rows;
     }
 
     private Application findById(UUID id) {

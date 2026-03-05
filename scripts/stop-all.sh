@@ -11,9 +11,8 @@ PORTS=(
   3050  # TanStack UI
   3060  # Angular UI
   3070  # Angular Spring UI
-  5001  # Hono API
   5010  # Koa API
-  5030  # (reserved)
+  5030  # Hono API
   5040  # Nuxt API
   5050  # Nest API
   5070  # Go API
