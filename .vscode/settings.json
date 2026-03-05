@@ -26,6 +26,9 @@
             "matchCommandLine": true
         },
         "go": true,
+        "gh": true,
+        "git": true,
+        "npm": true,
         "pkill": true,
         "npx jest": true,
         "./gradlew": true,
@@ -46,5 +49,6 @@
         "du": true,
         "df": true,
         "xargs": true
-    }
+    },
+    "java.compile.nullAnalysis.mode": "automatic"
 }
