@@ -59,6 +59,9 @@ dependencyCheck {
     failBuildOnCVSS = 7.0f
     suppressionFile = "config/dependency-check-suppressions.xml"
     skipConfigurations = listOf("checkstyle")
+    nvd {
+        apiKey = System.getenv("NVD_API_KEY") ?: ""
+    }
     analyzers {
         ossIndex {
             enabled = false
