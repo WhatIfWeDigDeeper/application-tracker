@@ -422,7 +422,7 @@ test.describe('Date display in list - angular-spring-ui', () => {
   });
 });
 
-test.describe('Interview stage edit and delete', () => {
+test.describe.serial('Interview stage edit and delete', () => {
   let stageAppId: string;
 
   test.beforeAll(async ({ browser }) => {

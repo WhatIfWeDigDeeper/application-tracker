@@ -12,6 +12,11 @@ import (
 	"github.com/user/application-tracker/go-api/internal/db"
 )
 
+// ErrValidation is returned when the caller provides invalid input (maps to HTTP 400).
+type ErrValidation struct{ Message string }
+
+func (e *ErrValidation) Error() string { return e.Message }
+
 // ApplicationInput holds the fields for creating or updating an application.
 type ApplicationInput struct {
 	CompanyName         string  `json:"companyName"`
@@ -296,7 +301,7 @@ func GetApplication(ctx context.Context, pool *pgxpool.Pool, id string) (*Applic
 // CreateApplication creates a new application.
 func CreateApplication(ctx context.Context, pool *pgxpool.Pool, input ApplicationInput) (*ApplicationResponse, error) {
 	if input.CompanyName == "" || input.PositionTitle == "" {
-		return nil, fmt.Errorf("companyName and positionTitle are required")
+		return nil, &ErrValidation{Message: "companyName and positionTitle are required"}
 	}
 	if input.Status == "" {
 		input.Status = "unsubmitted"
