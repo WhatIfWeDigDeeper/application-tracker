@@ -76,7 +76,7 @@ jobs:
 
       - name: Cache NVD dependency-check database
         if: steps.docs-check.outputs.only_changed == 'false'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.gradle/dependency-check-data
           key: nvd-data-${{ runner.os }}-${{ steps.date.outputs.today }}
