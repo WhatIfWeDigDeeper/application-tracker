@@ -135,10 +135,8 @@ test.describe('CSV Import/Export', () => {
     await page.click('button:has-text("Close")');
   });
 
-  test('should show skipped count for duplicate URLs', async ({ page }, testInfo) => {
-    // Use a unique ID per worker+run for both the URL and filename to avoid cross-browser
-    // race conditions — multiple browser projects can share the same workerIndex
-    const uniqueId = `${testInfo.workerIndex}-${Date.now()}`;
+  test('should show skipped count for duplicate URLs', async ({ page }) => {
+    const uniqueId = crypto.randomUUID();
     const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${uniqueId}`;
     const csv1 = [
       'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate',

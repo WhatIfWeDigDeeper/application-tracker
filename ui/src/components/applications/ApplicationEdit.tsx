@@ -162,8 +162,8 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
   // ---------------------------------------------------------------------------
   // Load application (edit mode)
   // ---------------------------------------------------------------------------
-  const loadApplication = useCallback(async (id: string): Promise<void> => {
-    setIsLoading(true);
+  const loadApplication = useCallback(async (id: string, silent = false): Promise<void> => {
+    if (!silent) setIsLoading(true);
     setFetchError(null);
     try {
       const app = await applicationsApi.get(id) as JobApplication;
@@ -175,7 +175,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
       const message = err instanceof Error ? err.message : 'Failed to load application';
       setFetchError(message);
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   }, []);
 
@@ -417,7 +417,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
           performanceRating: data.performanceRating || undefined,
         });
         // Reload application to get updated stages
-        await loadApplication(applicationId);
+        await loadApplication(applicationId, true);
         setHistoryKey((k) => k + 1);
         setShowStageForm(false);
       } catch (err: unknown) {
@@ -454,7 +454,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
 
         if (Object.keys(update).length > 0) {
           await stagesApi.update(applicationId, editingStage.id, update);
-          await loadApplication(applicationId);
+          await loadApplication(applicationId, true);
           setHistoryKey((k) => k + 1);
         }
         setEditingStage(null);
@@ -487,7 +487,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
     if (isEditMode && applicationId) {
       try {
         await stagesApi.delete(applicationId, editingStage.id);
-        await loadApplication(applicationId);
+        await loadApplication(applicationId, true);
         setHistoryKey((k) => k + 1);
       } catch (err: unknown) {
         logger.error('Failed to delete interview stage:', err);
@@ -512,7 +512,7 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps): React.
     if (isEditMode && applicationId) {
       try {
         await stagesApi.update(applicationId, stageId, update);
-        await loadApplication(applicationId);
+        await loadApplication(applicationId, true);
         setHistoryKey((k) => k + 1);
       } catch (err: unknown) {
         logger.error('Failed to toggle stage completion:', err);

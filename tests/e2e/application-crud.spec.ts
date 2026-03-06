@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { deleteApplicationViaApi, uniqueCompanyName } from './helpers';
 
 test.describe('Application CRUD - Inline Edit', () => {
-  const createdUrls: string[] = [];
+  const createdApps: { id: string; url: string }[] = [];
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -35,7 +36,8 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
-    createdUrls.push(page.url());
+    const id1 = page.url().split('/').pop()!;
+    createdApps.push({ id: id1, url: page.url() });
 
     await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('E2E Test Company');
     await expect(page.locator('input[placeholder="Position Title *"]')).toHaveValue('Senior Engineer');
@@ -50,7 +52,8 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.selectOption('#status', 'applied');
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
-    createdUrls.push(page.url());
+    const id2 = page.url().split('/').pop()!;
+    createdApps.push({ id: id2, url: page.url() });
 
     const companyInput = page.locator('input[placeholder="Company Name *"]');
     await companyInput.clear();
@@ -76,7 +79,8 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.fill('input[placeholder="Position Title *"]', 'Tester');
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
-    createdUrls.push(page.url());
+    const id3 = page.url().split('/').pop()!;
+    createdApps.push({ id: id3, url: page.url() });
 
     const companyInput = page.locator('input[placeholder="Company Name *"]');
     await companyInput.clear();
@@ -84,8 +88,8 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     await page.click('button:has-text("Discard")');
 
-    // Confirm discard in the dialog (use .last() to target the dialog's button)
-    await page.locator('button:has-text("Discard")').last().click();
+    // Confirm discard in the dialog
+    await page.locator('[role="dialog"] button:has-text("Discard")').click();
 
     await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('Discard Test Company');
   });
@@ -107,13 +111,14 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
-    createdUrls.push(page.url());
+    const id4 = page.url().split('/').pop()!;
+    createdApps.push({ id: id4, url: page.url() });
 
     await expect(page.locator('text=Phone Screen')).toBeVisible();
   });
 
   test('should delete an application', async ({ page }) => {
-    const uniqueName = `Delete Co ${Date.now()}`;
+    const uniqueName = uniqueCompanyName('Delete Co');
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
     await page.fill('input[placeholder="Company Name *"]', uniqueName);
@@ -123,8 +128,8 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     await page.click('button:has-text("Delete")');
 
-    // Confirm deletion in the dialog (use .last() to target the dialog's button, not the header's)
-    await page.locator('button:has-text("Delete")').last().click();
+    // Confirm deletion in the dialog
+    await page.locator('[role="dialog"] button:has-text("Delete")').click();
 
     await page.waitForURL('/');
 
@@ -173,7 +178,8 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
-    createdUrls.push(page.url());
+    const id5 = page.url().split('/').pop()!;
+    createdApps.push({ id: id5, url: page.url() });
 
     // Verify date field is empty on the edit page (null dateApplied)
     await expect(page.locator('#dateApplied')).toHaveValue('');
@@ -272,16 +278,11 @@ test.describe('Application CRUD - Inline Edit', () => {
   });
 
   test.afterAll(async ({ browser }) => {
-    if (createdUrls.length === 0) return;
+    if (createdApps.length === 0) return;
     const context = await browser.newContext();
     const page = await context.newPage();
-    for (const url of createdUrls) {
-      await page.goto(url);
-      await page.waitForLoadState('domcontentloaded');
-      await page.waitForSelector('input[placeholder="Company Name *"]', { timeout: 10000 });
-      await page.click('button:has-text("Delete")');
-      await page.locator('button:has-text("Delete")').last().click();
-      await page.waitForURL('/');
+    for (const { id } of createdApps) {
+      await deleteApplicationViaApi(page, id);
     }
     await context.close();
   });
@@ -319,10 +320,13 @@ test.describe('Status label - Not a match', () => {
     });
 
     await page.goto('/');
-    // Wait for networkidle so that React (SSR/hydration) and framework data fetches are fully settled
+    // Wait for the initial applications API response so that React SSR/hydration is settled
     // before interacting with the filter. This ensures selectOption() properly triggers onChange
     // handlers on React-based stacks (e.g. tanstack-start), which only work post-hydration.
-    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => null);
+    await page.waitForResponse(
+      (r) => r.url().includes('/api/applications') && r.status() === 200,
+      { timeout: 15000 },
+    ).catch(() => null);
 
     // Apply status filter if the UI supports it — ensures visibility even if parallel test activity
     // pushed this app off page 1 after the re-PATCH above.
@@ -415,5 +419,125 @@ test.describe('Date display in list - angular-spring-ui', () => {
     // NOT "56 years ago" which indicates epoch/array date parsing failure
     await expect(updatedCell).not.toContainText('years ago');
     await expect(updatedCell).toContainText(/just now|\d+ (minute|hour)s? ago/);
+  });
+});
+
+test.describe('Interview stage edit and delete', () => {
+  let stageAppId: string;
+
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    // Create application with one stage via API
+    const res = await page.request.post('/api/applications', {
+      data: { companyName: uniqueCompanyName('Stage Edit Co'), positionTitle: 'Engineer' },
+    });
+    const app = await res.json();
+    stageAppId = app.id;
+    // Add a stage via API (include order:0 for stacks that require it, e.g. koa-api)
+    await page.request.post(`/api/applications/${stageAppId}/interview-stages`, {
+      data: { name: 'Original Stage Name', order: 0 },
+    });
+    await context.close();
+  });
+
+  test.afterAll(async ({ browser }) => {
+    if (!stageAppId) return;
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await deleteApplicationViaApi(page, stageAppId);
+    await context.close();
+  });
+
+  test('should edit a stage name and persist the update', async ({ page }) => {
+    await page.goto(`/applications/${stageAppId}`);
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('text=Original Stage Name', { timeout: 10000 });
+
+    // Open stage edit — try aria-label first (ui/), then title, then "Edit" text
+    const editByAriaLabel = page.locator('button[aria-label="Edit Original Stage Name"]');
+    const editByTitle = page.locator('button[title="Edit stage"]');
+    const editByText = page.locator('button:has-text("Edit")').first();
+
+    if (await editByAriaLabel.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await editByAriaLabel.click();
+    } else if (await editByTitle.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await editByTitle.click();
+    } else if (await editByText.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await editByText.click();
+    } else {
+      test.skip(true, 'Stage edit mechanism not recognized on this stack');
+      return;
+    }
+
+    // Update the stage name (StageForm: visible when form is in edit mode)
+    const nameInput = page.locator('input[placeholder="e.g., Technical Interview"]');
+    const hasStageForm = await nameInput.isVisible({ timeout: 2000 }).catch(() => false);
+    if (!hasStageForm) {
+      test.skip(true, 'Stage form not available on this stack');
+      return;
+    }
+
+    await nameInput.fill('Updated Stage Name');
+
+    // Click Save Changes — uses direct onClick handler (bypasses webkit form submit events)
+    await page.locator('[data-testid="stage-form-save"]').click();
+
+    // Wait for the form to close (async save: PATCH + reload) before checking text
+    await expect(nameInput).not.toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Updated Stage Name')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=Original Stage Name')).not.toBeVisible();
+
+    // Reload to confirm persistence
+    await page.reload();
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('text=Updated Stage Name')).toBeVisible({ timeout: 10000 });
+  });
+
+  test('should delete a stage and verify removal', async ({ page }) => {
+    await page.goto(`/applications/${stageAppId}`);
+    await page.waitForLoadState('domcontentloaded');
+
+    // Skip if edit test was skipped (stage name was never updated on this stack)
+    const hasUpdatedName = await page.locator('text=Updated Stage Name').isVisible({ timeout: 5000 }).catch(() => false);
+    if (!hasUpdatedName) {
+      test.skip(true, 'Stage was not renamed (edit test skipped or not supported on this stack)');
+      return;
+    }
+
+    // Open stage edit
+    const editByAriaLabel = page.locator('button[aria-label="Edit Updated Stage Name"]');
+    const editByTitle = page.locator('button[title="Edit stage"]');
+    const editByText = page.locator('button:has-text("Edit")').first();
+
+    if (await editByAriaLabel.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await editByAriaLabel.click();
+    } else if (await editByTitle.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await editByTitle.click();
+    } else if (await editByText.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await editByText.click();
+    } else {
+      test.skip(true, 'Stage edit mechanism not recognized on this stack');
+      return;
+    }
+
+    const nameInput = page.locator('input[placeholder="e.g., Technical Interview"]');
+    const hasStageForm = await nameInput.isVisible({ timeout: 2000 }).catch(() => false);
+    if (!hasStageForm) {
+      test.skip(true, 'Stage form not available on this stack');
+      return;
+    }
+
+    // Click Delete Stage in the stage form
+    const stageForm = page.locator('form:has(input[placeholder="e.g., Technical Interview"])');
+    await stageForm.locator('button:has-text("Delete Stage")').click();
+
+    // Confirm deletion in dialog if one appears
+    const confirmDelete = page.locator('[role="dialog"] button:has-text("Delete")');
+    if (await confirmDelete.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await confirmDelete.click();
+    }
+
+    await expect(page.locator('text=Updated Stage Name')).not.toBeVisible({ timeout: 10000 });
   });
 });

@@ -134,8 +134,8 @@ export class ApplicationService {
 
   addStage(id: string, stage: Partial<InterviewStage>): Observable<Application> {
     const payload = {
-      stageName: stage.name,
-      stageOrder: stage.order,
+      name: stage.name,
+      order: stage.order,
       isCompleted: stage.isCompleted ?? false,
     };
     return this.http
@@ -149,8 +149,8 @@ export class ApplicationService {
     stage: Partial<InterviewStage>
   ): Observable<Application> {
     const payload = {
-      stageName: stage.name,
-      stageOrder: stage.order,
+      name: stage.name,
+      order: stage.order,
       isCompleted: stage.isCompleted ?? false,
     };
     return this.http

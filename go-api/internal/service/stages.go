@@ -15,8 +15,8 @@ var ErrStageNotFound = errors.New("stage not found")
 
 // StageInput holds the fields for creating or updating an interview stage.
 type StageInput struct {
-	StageName         string  `json:"stageName" binding:"required"`
-	StageOrder        int32   `json:"stageOrder"`
+	StageName         string  `json:"name" binding:"required"`
+	StageOrder        int32   `json:"order"`
 	IsCompleted       bool    `json:"isCompleted"`
 	PerformanceRating *string `json:"performanceRating"`
 	Notes             *string `json:"notes"`

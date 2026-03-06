@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   standalone: true,
   template: `
     <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl dark:bg-gray-800">
+      <div role="dialog" class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl dark:bg-gray-800">
         <h3 class="text-lg font-semibold text-gray-900 mb-2 dark:text-white">{{ title }}</h3>
         <p class="text-gray-600 mb-4 dark:text-gray-300">{{ message }}</p>
         <div class="flex justify-end gap-3">

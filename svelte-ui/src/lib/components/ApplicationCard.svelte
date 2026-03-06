@@ -58,7 +58,7 @@
 </script>
 
 <div
-  class="card p-4 hover:shadow-md transition-shadow cursor-pointer {application.isArchived ? 'opacity-60' : ''}"
+  class="card p-4 min-w-0 hover:shadow-md transition-shadow cursor-pointer {application.isArchived ? 'opacity-60' : ''}"
   onclick={onclick}
   onkeydown={(e) => e.key === 'Enter' && onclick()}
   tabindex="0"

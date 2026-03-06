@@ -75,7 +75,7 @@
   }
 </script>
 
-<div class="fixed inset-y-0 right-0 w-96 z-40 bg-white dark:bg-gray-800 shadow-xl border-l border-gray-200 dark:border-gray-700 flex flex-col">
+<div data-testid="history-panel" class="fixed inset-y-0 right-0 w-96 z-40 bg-white dark:bg-gray-800 shadow-xl border-l border-gray-200 dark:border-gray-700 flex flex-col">
   <!-- Header -->
   <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">History</h2>
@@ -101,7 +101,7 @@
     {:else}
       <div class="space-y-1">
         {#each entries as entry, i (entry.id)}
-          <div>
+          <div data-testid="history-entry">
             <button
               onclick={() => toggleExpand(entry.id)}
               class="w-full text-left p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 {expandedEntry === entry.id ? 'bg-gray-50 dark:bg-gray-700/50' : ''}"

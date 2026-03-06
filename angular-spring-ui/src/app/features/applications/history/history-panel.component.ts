@@ -26,6 +26,7 @@ import { RelativeDatePipe } from '../../../shared/pipes/relative-date.pipe';
 
     <!-- Slide-in panel -->
     <div
+      data-testid="history-panel"
       class="fixed inset-y-0 right-0 w-96 bg-white shadow-xl z-50 flex flex-col dark:bg-gray-800"
     >
       <div class="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
@@ -51,7 +52,7 @@ import { RelativeDatePipe } from '../../../shared/pipes/relative-date.pipe';
         } @else {
           <div class="space-y-1">
             @for (entry of history(); track entry.id; let i = $index) {
-              <div class="border border-gray-200 rounded-lg overflow-hidden dark:border-gray-700">
+              <div data-testid="history-entry" class="border border-gray-200 rounded-lg overflow-hidden dark:border-gray-700">
                 <button
                   type="button"
                   (click)="toggleEntry(entry.id)"
