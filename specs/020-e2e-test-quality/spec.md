@@ -2,7 +2,7 @@
 
 **Feature Branch**: `020-e2e-test-quality`
 **Created**: 2026-03-05
-**Status**: In Progress
+**Status**: Complete
 
 ## Problem Statement
 
@@ -58,6 +58,12 @@ Each history-enabled UI needs `data-testid="history-panel"` on the panel root an
 | `react-ui/` (React + Koa) | `react-ui/src/components/HistoryPanel.tsx` |
 | `vue-ui/` (Vue + Nuxt) | `vue-ui/src/components/HistoryPanel.vue` |
 | `svelte-ui/` (Svelte + Hono) | `svelte-ui/src/lib/components/HistoryPanel.svelte` |
+| `tanstack-ui/` (TanStack + NestJS) | `tanstack-ui/src/components/applications/HistoryPanel.tsx` |
+| `tanstack-start-ui/` (TanStack Start + FastAPI) | `tanstack-start-ui/src/components/applications/HistoryPanel.tsx` |
+| `angular-ui/` (Angular + Go) | `angular-ui/src/app/features/history-panel/history-panel.component.ts` |
+| `angular-spring-ui/` (Angular + Spring) | `angular-spring-ui/src/app/features/applications/history/history-panel.component.ts` |
+
+> **Note**: The original spec scoped S2 to 4 UIs. During implementation, the remaining 4 stacks were found to also lack testids and were updated to ensure full cross-stack compatibility.
 
 ## Detailed Requirements
 
@@ -119,6 +125,19 @@ Extend the existing "Create application with interview stages" test or add a sib
 - Create application with a stage
 - Edit the stage name/notes and verify the update persists
 - Delete the stage and verify it disappears from the list
+
+## Discovered Fixes (Beyond Original Scope)
+
+The following bugs were uncovered during E2E test implementation and fixed as part of this feature:
+
+| Issue | Fix |
+|-------|-----|
+| Go API `binding:"required"` on `companyName`/`positionTitle` rejected partial PATCH `{ status }` with 400 | Removed required constraint from `ApplicationInput`; validation moved to service layer for create only |
+| Go `StageInput` JSON keys used `stageName`/`stageOrder` instead of `name`/`order` (inconsistent with OpenAPI spec and all other backends) | Fixed JSON tags in `StageInput`; updated Go tests and Angular service |
+| Angular confirm dialogs lacked `role="dialog"` — `[role="dialog"]` Playwright locator found no match | Added `role="dialog"` to both `angular-ui` and `angular-spring-ui` confirm dialog components |
+| svelte-ui `ApplicationCard` overflowed narrow viewports (iPhone SE 375px) in webkit due to CSS Grid `min-width: auto` | Added `min-w-0` to `ApplicationCard` root div |
+| `tanstack-start-ui` SSR singleton `queryClient` had `staleTime: 60s` — newly created test records hidden by cache | Set `staleTime: 0` |
+| `.vscode/launch.json` had broken `Spring API (Launch)` entry with wrong `mainClass` and `projectName` | Removed entry; retain `Java Spring API (Attach)` on port 5005; added `dev:spring-api:debug` npm script |
 
 ## Success Criteria
 
