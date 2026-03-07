@@ -6,6 +6,8 @@ on:
 
 env:
   NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+  # OWASP dependency-check requires additional heap on CI runners.
+  GRADLE_OPTS: -Xmx4g -XX:MaxMetaspaceSize=1g -Dorg.gradle.daemon=false
 
 jobs:
   build:
