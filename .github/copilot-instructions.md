@@ -34,3 +34,5 @@
 - Mirror existing implementations; prefer incremental changes with tests.
 - Link to `.claude/skills` via the skills index instead of rewriting guidance.
 - Ask for clarification if a requirement conflicts; document any deviations in PR descriptions.
+
+- **Corrupted npm lockfile signatures**: If `package-lock.json` contains absolute temp paths (for example `../../../../private/tmp/.../node_modules/*`) and many `"extraneous": true` entries, `npm ci` may fail with platform errors (e.g. `@esbuild/*` `EBADPLATFORM`) even for optional deps. Fix by deleting `node_modules` and `package-lock.json` in that package, then running `npm install` to regenerate a clean lockfile.
