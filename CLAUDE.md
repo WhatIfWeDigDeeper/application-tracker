@@ -92,6 +92,8 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Null vs undefined in validation**: API fields that are "not set" often return `null`, not `undefined`. Strict `!== undefined` checks let `null` slip into range/format validators where JS coercion causes false failures (e.g. `null < 1` → `true`) — use `!= null` (loose equality) to treat both as absent.
 - **webkit + React 19 form submission**: Playwright's `requestSubmit()`, button `.click()`, and `press('Enter')` do not fire React's `onSubmit` in webkit for multi-input forms. Workaround: extract a `doSubmit()` function, add `type="button"` + `data-testid="<form>-save"` + `onClick={doSubmit}` to the submit button, and use `page.locator('[data-testid="<form>-save"]').click()` in tests.
 - **Submit button type changes**: When changing a button from `type="submit"` to `type="button"`, unit tests using `querySelector('button[type="submit"]')` will silently return `null`. Prefer `getByTestId()` or `getByRole('button', { name: /save/i })` instead.
+- **Angular `[hidden]` vs `@if` for Playwright gates**: `[hidden]="!expr"` keeps the element in the DOM (just invisible); in webkit, `expect(locator).toBeVisible()` can pass immediately while the element's content/state is still stale/default, so later assertions may read the wrong value. Use `@if (expr)` instead of `[hidden]="!expr"` whenever a Playwright assertion waits for an element to appear.
+- **Modal re-open timing in webkit**: After clicking Close on a modal/panel and immediately re-opening it, webkit can interact with stale DOM from the previous open cycle. Assert `await expect(page.locator('text=<panel heading>')).not.toBeVisible()` after Close before triggering the second open.
 
 ## Angular Patterns
 
