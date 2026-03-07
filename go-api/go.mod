@@ -1,6 +1,6 @@
 module github.com/user/application-tracker/go-api
 
-go 1.24.0
+go 1.26.1
 
 require (
 	github.com/gin-gonic/gin v1.10.0

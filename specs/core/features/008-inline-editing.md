@@ -10,7 +10,7 @@ Edit application fields directly on the detail page without a separate modal or 
 
 Instead of navigating to a separate edit form or opening a modal, the application detail page is always in edit mode. All fields are directly editable in place, with changes saved on blur or via an explicit save button. This reduces friction for quick updates and keeps the user in context.
 
-> **Note**: Currently implemented in vue-ui only. This spec defines the target behavior for all stacks. Stacks without inline editing use a separate edit form/modal (see [001-application-management](001-application-management.md)).
+> **Conformance**: This is a **P3 (Optional)** feature. Implementations are not required to include it. Stacks without inline editing use a separate edit form/modal (see [001-application-management](001-application-management.md)), which is the default approach. **Every implementation spec must explicitly declare this feature as in scope or deferred** — it must not be silently omitted. If included, the spec must state the save trigger (blur, explicit button, or both).
 
 ---
 

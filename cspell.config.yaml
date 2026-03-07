@@ -4,14 +4,11 @@ dictionaryDefinitions: []
 dictionaries: []
 words:
   - asyncpg
-  - domcontentloaded
-  - textareas
-  - Textareas
-  - unsubmitted
-  - Unsubmitted
   - auditconfig
+  - beforeunload
   - dedup
   - Dedup
+  - domcontentloaded
   - fastapi
   - golangci
   - gopath
@@ -19,6 +16,7 @@ words:
   - gotest
   - gotestsum
   - govulncheck
+  - gradlew
   - Hono
   - mypy
   - Nuxt
@@ -26,10 +24,17 @@ words:
   - pyproject
   - pytest
   - RYUK
+  - specifykit
   - sqlc
+  - sslmode
   - tanstack
   - tbls
+  - temurin
   - testname
+  - textareas
+  - Textareas
+  - unsubmitted
+  - Unsubmitted
   - uvx
   - venv
   - whatifwedigdeeper

@@ -10,14 +10,16 @@ PORTS=(
   3040  # TanStack Start UI
   3050  # TanStack UI
   3060  # Angular UI
-  5001  # Hono API
+  3070  # Angular Spring UI
   5010  # Koa API
-  5030  # (reserved)
+  5030  # Hono API
   5040  # Nuxt API
   5050  # Nest API
   5070  # Go API
   5160  # FastAPI
+  8080  # Spring Boot API
 )
+
 
 stopped=0
 for port in "${PORTS[@]}"; do

@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// CSV import/export tests only run for tanstack-ui (port 3050), tanstack-start-ui (port 3040), and angular-ui (port 3060)
+// CSV import/export tests only run for tanstack-ui (port 3050), tanstack-start-ui (port 3040), angular-ui (port 3060), and angular-spring-ui (port 3070)
 const port = Number(process.env.TEST_UI_PORT || 3000);
-const isTargetUI = port === 3050 || port === 3040 || port === 3060;
+const isTargetUI = port === 3050 || port === 3040 || port === 3060 || port === 3070;
 
 test.describe('CSV Import/Export', () => {
-  test.skip(!isTargetUI, 'CSV import/export only available on tanstack-ui (3050), tanstack-start-ui (3040), and angular-ui (3060)');
+  test.skip(!isTargetUI, 'CSV import/export only available on tanstack-ui (3050), tanstack-start-ui (3040), angular-ui (3060), and angular-spring-ui (3070)');
 
   const tmpDir = '/tmp/claude/e2e-csv-tests';
 
@@ -135,15 +135,15 @@ test.describe('CSV Import/Export', () => {
     await page.click('button:has-text("Close")');
   });
 
-  test('should show skipped count for duplicate URLs', async ({ page }, testInfo) => {
-    // Use a unique URL per worker to avoid cross-browser race conditions
-    const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${testInfo.workerIndex}-${Date.now()}`;
+  test('should show skipped count for duplicate URLs', async ({ page }) => {
+    const uniqueId = crypto.randomUUID();
+    const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${uniqueId}`;
     const csv1 = [
       'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate',
       `Dedup E2E Corp,Dedup Role,,,,${uniqueUrl},,,,,,,,,,`
     ].join('\n');
 
-    const csvPath1 = path.join(tmpDir, `dedup-test-${testInfo.workerIndex}.csv`);
+    const csvPath1 = path.join(tmpDir, `dedup-test-${uniqueId}.csv`);
     fs.writeFileSync(csvPath1, csv1);
 
     // First import
@@ -155,6 +155,10 @@ test.describe('CSV Import/Export', () => {
     // Verify the first import actually created the app — if imported=0 the dedup test is invalid
     await expect(page.locator('text=Imported').locator('..')).toContainText(/\b1(?!\d)/);
     await page.click('button:has-text("Close")');
+    // Wait for the import panel to fully close before starting second import.
+    // Without this, webkit can find the stale first-import result (skipped:0)
+    // before the panel re-opens and the second import completes.
+    await expect(page.locator('text=Import Applications')).not.toBeVisible({ timeout: 5000 });
 
     // Second import with same URL — should be skipped
     await page.click('button:has-text("Import CSV")');

@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+  # OWASP dependency-check requires additional heap on CI runners.
+  GRADLE_OPTS: -Xmx4g -XX:MaxMetaspaceSize=1g -Dorg.gradle.daemon=false
 
 jobs:
   build:
@@ -12,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -42,7 +46,7 @@ jobs:
 
       - name: Use Node.js from .node-version
         if: steps.docs-check.outputs.only_changed == 'false'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.node-version'
 
@@ -56,11 +60,35 @@ jobs:
         if: steps.docs-check.outputs.only_changed == 'false'
         run: cd fastapi && uv sync --extra dev
 
+      - name: Set up Java 21
+        if: steps.docs-check.outputs.only_changed == 'false'
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        if: steps.docs-check.outputs.only_changed == 'false'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Get date for NVD cache key
+        if: steps.docs-check.outputs.only_changed == 'false'
+        id: date
+        run: echo "today=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+
+      - name: Cache NVD dependency-check database
+        if: steps.docs-check.outputs.only_changed == 'false'
+        uses: actions/cache@v5
+        with:
+          path: ~/.gradle/dependency-check-data
+          key: nvd-data-${{ runner.os }}-${{ steps.date.outputs.today }}
+          restore-keys: nvd-data-${{ runner.os }}-
+
       - name: Set up Go
         if: steps.docs-check.outputs.only_changed == 'false'
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.24'
+          go-version: '1.26'
           cache-dependency-path: go-api/go.sum
 
       - name: Install govulncheck
@@ -78,6 +106,10 @@ jobs:
       - name: Install npm packages
         if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run ci:all
+
+      - name: Install angular-spring-ui packages
+        if: steps.docs-check.outputs.only_changed == 'false'
+        run: cd angular-spring-ui && npm ci
 
       - name: Lint
         if: steps.docs-check.outputs.only_changed == 'false'

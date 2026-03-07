@@ -12,6 +12,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [5. React + TanStack + NestJS + Drizzle](#5-react--tanstack--nestjs--drizzle)
   - [6. React SSR + TanStack Start + FastAPI](#6-react-ssr--tanstack-start--fastapi)
   - [7. Angular + Go Gin + pgx/sqlc](#7-angular--go-gin--pgxsqlc)
+  - [8. Angular + Spring Boot + JPA/Hibernate](#8-angular--spring-boot--jpahibernate)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -25,6 +26,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [Unit Tests](#unit-tests)
   - [End-to-End Tests](#end-to-end-tests)
   - [Build Verification](#build-verification)
+  - [Per-Stack Validation](#per-stack-validation)
 - [Development Tools](#development-tools)
   - [VS Code Debug Configurations](#vs-code-debug-configurations)
   - [Notifications (Optional)](#notifications-optional)
@@ -97,6 +99,16 @@ This repository contains a complete job application tracker built with multiple 
 - Snapshot-based history with field diffs and restore
 - testcontainers-go integration tests
 
+### 8. Angular + Spring Boot + JPA/Hibernate
+**Directories**: `angular-spring-ui/` + `spring-api/`
+**Stack**:
+- Frontend: Angular 21 + standalone components + Angular Signals + Tailwind CSS 4.x — port 3070
+- Backend: Java 21 + Spring Boot 3.4.x + Spring Data JPA + Hibernate 6 + Flyway — port 8080
+- Database: PostgreSQL via `java_spring` schema (JPA entities + Flyway migrations)
+- AttributeConverter classes for PostgreSQL enum types with hyphenated values
+- Snapshot-based history with field diffs and restore
+- Gradle 8.x (Kotlin DSL) build system
+
 ## Core Features
 
 All implementations provide:
@@ -122,6 +134,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
 | `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
 | `go_gin` | Angular + Go Gin API | [schema docs](docs/schema/go-gin/README.md) |
+| `java_spring` | Angular + Spring Boot + JPA | [schema docs](docs/schema/java-spring/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -137,6 +150,7 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [nest-api](docs/types/nest-api/api.mermaid) - NestJS API
 - [tanstack-start-ui](docs/types/tanstack-start-ui/application.mermaid) - React SSR + TanStack Start
 - [angular-ui](docs/types/angular-ui/application.model.mermaid) - Angular + Go Gin
+- [angular-spring-ui](docs/types/angular-spring-ui/application.model.mermaid) - Angular + Spring Boot
 
 Regenerate with `npm run docs:types`.
 
@@ -153,7 +167,9 @@ Regenerate with `npm run docs:types`.
 ├── vue-ui/                       # Vue + Vite UI
 ├── tanstack-ui/                  # React + TanStack Query/Router UI
 ├── tanstack-start-ui/            # React SSR + TanStack Start UI
-├── angular-ui/                   # Angular 21 UI
+├── angular-ui/                   # Angular 21 UI (Go Gin backend)
+├── angular-spring-ui/            # Angular 21 UI (Spring Boot backend)
+├── spring-api/                   # Spring Boot 3.4 API
 ├── nest-api/                     # NestJS + Fastify API
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
@@ -172,6 +188,7 @@ Regenerate with `npm run docs:types`.
 - Node.js (v18+)
 - Python 3.12+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
 - Go 1.24+ (for the Go Gin API implementation) — ensure `$(go env GOPATH)/bin` (typically `~/go/bin`) appears in your `PATH` before system package manager paths so locally-installed Go tools (`govulncheck`, `gotestsum`) take precedence
+- Java 21 (for the Spring Boot implementation) — Eclipse Temurin is recommended: `brew install --cask temurin@21`
 - Docker and Docker Compose (for PostgreSQL)
 - [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
@@ -202,6 +219,7 @@ Regenerate with `npm run docs:types`.
    npm run migrate:nest-api       # NestJS + Drizzle
    npm run migrate:fastapi        # FastAPI (asyncpg)
    npm run migrate:go             # Go Gin API (raw SQL)
+   npm run migrate:spring-api     # Spring Boot API (Flyway — auto-run on startup too)
 
    # or all at once:
    npm run migrate:all
@@ -213,7 +231,7 @@ Each implementation can be run independently:
 
 ```bash
 # Next.js + Express (UI 3000 + API 3001)
-npm run dev:react-next
+npm run dev:react-next-ui
 npm run dev:express-api
 
 # React + Koa (UI 3010 + API 5010)
@@ -239,6 +257,10 @@ npm run dev:fastapi
 # Angular + Go Gin (UI 3060 + API 5070)
 npm run dev:go-api
 npm run dev:angular-ui
+
+# Angular + Spring Boot (UI 3070 + API 8080)
+npm run dev:spring-api
+npm run dev:angular-spring-ui
 ```
 
 ### Schema Documentation
@@ -259,7 +281,7 @@ Run tests for individual implementations:
 
 ```bash
 npm run test:express-api  # Express + Prisma API tests
-npm run test:react-next   # Next.js UI tests
+npm run test:react-next-ui  # Next.js UI tests
 npm run test:koa-api      # Koa API tests
 npm run test:react-ui     # React UI tests
 npm run test:svelte-ui    # Svelte UI tests
@@ -270,6 +292,8 @@ npm run test:tanstack-start-ui  # TanStack Start UI tests
 npm run test:fastapi      # FastAPI pytest unit tests
 npm run test:go-api       # Go Gin API integration tests (testcontainers-go)
 npm run test:angular-ui   # Angular UI tests (Jest + @testing-library/angular)
+npm run test:spring-api   # Spring Boot API tests (JUnit 5)
+npm run test:angular-spring-ui  # Angular Spring UI tests (Jest + @testing-library/angular)
 ```
 
 Run all unit tests:
@@ -283,17 +307,20 @@ npm run test:all          # Run all implementation tests
 E2E tests use Playwright and run against each implementation:
 
 ```bash
-npm run test:e2e:express  # Next.js + Express (port 3000)
-npm run test:e2e:vue      # Vue + Vite (port 3020)
-npm run test:e2e:svelte   # Svelte + Hono (port 3030)
-npm run test:e2e:react-koa # React + Koa (port 3010)
-npm run test:e2e:tanstack  # React + TanStack + NestJS (port 3050)
-npm run test:e2e:tanstack-start  # React SSR + TanStack Start + FastAPI (port 3040)
-npm run test:e2e:angular  # Angular + Go Gin (port 3060)
-npm run test:e2e:all      # Run all e2e tests
+npm run test:e2e:react-next-ui      # Next.js + Express (port 3000)
+npm run test:e2e:react-ui           # React + Koa (port 3010)
+npm run test:e2e:vue-ui             # Vue + Nuxt (port 3020)
+npm run test:e2e:svelte-ui          # Svelte + Hono (port 3030)
+npm run test:e2e:tanstack-start-ui  # React SSR + TanStack Start + FastAPI (port 3040)
+npm run test:e2e:tanstack-ui        # React + TanStack + NestJS (port 3050)
+npm run test:e2e:angular-ui         # Angular + Go Gin (port 3060)
+npm run test:e2e:angular-spring-ui  # Angular + Spring Boot (port 3070)
+npm run test:e2e:all                # Run all e2e tests
 ```
 
 To clean up leftover test data from interrupted runs, see [Test Data Cleanup](docs/TESTING_REFERENCE.md#test-data-cleanup).
+
+To remove orphaned Docker containers left behind by Go test runs (`TESTCONTAINERS_RYUK_DISABLED=true`), run `npm run cleanup:docker`.
 
 ### Build Verification
 
@@ -301,6 +328,23 @@ Build all implementations:
 
 ```bash
 npm run build:all         # Build all implementations
+```
+
+### Per-Stack Validation
+
+Run the full validation chain (audit → build → lint → test) for a single stack:
+
+```bash
+npm run validate:tanstack-ui      # audit:ci → build → lint → test
+npm run validate:express-api
+npm run validate:spring-api
+# ... validate:<stack> available for all 14 stacks
+```
+
+Run everything across all stacks:
+
+```bash
+npm run validate:all
 ```
 
 ## Development Tools
