@@ -155,6 +155,10 @@ test.describe('CSV Import/Export', () => {
     // Verify the first import actually created the app — if imported=0 the dedup test is invalid
     await expect(page.locator('text=Imported').locator('..')).toContainText(/\b1(?!\d)/);
     await page.click('button:has-text("Close")');
+    // Wait for the import panel to fully close before starting second import.
+    // Without this, webkit can find the stale first-import result (skipped:0)
+    // before the panel re-opens and the second import completes.
+    await expect(page.locator('text=Import Applications')).not.toBeVisible({ timeout: 5000 });
 
     // Second import with same URL — should be skipped
     await page.click('button:has-text("Import CSV")');
