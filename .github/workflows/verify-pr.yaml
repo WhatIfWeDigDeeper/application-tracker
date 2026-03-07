@@ -22,7 +22,7 @@ jobs:
 
       - name: Check for docs-only changes
         id: docs-check
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             docs/**
