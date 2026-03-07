@@ -38,8 +38,8 @@ func TestAddStage(t *testing.T) {
 	defer deleteApp(t, srv.URL, app.ID)
 
 	stageBody, _ := json.Marshal(map[string]interface{}{
-		"stageName":  "Phone Screen",
-		"stageOrder": 1,
+		"name":  "Phone Screen",
+		"order": 1,
 	})
 	resp, err := http.Post(
 		fmt.Sprintf("%s/applications/%s/interview-stages", srv.URL, app.ID),
@@ -69,8 +69,8 @@ func TestUpdateStage(t *testing.T) {
 
 	// Add stage
 	stageBody, _ := json.Marshal(map[string]interface{}{
-		"stageName":  "Initial Screen",
-		"stageOrder": 1,
+		"name":  "Initial Screen",
+		"order": 1,
 	})
 	addResp, err := http.Post(
 		fmt.Sprintf("%s/applications/%s/interview-stages", srv.URL, app.ID),
@@ -84,8 +84,8 @@ func TestUpdateStage(t *testing.T) {
 
 	// Update stage
 	updateBody, _ := json.Marshal(map[string]interface{}{
-		"stageName":  "Technical Interview",
-		"stageOrder": 1,
+		"name":  "Technical Interview",
+		"order": 1,
 	})
 	req, _ := http.NewRequest(http.MethodPatch,
 		fmt.Sprintf("%s/applications/%s/interview-stages/%s", srv.URL, app.ID, stageID),
@@ -117,8 +117,8 @@ func TestRemoveStage(t *testing.T) {
 
 	// Add stage
 	stageBody, _ := json.Marshal(map[string]interface{}{
-		"stageName":  "Stage to Remove",
-		"stageOrder": 1,
+		"name":  "Stage to Remove",
+		"order": 1,
 	})
 	addResp, err := http.Post(
 		fmt.Sprintf("%s/applications/%s/interview-stages", srv.URL, app.ID),

@@ -91,6 +91,13 @@
       "mode": "auto",
       "program": "${workspaceFolder}/go-api/cmd/server",
       "envFile": "${workspaceFolder}/go-api/.env"
-    }
+    },
+    {
+      "name": "Java Spring API (Attach)",
+      "type": "java",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005
+    },
   ]
 }

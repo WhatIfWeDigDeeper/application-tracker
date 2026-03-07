@@ -109,7 +109,11 @@ func createApplication(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		app, err := service.CreateApplication(c.Request.Context(), pool, input)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			status := http.StatusInternalServerError
+			if _, ok := err.(*service.ErrValidation); ok {
+				status = http.StatusBadRequest
+			}
+			c.JSON(status, gin.H{"error": err.Error()})
 			return
 		}
 		c.JSON(http.StatusCreated, app)

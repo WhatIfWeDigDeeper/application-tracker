@@ -74,9 +74,7 @@ export function StageForm({
     }));
   };
 
-  const handleSubmit = (e: FormEvent): void => {
-    e.preventDefault();
-
+  const doSubmit = (): void => {
     const validation = validateInterviewStage(formData);
 
     if (!validation.isValid) {
@@ -99,8 +97,13 @@ export function StageForm({
     onSubmit(cleanData);
   };
 
+  const handleSubmit = (e: FormEvent): void => {
+    e.preventDefault();
+    doSubmit();
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <Input
         label="Stage Name"
         name="name"
@@ -197,7 +200,7 @@ export function StageForm({
           <Button type="button" variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">
+          <Button type="button" data-testid="stage-form-save" onClick={doSubmit}>
             {mode === 'create' ? 'Add Stage' : 'Save Changes'}
           </Button>
         </div>

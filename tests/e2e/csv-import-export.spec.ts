@@ -135,10 +135,8 @@ test.describe('CSV Import/Export', () => {
     await page.click('button:has-text("Close")');
   });
 
-  test('should show skipped count for duplicate URLs', async ({ page }, testInfo) => {
-    // Use a unique ID per worker+run for both the URL and filename to avoid cross-browser
-    // race conditions — multiple browser projects can share the same workerIndex
-    const uniqueId = `${testInfo.workerIndex}-${Date.now()}`;
+  test('should show skipped count for duplicate URLs', async ({ page }) => {
+    const uniqueId = crypto.randomUUID();
     const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${uniqueId}`;
     const csv1 = [
       'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate',
@@ -157,6 +155,10 @@ test.describe('CSV Import/Export', () => {
     // Verify the first import actually created the app — if imported=0 the dedup test is invalid
     await expect(page.locator('text=Imported').locator('..')).toContainText(/\b1(?!\d)/);
     await page.click('button:has-text("Close")');
+    // Wait for the import panel to fully close before starting second import.
+    // Without this, webkit can find the stale first-import result (skipped:0)
+    // before the panel re-opens and the second import completes.
+    await expect(page.locator('text=Import Applications')).not.toBeVisible({ timeout: 5000 });
 
     // Second import with same URL — should be skipped
     await page.click('button:has-text("Import CSV")');

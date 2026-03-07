@@ -118,7 +118,7 @@ export function validateInterviewStage(input: InterviewStageInput): ValidationRe
   }
 
   // Performance rating validation
-  if (input.performanceRating !== undefined) {
+  if (input.performanceRating != null) {
     if (
       input.performanceRating < VALIDATION_LIMITS.performanceRating.min ||
       input.performanceRating > VALIDATION_LIMITS.performanceRating.max
