@@ -33,6 +33,7 @@
         "jar": true,
         "java": true,
         "npm": true,
+        "node": true,
         "pkill": true,
         "npx jest": true,
         "npx tsc": true,
