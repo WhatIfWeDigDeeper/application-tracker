@@ -83,7 +83,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="fixed inset-y-0 right-0 w-96 z-40 bg-white dark:bg-gray-800 shadow-xl border-l border-gray-200 dark:border-gray-700 flex flex-col">
+  <div
+    data-testid="history-panel"
+    class="fixed inset-y-0 right-0 w-96 z-40 bg-white dark:bg-gray-800 shadow-xl border-l border-gray-200 dark:border-gray-700 flex flex-col"
+  >
     <!-- Header -->
     <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-2">
@@ -128,6 +131,7 @@ onMounted(() => {
         <div
           v-for="commit in commits"
           :key="commit.id"
+          data-testid="history-entry"
           class="border border-gray-100 dark:border-gray-700 rounded-lg"
           :class="isCurrentVersion(commit) ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800' : 'bg-white dark:bg-gray-800'"
         >

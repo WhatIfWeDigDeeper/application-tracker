@@ -1,15 +1,17 @@
 import { test, expect, type Page } from '@playwright/test';
+import { deleteApplicationViaApi, uniqueCompanyName } from './helpers';
 
 // Shared history tests for all stacks with history support:
 // Next.js+Express (port 3000), React+Koa (port 3010), Vue+Nuxt (port 3020), Svelte+Hono (port 3030).
 
 test.describe.serial('History Panel', () => {
   let applicationUrl: string;
-  const uniqueCompany = `History Co ${Date.now()}`;
-  const uniquePosition = `Engineer ${Date.now()}`;
+  let applicationId: string;
+  const uniqueCompany = uniqueCompanyName('History Co');
+  const uniquePosition = uniqueCompanyName('Engineer');
 
-  const panel = (page: Page): ReturnType<Page['locator']> => page.locator('.fixed.inset-y-0.right-0');
-  const entries = (page: Page): ReturnType<Page['locator']> => panel(page).locator('.space-y-1 > div');
+  const panel = (page: Page): ReturnType<Page['locator']> => page.locator('[data-testid="history-panel"]');
+  const entries = (page: Page): ReturnType<Page['locator']> => panel(page).locator('[data-testid="history-entry"]');
 
   async function createApplication(page: Page, company: string, position: string): Promise<string> {
     await page.goto('/applications/new');
@@ -18,6 +20,7 @@ test.describe.serial('History Panel', () => {
     await page.fill('input[placeholder="Position Title *"]', position);
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
+    applicationId = page.url().split('/').pop()!;
     return page.url();
   }
 
@@ -154,15 +157,10 @@ test.describe.serial('History Panel', () => {
   });
 
   test.afterAll(async ({ browser }) => {
-    if (!applicationUrl) return;
+    if (!applicationId) return;
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto(applicationUrl);
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForSelector('input[placeholder="Company Name *"]', { timeout: 10000 });
-    await page.click('button:has-text("Delete")');
-    await page.locator('button:has-text("Delete")').last().click();
-    await page.waitForURL('/');
+    await deleteApplicationViaApi(page, applicationId);
     await context.close();
   });
 });

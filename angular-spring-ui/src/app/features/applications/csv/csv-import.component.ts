@@ -42,14 +42,18 @@ import { ImportResult } from '../../../core/models/application.model';
         </button>
       </div>
 
-      <div [hidden]="!result()" class="p-3 bg-green-50 border border-green-200 rounded text-sm dark:bg-green-900/20 dark:border-green-800 space-y-1">
-          <p class="font-medium text-green-800 dark:text-green-400">Imported: {{ result()?.imported ?? 0 }}</p>
-          <p class="font-medium text-green-800 dark:text-green-400">Skipped: {{ result()?.skipped ?? 0 }}</p>
+      @if (result()) {
+        <div class="p-3 bg-green-50 border border-green-200 rounded text-sm dark:bg-green-900/20 dark:border-green-800 space-y-1">
+          <p class="font-medium text-green-800 dark:text-green-400">Imported: {{ result()!.imported }}</p>
+          <p class="font-medium text-green-800 dark:text-green-400">Skipped: {{ result()!.skipped }}</p>
           <div data-testid="import-result-errors" class="font-medium text-green-800 dark:text-green-400">
-            Errors: {{ result()?.errors?.length ?? 0 }}
-            <pre [hidden]="!errorLines().length" class="mt-1 whitespace-pre-wrap text-red-700 dark:text-red-400 font-sans text-sm">{{ errorLines().join('\n') }}</pre>
+            Errors: {{ result()!.errors.length }}
+            @if (errorLines().length) {
+              <pre class="mt-1 whitespace-pre-wrap text-red-700 dark:text-red-400 font-sans text-sm">{{ errorLines().join('\n') }}</pre>
+            }
           </div>
         </div>
+      }
 
       <p [hidden]="!error()" class="text-sm text-red-600 dark:text-red-400">{{ error() }}</p>
     </div>

@@ -85,7 +85,7 @@ export function HistoryPanel({ applicationId, refreshKey, onClose, onRestored }:
   }
 
   return (
-    <div className="fixed inset-y-0 right-0 w-96 z-40 bg-white dark:bg-gray-800 shadow-xl border-l border-gray-200 dark:border-gray-700 flex flex-col">
+    <div data-testid="history-panel" className="fixed inset-y-0 right-0 w-96 z-40 bg-white dark:bg-gray-800 shadow-xl border-l border-gray-200 dark:border-gray-700 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">History</h2>
@@ -115,7 +115,7 @@ export function HistoryPanel({ applicationId, refreshKey, onClose, onRestored }:
         ) : (
           <div className="space-y-1">
             {entries.map((entry, i) => (
-              <div key={entry.id}>
+              <div key={entry.id} data-testid="history-entry">
                 <button
                   onClick={() => toggleExpand(entry.id)}
                   className={`w-full text-left p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 ${

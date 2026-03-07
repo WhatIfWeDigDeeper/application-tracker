@@ -57,9 +57,8 @@ describe('InterviewChecklist', () => {
       fireEvent.change(nameInput, { target: { value: 'Onsite' } });
 
       // Submit the form
-      const form = nameInput.closest('form');
-      const submitButton = form?.querySelector('button[type="submit"]');
-      fireEvent.click(submitButton!);
+      const submitButton = screen.getByTestId('stage-form-save') as HTMLElement;
+      fireEvent.click(submitButton);
 
       // Wait for the modal to close (which means form submission completed)
       await waitFor(() => {

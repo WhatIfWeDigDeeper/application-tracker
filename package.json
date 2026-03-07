@@ -36,6 +36,7 @@
     "dev:go-api": "cd go-api && go run ./cmd/server",
     "dev:angular-ui": "cd angular-ui && npm start",
     "dev:spring-api": "cd spring-api && ./gradlew bootRun",
+    "dev:spring-api:debug": "cd spring-api && ./gradlew bootRun --debug-jvm",
     "dev:angular-spring-ui": "cd angular-spring-ui && npm run dev",
     "build:express-api": "cd api && npm run build",
     "build:react-next-ui": "cd ui && npm run build",
