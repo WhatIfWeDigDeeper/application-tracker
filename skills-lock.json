@@ -4,7 +4,7 @@
     "js-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "192a3c879a7e38aac1c52187bf0fc1e1ff9e50ada25e7ee11f8e3dd0477525da"
+      "computedHash": "08c5e55b53bc30753d6672b24ccfaf6c64e94461e8aed7f1b9dd452269c3be8f"
     },
     "learn": {
       "source": "whatifwedigdeeper/agent-skills",
@@ -14,7 +14,7 @@
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "d12a5c3be8f49502051d706b7e4d48333680dd5779c25602efb31cd1d310ede6"
+      "computedHash": "0987ccc66fa96c0b5916e095f0bd314fb30c0284e02829db6af690f404f377bb"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
