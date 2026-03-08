@@ -22,7 +22,7 @@ jobs:
 
       - name: Check for docs-only changes
         id: docs-check
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             docs/**
@@ -52,7 +52,7 @@ jobs:
 
       - name: Install uv and Python
         if: steps.docs-check.outputs.only_changed == 'false'
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.14'
 
@@ -69,7 +69,7 @@ jobs:
 
       - name: Set up Gradle
         if: steps.docs-check.outputs.only_changed == 'false'
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Get date for NVD cache key
         if: steps.docs-check.outputs.only_changed == 'false'
