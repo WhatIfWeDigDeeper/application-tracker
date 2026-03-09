@@ -1,4 +1,5 @@
 import type { ApplicationStatus, CompanyCategory, JobSource } from '../../types/application.js';
+import { STATUS_LABELS, CATEGORY_LABELS, SOURCE_LABELS, COMPANY_CATEGORIES, JOB_SOURCES } from '../../types/application.js';
 
 export interface Filters {
   status?: ApplicationStatus;
@@ -16,34 +17,18 @@ interface FilterBarProps {
 }
 
 const STATUS_OPTIONS: { value: ApplicationStatus; label: string }[] = [
-  { value: 'wishlist', label: 'Wishlist' },
-  { value: 'applied', label: 'Applied' },
-  { value: 'interviewing', label: 'Interviewing' },
-  { value: 'offer', label: 'Offer' },
-  { value: 'rejected', label: 'Rejected' },
-  { value: 'withdrawn', label: 'Withdrawn' },
-  { value: 'archived', label: 'Archived' },
+  { value: 'unsubmitted', label: STATUS_LABELS.unsubmitted },
+  { value: 'applied', label: STATUS_LABELS.applied },
+  { value: 'interviewing', label: STATUS_LABELS.interviewing },
+  { value: 'given_offer', label: STATUS_LABELS.given_offer },
+  { value: 'accepted_offer', label: STATUS_LABELS.accepted_offer },
+  { value: 'declined_offer', label: STATUS_LABELS.declined_offer },
+  { value: 'rejected', label: STATUS_LABELS.rejected },
+  { value: 'no_offer', label: STATUS_LABELS.no_offer },
 ];
 
-const CATEGORY_OPTIONS: { value: CompanyCategory; label: string }[] = [
-  { value: 'enterprise-software', label: 'Enterprise Software' },
-  { value: 'startup', label: 'Startup' },
-  { value: 'mid-market', label: 'Mid-Market' },
-  { value: 'agency', label: 'Agency' },
-  { value: 'government', label: 'Government' },
-  { value: 'nonprofit', label: 'Nonprofit' },
-  { value: 'other', label: 'Other' },
-];
-
-const SOURCE_OPTIONS: { value: JobSource; label: string }[] = [
-  { value: 'linkedin', label: 'LinkedIn' },
-  { value: 'indeed', label: 'Indeed' },
-  { value: 'referral', label: 'Referral' },
-  { value: 'company-website', label: 'Company Website' },
-  { value: 'recruiter', label: 'Recruiter' },
-  { value: 'job-board', label: 'Job Board' },
-  { value: 'other', label: 'Other' },
-];
+const CATEGORY_OPTIONS = COMPANY_CATEGORIES.map((v) => ({ value: v, label: CATEGORY_LABELS[v] }));
+const SOURCE_OPTIONS = JOB_SOURCES.map((v) => ({ value: v, label: SOURCE_LABELS[v] }));
 
 const SORT_OPTIONS = [
   { value: 'updatedAt', label: 'Last Updated' },
@@ -102,12 +87,12 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
           <input
             id="filter-skills"
             type="number"
-            min="0"
-            max="100"
+            min="1"
+            max="5"
             value={filters.skillsMatchMin ?? ''}
             onChange={(e) => update({ skillsMatchMin: e.target.value ? Number(e.target.value) : undefined })}
             className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="0-100"
+            placeholder="1-5"
           />
         </div>
 

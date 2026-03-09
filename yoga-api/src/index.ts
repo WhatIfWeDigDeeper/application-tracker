@@ -1,8 +1,10 @@
 import 'dotenv/config';
-import { createServer } from 'node:http';
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createYoga } from 'graphql-yoga';
 import { schema } from './schema/index.js';
 import { prisma } from './db/client.js';
+import { getAllApplications, deleteApplication } from './services/application.service.js';
+import Busboy from 'busboy';
 
 const yoga = createYoga({
   schema,
@@ -10,15 +12,274 @@ const yoga = createYoga({
   cors: { origin: ['http://localhost:3080'], credentials: true },
 });
 
+const CSV_COLUMNS = [
+  'companyName', 'positionTitle', 'dateApplied', 'status',
+  'companyUrl', 'jobPostingUrl', 'companyCareerUrl', 'companyCategory',
+  'skillsMatch', 'jobSource', 'coverLetterRequired', 'specialRequirements',
+  'salaryMin', 'salaryMax', 'notes', 'offerDueDate',
+] as const;
+
+function escapeCSV(value: string | null | undefined): string {
+  if (value == null) return '';
+  const str = String(value);
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+function rowToCSV(row: Record<string, string>): string {
+  return CSV_COLUMNS.map((col) => escapeCSV(row[col])).join(',');
+}
+
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { current += ch; }
+    } else {
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === ',') { result.push(current); current = ''; }
+      else { current += ch; }
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+async function handleExport(res: ServerResponse) {
+  const apps = await getAllApplications();
+  const header = CSV_COLUMNS.join(',');
+  const rows = apps.map((app) => rowToCSV({
+    companyName: app.companyName,
+    positionTitle: app.positionTitle,
+    dateApplied: app.dateApplied ? app.dateApplied.toISOString().split('T')[0] : '',
+    status: app.status,
+    companyUrl: app.companyUrl ?? '',
+    jobPostingUrl: app.jobPostingUrl ?? '',
+    companyCareerUrl: app.companyCareerUrl ?? '',
+    companyCategory: app.companyCategory ?? '',
+    skillsMatch: app.skillsMatch != null ? String(app.skillsMatch) : '',
+    jobSource: app.jobSource ?? '',
+    coverLetterRequired: String(app.coverLetterRequired),
+    specialRequirements: app.specialRequirements ?? '',
+    salaryMin: app.salaryMin != null ? String(app.salaryMin) : '',
+    salaryMax: app.salaryMax != null ? String(app.salaryMax) : '',
+    notes: app.notes ?? '',
+    offerDueDate: app.offerDueDate ? app.offerDueDate.toISOString().split('T')[0] : '',
+  }));
+  const csv = [header, ...rows].join('\n') + '\n';
+  const date = new Date().toISOString().split('T')[0];
+  res.writeHead(200, {
+    'Content-Type': 'text/csv',
+    'Content-Disposition': `attachment; filename="applications-${date}.csv"`,
+  });
+  res.end(csv);
+}
+
+function handleSampleCSV(res: ServerResponse) {
+  const header = CSV_COLUMNS.join(',');
+  const example = 'Acme Corp,Software Engineer,2026-01-15,applied,https://acme.com,https://acme.com/jobs/123,https://acme.com/careers,ai,4,linkedin,false,Must have 3+ years experience,80000,120000,Great company culture,';
+  const csv = `${header}\n${example}\n`;
+  res.writeHead(200, {
+    'Content-Type': 'text/csv',
+    'Content-Disposition': 'attachment; filename="applications-template.csv"',
+  });
+  res.end(csv);
+}
+
+async function handleImport(req: IncomingMessage, res: ServerResponse) {
+  const contentType = req.headers['content-type'] ?? '';
+  if (!contentType.includes('multipart/form-data')) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Expected multipart/form-data' }));
+    return;
+  }
+
+  const fileBuffer = await new Promise<Buffer | null>((resolve, reject) => {
+    const bb = Busboy({ headers: req.headers });
+    let found: Buffer | null = null;
+    bb.on('file', (_name, stream) => {
+      const chunks: Buffer[] = [];
+      stream.on('data', (d: Buffer) => chunks.push(d));
+      stream.on('end', () => { found = Buffer.concat(chunks); });
+    });
+    bb.on('finish', () => resolve(found));
+    bb.on('error', reject);
+    req.pipe(bb);
+  });
+
+  if (!fileBuffer) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'No file uploaded' }));
+    return;
+  }
+
+  const content = fileBuffer.toString('utf-8');
+  const lines = content.split(/\r?\n/).filter((l) => l.trim());
+  if (lines.length < 2) {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ imported: 0, skipped: 0, errors: [] }));
+    return;
+  }
+
+  const headers = parseCSVLine(lines[0]);
+  const colIndex: Record<string, number> = {};
+  headers.forEach((h, i) => { colIndex[h.trim()] = i; });
+
+  // Get existing jobPostingUrls for dedup
+  const existingApps = await prisma.application.findMany({
+    select: { jobPostingUrl: true, companyName: true, positionTitle: true },
+  });
+  const existingUrls = new Set(existingApps.filter((a) => a.jobPostingUrl).map((a) => a.jobPostingUrl!));
+  const existingNamePos = new Set(existingApps.map((a) => `${a.companyName}|||${a.positionTitle}`));
+
+  const seenUrls = new Set<string>();
+  const seenNamePos = new Set<string>();
+  const result = { imported: 0, skipped: 0, errors: [] as { row: number; message: string }[] };
+
+  const get = (row: string[], col: string): string => {
+    const idx = colIndex[col];
+    return idx !== undefined ? (row[idx] ?? '').trim() : '';
+  };
+
+  for (let i = 1; i < lines.length; i++) {
+    const rowNum = i + 1;
+    const cols = parseCSVLine(lines[i]);
+
+    const companyName = get(cols, 'companyName');
+    const positionTitle = get(cols, 'positionTitle');
+
+    if (!companyName) {
+      result.errors.push({ row: rowNum, message: 'companyName is required' });
+      continue;
+    }
+    if (!positionTitle) {
+      result.errors.push({ row: rowNum, message: 'positionTitle is required' });
+      continue;
+    }
+
+    const jobPostingUrl = get(cols, 'jobPostingUrl') || null;
+
+    // Duplicate check
+    if (jobPostingUrl) {
+      if (existingUrls.has(jobPostingUrl) || seenUrls.has(jobPostingUrl)) {
+        result.skipped++;
+        continue;
+      }
+      seenUrls.add(jobPostingUrl);
+    } else {
+      const key = `${companyName}|||${positionTitle}`;
+      if (existingNamePos.has(key) || seenNamePos.has(key)) {
+        result.skipped++;
+        continue;
+      }
+      seenNamePos.add(key);
+    }
+
+    const statusRaw = get(cols, 'status');
+    const validStatuses = ['unsubmitted', 'applied', 'interviewing', 'given offer', 'accepted offer', 'declined offer', 'rejected', 'no offer'];
+    const status = validStatuses.includes(statusRaw) ? statusRaw : 'unsubmitted';
+
+    const dateAppliedRaw = get(cols, 'dateApplied');
+    const dateApplied = dateAppliedRaw ? new Date(dateAppliedRaw) : null;
+
+    const skillsMatchRaw = get(cols, 'skillsMatch');
+    const skillsMatch = skillsMatchRaw ? parseInt(skillsMatchRaw, 10) : null;
+    if (skillsMatch != null && (isNaN(skillsMatch) || skillsMatch < 1 || skillsMatch > 5)) {
+      result.errors.push({ row: rowNum, message: 'skillsMatch must be 1-5' });
+      continue;
+    }
+
+    const salaryMinRaw = get(cols, 'salaryMin');
+    const salaryMaxRaw = get(cols, 'salaryMax');
+    const salaryMin = salaryMinRaw ? parseInt(salaryMinRaw, 10) : null;
+    const salaryMax = salaryMaxRaw ? parseInt(salaryMaxRaw, 10) : null;
+
+    const coverLetterRaw = get(cols, 'coverLetterRequired');
+    const coverLetterRequired = coverLetterRaw === 'true';
+
+    try {
+      await prisma.application.create({
+        data: {
+          companyName,
+          positionTitle,
+          status: status as import('@prisma/client').ApplicationStatus,
+          dateApplied,
+          companyUrl: get(cols, 'companyUrl') || null,
+          jobPostingUrl,
+          companyCareerUrl: get(cols, 'companyCareerUrl') || null,
+          companyCategory: (get(cols, 'companyCategory') as import('@prisma/client').CompanyCategory) || null,
+          skillsMatch,
+          jobSource: (get(cols, 'jobSource') as import('@prisma/client').JobSource) || null,
+          coverLetterRequired,
+          specialRequirements: get(cols, 'specialRequirements') || null,
+          salaryMin,
+          salaryMax,
+          notes: get(cols, 'notes') || null,
+          offerDueDate: get(cols, 'offerDueDate') ? new Date(get(cols, 'offerDueDate')) : null,
+        },
+      });
+      result.imported++;
+    } catch (err) {
+      result.errors.push({ row: rowNum, message: `Database error: ${(err as Error).message}` });
+    }
+  }
+
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(result));
+}
+
+async function handleGetApplications(res: ServerResponse) {
+  const apps = await getAllApplications();
+  const items = apps.map((app) => ({
+    id: app.id,
+    companyName: app.companyName,
+    positionTitle: app.positionTitle,
+    status: app.status,
+    dateApplied: app.dateApplied ? app.dateApplied.toISOString().split('T')[0] : null,
+  }));
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ items, total: items.length }));
+}
+
 const server = createServer((req, res) => {
-  const match = req.url?.match(/^\/api\/applications\/([^/?]+)/);
+  const url = req.url ?? '';
+
+  if (req.method === 'GET' && url.startsWith('/api/applications/export')) {
+    handleExport(res).catch(() => { res.writeHead(500); res.end(); });
+    return;
+  }
+
+  if (req.method === 'GET' && url.startsWith('/api/applications/sample-csv')) {
+    handleSampleCSV(res);
+    return;
+  }
+
+  if (req.method === 'POST' && url.startsWith('/api/applications/import')) {
+    handleImport(req, res).catch(() => { res.writeHead(500); res.end(); });
+    return;
+  }
+
+  if (req.method === 'GET' && url.startsWith('/api/applications') && !url.includes('/graphql')) {
+    handleGetApplications(res).catch(() => { res.writeHead(500); res.end(); });
+    return;
+  }
+
+  const match = url.match(/^\/api\/applications\/([^/?]+)/);
   if (req.method === 'DELETE' && match) {
     const id = match[1];
-    prisma.application.delete({ where: { id } })
+    deleteApplication(id)
       .then(() => { res.writeHead(204); res.end(); })
       .catch(() => { res.writeHead(404); res.end(); });
     return;
   }
+
   yoga(req, res);
 });
 

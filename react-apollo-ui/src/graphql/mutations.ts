@@ -13,7 +13,9 @@ export const UPDATE_APPLICATION = gql`
   mutation UpdateApplication($id: ID!, $input: UpdateApplicationInput!) {
     updateApplication(id: $id, input: $input) {
       ...ApplicationFields
-      interviewStages { id applicationId stageName stageOrder scheduledDate notes createdAt updatedAt }
+      interviewStages {
+        id applicationId name order isCompleted completedDate notes performanceRating createdAt updatedAt
+      }
     }
   }
 `;
@@ -35,7 +37,7 @@ export const RESTORE_APPLICATION = gql`
 export const CREATE_STAGE = gql`
   mutation CreateStage($applicationId: ID!, $input: StageInput!) {
     createStage(applicationId: $applicationId, input: $input) {
-      id applicationId stageName stageOrder scheduledDate notes createdAt updatedAt
+      id applicationId name order isCompleted completedDate notes performanceRating createdAt updatedAt
     }
   }
 `;
@@ -43,7 +45,7 @@ export const CREATE_STAGE = gql`
 export const UPDATE_STAGE = gql`
   mutation UpdateStage($applicationId: ID!, $stageId: ID!, $input: StageInput!) {
     updateStage(applicationId: $applicationId, stageId: $stageId, input: $input) {
-      id applicationId stageName stageOrder scheduledDate notes createdAt updatedAt
+      id applicationId name order isCompleted completedDate notes performanceRating createdAt updatedAt
     }
   }
 `;
@@ -59,7 +61,9 @@ export const RESTORE_HISTORY = gql`
   mutation RestoreHistory($applicationId: ID!, $sequence: Int!) {
     restoreHistory(applicationId: $applicationId, sequence: $sequence) {
       ...ApplicationFields
-      interviewStages { id applicationId stageName stageOrder scheduledDate notes createdAt updatedAt }
+      interviewStages {
+        id applicationId name order isCompleted completedDate notes performanceRating createdAt updatedAt
+      }
     }
   }
 `;

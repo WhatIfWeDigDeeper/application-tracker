@@ -9,39 +9,51 @@ beforeEach(() => mockReset(mockPrisma));
 
 const { createStage, deleteStage } = await import('../services/stages.service.js');
 
+function makeStage(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'stage-id', applicationId: 'app-id', name: 'Phone Screen',
+    order: 1, isCompleted: false, completedDate: null, notes: null,
+    performanceRating: null, createdAt: new Date(), updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
+function makeApp(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'app-id', companyName: 'Acme', positionTitle: 'Engineer',
+    status: 'applied' as const, dateApplied: null, jobPostingUrl: null,
+    companyUrl: null, companyCareerUrl: null,
+    companyCategory: null, jobSource: null,
+    salaryMin: null, salaryMax: null, skillsMatch: null,
+    coverLetterRequired: false, specialRequirements: null,
+    notes: null, offerDueDate: null,
+    isArchived: false, createdAt: new Date(), updatedAt: new Date(),
+    interviewStages: [],
+    ...overrides,
+  };
+}
+
 describe('createStage', () => {
-  it('throws when stageName is empty', async () => {
-    await expect(createStage('app-id', { stageName: '', stageOrder: 1 }))
+  it('throws when name is empty', async () => {
+    await expect(createStage('app-id', { name: '', order: 1 }))
       .rejects.toThrow('stageName is required');
   });
 
-  it('throws when stageName is whitespace only', async () => {
-    await expect(createStage('app-id', { stageName: '   ', stageOrder: 1 }))
+  it('throws when name is whitespace only', async () => {
+    await expect(createStage('app-id', { name: '   ', order: 1 }))
       .rejects.toThrow('stageName is required');
   });
 
-  it('throws when stageOrder is out of range', async () => {
-    await expect(createStage('app-id', { stageName: 'Phone Screen', stageOrder: 0 }))
-      .rejects.toThrow('stageOrder must be 1-100');
+  it('throws when order is negative', async () => {
+    await expect(createStage('app-id', { name: 'Phone Screen', order: -1 }))
+      .rejects.toThrow('order must be a non-negative integer');
   });
 });
 
 describe('deleteStage', () => {
   it('returns true on success', async () => {
-    const mockStage = {
-      id: 'stage-id', applicationId: 'app-id', stageName: 'Phone Screen',
-      stageOrder: 1, scheduledDate: null, notes: null,
-      createdAt: new Date(), updatedAt: new Date(),
-    };
-    const mockApp = {
-      id: 'app-id', companyName: 'Acme', positionTitle: 'Engineer',
-      status: 'applied' as const, dateApplied: null, jobPostingUrl: null,
-      companyWebsiteUrl: null, companyCategory: null, jobSource: null,
-      salaryMin: null, salaryMax: null, skillsMatch: null, notes: null,
-      contactName: null, contactEmail: null, offerDueDate: null,
-      isArchived: false, createdAt: new Date(), updatedAt: new Date(),
-      interviewStages: [],
-    };
+    const mockStage = makeStage();
+    const mockApp = makeApp();
 
     mockPrisma.interviewStage.findFirst.mockResolvedValue(mockStage);
     mockPrisma.interviewStage.delete.mockResolvedValue(mockStage);

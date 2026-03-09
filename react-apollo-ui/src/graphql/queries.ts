@@ -2,9 +2,11 @@ import { gql } from '@apollo/client';
 
 export const APPLICATION_FIELDS = gql`
   fragment ApplicationFields on Application {
-    id companyName positionTitle status dateApplied jobPostingUrl companyWebsiteUrl
-    companyCategory jobSource salaryMin salaryMax skillsMatch notes contactName
-    contactEmail offerDueDate isArchived createdAt updatedAt
+    id companyName positionTitle status dateApplied
+    jobPostingUrl companyUrl companyCareerUrl
+    companyCategory jobSource salaryMin salaryMax skillsMatch
+    coverLetterRequired specialRequirements
+    notes offerDueDate isArchived createdAt updatedAt
   }
 `;
 
@@ -31,7 +33,9 @@ export const GET_APPLICATION = gql`
   query GetApplication($id: ID!) {
     application(id: $id) {
       ...ApplicationFields
-      interviewStages { id applicationId stageName stageOrder scheduledDate notes createdAt updatedAt }
+      interviewStages {
+        id applicationId name order isCompleted completedDate notes performanceRating createdAt updatedAt
+      }
     }
   }
 `;

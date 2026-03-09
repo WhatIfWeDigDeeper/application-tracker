@@ -10,20 +10,26 @@ import { Badge } from '../../components/ui/Badge.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';
 import { Spinner } from '../../components/ui/Spinner.js';
-import type { Application, ApplicationStatus, InterviewStage, HistoryEntry } from '../../types/application.js';
+import {
+  type Application, type ApplicationStatus, type InterviewStage, type HistoryEntry,
+  type CompanyCategory, type JobSource,
+  STATUS_LABELS, CATEGORY_LABELS, SOURCE_LABELS, COMPANY_CATEGORIES, JOB_SOURCES,
+  TERMINAL_STATUSES,
+} from '../../types/application.js';
 
 export const Route = createFileRoute('/applications/$id')({
   component: ApplicationDetailPage,
 });
 
 const STATUS_OPTIONS: { value: ApplicationStatus; label: string }[] = [
-  { value: 'wishlist', label: 'Wishlist' },
-  { value: 'applied', label: 'Applied' },
-  { value: 'interviewing', label: 'Interviewing' },
-  { value: 'offer', label: 'Offer' },
-  { value: 'rejected', label: 'Rejected' },
-  { value: 'withdrawn', label: 'Withdrawn' },
-  { value: 'archived', label: 'Archived' },
+  { value: 'unsubmitted', label: STATUS_LABELS.unsubmitted },
+  { value: 'applied', label: STATUS_LABELS.applied },
+  { value: 'interviewing', label: STATUS_LABELS.interviewing },
+  { value: 'given_offer', label: STATUS_LABELS.given_offer },
+  { value: 'accepted_offer', label: STATUS_LABELS.accepted_offer },
+  { value: 'declined_offer', label: STATUS_LABELS.declined_offer },
+  { value: 'rejected', label: STATUS_LABELS.rejected },
+  { value: 'no_offer', label: STATUS_LABELS.no_offer },
 ];
 
 function ApplicationDetailPage() {
@@ -34,10 +40,13 @@ function ApplicationDetailPage() {
   const app: Application | null = data?.application ?? null;
 
   const [form, setForm] = useState({
-    companyName: '', positionTitle: '', status: 'wishlist' as ApplicationStatus,
-    dateApplied: '', jobPostingUrl: '', companyWebsiteUrl: '',
-    salaryMin: '', salaryMax: '', skillsMatch: '', notes: '',
-    contactName: '', contactEmail: '', offerDueDate: '',
+    companyName: '', positionTitle: '', status: 'unsubmitted' as ApplicationStatus,
+    dateApplied: '', jobPostingUrl: '', companyUrl: '', companyCareerUrl: '',
+    companyCategory: '' as CompanyCategory | '',
+    jobSource: '' as JobSource | '',
+    salaryMin: '', salaryMax: '', skillsMatch: '',
+    coverLetterRequired: false,
+    specialRequirements: '', notes: '', offerDueDate: '',
   });
   const [isDirty, setIsDirty] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -45,18 +54,22 @@ function ApplicationDetailPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [showAddStage, setShowAddStage] = useState(false);
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
-  const [stageForm, setStageForm] = useState({ stageName: '', stageOrder: '1', scheduledDate: '', notes: '' });
+  const [stageForm, setStageForm] = useState({ name: '', order: '0', notes: '' });
 
   useEffect(() => {
     if (app) {
       setForm({
         companyName: app.companyName, positionTitle: app.positionTitle,
         status: app.status, dateApplied: app.dateApplied ?? '',
-        jobPostingUrl: app.jobPostingUrl ?? '', companyWebsiteUrl: app.companyWebsiteUrl ?? '',
+        jobPostingUrl: app.jobPostingUrl ?? '', companyUrl: app.companyUrl ?? '',
+        companyCareerUrl: app.companyCareerUrl ?? '',
+        companyCategory: (app.companyCategory ?? '') as CompanyCategory | '',
+        jobSource: (app.jobSource ?? '') as JobSource | '',
         salaryMin: app.salaryMin?.toString() ?? '', salaryMax: app.salaryMax?.toString() ?? '',
-        skillsMatch: app.skillsMatch?.toString() ?? '', notes: app.notes ?? '',
-        contactName: app.contactName ?? '', contactEmail: app.contactEmail ?? '',
-        offerDueDate: app.offerDueDate ?? '',
+        skillsMatch: app.skillsMatch?.toString() ?? '',
+        coverLetterRequired: app.coverLetterRequired ?? false,
+        specialRequirements: app.specialRequirements ?? '',
+        notes: app.notes ?? '', offerDueDate: app.offerDueDate ?? '',
       });
       setIsDirty(false);
     }
@@ -66,17 +79,21 @@ function ApplicationDetailPage() {
   const [deleteApp] = useMutation(DELETE_APPLICATION);
   const [archiveApp] = useMutation(ARCHIVE_APPLICATION, { onCompleted: () => refetch() });
   const [restoreApp] = useMutation(RESTORE_APPLICATION, { onCompleted: () => refetch() });
-  const [createStage] = useMutation(CREATE_STAGE, { onCompleted: () => { refetch(); setShowAddStage(false); setStageForm({ stageName: '', stageOrder: '1', scheduledDate: '', notes: '' }); } });
+  const [createStage] = useMutation(CREATE_STAGE, { onCompleted: () => { refetch(); setShowAddStage(false); setStageForm({ name: '', order: '0', notes: '' }); } });
   const [updateStage] = useMutation(UPDATE_STAGE, { onCompleted: () => { refetch(); setEditingStageId(null); } });
   const [deleteStage] = useMutation(DELETE_STAGE, { onCompleted: () => refetch() });
   const [restoreHistory] = useMutation(RESTORE_HISTORY, { onCompleted: () => { refetch(); setShowHistory(false); } });
 
-  const updateField = <K extends keyof typeof form>(field: K, value: string) => {
+  const isTerminal = TERMINAL_STATUSES.includes(form.status);
+
+  const updateField = <K extends keyof typeof form>(field: K, value: typeof form[K]) => {
     setForm((prev) => {
       const next = { ...prev, [field]: value };
       if (field === 'status') {
-        if (value === 'wishlist') next.dateApplied = '';
-        else if (prev.status === 'wishlist' && !prev.dateApplied) {
+        const newStatus = value as ApplicationStatus;
+        if (newStatus === 'unsubmitted') {
+          next.dateApplied = '';
+        } else if (prev.status === 'unsubmitted' && !prev.dateApplied) {
           const today = new Date().toISOString().split('T')[0];
           next.dateApplied = today;
         }
@@ -100,12 +117,18 @@ function ApplicationDetailPage() {
           input: {
             companyName: form.companyName.trim(), positionTitle: form.positionTitle.trim(),
             status: form.status, dateApplied: form.dateApplied || null,
-            jobPostingUrl: form.jobPostingUrl || null, companyWebsiteUrl: form.companyWebsiteUrl || null,
+            jobPostingUrl: form.jobPostingUrl || null,
+            companyUrl: form.companyUrl || null,
+            companyCareerUrl: form.companyCareerUrl || null,
+            companyCategory: form.companyCategory || null,
+            jobSource: form.jobSource || null,
             salaryMin: form.salaryMin ? parseInt(form.salaryMin, 10) : null,
             salaryMax: form.salaryMax ? parseInt(form.salaryMax, 10) : null,
             skillsMatch: form.skillsMatch ? parseInt(form.skillsMatch, 10) : null,
-            notes: form.notes || null, contactName: form.contactName || null,
-            contactEmail: form.contactEmail || null, offerDueDate: form.offerDueDate || null,
+            coverLetterRequired: form.coverLetterRequired,
+            specialRequirements: form.specialRequirements || null,
+            notes: form.notes || null,
+            offerDueDate: form.offerDueDate || null,
           },
         },
       });
@@ -126,8 +149,8 @@ function ApplicationDetailPage() {
       variables: {
         applicationId: id,
         input: {
-          stageName: stageForm.stageName, stageOrder: parseInt(stageForm.stageOrder, 10),
-          scheduledDate: stageForm.scheduledDate || null, notes: stageForm.notes || null,
+          name: stageForm.name, order: parseInt(stageForm.order, 10),
+          notes: stageForm.notes || null,
         },
       },
     });
@@ -138,8 +161,8 @@ function ApplicationDetailPage() {
       variables: {
         applicationId: id, stageId,
         input: {
-          stageName: stageForm.stageName, stageOrder: parseInt(stageForm.stageOrder, 10),
-          scheduledDate: stageForm.scheduledDate || null, notes: stageForm.notes || null,
+          name: stageForm.name, order: parseInt(stageForm.order, 10),
+          notes: stageForm.notes || null,
         },
       },
     });
@@ -148,8 +171,8 @@ function ApplicationDetailPage() {
   const startEditStage = (stage: InterviewStage) => {
     setEditingStageId(stage.id);
     setStageForm({
-      stageName: stage.stageName, stageOrder: stage.stageOrder.toString(),
-      scheduledDate: stage.scheduledDate ?? '', notes: stage.notes ?? '',
+      name: stage.name, order: stage.order.toString(),
+      notes: stage.notes ?? '',
     });
   };
 
@@ -157,7 +180,10 @@ function ApplicationDetailPage() {
   if (error) return <div className="text-red-600 p-4">{error.message}</div>;
   if (!app) return <div className="text-gray-500 p-4">Application not found.</div>;
 
-  const stages: InterviewStage[] = [...(app.interviewStages ?? [])].sort((a, b) => a.stageOrder - b.stageOrder);
+  const stages: InterviewStage[] = [...(app.interviewStages ?? [])].sort((a, b) => a.order - b.order);
+
+  const inputClass = (hasError = false) =>
+    `w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${hasError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -176,7 +202,26 @@ function ApplicationDetailPage() {
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
           {isDirty && (
-            <Button variant="secondary" onClick={() => { if (app) { setForm({ companyName: app.companyName, positionTitle: app.positionTitle, status: app.status, dateApplied: app.dateApplied ?? '', jobPostingUrl: app.jobPostingUrl ?? '', companyWebsiteUrl: app.companyWebsiteUrl ?? '', salaryMin: app.salaryMin?.toString() ?? '', salaryMax: app.salaryMax?.toString() ?? '', skillsMatch: app.skillsMatch?.toString() ?? '', notes: app.notes ?? '', contactName: app.contactName ?? '', contactEmail: app.contactEmail ?? '', offerDueDate: app.offerDueDate ?? '' }); setIsDirty(false); } }}>
+            <Button variant="secondary" onClick={() => {
+              if (app) {
+                setForm({
+                  companyName: app.companyName, positionTitle: app.positionTitle,
+                  status: app.status, dateApplied: app.dateApplied ?? '',
+                  jobPostingUrl: app.jobPostingUrl ?? '',
+                  companyUrl: app.companyUrl ?? '',
+                  companyCareerUrl: app.companyCareerUrl ?? '',
+                  companyCategory: (app.companyCategory ?? '') as CompanyCategory | '',
+                  jobSource: (app.jobSource ?? '') as JobSource | '',
+                  salaryMin: app.salaryMin?.toString() ?? '',
+                  salaryMax: app.salaryMax?.toString() ?? '',
+                  skillsMatch: app.skillsMatch?.toString() ?? '',
+                  coverLetterRequired: app.coverLetterRequired ?? false,
+                  specialRequirements: app.specialRequirements ?? '',
+                  notes: app.notes ?? '', offerDueDate: app.offerDueDate ?? '',
+                });
+                setIsDirty(false);
+              }
+            }}>
               Discard
             </Button>
           )}
@@ -201,13 +246,14 @@ function ApplicationDetailPage() {
         <div className="flex items-center gap-3 mb-2">
           <Badge status={app.status} />
           {app.isArchived && <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">Archived</span>}
+          {isTerminal && <span className="text-xs text-orange-600 dark:text-orange-400 font-medium">(Terminal state)</span>}
         </div>
 
         <div>
           <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name *</label>
           <input id="companyName" type="text" value={form.companyName}
             onChange={(e) => updateField('companyName', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.companyName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`} />
+            className={inputClass(!!errors.companyName)} />
           {errors.companyName && <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>}
         </div>
 
@@ -215,15 +261,17 @@ function ApplicationDetailPage() {
           <label htmlFor="positionTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position Title *</label>
           <input id="positionTitle" type="text" value={form.positionTitle}
             onChange={(e) => updateField('positionTitle', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.positionTitle ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`} />
+            className={inputClass(!!errors.positionTitle)} />
           {errors.positionTitle && <p className="mt-1 text-sm text-red-600">{errors.positionTitle}</p>}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-            <select id="status" value={form.status} onChange={(e) => updateField('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="status" value={form.status}
+              onChange={(e) => updateField('status', e.target.value as ApplicationStatus)}
+              disabled={isTerminal}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
               {STATUS_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>
           </div>
@@ -231,12 +279,12 @@ function ApplicationDetailPage() {
             <label htmlFor="dateApplied" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Applied</label>
             <input id="dateApplied" type="date" value={form.dateApplied}
               onChange={(e) => updateField('dateApplied', e.target.value)}
-              disabled={form.status === 'wishlist'}
+              disabled={form.status === 'unsubmitted'}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed" />
           </div>
         </div>
 
-        {form.status === 'offer' && (
+        {form.status === 'given_offer' && (
           <div>
             <label htmlFor="offerDueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Offer Due Date</label>
             <input id="offerDueDate" type="date" value={form.offerDueDate}
@@ -245,18 +293,49 @@ function ApplicationDetailPage() {
           </div>
         )}
 
+        <div>
+          <label htmlFor="jobPostingUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job Posting URL</label>
+          <input id="jobPostingUrl" type="url" value={form.jobPostingUrl}
+            onChange={(e) => updateField('jobPostingUrl', e.target.value)}
+            placeholder="https://linkedin.com/jobs/..."
+            className={inputClass()} />
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="jobPostingUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job Posting URL</label>
-            <input id="jobPostingUrl" type="url" value={form.jobPostingUrl}
-              onChange={(e) => updateField('jobPostingUrl', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label htmlFor="companyUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company URL</label>
+            <input id="companyUrl" type="url" value={form.companyUrl}
+              onChange={(e) => updateField('companyUrl', e.target.value)}
+              placeholder="https://example.com"
+              className={inputClass()} />
           </div>
           <div>
-            <label htmlFor="companyWebsiteUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Website</label>
-            <input id="companyWebsiteUrl" type="url" value={form.companyWebsiteUrl}
-              onChange={(e) => updateField('companyWebsiteUrl', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label htmlFor="companyCareerUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Career URL</label>
+            <input id="companyCareerUrl" type="url" value={form.companyCareerUrl}
+              onChange={(e) => updateField('companyCareerUrl', e.target.value)}
+              placeholder="https://example.com/careers"
+              className={inputClass()} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="companyCategory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Category</label>
+            <select id="companyCategory" value={form.companyCategory}
+              onChange={(e) => updateField('companyCategory', e.target.value as CompanyCategory | '')}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Select category</option>
+              {COMPANY_CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="jobSource" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job Source</label>
+            <select id="jobSource" value={form.jobSource}
+              onChange={(e) => updateField('jobSource', e.target.value as JobSource | '')}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Select source</option>
+              {JOB_SOURCES.map((s) => <option key={s} value={s}>{SOURCE_LABELS[s]}</option>)}
+            </select>
           </div>
         </div>
 
@@ -265,43 +344,48 @@ function ApplicationDetailPage() {
             <label htmlFor="salaryMin" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Min Salary</label>
             <input id="salaryMin" type="number" value={form.salaryMin}
               onChange={(e) => updateField('salaryMin', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className={inputClass()} />
           </div>
           <div>
             <label htmlFor="salaryMax" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Salary</label>
             <input id="salaryMax" type="number" value={form.salaryMax}
               onChange={(e) => updateField('salaryMax', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className={inputClass()} />
           </div>
           <div>
-            <label htmlFor="skillsMatch" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Skills Match %</label>
-            <input id="skillsMatch" type="number" min="0" max="100" value={form.skillsMatch}
+            <label htmlFor="skillsMatch" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Skills Match (1-5)</label>
+            <input id="skillsMatch" type="number" min="1" max="5" value={form.skillsMatch}
               onChange={(e) => updateField('skillsMatch', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className={inputClass()} />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="contactName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Name</label>
-            <input id="contactName" type="text" value={form.contactName}
-              onChange={(e) => updateField('contactName', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div>
-            <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Email</label>
-            <input id="contactEmail" type="email" value={form.contactEmail}
-              onChange={(e) => updateField('contactEmail', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={form.coverLetterRequired}
+              onChange={(e) => updateField('coverLetterRequired', e.target.checked)}
+              className="w-4 h-4"
+            />
+            cover letter required
+          </label>
+        </div>
+
+        <div>
+          <label htmlFor="specialRequirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Special Requirements</label>
+          <textarea id="specialRequirements" value={form.specialRequirements}
+            onChange={(e) => updateField('specialRequirements', e.target.value)}
+            maxLength={1000} rows={3}
+            className={`${inputClass()} resize-y`} />
         </div>
 
         <div>
           <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
           <textarea id="notes" value={form.notes}
             onChange={(e) => updateField('notes', e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" />
+            maxLength={5000} rows={4}
+            className={`${inputClass()} resize-y`} />
         </div>
       </div>
 
@@ -309,7 +393,10 @@ function ApplicationDetailPage() {
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Interview Stages</h2>
-          <Button onClick={() => { setShowAddStage(true); setStageForm({ stageName: '', stageOrder: String((stages.length > 0 ? Math.max(...stages.map(s => s.stageOrder)) + 1 : 1)), scheduledDate: '', notes: '' }); }}>
+          <Button onClick={() => {
+            setShowAddStage(true);
+            setStageForm({ name: '', order: String(stages.length), notes: '' });
+          }}>
             Add Stage
           </Button>
         </div>
@@ -340,9 +427,9 @@ function ApplicationDetailPage() {
             ) : (
               <div key={stage.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
                 <div>
-                  <span className="font-medium text-sm">{stage.stageName}</span>
-                  <span className="ml-2 text-xs text-gray-500">#{stage.stageOrder}</span>
-                  {stage.scheduledDate && <span className="ml-2 text-xs text-gray-400">{stage.scheduledDate}</span>}
+                  <span className="font-medium text-sm">{stage.name}</span>
+                  <span className="ml-2 text-xs text-gray-500">#{stage.order}</span>
+                  {stage.isCompleted && <span className="ml-2 text-xs text-green-600">Completed</span>}
                 </div>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => startEditStage(stage)}
@@ -384,8 +471,8 @@ function ApplicationDetailPage() {
 }
 
 interface StageFormProps {
-  form: { stageName: string; stageOrder: string; scheduledDate: string; notes: string };
-  onChange: (f: { stageName: string; stageOrder: string; scheduledDate: string; notes: string }) => void;
+  form: { name: string; order: string; notes: string };
+  onChange: (f: { name: string; order: string; notes: string }) => void;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -396,25 +483,26 @@ function StageForm({ form, onChange, onSave, onCancel }: StageFormProps) {
       <div className="grid grid-cols-2 gap-3 mb-3">
         <div>
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stage Name *</label>
-          <input type="text" value={form.stageName} onChange={(e) => onChange({ ...form, stageName: e.target.value })}
+          <input type="text" value={form.name} onChange={(e) => onChange({ ...form, name: e.target.value })}
             placeholder="e.g., Phone Screen"
             className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500" />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Order</label>
-          <input type="number" min="1" max="100" value={form.stageOrder} onChange={(e) => onChange({ ...form, stageOrder: e.target.value })}
+          <input type="number" min="0" value={form.order} onChange={(e) => onChange({ ...form, order: e.target.value })}
             className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500" />
         </div>
       </div>
       <div className="mb-3">
-        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Scheduled Date</label>
-        <input type="date" value={form.scheduledDate} onChange={(e) => onChange({ ...form, scheduledDate: e.target.value })}
-          className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500" />
+        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+        <textarea value={form.notes} onChange={(e) => onChange({ ...form, notes: e.target.value })}
+          rows={2}
+          className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 resize-y" />
       </div>
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onCancel}
           className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
-        <button type="button" onClick={onSave}
+        <button type="button" data-testid="stage-form-save" onClick={onSave}
           className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
       </div>
     </div>
@@ -432,7 +520,7 @@ function HistoryPanel({ applicationId, onClose, onRestore }: HistoryPanelProps) 
   const entries: HistoryEntry[] = data?.applicationHistory?.items ?? [];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+    <div data-testid="history-panel" className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">History</h2>
         <button type="button" onClick={onClose}
@@ -444,7 +532,7 @@ function HistoryPanel({ applicationId, onClose, onRestore }: HistoryPanelProps) 
         {entries.map((entry) => {
           const changed: string[] = JSON.parse(entry.changedFields);
           return (
-            <div key={entry.id} className="flex items-start justify-between p-3 border border-gray-200 dark:border-gray-600 rounded">
+            <div key={entry.id} data-testid="history-entry" className="flex items-start justify-between p-3 border border-gray-200 dark:border-gray-600 rounded">
               <div>
                 <span className="text-sm font-medium">#{entry.sequence}</span>
                 <span className="ml-2 text-xs text-gray-500">{new Date(entry.createdAt).toLocaleString()}</span>

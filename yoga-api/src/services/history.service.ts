@@ -12,10 +12,11 @@ export async function recordSnapshot(tx: TxClient, app: AppWithStages, changedFi
   const snapshot = {
     id: app.id, companyName: app.companyName, positionTitle: app.positionTitle,
     status: app.status, dateApplied: app.dateApplied, jobPostingUrl: app.jobPostingUrl,
-    companyWebsiteUrl: app.companyWebsiteUrl, companyCategory: app.companyCategory,
-    jobSource: app.jobSource, salaryMin: app.salaryMin, salaryMax: app.salaryMax,
-    skillsMatch: app.skillsMatch, notes: app.notes, contactName: app.contactName,
-    contactEmail: app.contactEmail, offerDueDate: app.offerDueDate,
+    companyUrl: app.companyUrl, companyCareerUrl: app.companyCareerUrl,
+    companyCategory: app.companyCategory, jobSource: app.jobSource,
+    salaryMin: app.salaryMin, salaryMax: app.salaryMax, skillsMatch: app.skillsMatch,
+    coverLetterRequired: app.coverLetterRequired, specialRequirements: app.specialRequirements,
+    notes: app.notes, offerDueDate: app.offerDueDate,
     isArchived: app.isArchived, createdAt: app.createdAt, updatedAt: app.updatedAt,
   };
   await tx.applicationHistory.create({
@@ -49,19 +50,20 @@ export async function restoreToSnapshot(applicationId: string, sequence: number)
         status: snap.status as import('@prisma/client').ApplicationStatus,
         dateApplied: snap.dateApplied ? new Date(snap.dateApplied as string) : null,
         jobPostingUrl: (snap.jobPostingUrl as string | null) ?? null,
-        companyWebsiteUrl: (snap.companyWebsiteUrl as string | null) ?? null,
+        companyUrl: (snap.companyUrl as string | null) ?? null,
+        companyCareerUrl: (snap.companyCareerUrl as string | null) ?? null,
         companyCategory: (snap.companyCategory as import('@prisma/client').CompanyCategory | null) ?? null,
         jobSource: (snap.jobSource as import('@prisma/client').JobSource | null) ?? null,
         salaryMin: (snap.salaryMin as number | null) ?? null,
         salaryMax: (snap.salaryMax as number | null) ?? null,
         skillsMatch: (snap.skillsMatch as number | null) ?? null,
+        coverLetterRequired: (snap.coverLetterRequired as boolean) ?? false,
+        specialRequirements: (snap.specialRequirements as string | null) ?? null,
         notes: (snap.notes as string | null) ?? null,
-        contactName: (snap.contactName as string | null) ?? null,
-        contactEmail: (snap.contactEmail as string | null) ?? null,
         offerDueDate: snap.offerDueDate ? new Date(snap.offerDueDate as string) : null,
         isArchived: snap.isArchived as boolean,
       },
-      include: { interviewStages: { orderBy: { stageOrder: 'asc' } } },
+      include: { interviewStages: { orderBy: { order: 'asc' } } },
     });
     await recordSnapshot(tx, app, ['restored']);
     return app;

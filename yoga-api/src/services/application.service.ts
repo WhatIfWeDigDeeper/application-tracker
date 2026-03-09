@@ -2,8 +2,10 @@ import { prisma } from '../db/client.js';
 import { Prisma, ApplicationStatus, CompanyCategory, JobSource } from '@prisma/client';
 import { recordSnapshot } from './history.service.js';
 
-const TERMINAL_STATUSES: ApplicationStatus[] = ['rejected', 'withdrawn'];
-const SUBMITTED_STATUSES: ApplicationStatus[] = ['applied', 'interviewing', 'offer', 'rejected', 'withdrawn', 'archived'];
+const TERMINAL_STATUSES: ApplicationStatus[] = ['accepted_offer', 'declined_offer'];
+const SUBMITTED_STATUSES: ApplicationStatus[] = [
+  'applied', 'interviewing', 'given_offer', 'accepted_offer', 'declined_offer', 'rejected', 'no_offer',
+];
 
 export interface ListFilters {
   status?: ApplicationStatus;
@@ -27,7 +29,7 @@ export async function listApplications(filters: ListFilters = {}, pagination: Pa
 
   const where: Prisma.ApplicationWhereInput = {};
   if (filters.status) where.status = filters.status;
-  else if (!filters.includeArchived) where.status = { not: 'archived' };
+  else if (!filters.includeArchived) where.isArchived = false;
   if (filters.companyCategory) where.companyCategory = filters.companyCategory;
   if (filters.jobSource) where.jobSource = filters.jobSource;
   if (filters.skillsMatchMin != null) where.skillsMatch = { gte: filters.skillsMatchMin };
@@ -43,7 +45,7 @@ export async function listApplications(filters: ListFilters = {}, pagination: Pa
     prisma.application.findMany({
       where, skip, take: limit,
       orderBy: { [sortField]: sortDir },
-      include: { interviewStages: { orderBy: { stageOrder: 'asc' } } },
+      include: { interviewStages: { orderBy: { order: 'asc' } } },
     }),
     prisma.application.count({ where }),
   ]);
@@ -54,10 +56,18 @@ export async function listApplications(filters: ListFilters = {}, pagination: Pa
 export async function getApplication(id: string) {
   const app = await prisma.application.findUnique({
     where: { id },
-    include: { interviewStages: { orderBy: { stageOrder: 'asc' } } },
+    include: { interviewStages: { orderBy: { order: 'asc' } } },
   });
   if (!app) throw new Error(`Application ${id} not found`);
   return app;
+}
+
+export async function getAllApplications() {
+  return prisma.application.findMany({
+    where: { isArchived: false },
+    orderBy: [{ dateApplied: 'asc' }, { updatedAt: 'desc' }],
+    include: { interviewStages: { orderBy: { order: 'asc' } } },
+  });
 }
 
 function validateInput(input: Record<string, unknown>) {
@@ -67,7 +77,7 @@ function validateInput(input: Record<string, unknown>) {
     throw new Error('positionTitle is required');
   if (input.skillsMatch !== undefined && input.skillsMatch !== null) {
     const v = input.skillsMatch as number;
-    if (v < 0 || v > 100) throw new Error('skillsMatch must be 0-100');
+    if (!Number.isInteger(v) || v < 1 || v > 5) throw new Error('skillsMatch must be 1-5');
   }
   if (input.salaryMin !== undefined && input.salaryMin !== null && (input.salaryMin as number) < 0)
     throw new Error('salaryMin must be non-negative');
@@ -79,28 +89,32 @@ function validateInput(input: Record<string, unknown>) {
 
 export async function createApplication(input: {
   companyName: string; positionTitle: string; status?: ApplicationStatus;
-  dateApplied?: string | null; jobPostingUrl?: string | null; companyWebsiteUrl?: string | null;
-  companyCategory?: CompanyCategory | null; jobSource?: JobSource | null;
+  dateApplied?: string | null; jobPostingUrl?: string | null; companyUrl?: string | null;
+  companyCareerUrl?: string | null; companyCategory?: CompanyCategory | null; jobSource?: JobSource | null;
   salaryMin?: number | null; salaryMax?: number | null; skillsMatch?: number | null;
-  notes?: string | null; contactName?: string | null; contactEmail?: string | null; offerDueDate?: string | null;
+  coverLetterRequired?: boolean | null; specialRequirements?: string | null;
+  notes?: string | null; offerDueDate?: string | null;
 }) {
   if (!input.companyName?.trim()) throw new Error('companyName is required');
   if (!input.positionTitle?.trim()) throw new Error('positionTitle is required');
   validateInput(input as Record<string, unknown>);
 
-  const status = input.status ?? 'wishlist';
+  const status = input.status ?? 'unsubmitted';
   let dateApplied = input.dateApplied ? new Date(input.dateApplied) : null;
   if (SUBMITTED_STATUSES.includes(status) && !dateApplied) dateApplied = new Date();
-  if (status === 'wishlist') dateApplied = null;
+  if (status === 'unsubmitted') dateApplied = null;
 
   return prisma.$transaction(async (tx) => {
     const app = await tx.application.create({
       data: {
         companyName: input.companyName, positionTitle: input.positionTitle, status,
-        dateApplied, jobPostingUrl: input.jobPostingUrl, companyWebsiteUrl: input.companyWebsiteUrl,
+        dateApplied, jobPostingUrl: input.jobPostingUrl,
+        companyUrl: input.companyUrl, companyCareerUrl: input.companyCareerUrl,
         companyCategory: input.companyCategory, jobSource: input.jobSource,
         salaryMin: input.salaryMin, salaryMax: input.salaryMax, skillsMatch: input.skillsMatch,
-        notes: input.notes, contactName: input.contactName, contactEmail: input.contactEmail,
+        coverLetterRequired: input.coverLetterRequired ?? false,
+        specialRequirements: input.specialRequirements,
+        notes: input.notes,
         offerDueDate: input.offerDueDate ? new Date(input.offerDueDate) : null,
       },
       include: { interviewStages: true },
@@ -112,10 +126,11 @@ export async function createApplication(input: {
 
 export async function updateApplication(id: string, input: Partial<{
   companyName: string; positionTitle: string; status: ApplicationStatus;
-  dateApplied: string | null; jobPostingUrl: string | null; companyWebsiteUrl: string | null;
-  companyCategory: CompanyCategory | null; jobSource: JobSource | null;
+  dateApplied: string | null; jobPostingUrl: string | null; companyUrl: string | null;
+  companyCareerUrl: string | null; companyCategory: CompanyCategory | null; jobSource: JobSource | null;
   salaryMin: number | null; salaryMax: number | null; skillsMatch: number | null;
-  notes: string | null; contactName: string | null; contactEmail: string | null; offerDueDate: string | null;
+  coverLetterRequired: boolean | null; specialRequirements: string | null;
+  notes: string | null; offerDueDate: string | null;
 }>) {
   validateInput(input as Record<string, unknown>);
   const existing = await prisma.application.findUnique({ where: { id } });
@@ -134,7 +149,7 @@ export async function updateApplication(id: string, input: Partial<{
 
   if ('status' in input && input.status !== undefined) {
     const newStatus = input.status;
-    if (newStatus === 'wishlist') {
+    if (newStatus === 'unsubmitted') {
       data.dateApplied = null; if (!changedFields.includes('dateApplied')) changedFields.push('dateApplied');
     } else if (SUBMITTED_STATUSES.includes(newStatus)) {
       if ('dateApplied' in input) {
@@ -156,7 +171,7 @@ export async function updateApplication(id: string, input: Partial<{
   return prisma.$transaction(async (tx) => {
     const app = await tx.application.update({
       where: { id }, data,
-      include: { interviewStages: { orderBy: { stageOrder: 'asc' } } },
+      include: { interviewStages: { orderBy: { order: 'asc' } } },
     });
     await recordSnapshot(tx, app, changedFields);
     return app;
@@ -171,30 +186,21 @@ export async function deleteApplication(id: string) {
 export async function archiveApplication(id: string) {
   return prisma.$transaction(async (tx) => {
     const app = await tx.application.update({
-      where: { id }, data: { status: 'archived', isArchived: true },
-      include: { interviewStages: { orderBy: { stageOrder: 'asc' } } },
+      where: { id }, data: { isArchived: true },
+      include: { interviewStages: { orderBy: { order: 'asc' } } },
     });
-    await recordSnapshot(tx, app, ['status', 'isArchived']);
+    await recordSnapshot(tx, app, ['isArchived']);
     return app;
   });
 }
 
 export async function restoreApplication(id: string) {
-  const history = await prisma.applicationHistory.findMany({
-    where: { applicationId: id }, orderBy: { sequence: 'desc' },
-  });
-  let previousStatus: ApplicationStatus = 'withdrawn';
-  for (const h of history) {
-    const snap = h.snapshot as Record<string, unknown>;
-    const s = snap.status as ApplicationStatus;
-    if (s && s !== 'archived') { previousStatus = s; break; }
-  }
   return prisma.$transaction(async (tx) => {
     const app = await tx.application.update({
-      where: { id }, data: { status: previousStatus, isArchived: false },
-      include: { interviewStages: { orderBy: { stageOrder: 'asc' } } },
+      where: { id }, data: { isArchived: false },
+      include: { interviewStages: { orderBy: { order: 'asc' } } },
     });
-    await recordSnapshot(tx, app, ['status', 'isArchived']);
+    await recordSnapshot(tx, app, ['isArchived']);
     return app;
   });
 }

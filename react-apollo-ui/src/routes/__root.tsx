@@ -7,12 +7,12 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   const [dark, setDark] = useState(() =>
-    typeof window !== 'undefined' && localStorage.getItem('theme') === 'dark'
+    typeof window !== 'undefined' && localStorage.getItem('app-theme') === 'dark'
   );
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
-    localStorage.setItem('theme', dark ? 'dark' : 'light');
+    localStorage.setItem('app-theme', dark ? 'dark' : 'light');
   }, [dark]);
 
   return (
@@ -24,8 +24,11 @@ function RootLayout() {
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-medium">
             Add Application
           </Link>
-          <button onClick={() => setDark(d => !d)}
-            className="p-2 rounded border border-gray-300 dark:border-gray-600 text-sm">
+          <button
+            onClick={() => setDark(d => !d)}
+            aria-label={dark ? 'switch to light mode' : 'switch to dark mode'}
+            className="p-2 rounded border border-gray-300 dark:border-gray-600 text-sm"
+          >
             {dark ? '☀️' : '🌙'}
           </button>
         </div>

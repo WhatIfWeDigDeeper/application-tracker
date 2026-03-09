@@ -15,63 +15,77 @@ datasource db {
 }
 
 enum ApplicationStatus {
-  wishlist
+  unsubmitted
   applied
   interviewing
-  offer
+  given_offer    @map("given offer")
+  accepted_offer @map("accepted offer")
+  declined_offer @map("declined offer")
   rejected
-  withdrawn
-  archived
+  no_offer       @map("no offer")
 
   @@map("application_status")
 }
 
 enum CompanyCategory {
+  ai
+  climate
+  consulting
+  consumer_tech       @map("consumer-tech")
+  cybersecurity
+  e_commerce          @map("e-commerce")
+  education
+  energy
   enterprise_software @map("enterprise-software")
-  startup
-  mid_market          @map("mid-market")
-  agency
+  finance
+  gaming
   government
+  health
+  hospitality
+  media_entertainment @map("media-entertainment")
   nonprofit
+  restaurant
+  retail
   other
 
   @@map("company_category")
 }
 
 enum JobSource {
+  recruiter
   linkedin
   indeed
-  referral
+  friend
+  colleague
   company_website @map("company-website")
-  recruiter
-  job_board       @map("job-board")
   other
 
   @@map("job_source")
 }
 
 model Application {
-  id                String              @id @default(uuid())
-  companyName       String              @map("company_name") @db.VarChar(200)
-  positionTitle     String              @map("position_title") @db.VarChar(200)
-  status            ApplicationStatus   @default(wishlist)
-  dateApplied       DateTime?           @map("date_applied") @db.Date
-  jobPostingUrl     String?             @map("job_posting_url") @db.Text
-  companyWebsiteUrl String?             @map("company_website_url") @db.Text
-  companyCategory   CompanyCategory?    @map("company_category")
-  jobSource         JobSource?          @map("job_source")
-  salaryMin         Int?                @map("salary_min")
-  salaryMax         Int?                @map("salary_max")
-  skillsMatch       Int?                @map("skills_match")
-  notes             String?             @db.Text
-  contactName       String?             @map("contact_name") @db.VarChar(200)
-  contactEmail      String?             @map("contact_email") @db.VarChar(200)
-  offerDueDate      DateTime?           @map("offer_due_date") @db.Date
-  isArchived        Boolean             @default(false) @map("is_archived")
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  interviewStages   InterviewStage[]
-  history           ApplicationHistory[]
+  id                  String              @id @default(uuid())
+  companyName         String              @map("company_name") @db.VarChar(200)
+  positionTitle       String              @map("position_title") @db.VarChar(200)
+  status              ApplicationStatus   @default(unsubmitted)
+  dateApplied         DateTime?           @map("date_applied") @db.Date
+  jobPostingUrl       String?             @map("job_posting_url") @db.Text
+  companyUrl          String?             @map("company_url") @db.Text
+  companyCareerUrl    String?             @map("company_career_url") @db.Text
+  companyCategory     CompanyCategory?    @map("company_category")
+  jobSource           JobSource?          @map("job_source")
+  salaryMin           Int?                @map("salary_min")
+  salaryMax           Int?                @map("salary_max")
+  skillsMatch         Int?                @map("skills_match")
+  coverLetterRequired Boolean             @default(false) @map("cover_letter_required")
+  specialRequirements String?             @map("special_requirements") @db.Text
+  notes               String?             @db.Text
+  offerDueDate        DateTime?           @map("offer_due_date") @db.Date
+  isArchived          Boolean             @default(false) @map("is_archived")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+  interviewStages     InterviewStage[]
+  history             ApplicationHistory[]
 
   @@map("applications")
 }
@@ -79,10 +93,12 @@ model Application {
 model InterviewStage {
   id            String      @id @default(uuid())
   applicationId String      @map("application_id")
-  stageName     String      @map("stage_name") @db.VarChar(200)
-  stageOrder    Int         @map("stage_order")
-  scheduledDate DateTime?   @map("scheduled_date") @db.Date
+  name          String      @map("name") @db.VarChar(200)
+  order         Int         @map("order")
+  isCompleted   Boolean     @default(false) @map("is_completed")
+  completedDate DateTime?   @map("completed_date") @db.Date
   notes         String?     @db.Text
+  performanceRating Int?    @map("performance_rating")
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)

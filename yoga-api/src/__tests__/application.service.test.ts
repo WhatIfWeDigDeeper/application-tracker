@@ -10,6 +10,20 @@ beforeEach(() => mockReset(mockPrisma));
 // Import after mock setup
 const { listApplications, createApplication, updateApplication, deleteApplication } = await import('../services/application.service.js');
 
+function makeApp(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'test-id', companyName: 'Acme', positionTitle: 'Engineer',
+    status: 'applied' as const, dateApplied: null, jobPostingUrl: null,
+    companyUrl: null, companyCareerUrl: null,
+    companyCategory: null, jobSource: null,
+    salaryMin: null, salaryMax: null, skillsMatch: null,
+    coverLetterRequired: false, specialRequirements: null,
+    notes: null, offerDueDate: null,
+    isArchived: false, createdAt: new Date(), updatedAt: new Date(),
+    ...overrides,
+  };
+}
+
 describe('listApplications', () => {
   it('excludes archived by default', async () => {
     mockPrisma.application.findMany.mockResolvedValue([]);
@@ -19,7 +33,7 @@ describe('listApplications', () => {
 
     expect(mockPrisma.application.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ status: { not: 'archived' } }),
+        where: expect.objectContaining({ isArchived: false }),
       })
     );
   });
@@ -37,15 +51,7 @@ describe('createApplication', () => {
   });
 
   it('auto-sets dateApplied when status is applied', async () => {
-    const mockApp = {
-      id: 'test-id', companyName: 'Acme', positionTitle: 'Engineer',
-      status: 'applied' as const, dateApplied: new Date(), jobPostingUrl: null,
-      companyWebsiteUrl: null, companyCategory: null, jobSource: null,
-      salaryMin: null, salaryMax: null, skillsMatch: null, notes: null,
-      contactName: null, contactEmail: null, offerDueDate: null,
-      isArchived: false, createdAt: new Date(), updatedAt: new Date(),
-      interviewStages: [],
-    };
+    const mockApp = { ...makeApp({ dateApplied: new Date() }), interviewStages: [] };
 
     mockPrisma.$transaction.mockImplementation(async (fn) => fn(mockPrisma));
     mockPrisma.application.create.mockResolvedValue(mockApp);
@@ -60,34 +66,56 @@ describe('createApplication', () => {
     const createCall = mockPrisma.application.create.mock.calls[0][0];
     expect(createCall.data.dateApplied).toBeInstanceOf(Date);
   });
+
+  it('throws when skillsMatch is out of range', async () => {
+    await expect(createApplication({ companyName: 'Acme', positionTitle: 'Engineer', skillsMatch: 6 }))
+      .rejects.toThrow('skillsMatch must be 1-5');
+  });
+
+  it('throws when skillsMatch is 0', async () => {
+    await expect(createApplication({ companyName: 'Acme', positionTitle: 'Engineer', skillsMatch: 0 }))
+      .rejects.toThrow('skillsMatch must be 1-5');
+  });
 });
 
 describe('updateApplication', () => {
-  it('throws when transitioning from terminal status rejected', async () => {
-    mockPrisma.application.findUnique.mockResolvedValue({
-      id: 'test-id', companyName: 'Acme', positionTitle: 'Engineer',
-      status: 'rejected' as const, dateApplied: null, jobPostingUrl: null,
-      companyWebsiteUrl: null, companyCategory: null, jobSource: null,
-      salaryMin: null, salaryMax: null, skillsMatch: null, notes: null,
-      contactName: null, contactEmail: null, offerDueDate: null,
-      isArchived: false, createdAt: new Date(), updatedAt: new Date(),
-    });
+  it('throws when transitioning from terminal status accepted_offer', async () => {
+    mockPrisma.application.findUnique.mockResolvedValue(makeApp({ status: 'accepted_offer' as const }));
 
     await expect(updateApplication('test-id', { status: 'applied' }))
-      .rejects.toThrow('Cannot transition from terminal status rejected');
+      .rejects.toThrow('Cannot transition from terminal status accepted_offer');
+  });
+
+  it('throws when transitioning from terminal status declined_offer', async () => {
+    mockPrisma.application.findUnique.mockResolvedValue(makeApp({ status: 'declined_offer' as const }));
+
+    await expect(updateApplication('test-id', { status: 'applied' }))
+      .rejects.toThrow('Cannot transition from terminal status declined_offer');
+  });
+
+  it('clears dateApplied when transitioning to unsubmitted', async () => {
+    const existing = makeApp({ status: 'applied' as const, dateApplied: new Date() });
+    mockPrisma.application.findUnique.mockResolvedValue(existing);
+
+    const mockUpdated = { ...makeApp({ status: 'unsubmitted' as const, dateApplied: null }), interviewStages: [] };
+    mockPrisma.$transaction.mockImplementation(async (fn) => fn(mockPrisma));
+    mockPrisma.application.update.mockResolvedValue(mockUpdated);
+    mockPrisma.applicationHistory.findFirst.mockResolvedValue(null);
+    mockPrisma.applicationHistory.create.mockResolvedValue({
+      id: 'h1', applicationId: 'test-id', sequence: 1,
+      snapshot: {}, changedFields: [], createdAt: new Date(),
+    });
+
+    await updateApplication('test-id', { status: 'unsubmitted' });
+
+    const updateCall = mockPrisma.application.update.mock.calls[0][0];
+    expect(updateCall.data.dateApplied).toBeNull();
   });
 });
 
 describe('deleteApplication', () => {
   it('returns true on success', async () => {
-    mockPrisma.application.delete.mockResolvedValue({
-      id: 'test-id', companyName: 'Acme', positionTitle: 'Engineer',
-      status: 'wishlist' as const, dateApplied: null, jobPostingUrl: null,
-      companyWebsiteUrl: null, companyCategory: null, jobSource: null,
-      salaryMin: null, salaryMax: null, skillsMatch: null, notes: null,
-      contactName: null, contactEmail: null, offerDueDate: null,
-      isArchived: false, createdAt: new Date(), updatedAt: new Date(),
-    });
+    mockPrisma.application.delete.mockResolvedValue(makeApp({ status: 'unsubmitted' as const }));
 
     const result = await deleteApplication('test-id');
     expect(result).toBe(true);
