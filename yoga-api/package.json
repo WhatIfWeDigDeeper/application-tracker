@@ -1,16 +1,24 @@
 {
   "name": "yoga-api",
   "version": "1.0.0",
+  "description": "GraphQL Yoga API for Application Tracker with Pothos, Prisma and Postgres",
+  "main": "dist/index.js",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc --noEmit",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "lint": "eslint src",
     "test": "vitest run",
-    "generate": "prisma generate",
-    "migrate": "prisma migrate dev"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio"
   },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
     "@pothos/core": "4.3.0",
     "@pothos/plugin-prisma": "4.6.0",

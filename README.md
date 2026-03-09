@@ -13,7 +13,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [6. React SSR + TanStack Start + FastAPI](#6-react-ssr--tanstack-start--fastapi)
   - [7. Angular + Go Gin + pgx/sqlc](#7-angular--go-gin--pgxsqlc)
   - [8. Angular + Spring Boot + JPA/Hibernate](#8-angular--spring-boot--jpahibernate)
-- [9. GraphQL Yoga + React Apollo](#9-graphql-yoga--react-apollo)
+  - [9. GraphQL Yoga + React Apollo](#9-graphql-yoga--react-apollo)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
