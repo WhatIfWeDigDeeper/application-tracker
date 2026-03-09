@@ -145,7 +145,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
 | `go_gin` | Angular + Go Gin API | [schema docs](docs/schema/go-gin/README.md) |
 | `java_spring` | Angular + Spring Boot + JPA | [schema docs](docs/schema/java-spring/README.md) |
-| `graphql_yoga` | GraphQL Yoga + React Apollo | — |
+| `graphql_yoga` | GraphQL Yoga + React Apollo | [schema docs](docs/schema/graphql-yoga/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -162,6 +162,8 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [tanstack-start-ui](docs/types/tanstack-start-ui/application.mermaid) - React SSR + TanStack Start
 - [angular-ui](docs/types/angular-ui/application.model.mermaid) - Angular + Go Gin
 - [angular-spring-ui](docs/types/angular-spring-ui/application.model.mermaid) - Angular + Spring Boot
+- [react-apollo-ui](docs/types/react-apollo-ui/application.mermaid) - React Apollo + GraphQL Yoga
+- [yoga-api](docs/types/yoga-api/application.service.mermaid) - GraphQL Yoga API (service input/filter types)
 
 Regenerate with `npm run docs:types`.
 

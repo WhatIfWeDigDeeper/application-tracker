@@ -1,0 +1,106 @@
+classDiagram
+  %% Legend
+  %% --|> : Inheritance (extends)
+  %% ..|> : Implementation (implements)
+  %% --* : Composition (has/contains)
+  %% -- : Association
+
+  class ApplicationStatus {
+    <<enumeration>>
+    'applied'
+    'archived'
+    'interviewing'
+    'offer'
+    'rejected'
+    'wishlist'
+    'withdrawn'
+  }
+
+  class CompanyCategory {
+    <<enumeration>>
+    'agency'
+    'enterprise-software'
+    'government'
+    'mid-market'
+    'nonprofit'
+    'other'
+    'startup'
+  }
+
+  class JobSource {
+    <<enumeration>>
+    'company-website'
+    'indeed'
+    'job-board'
+    'linkedin'
+    'other'
+    'recruiter'
+    'referral'
+  }
+
+  class InterviewStage {
+    <<interface>>
+    +id: string
+    +applicationId: string
+    +stageName: string
+    +stageOrder: number
+    -scheduledDate?: string or null
+    -notes?: string or null
+    +createdAt: string
+    +updatedAt: string
+  }
+
+  class Application {
+    <<interface>>
+    +id: string
+    +companyName: string
+    +positionTitle: string
+    +status: ApplicationStatus
+    -dateApplied?: string or null
+    -jobPostingUrl?: string or null
+    -companyWebsiteUrl?: string or null
+    -companyCategory?: ComplexUnion
+    -jobSource?: ComplexUnion
+    -salaryMin?: number or null
+    -salaryMax?: number or null
+    -skillsMatch?: number or null
+    -notes?: string or null
+    -contactName?: string or null
+    -contactEmail?: string or null
+    -offerDueDate?: string or null
+    +isArchived: boolean
+    +createdAt: string
+    +updatedAt: string
+    -interviewStages?: InterviewStageArray~~
+  }
+
+  class HistoryEntry {
+    <<interface>>
+    +id: string
+    +applicationId: string
+    +sequence: number
+    +snapshot: string
+    +changedFields: string
+    +createdAt: string
+  }
+
+  class ApplicationListResult {
+    <<interface>>
+    +items: ApplicationArray~~
+    +total: number
+    +page: number
+    +totalPages: number
+  }
+
+  class HistoryListResult {
+    <<interface>>
+    +items: HistoryEntryArray~~
+    +total: number
+    +page: number
+    +totalPages: number
+  }
+
+  Application --* ApplicationStatus : status
+  Application --* InterviewStage : interviewStages
+  ApplicationListResult --* Application : items
+  HistoryListResult --* HistoryEntry : items
