@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+generator pothos {
+  provider     = "prisma-pothos-types"
+  clientOutput = "@prisma/client"
+  output       = "../src/schema/pothos-types.d.ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ApplicationStatus {
+  wishlist
+  applied
+  interviewing
+  offer
+  rejected
+  withdrawn
+  archived
+
+  @@map("application_status")
+}
+
+enum CompanyCategory {
+  enterprise_software @map("enterprise-software")
+  startup
+  mid_market          @map("mid-market")
+  agency
+  government
+  nonprofit
+  other
+
+  @@map("company_category")
+}
+
+enum JobSource {
+  linkedin
+  indeed
+  referral
+  company_website @map("company-website")
+  recruiter
+  job_board       @map("job-board")
+  other
+
+  @@map("job_source")
+}
+
+model Application {
+  id                String              @id @default(uuid())
+  companyName       String              @map("company_name") @db.VarChar(200)
+  positionTitle     String              @map("position_title") @db.VarChar(200)
+  status            ApplicationStatus   @default(wishlist)
+  dateApplied       DateTime?           @map("date_applied") @db.Date
+  jobPostingUrl     String?             @map("job_posting_url") @db.Text
+  companyWebsiteUrl String?             @map("company_website_url") @db.Text
+  companyCategory   CompanyCategory?    @map("company_category")
+  jobSource         JobSource?          @map("job_source")
+  salaryMin         Int?                @map("salary_min")
+  salaryMax         Int?                @map("salary_max")
+  skillsMatch       Int?                @map("skills_match")
+  notes             String?             @db.Text
+  contactName       String?             @map("contact_name") @db.VarChar(200)
+  contactEmail      String?             @map("contact_email") @db.VarChar(200)
+  offerDueDate      DateTime?           @map("offer_due_date") @db.Date
+  isArchived        Boolean             @default(false) @map("is_archived")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  interviewStages   InterviewStage[]
+  history           ApplicationHistory[]
+
+  @@map("applications")
+}
+
+model InterviewStage {
+  id            String      @id @default(uuid())
+  applicationId String      @map("application_id")
+  stageName     String      @map("stage_name") @db.VarChar(200)
+  stageOrder    Int         @map("stage_order")
+  scheduledDate DateTime?   @map("scheduled_date") @db.Date
+  notes         String?     @db.Text
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("interview_stages")
+}
+
+model ApplicationHistory {
+  id            String      @id @default(uuid())
+  applicationId String      @map("application_id")
+  sequence      Int
+  snapshot      Json
+  changedFields Json        @map("changed_fields")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, sequence])
+  @@map("application_history")
+}

@@ -37,6 +37,7 @@ words:
   - Unsubmitted
   - uvx
   - venv
+  - worktree
   - whatifwedigdeeper
 ignoreWords: []
 import: []

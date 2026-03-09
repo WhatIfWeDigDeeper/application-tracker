@@ -111,6 +111,15 @@ jobs:
         if: steps.docs-check.outputs.only_changed == 'false'
         run: cd angular-spring-ui && npm ci
 
+      - name: Install yoga-api packages
+        if: steps.docs-check.outputs.only_changed == 'false'
+        run: |
+          cd yoga-api && npm ci && npx prisma generate
+
+      - name: Install react-apollo-ui packages
+        if: steps.docs-check.outputs.only_changed == 'false'
+        run: cd react-apollo-ui && npm ci
+
       - name: Lint
         if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run lint:all
