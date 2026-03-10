@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useRef, useEffect } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_APPLICATIONS } from '../graphql/queries.js';
 import { DELETE_APPLICATION, ARCHIVE_APPLICATION, RESTORE_APPLICATION } from '../graphql/mutations.js';
 import { FilterBar } from '../components/applications/FilterBar.js';
@@ -136,9 +136,11 @@ function ListPage() {
   const [restoreApp] = useMutation(RESTORE_APPLICATION, { onCompleted: () => refetch() });
   const [deleteApp] = useMutation(DELETE_APPLICATION, { onCompleted: () => refetch() });
 
-  const applications: Application[] = (data?.applications?.items ?? []).map(fromApiApplication);
-  const total: number = data?.applications?.total ?? 0;
-  const totalPages: number = data?.applications?.totalPages ?? 1;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawData = data as any;
+  const applications: Application[] = (rawData?.applications?.items ?? []).map(fromApiApplication);
+  const total: number = rawData?.applications?.total ?? 0;
+  const totalPages: number = rawData?.applications?.totalPages ?? 1;
 
   const handleFilterChange = (newFilters: Filters) => {
     setFilters(newFilters);

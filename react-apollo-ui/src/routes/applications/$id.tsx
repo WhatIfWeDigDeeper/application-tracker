@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_APPLICATION, GET_HISTORY } from '../../graphql/queries.js';
 import {
   UPDATE_APPLICATION, DELETE_APPLICATION, ARCHIVE_APPLICATION,
@@ -38,7 +38,8 @@ function ApplicationDetailPage() {
   const navigate = useNavigate();
 
   const { data, loading, error, refetch } = useQuery(GET_APPLICATION, { variables: { id } });
-  const rawApp = data?.application ?? null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawApp = (data as any)?.application ?? null;
   const app: Application | null = rawApp ? (fromApiApplication(rawApp) as unknown as Application) : null;
 
   const [form, setForm] = useState({
@@ -635,7 +636,8 @@ function HistoryEntryRow({ entry, prevEntry, isCurrent, isCreation, onRestore }:
 
 function HistoryPanel({ applicationId, onClose, onRestore }: HistoryPanelProps) {
   const { data, loading } = useQuery(GET_HISTORY, { variables: { applicationId, page: 1, limit: 20 } });
-  const entries: HistoryEntry[] = data?.applicationHistory?.items ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const entries: HistoryEntry[] = (data as any)?.applicationHistory?.items ?? [];
 
   // entries sorted DESC by sequence — entries[0] is newest (current)
   const sortedEntries = [...entries].sort((a, b) => b.sequence - a.sequence);

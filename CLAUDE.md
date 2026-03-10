@@ -66,7 +66,7 @@ Then proceed with the full build → lint → test → e2e chain as normal.
 
 ## Dependency Management
 
-When installing **new npm packages**: use latest stable version, exact versions (no ^ or ~), install `@types/*` if needed. Note: `npm install pkg@x.y.z` silently adds a `^` caret — verify package.json afterward and remove it to restore exact pinning.
+When installing **new npm packages**: use the latest stable major.minor.patch version, exact versions (no ^ or ~), install `@types/*` if needed. Exception: if the latest major is at `x.0.0` with no patches yet, stay on the previous major until `x.0.1+` is available — brand-new majors at `.0.0` have no patch history and may have rough edges. Note: `npm install pkg@x.y.z` silently adds a `^` caret — verify package.json afterward and remove it to restore exact pinning.
 
 When installing **new Python packages**: `cd fastapi && uv add <package>` (or `uv add --dev <package>` for dev deps). Use exact versions in `pyproject.toml`.
 

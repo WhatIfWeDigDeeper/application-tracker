@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { CREATE_APPLICATION, CREATE_STAGE } from '../../graphql/mutations.js';
 import { GET_APPLICATIONS } from '../../graphql/queries.js';
 import { Button } from '../../components/ui/Button.js';
@@ -106,7 +106,8 @@ function NewApplicationPage() {
           },
         },
       });
-      const app = result.data?.createApplication;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const app = (result.data as any)?.createApplication;
       if (app) {
         for (const stage of pendingStages) {
           await createStage({

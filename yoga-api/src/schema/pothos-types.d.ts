@@ -1,5 +1,6 @@
 /* eslint-disable */
 import type { Prisma, Application, InterviewStage, ApplicationHistory } from "@prisma/client";
+import type { PothosPrismaDatamodel } from "@pothos/plugin-prisma";
 export default interface PrismaTypes {
     Application: {
         Name: "Application";
@@ -67,3 +68,4 @@ export default interface PrismaTypes {
         };
     };
 }
+export function getDatamodel(): PothosPrismaDatamodel;

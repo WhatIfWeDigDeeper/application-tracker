@@ -12,30 +12,30 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@apollo/client": "3.13.4",
-    "@tanstack/react-router": "1.114.23",
-    "graphql": "16.10.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "@apollo/client": "4.1.6",
+    "@tanstack/react-router": "1.166.6",
+    "graphql": "16.13.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@tanstack/router-vite-plugin": "1.114.23",
+    "@tanstack/router-vite-plugin": "1.166.6",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "14.6.1",
-    "@types/node": "22.14.0",
-    "@types/react": "19.1.1",
-    "@types/react-dom": "19.1.2",
-    "@typescript-eslint/eslint-plugin": "8.29.1",
-    "@typescript-eslint/parser": "8.29.1",
-    "@vitejs/plugin-react": "4.3.4",
+    "@types/node": "25.4.0",
+    "@types/react": "19.2.3",
+    "@types/react-dom": "19.2.3",
+    "@typescript-eslint/eslint-plugin": "8.57.0",
+    "@typescript-eslint/parser": "8.57.0",
+    "@vitejs/plugin-react": "5.1.4",
     "@tailwindcss/vite": "4.2.1",
     "@playwright/test": "1.58.2",
-    "eslint": "9.23.0",
+    "eslint": "10.0.3",
     "jsdom": "26.1.0",
     "tailwindcss": "4.2.1",
-    "typescript": "5.8.2",
-    "vite": "6.4.1",
+    "typescript": "5.9.3",
+    "vite": "7.3.1",
     "vitest": "3.1.1"
   }
 }

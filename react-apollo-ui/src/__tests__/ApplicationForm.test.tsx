@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/testing/react';
 import { RouterProvider, createMemoryHistory, createRouter } from '@tanstack/react-router';
 import { routeTree } from '../routeTree.gen';
 
@@ -8,7 +8,7 @@ function renderWithProviders(path: string) {
   const memoryHistory = createMemoryHistory({ initialEntries: [path] });
   const router = createRouter({ routeTree, history: memoryHistory });
   return render(
-    <MockedProvider mocks={[]} addTypename={false}>
+    <MockedProvider mocks={[]}>
       <RouterProvider router={router} />
     </MockedProvider>
   );
