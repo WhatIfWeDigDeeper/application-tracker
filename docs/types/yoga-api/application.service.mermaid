@@ -1,29 +1,7 @@
-classDiagram
-  %% Legend
-  %% --|> : Inheritance (extends)
-  %% ..|> : Implementation (implements)
-  %% --* : Composition (has/contains)
-  %% -- : Association
-
-  %% Errors encountered during conversion:
-  %% - TS2307: Cannot find module '../db/client.js' or its corresponding type declarations.
-  %% - TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
-  %% - TS2307: Cannot find module './history.service.js' or its corresponding type declarations.
-
-  class ListFilters {
-    <<interface>>
-    -status?: ApplicationStatus
-    -companyCategory?: CompanyCategory
-    -jobSource?: JobSource
-    -skillsMatchMin?: number
-    -includeArchived?: boolean
-    -sortBy?: string
-    -sortDir?: string
-  }
-
-  class Pagination {
-    <<interface>>
-    -page?: number
-    -limit?: number
-  }
-
+%% Yoga API type diagram intentionally omitted.
+%% The previous generated diagram had unresolved imports during ts-to-mermaid
+%% conversion, which made it unreliable as documentation.
+%%
+%% Once the generation pipeline has been fixed so that all imports resolve
+%% cleanly, regenerate this file from the TypeScript sources and restore
+%% a proper `classDiagram` definition here.

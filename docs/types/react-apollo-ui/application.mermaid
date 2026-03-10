@@ -7,45 +7,32 @@ classDiagram
 
   class ApplicationStatus {
     <<enumeration>>
+    'accepted offer'
     'applied'
-    'archived'
+    'declined offer'
+    'given offer'
     'interviewing'
-    'offer'
+    'no offer'
     'rejected'
-    'wishlist'
-    'withdrawn'
+    'unsubmitted'
   }
 
   class CompanyCategory {
-    <<enumeration>>
-    'agency'
-    'enterprise-software'
-    'government'
-    'mid-market'
-    'nonprofit'
-    'other'
-    'startup'
   }
 
   class JobSource {
-    <<enumeration>>
-    'company-website'
-    'indeed'
-    'job-board'
-    'linkedin'
-    'other'
-    'recruiter'
-    'referral'
   }
 
   class InterviewStage {
     <<interface>>
     +id: string
     +applicationId: string
-    +stageName: string
-    +stageOrder: number
-    -scheduledDate?: string or null
+    +name: string
+    +order: number
+    +isCompleted: boolean
+    -completedDate?: string or null
     -notes?: string or null
+    -performanceRating?: number or null
     +createdAt: string
     +updatedAt: string
   }
@@ -58,15 +45,16 @@ classDiagram
     +status: ApplicationStatus
     -dateApplied?: string or null
     -jobPostingUrl?: string or null
-    -companyWebsiteUrl?: string or null
+    -companyUrl?: string or null
+    -companyCareerUrl?: string or null
     -companyCategory?: ComplexUnion
     -jobSource?: ComplexUnion
+    -skillsMatch?: number or null
+    +coverLetterRequired: boolean
+    -specialRequirements?: string or null
     -salaryMin?: number or null
     -salaryMax?: number or null
-    -skillsMatch?: number or null
     -notes?: string or null
-    -contactName?: string or null
-    -contactEmail?: string or null
     -offerDueDate?: string or null
     +isArchived: boolean
     +createdAt: string
