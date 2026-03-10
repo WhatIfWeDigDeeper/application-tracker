@@ -20,6 +20,7 @@ words:
   - Hono
   - mypy
   - Nuxt
+  - osascript
   - Pydantic
   - pyproject
   - pytest
@@ -37,7 +38,7 @@ words:
   - Unsubmitted
   - uvx
   - venv
-  - worktree
   - whatifwedigdeeper
+  - worktree
 ignoreWords: []
 import: []
