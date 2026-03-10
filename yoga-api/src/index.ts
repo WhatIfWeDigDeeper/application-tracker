@@ -14,6 +14,17 @@ const STATUS_DISPLAY_TO_PRISMA: Record<string, string> = {
   'no offer': 'no_offer',
 };
 
+const COMPANY_CATEGORY_MAP: Record<string, string> = {
+  'consumer-tech': 'consumer_tech',
+  'e-commerce': 'e_commerce',
+  'enterprise-software': 'enterprise_software',
+  'media-entertainment': 'media_entertainment',
+};
+
+const JOB_SOURCE_MAP: Record<string, string> = {
+  'company-website': 'company_website',
+};
+
 async function readJsonBody(req: IncomingMessage): Promise<Record<string, unknown>> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -92,24 +103,27 @@ function rowToCSV(row: Record<string, string>): string {
   return CSV_COLUMNS.map((col) => escapeCSV(row[col])).join(',');
 }
 
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
+function parseCSV(content: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
   let current = '';
   let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
+  for (let i = 0; i < content.length; i++) {
+    const ch = content[i];
     if (inQuotes) {
-      if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
+      if (ch === '"' && content[i + 1] === '"') { current += '"'; i++; }
       else if (ch === '"') { inQuotes = false; }
       else { current += ch; }
     } else {
       if (ch === '"') { inQuotes = true; }
-      else if (ch === ',') { result.push(current); current = ''; }
+      else if (ch === ',') { row.push(current); current = ''; }
+      else if (ch === '\r' && content[i + 1] === '\n') { row.push(current); current = ''; rows.push(row); row = []; i++; }
+      else if (ch === '\n') { row.push(current); current = ''; rows.push(row); row = []; }
       else { current += ch; }
     }
   }
-  result.push(current);
-  return result;
+  if (current || row.length > 0) { row.push(current); rows.push(row); }
+  return rows.filter((r) => r.some((c) => c.trim()));
 }
 
 async function handleExport(res: ServerResponse) {
@@ -181,14 +195,14 @@ async function handleImport(req: IncomingMessage, res: ServerResponse) {
   }
 
   const content = fileBuffer.toString('utf-8');
-  const lines = content.split(/\r?\n/).filter((l) => l.trim());
-  if (lines.length < 2) {
+  const rows = parseCSV(content);
+  if (rows.length < 2) {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ imported: 0, skipped: 0, errors: [] }));
     return;
   }
 
-  const headers = parseCSVLine(lines[0]);
+  const headers = rows[0];
   const colIndex: Record<string, number> = {};
   headers.forEach((h, i) => { colIndex[h.trim()] = i; });
 
@@ -208,9 +222,9 @@ async function handleImport(req: IncomingMessage, res: ServerResponse) {
     return idx !== undefined ? (row[idx] ?? '').trim() : '';
   };
 
-  for (let i = 1; i < lines.length; i++) {
+  for (let i = 1; i < rows.length; i++) {
     const rowNum = i + 1;
-    const cols = parseCSVLine(lines[i]);
+    const cols = rows[i];
 
     const companyName = get(cols, 'companyName');
     const positionTitle = get(cols, 'positionTitle');
@@ -275,9 +289,9 @@ async function handleImport(req: IncomingMessage, res: ServerResponse) {
           companyUrl: get(cols, 'companyUrl') || null,
           jobPostingUrl,
           companyCareerUrl: get(cols, 'companyCareerUrl') || null,
-          companyCategory: (get(cols, 'companyCategory') as import('@prisma/client').CompanyCategory) || null,
+          companyCategory: (() => { const v = get(cols, 'companyCategory'); return (v ? (COMPANY_CATEGORY_MAP[v] ?? v) : null) as import('@prisma/client').CompanyCategory | null; })(),
           skillsMatch,
-          jobSource: (get(cols, 'jobSource') as import('@prisma/client').JobSource) || null,
+          jobSource: (() => { const v = get(cols, 'jobSource'); return (v ? (JOB_SOURCE_MAP[v] ?? v) : null) as import('@prisma/client').JobSource | null; })(),
           coverLetterRequired,
           specialRequirements: get(cols, 'specialRequirements') || null,
           salaryMin,
