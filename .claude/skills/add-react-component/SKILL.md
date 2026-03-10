@@ -1,10 +1,13 @@
 ---
-skill: add-component
-description: Create a React component with TypeScript and optional tests
-arguments: component name and optional props description
+name: add-react-component
+description: >-
+  Create a React component with TypeScript and optional tests.
+  Use when: adding a new UI component, container, layout, or form to a React
+  or Next.js frontend. Only for React-based stacks — for Vue, Svelte, or
+  Angular, read the existing component files for that stack instead.
 ---
 
-# Add Component: $ARGUMENTS
+# Add React Component: $ARGUMENTS
 
 Create a new React component with proper TypeScript types.
 

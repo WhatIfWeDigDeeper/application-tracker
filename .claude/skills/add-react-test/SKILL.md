@@ -1,12 +1,17 @@
 ---
-skill: add-test
-description: Add unit tests for a component or function
-arguments: component or function name
+name: add-react-test
+description: >-
+  Add unit tests for a React component or utility function using
+  @testing-library/react and Jest/Vitest.
+  Use when: writing or improving tests for a React component, hook, or utility
+  in a React or Next.js frontend. Only for React-based stacks — for other
+  frameworks (Vue, Svelte, Angular, Python, Java, Go) read the existing test
+  files and use that stack's testing framework instead.
 ---
 
-# Add Tests: $ARGUMENTS
+# Add React Tests: $ARGUMENTS
 
-Create comprehensive unit tests for the specified component or function.
+Create comprehensive unit tests for the specified React component or function.
 
 ## Process
 

@@ -1,10 +1,14 @@
 ---
-skill: add-hook
-description: Create a custom React hook with TypeScript and tests
-arguments: hook name and purpose
+name: add-react-hook
+description: >-
+  Create a custom React hook with TypeScript and tests.
+  Use when: extracting reusable stateful logic into a custom hook for a React
+  or Next.js frontend (useState, useEffect, useCallback patterns). Only for
+  React-based stacks — for Vue composables, Svelte stores, or Angular services,
+  read the existing code for that stack instead.
 ---
 
-# Add Hook: $ARGUMENTS
+# Add React Hook: $ARGUMENTS
 
 Create a custom React hook with proper typing and tests.
 
