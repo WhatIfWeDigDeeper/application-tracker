@@ -4,9 +4,10 @@ generator client {
 }
 
 generator pothos {
-  provider     = "prisma-pothos-types"
-  clientOutput = "@prisma/client"
-  output       = "../src/schema/pothos-types.d.ts"
+  provider          = "prisma-pothos-types"
+  clientOutput      = "@prisma/client"
+  output            = "../src/schema/pothos-types.ts"
+  generateDatamodel = "true"
 }
 
 datasource db {

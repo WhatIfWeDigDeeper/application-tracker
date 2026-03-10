@@ -1,7 +1,7 @@
 import SchemaBuilder from '@pothos/core';
 import PrismaPlugin from '@pothos/plugin-prisma';
-import { Prisma } from '@prisma/client';
 import type PrismaTypes from './pothos-types.js';
+import { getDatamodel } from './pothos-types.js';
 import { prisma } from '../db/client.js';
 
 export const builder = new SchemaBuilder<{
@@ -11,7 +11,7 @@ export const builder = new SchemaBuilder<{
   plugins: [PrismaPlugin],
   prisma: {
     client: prisma,
-    dmmf: Prisma.dmmf,
+    dmmf: getDatamodel(),
     exposeDescriptions: false,
     filterConnectionTotalCount: true,
   },
