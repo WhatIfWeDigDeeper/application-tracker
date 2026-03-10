@@ -56,7 +56,7 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 **When adding or changing packages** — run two additional steps before the validation chain:
 - `npm run install:<stack>` — keeps the lockfile in sync
-- `npm run audit:ci:<stack>` — fails on known vulnerabilities (e.g. `audit:ci:angular-ui`, `audit:ci:fastapi`)
+- `npm run audit:ci:<stack>` — fails on known vulnerabilities (e.g. `audit:ci:angular-ui`, `audit:ci:fastapi`). If it fails, try `npm audit fix` (npm) or `uv lock --upgrade-package <package>` (Python) first; if that doesn't resolve it, upgrade the offending package manually or find an alternative.
 Then proceed with the full build → lint → test → e2e chain as normal.
 
 **When adding a new implementation** — run `audit:ci:<stack>` for both the API and UI packages before considering the implementation complete. High or critical vulnerabilities must be fixed — do not merge with known high/critical CVEs. For npm-based stacks, try `npm audit fix` first; if that doesn't resolve it, upgrade the offending package manually or find an alternative.
