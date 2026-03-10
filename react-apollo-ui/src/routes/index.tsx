@@ -27,11 +27,11 @@ const STATUS_BORDER: Record<ApplicationStatus, string> = {
   'no offer': '#a855f7',
 };
 
-function SkillsDots({ score }: { score: number }) {
+function SkillsStars({ score }: { score: number }) {
   return (
-    <span className="inline-flex gap-0.5 text-xs" title={`Skills match: ${score}/5`}>
+    <span className="inline-flex gap-0.5" title={`Skills match: ${score}/5`}>
       {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} style={{ color: i < score ? 'var(--gql-pink)' : undefined }} className={i < score ? '' : 'text-gray-300 dark:text-gray-600'}>●</span>
+        <span key={i} style={{ color: i < score ? '#f59e0b' : '#6b7280' }}>★</span>
       ))}
     </span>
   );
@@ -235,7 +235,7 @@ function ListPage() {
                     {app.companyCategory && (
                       <span className="text-xs text-gray-400 dark:text-gray-500">[{CATEGORY_LABELS[app.companyCategory]}]</span>
                     )}
-                    {app.skillsMatch != null && <SkillsDots score={app.skillsMatch} />}
+                    {app.skillsMatch != null && <SkillsStars score={app.skillsMatch} />}
                   </div>
                   {app.dateApplied && (
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Applied: {app.dateApplied}</p>

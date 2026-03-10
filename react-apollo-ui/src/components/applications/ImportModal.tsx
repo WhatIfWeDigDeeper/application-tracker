@@ -63,17 +63,23 @@ export function ImportModal({ onClose }: ImportModalProps) {
           </a>
         </p>
 
-        <div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+          >
+            Choose File
+          </button>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {file ? file.name : 'No file chosen'}
+          </span>
           <input
             ref={fileRef}
             type="file"
             accept=".csv"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            onInput={(e) => {
-              const f = (e.target as HTMLInputElement).files?.[0];
-              if (f) setFile(f);
-            }}
-            className="w-full text-sm text-gray-600 dark:text-gray-300"
+            className="hidden"
           />
         </div>
 
