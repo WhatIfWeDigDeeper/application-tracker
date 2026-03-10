@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "dev": {
+      "source": "microsoft/playwright-cli",
+      "sourceType": "github",
+      "computedHash": "2895341c0061c04328444399ca4e375625dc87615bf110d0cf77231232d20f27"
+    },
     "js-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
@@ -10,6 +15,11 @@
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "computedHash": "f5ceaf17d0aeebfaf15db5980c0fa63e27a65ba9fa52caccd7d3f45190da10bc"
+    },
+    "playwright-cli": {
+      "source": "microsoft/playwright-cli",
+      "sourceType": "github",
+      "computedHash": "7075ab30f588019197a2f1518bb4c9d33d69d33352af079b5f9c60303ad3886e"
     },
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",

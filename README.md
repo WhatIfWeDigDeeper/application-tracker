@@ -384,6 +384,13 @@ Since `npx skills check` and `npx skills update` apparently do not work with the
 npx skills add -y whatifwedigdeeper/agent-skills
 ```
 
+Other skills
+
+```bash
+npx skills add -y https://github.com/microsoft/playwright-cli
+```
+
+
 See [.claude/](.claude/) for all available commands and skills.
 
 ### VS Code Debug Configurations
