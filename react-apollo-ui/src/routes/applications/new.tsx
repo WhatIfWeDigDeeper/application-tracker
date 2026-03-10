@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client';
 import { CREATE_APPLICATION, CREATE_STAGE } from '../../graphql/mutations.js';
 import { GET_APPLICATIONS } from '../../graphql/queries.js';
 import { Button } from '../../components/ui/Button.js';
+import { StarRating } from '../../components/ui/StarRating.js';
 import {
   type ApplicationStatus, type CompanyCategory, type JobSource,
   STATUS_LABELS, CATEGORY_LABELS, SOURCE_LABELS, COMPANY_CATEGORIES, JOB_SOURCES,
@@ -335,18 +336,10 @@ function NewApplicationPage() {
             />
           </div>
           <div>
-            <label htmlFor="skillsMatch" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Skills Match
             </label>
-            <input
-              id="skillsMatch"
-              type="number"
-              min="1"
-              max="5"
-              value={skillsMatch}
-              onChange={(e) => setSkillsMatch(e.target.value)}
-              className={inputClass()}
-            />
+            <StarRating value={skillsMatch} onChange={setSkillsMatch} />
           </div>
         </div>
 

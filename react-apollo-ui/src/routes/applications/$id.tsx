@@ -10,6 +10,7 @@ import { Badge } from '../../components/ui/Badge.js';
 import { Button } from '../../components/ui/Button.js';
 import { Modal } from '../../components/ui/Modal.js';
 import { Spinner } from '../../components/ui/Spinner.js';
+import { StarRating } from '../../components/ui/StarRating.js';
 import {
   type Application, type ApplicationStatus, type InterviewStage, type HistoryEntry,
   type CompanyCategory, type JobSource,
@@ -343,10 +344,8 @@ function ApplicationDetailPage() {
               className={inputClass()} />
           </div>
           <div>
-            <label htmlFor="skillsMatch" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Skills Match (1-5)</label>
-            <input id="skillsMatch" type="number" min="1" max="5" value={form.skillsMatch}
-              onChange={(e) => updateField('skillsMatch', e.target.value)}
-              className={inputClass()} />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Skills Match</label>
+            <StarRating value={form.skillsMatch} onChange={(v) => updateField('skillsMatch', v)} />
           </div>
         </div>
 

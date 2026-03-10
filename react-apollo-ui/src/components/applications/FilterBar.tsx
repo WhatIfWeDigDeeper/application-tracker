@@ -44,12 +44,18 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <div>
-          <label htmlFor="filter-status" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Status</label>
+          <label
+            htmlFor="filter-status"
+            className="block text-xs font-medium mb-1"
+            style={{ color: filters.status ? 'var(--gql-pink)' : undefined }}
+          >
+            {filters.status ? '● ' : ''}Status
+          </label>
           <select
             id="filter-status"
             value={filters.status ?? ''}
             onChange={(e) => update({ status: (e.target.value || undefined) as ApplicationStatus | undefined })}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-[var(--gql-pink)]"
           >
             <option value="">All statuses</option>
             {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -57,12 +63,18 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
         </div>
 
         <div>
-          <label htmlFor="filter-category" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Category</label>
+          <label
+            htmlFor="filter-category"
+            className="block text-xs font-medium mb-1"
+            style={{ color: filters.companyCategory ? 'var(--gql-pink)' : undefined }}
+          >
+            {filters.companyCategory ? '● ' : ''}Category
+          </label>
           <select
             id="filter-category"
             value={filters.companyCategory ?? ''}
             onChange={(e) => update({ companyCategory: (e.target.value || undefined) as CompanyCategory | undefined })}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1"
           >
             <option value="">All categories</option>
             {CATEGORY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -70,12 +82,18 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
         </div>
 
         <div>
-          <label htmlFor="filter-source" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Source</label>
+          <label
+            htmlFor="filter-source"
+            className="block text-xs font-medium mb-1"
+            style={{ color: filters.jobSource ? 'var(--gql-pink)' : undefined }}
+          >
+            {filters.jobSource ? '● ' : ''}Source
+          </label>
           <select
             id="filter-source"
             value={filters.jobSource ?? ''}
             onChange={(e) => update({ jobSource: (e.target.value || undefined) as JobSource | undefined })}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1"
           >
             <option value="">All sources</option>
             {SOURCE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -83,33 +101,51 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
         </div>
 
         <div>
-          <label htmlFor="filter-skills" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Skills Match Min</label>
-          <input
+          <label
+            htmlFor="filter-skills"
+            className="block text-xs font-medium mb-1"
+            style={{ color: filters.skillsMatchMin ? 'var(--gql-pink)' : undefined }}
+          >
+            {filters.skillsMatchMin ? '● ' : ''}Skills
+          </label>
+          <select
             id="filter-skills"
-            type="number"
-            min="1"
-            max="5"
             value={filters.skillsMatchMin ?? ''}
             onChange={(e) => update({ skillsMatchMin: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="1-5"
-          />
+            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-[var(--gql-pink)]"
+          >
+            <option value="">Any</option>
+            <option value="2">2+ stars</option>
+            <option value="3">3+ stars</option>
+            <option value="4">4+ stars</option>
+            <option value="5">5 stars</option>
+          </select>
         </div>
 
         <div>
           <label htmlFor="filter-sort" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Sort By</label>
-          <select
-            id="filter-sort"
-            value={filters.sortBy ?? 'updatedAt'}
-            onChange={(e) => update({ sortBy: e.target.value })}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-          >
-            {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
+          <div className="flex gap-1">
+            <select
+              id="filter-sort"
+              value={filters.sortBy ?? 'updatedAt'}
+              onChange={(e) => update({ sortBy: e.target.value })}
+              className="flex-1 min-w-0 px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1"
+            >
+              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <button
+              type="button"
+              title={filters.sortDir === 'asc' ? 'Ascending — click for descending' : 'Descending — click for ascending'}
+              onClick={() => update({ sortDir: filters.sortDir === 'asc' ? 'desc' : 'asc' })}
+              className="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 flex-shrink-0"
+            >
+              {filters.sortDir === 'asc' ? '↑' : '↓'}
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-400 mt-5">
+        <div className="flex items-end pb-0.5">
+          <label className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-400">
             <input
               id="filter-archived"
               type="checkbox"
@@ -119,13 +155,6 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
             />
             Include Archived
           </label>
-          <button
-            type="button"
-            onClick={() => update({ sortDir: filters.sortDir === 'asc' ? 'desc' : 'asc' })}
-            className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
-          >
-            {filters.sortDir === 'asc' ? 'Asc' : 'Desc'}
-          </button>
         </div>
       </div>
     </div>

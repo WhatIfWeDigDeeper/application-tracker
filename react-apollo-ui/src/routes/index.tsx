@@ -9,12 +9,48 @@ import { Spinner } from '../components/ui/Spinner.js';
 import { Modal } from '../components/ui/Modal.js';
 import { ImportModal } from '../components/applications/ImportModal.js';
 import type { Application, ApplicationStatus, CompanyCategory, JobSource } from '../types/application.js';
-import { fromApiApplication, toApiStatus, toApiCategory, toApiSource } from '../types/application.js';
+import { CATEGORY_LABELS, fromApiApplication, toApiStatus, toApiCategory, toApiSource } from '../types/application.js';
 import type { Filters } from '../components/applications/FilterBar.js';
 
 export const Route = createFileRoute('/')({
   component: ListPage,
 });
+
+const STATUS_BORDER: Record<ApplicationStatus, string> = {
+  unsubmitted: '#9ca3af',
+  applied: '#0ea5e9',
+  interviewing: '#fbbf24',
+  'given offer': '#10b981',
+  'accepted offer': '#059669',
+  'declined offer': '#f97316',
+  rejected: '#ef4444',
+  'no offer': '#a855f7',
+};
+
+function SkillsDots({ score }: { score: number }) {
+  return (
+    <span className="inline-flex gap-0.5 text-xs" title={`Skills match: ${score}/5`}>
+      {Array.from({ length: 5 }, (_, i) => (
+        <span key={i} style={{ color: i < score ? 'var(--gql-pink)' : undefined }} className={i < score ? '' : 'text-gray-300 dark:text-gray-600'}>●</span>
+      ))}
+    </span>
+  );
+}
+
+function GraphQLIcon({ size = 48 }: { size?: number }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width={size} height={size} aria-hidden="true" opacity="0.3">
+      <polygon points="16,3 27.3,22.5 4.7,22.5" fill="none" stroke="#E10098" strokeWidth="1.5" strokeLinejoin="round"/>
+      <polygon points="27.3,9.5 16,29 4.7,9.5" fill="none" stroke="#E10098" strokeWidth="1.5" strokeLinejoin="round"/>
+      <circle cx="16"   cy="3"    r="2" fill="#E10098"/>
+      <circle cx="27.3" cy="9.5"  r="2" fill="#E10098"/>
+      <circle cx="27.3" cy="22.5" r="2" fill="#E10098"/>
+      <circle cx="16"   cy="29"   r="2" fill="#E10098"/>
+      <circle cx="4.7"  cy="22.5" r="2" fill="#E10098"/>
+      <circle cx="4.7"  cy="9.5"  r="2" fill="#E10098"/>
+    </svg>
+  );
+}
 
 function ActionMenu({
   app,
@@ -123,13 +159,6 @@ function ListPage() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-bold">Applications</h1>
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate({ to: '/applications/new' })}
-            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Add Application
-          </button>
           <span className="text-sm text-gray-500 dark:text-gray-400">{total} total</span>
           <button
             type="button"
@@ -166,8 +195,17 @@ function ListPage() {
       {loading && !data && <Spinner />}
 
       {!loading && applications.length === 0 && (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          No applications found.
+        <div className="flex flex-col items-center gap-4 py-16 text-gray-400 dark:text-gray-500">
+          <GraphQLIcon size={56} />
+          <p className="text-sm">No applications found.</p>
+          <button
+            type="button"
+            onClick={() => navigate({ to: '/applications/new' })}
+            className="px-4 py-2 text-sm text-white rounded hover:opacity-90"
+            style={{ background: 'var(--gql-pink)' }}
+          >
+            Add your first application
+          </button>
         </div>
       )}
 
@@ -176,55 +214,64 @@ function ListPage() {
           <div
             key={app.id}
             onClick={() => navigate({ to: '/applications/$id', params: { id: app.id } })}
-            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
+            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-colors"
+            style={{ borderLeft: `3px solid ${STATUS_BORDER[app.status]}` }}
           >
             <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="font-semibold text-gray-900 dark:text-white truncate">{app.companyName}</h2>
-                  <Badge status={app.status} />
-                  {app.isArchived && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
-                      Archived
-                    </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="font-semibold text-gray-900 dark:text-white truncate">{app.companyName}</h2>
+                    <Badge status={app.status} />
+                    {app.isArchived && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                        Archived
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{app.positionTitle}</p>
+                    {app.companyCategory && (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">[{CATEGORY_LABELS[app.companyCategory]}]</span>
+                    )}
+                    {app.skillsMatch != null && <SkillsDots score={app.skillsMatch} />}
+                  </div>
+                  {app.dateApplied && (
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Applied: {app.dateApplied}</p>
                   )}
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{app.positionTitle}</p>
-                {app.dateApplied && (
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Applied: {app.dateApplied}</p>
-                )}
-              </div>
-              <ActionMenu
-                app={app}
-                onArchive={() => archiveApp({ variables: { id: app.id } })}
-                onRestore={() => restoreApp({ variables: { id: app.id } })}
-                onDelete={() => setDeleteTarget(app.id)}
-              />
+                <ActionMenu
+                  app={app}
+                  onArchive={() => archiveApp({ variables: { id: app.id } })}
+                  onRestore={() => restoreApp({ variables: { id: app.id } })}
+                  onDelete={() => setDeleteTarget(app.id)}
+                />
             </div>
           </div>
         ))}
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center items-center gap-3">
           <button
             type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
             className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700"
+            aria-label="Previous page"
           >
-            Previous
+            ←
           </button>
-          <span className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400">
-            {page} / {totalPages}
+          <span className="text-sm text-gray-500 dark:text-gray-400" style={{ fontFamily: 'var(--font-mono)' }}>
+            Page {page} of {totalPages}
           </span>
           <button
             type="button"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
             className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700"
+            aria-label="Next page"
           >
-            Next
+            →
           </button>
         </div>
       )}
