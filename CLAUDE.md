@@ -22,7 +22,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 
 ## Documentation Guidelines
 
-- **NEVER create documentation at repository root** - use `/docs/` or `implementations/<name>/docs/`
+- **NEVER create documentation at repository root** - use `/docs/` or `<package-name>/docs/` (e.g., `yoga-api/docs/`)
 
 ## Database Architecture
 
@@ -97,6 +97,11 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Angular `[hidden]` vs `@if` for Playwright gates**: `[hidden]="!expr"` keeps the element in the DOM (just invisible); in webkit, `expect(locator).toBeVisible()` can pass immediately while the element's content/state is still stale/default, so later assertions may read the wrong value. Use `@if (expr)` instead of `[hidden]="!expr"` whenever a Playwright assertion waits for an element to appear.
 - **Modal re-open timing in webkit**: After clicking Close on a modal/panel and immediately re-opening it, webkit can interact with stale DOM from the previous open cycle. Assert `await expect(page.locator('text=<panel heading>')).not.toBeVisible()` after Close before triggering the second open.
 
+## CSV Import Patterns
+
+- **Multi-line fields**: Never pre-split CSV content by newlines before parsing — quoted fields can contain embedded newlines. Process the entire file character-by-character, tracking `inQuotes` state, and only treat `\n` as a row separator when `inQuotes` is false.
+- **Prisma enum `@map` values**: CSVs store `@map` display values (e.g. `"company-website"`, `"media-entertainment"`) but Prisma `create()`/`update()` requires the enum identifier name (`company_website`, `media_entertainment`). Add a lookup table (like `STATUS_DISPLAY_TO_PRISMA`) for each enum with hyphenated/spaced `@map` values and apply it during import.
+
 ## Angular Patterns
 
 - **Confirm dialog `role="dialog"`**: Locators using `[role="dialog"] button:has-text(...)` require the inner dialog container div to have `role="dialog"` — Angular components don't add it automatically. Always include `role="dialog"` on the modal content div in `ConfirmDialogComponent`.
@@ -120,7 +125,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`isXxx` field naming**: JPA boolean fields named `isXxx` conflict with getter naming; name the field `archived` (not `isArchived`) — getter `isArchived()`, setter `setArchived()`
 - **Flyway auto-migration**: Flyway runs on startup — `./gradlew flywayMigrate` is only needed for manual runs; migrations live in `classpath:db/migration/`
 - **Gradle Kotlin DSL**: Uses `build.gradle.kts` — Kotlin syntax for plugin/dependency blocks
-- **Commit message file**: Multi-line `git commit -m` strings cause a `dquote>` hang in zsh. Write the message with `create_file` to `/tmp/commit-msg.txt`, then run `git commit -F /tmp/commit-msg.txt`
+- **Commit message file**: Multi-line `git commit -m` strings cause a `dquote>` hang in zsh. Write the message to `$TMPDIR/commit-msg.txt` using the Write tool, then run `git commit -F $TMPDIR/commit-msg.txt`
 - **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
 - **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
 - **Jackson date serialization**: `LocalDate`/`LocalDateTime` serialize as arrays (e.g. `[2026,3,5]`) by default — add `.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)` to `ObjectMapper` config to get ISO strings (`"2026-03-05"`, `"2026-03-05T13:00:00Z"`)
@@ -128,7 +133,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 ## Terminal Management
 
 - **Repeated test runs**: Run iterative/debugging test commands as foreground tasks in one shared terminal rather than spawning a new background terminal each iteration — background terminals accumulate and are never auto-cleaned.
-- **Kill background terminals promptly**: Call `kill_terminal` immediately after a background process is no longer needed; IDs are only available in the current session and cannot be recovered later.
+- **Kill background processes promptly**: Stop background Bash tasks via `TaskStop` (by task ID) or `kill <pid>` as soon as they're no longer needed — task IDs are only available in the current session.
 
 ## Subagent Usage
 
@@ -152,8 +157,6 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 ## Running E2E Tests
 
 **Server lifecycle**: For fully managed runs (API auto-start/stop), use `bash scripts/run-e2e.sh [stack|all]` — `npm run test:e2e:all` also uses this. To run manually when servers are already up, use `npm run test:e2e:<stack>` directly and leave pre-existing servers running afterward. **`npm run test:e2e:<stack>` only starts the UI dev server** (via playwright `webServer`), not the API backend — if you've killed the backend manually, use `bash scripts/run-e2e.sh <stack>` to restart it before running tests.
-
-Run all: `npm run test:e2e:all`. Run one stack: `npm run test:e2e:<stack>` (e.g., `react-next-ui`, `vue-ui`).
 
 Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
 
