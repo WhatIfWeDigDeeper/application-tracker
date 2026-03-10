@@ -45,6 +45,8 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 **When fixing a bug or test failure, automatically run the relevant tests after applying the fix** — do not wait for the user to ask. Use the most targeted test command available (e.g., `test:e2e:react-ui` for a react-ui failure). Report pass/fail results immediately.
 
+**When fixing a shared E2E test failure** — shared tests in `tests/e2e/` run against all stacks. After applying a fix, run `bash scripts/run-e2e.sh all` (or `npm run test:e2e:all`) to confirm no other stack regressed. Do not stop after the originally failing stack passes.
+
 1. **Add tests** — Create or update tests for new functionality. Include E2E tests when the change affects user-visible behavior (labels, UI interactions, API contracts). **When fixing a bug, write a failing test first that reproduces the issue, then fix it** — this ensures the bug is understood and won't regress.
 2. **Build** - `npm run build:<stack>` (runs per-package build; catches compilation errors)
 3. **Lint** - `npm run lint:<stack>` (ESLint/ruff across packages)

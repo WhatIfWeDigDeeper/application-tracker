@@ -88,8 +88,12 @@ test.describe.serial('List filter by status', () => {
     await statusSelect.selectOption('applied');
     await expect(page.locator(`text=${interviewingCompany}`)).not.toBeVisible({ timeout: 10000 });
 
-    // Clear the filter (first option "" = all), wait for both to appear
+    // Clear the filter (first option "" = all), wait for both to appear.
+    // Explicitly dispatch 'change' after selectOption('') because webkit does not
+    // fire a change event when returning to the blank default option, which means
+    // Angular's (ngModelChange) handler never runs without this extra dispatch.
     await statusSelect.selectOption('');
+    await statusSelect.dispatchEvent('change');
     await expect(page.locator(`text=${appliedCompany}`).first()).toBeVisible({ timeout: 10000 });
     await expect(page.locator(`text=${interviewingCompany}`).first()).toBeVisible({ timeout: 10000 });
   });
