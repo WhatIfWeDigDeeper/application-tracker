@@ -69,6 +69,10 @@ export function ImportModal({ onClose }: ImportModalProps) {
             type="file"
             accept=".csv"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            onInput={(e) => {
+              const f = (e.target as HTMLInputElement).files?.[0];
+              if (f) setFile(f);
+            }}
             className="w-full text-sm text-gray-600 dark:text-gray-300"
           />
         </div>
@@ -82,13 +86,11 @@ export function ImportModal({ onClose }: ImportModalProps) {
         {result && (
           <div className="space-y-3">
             <div className="flex gap-4 text-sm">
-              <div className="flex-1 p-3 bg-green-50 dark:bg-green-900/20 rounded">
-                <div className="font-medium text-green-800 dark:text-green-300">Imported</div>
-                <div className="text-2xl font-bold text-green-700 dark:text-green-400">{result.imported}</div>
+              <div className="flex-1 p-3 bg-green-50 dark:bg-green-900/20 rounded font-medium text-green-800 dark:text-green-300">
+                Imported: <span className="text-2xl font-bold text-green-700 dark:text-green-400">{result.imported}</span>
               </div>
-              <div className="flex-1 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded">
-                <div className="font-medium text-yellow-800 dark:text-yellow-300">Skipped</div>
-                <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">{result.skipped}</div>
+              <div className="flex-1 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded font-medium text-yellow-800 dark:text-yellow-300">
+                Skipped: <span className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">{result.skipped}</span>
               </div>
             </div>
 
@@ -115,7 +117,7 @@ export function ImportModal({ onClose }: ImportModalProps) {
             Close
           </button>
           {!result && (
-            <button type="button" onClick={handleImport} disabled={!file || loading}
+            <button type="button" onClick={handleImport} disabled={loading}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
               {loading ? 'Importing...' : 'Import'}
             </button>

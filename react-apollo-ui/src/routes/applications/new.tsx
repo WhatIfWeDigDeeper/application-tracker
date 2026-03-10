@@ -42,6 +42,7 @@ function NewApplicationPage() {
   const [salaryMin, setSalaryMin] = useState('');
   const [salaryMax, setSalaryMax] = useState('');
   const [notes, setNotes] = useState('');
+  const [offerDueDate, setOfferDueDate] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Interview stages state
@@ -100,6 +101,7 @@ function NewApplicationPage() {
             salaryMin: salaryMin ? parseInt(salaryMin, 10) : null,
             salaryMax: salaryMax ? parseInt(salaryMax, 10) : null,
             notes: notes || null,
+            offerDueDate: offerDueDate || null,
           },
         },
       });
@@ -213,6 +215,21 @@ function NewApplicationPage() {
             />
           </div>
         </div>
+
+        {status === 'given offer' && (
+          <div>
+            <label htmlFor="offerDueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Offer Due Date
+            </label>
+            <input
+              id="offerDueDate"
+              type="date"
+              value={offerDueDate}
+              onChange={(e) => setOfferDueDate(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        )}
 
         <div>
           <label htmlFor="jobPostingUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

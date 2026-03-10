@@ -52,29 +52,34 @@ function ApplicationDetailPage() {
   const [isDirty, setIsDirty] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showAddStage, setShowAddStage] = useState(false);
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
   const [stageForm, setStageForm] = useState({ name: '', order: '0', notes: '' });
 
+  // Depend on rawApp (stable Apollo cache reference) to avoid resetting isDirty on every render.
+  // fromApiApplication() creates a new object each call, so using [app] would reset isDirty every render.
   useEffect(() => {
-    if (app) {
+    if (rawApp) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const t = fromApiApplication(rawApp as any) as any;
       setForm({
-        companyName: app.companyName, positionTitle: app.positionTitle,
-        status: app.status, dateApplied: app.dateApplied ?? '',
-        jobPostingUrl: app.jobPostingUrl ?? '', companyUrl: app.companyUrl ?? '',
-        companyCareerUrl: app.companyCareerUrl ?? '',
-        companyCategory: (app.companyCategory ?? '') as CompanyCategory | '',
-        jobSource: (app.jobSource ?? '') as JobSource | '',
-        salaryMin: app.salaryMin?.toString() ?? '', salaryMax: app.salaryMax?.toString() ?? '',
-        skillsMatch: app.skillsMatch?.toString() ?? '',
-        coverLetterRequired: app.coverLetterRequired ?? false,
-        specialRequirements: app.specialRequirements ?? '',
-        notes: app.notes ?? '', offerDueDate: app.offerDueDate ?? '',
+        companyName: t.companyName ?? '', positionTitle: t.positionTitle ?? '',
+        status: t.status as ApplicationStatus, dateApplied: t.dateApplied ?? '',
+        jobPostingUrl: t.jobPostingUrl ?? '', companyUrl: t.companyUrl ?? '',
+        companyCareerUrl: t.companyCareerUrl ?? '',
+        companyCategory: (t.companyCategory ?? '') as CompanyCategory | '',
+        jobSource: (t.jobSource ?? '') as JobSource | '',
+        salaryMin: t.salaryMin?.toString() ?? '', salaryMax: t.salaryMax?.toString() ?? '',
+        skillsMatch: t.skillsMatch?.toString() ?? '',
+        coverLetterRequired: t.coverLetterRequired ?? false,
+        specialRequirements: t.specialRequirements ?? '',
+        notes: t.notes ?? '', offerDueDate: t.offerDueDate ?? '',
       });
       setIsDirty(false);
     }
-  }, [app]);
+  }, [rawApp]);
 
   const [updateApp, { loading: saving }] = useMutation(UPDATE_APPLICATION);
   const [deleteApp] = useMutation(DELETE_APPLICATION);
@@ -204,26 +209,7 @@ function ApplicationDetailPage() {
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
           {isDirty && (
-            <Button variant="secondary" onClick={() => {
-              if (app) {
-                setForm({
-                  companyName: app.companyName, positionTitle: app.positionTitle,
-                  status: app.status, dateApplied: app.dateApplied ?? '',
-                  jobPostingUrl: app.jobPostingUrl ?? '',
-                  companyUrl: app.companyUrl ?? '',
-                  companyCareerUrl: app.companyCareerUrl ?? '',
-                  companyCategory: (app.companyCategory ?? '') as CompanyCategory | '',
-                  jobSource: (app.jobSource ?? '') as JobSource | '',
-                  salaryMin: app.salaryMin?.toString() ?? '',
-                  salaryMax: app.salaryMax?.toString() ?? '',
-                  skillsMatch: app.skillsMatch?.toString() ?? '',
-                  coverLetterRequired: app.coverLetterRequired ?? false,
-                  specialRequirements: app.specialRequirements ?? '',
-                  notes: app.notes ?? '', offerDueDate: app.offerDueDate ?? '',
-                });
-                setIsDirty(false);
-              }
-            }}>
+            <Button variant="secondary" onClick={() => setShowDiscardConfirm(true)}>
               Discard
             </Button>
           )}
@@ -428,6 +414,8 @@ function ApplicationDetailPage() {
                 onChange={setStageForm}
                 onSave={() => handleUpdateStage(stage.id)}
                 onCancel={() => setEditingStageId(null)}
+                onDelete={() => deleteStage({ variables: { applicationId: id, stageId: stage.id } })}
+                mode="edit"
               />
             ) : (
               <div key={stage.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
@@ -461,6 +449,36 @@ function ApplicationDetailPage() {
         />
       )}
 
+      {/* Discard Confirm */}
+      <Modal
+        isOpen={showDiscardConfirm}
+        title="Discard Changes"
+        message="Are you sure you want to discard your changes?"
+        confirmLabel="Discard"
+        onConfirm={() => {
+          if (rawApp) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const t = fromApiApplication(rawApp as any) as any;
+            setForm({
+              companyName: t.companyName ?? '', positionTitle: t.positionTitle ?? '',
+              status: t.status as ApplicationStatus, dateApplied: t.dateApplied ?? '',
+              jobPostingUrl: t.jobPostingUrl ?? '', companyUrl: t.companyUrl ?? '',
+              companyCareerUrl: t.companyCareerUrl ?? '',
+              companyCategory: (t.companyCategory ?? '') as CompanyCategory | '',
+              jobSource: (t.jobSource ?? '') as JobSource | '',
+              salaryMin: t.salaryMin?.toString() ?? '', salaryMax: t.salaryMax?.toString() ?? '',
+              skillsMatch: t.skillsMatch?.toString() ?? '',
+              coverLetterRequired: t.coverLetterRequired ?? false,
+              specialRequirements: t.specialRequirements ?? '',
+              notes: t.notes ?? '', offerDueDate: t.offerDueDate ?? '',
+            });
+            setIsDirty(false);
+          }
+          setShowDiscardConfirm(false);
+        }}
+        onClose={() => setShowDiscardConfirm(false)}
+      />
+
       {/* Delete Confirm */}
       <Modal
         isOpen={showDeleteConfirm}
@@ -480,10 +498,11 @@ interface StageFormProps {
   onChange: (f: { name: string; order: string; notes: string }) => void;
   onSave: () => void;
   onCancel: () => void;
+  onDelete?: () => void;
   mode?: 'add' | 'edit';
 }
 
-function StageForm({ form, onChange, onSave, onCancel, mode = 'edit' }: StageFormProps) {
+function StageForm({ form, onChange, onSave, onCancel, onDelete, mode = 'edit' }: StageFormProps) {
   return (
     <form className="border border-blue-200 dark:border-blue-700 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20 mb-3" onSubmit={(e) => e.preventDefault()}>
       <div className="grid grid-cols-2 gap-3 mb-3">
@@ -505,13 +524,21 @@ function StageForm({ form, onChange, onSave, onCancel, mode = 'edit' }: StageFor
           rows={2}
           className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 resize-y" />
       </div>
-      <div className="flex justify-end gap-2">
-        <button type="button" onClick={onCancel}
-          className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
-        <button type="button" data-testid={mode === 'edit' ? 'stage-form-save' : undefined} onClick={onSave}
-          className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
-          {mode === 'add' ? 'Add Stage' : 'Save'}
-        </button>
+      <div className="flex justify-between gap-2">
+        {onDelete && (
+          <button type="button" onClick={onDelete}
+            className="px-3 py-1 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20">
+            Delete Stage
+          </button>
+        )}
+        <div className="flex gap-2 ml-auto">
+          <button type="button" onClick={onCancel}
+            className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+          <button type="button" data-testid={mode === 'edit' ? 'stage-form-save' : undefined} onClick={onSave}
+            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+            {mode === 'add' ? 'Add Stage' : 'Save'}
+          </button>
+        </div>
       </div>
     </form>
   );
@@ -523,13 +550,98 @@ interface HistoryPanelProps {
   onRestore: (sequence: number) => void;
 }
 
+const HISTORY_FIELD_LABELS: Record<string, string> = {
+  companyName: 'Company Name', positionTitle: 'Position Title', status: 'Status',
+  dateApplied: 'Date Applied', jobPostingUrl: 'Job Posting URL',
+  companyUrl: 'Company URL', companyCareerUrl: 'Career URL',
+  companyCategory: 'Company Category', jobSource: 'Job Source',
+  skillsMatch: 'Skills Match', coverLetterRequired: 'Cover Letter Required',
+  specialRequirements: 'Special Requirements', salaryMin: 'Salary Min',
+  salaryMax: 'Salary Max', notes: 'Notes', offerDueDate: 'Offer Due Date',
+  isArchived: 'Archived', interviewStages: 'Interview Stages',
+};
+
+interface HistoryEntryRowProps {
+  entry: HistoryEntry;
+  prevEntry: HistoryEntry | undefined;
+  isCurrent: boolean;
+  isCreation: boolean;
+  onRestore: (sequence: number) => void;
+}
+
+function HistoryEntryRow({ entry, prevEntry, isCurrent, isCreation, onRestore }: HistoryEntryRowProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const changed: string[] = (() => {
+    try { return JSON.parse(entry.changedFields) as string[]; } catch { return []; }
+  })();
+  const isRestored = changed.includes('restored');
+  const currSnap: Record<string, unknown> = (() => {
+    try { return JSON.parse(entry.snapshot) as Record<string, unknown>; } catch { return {}; }
+  })();
+  const prevSnap: Record<string, unknown> = (() => {
+    try { return prevEntry ? JSON.parse(prevEntry.snapshot) as Record<string, unknown> : {}; } catch { return {}; }
+  })();
+  const displayFields = changed.filter((f) => f !== 'restored' && HISTORY_FIELD_LABELS[f]);
+  const changedDiffFields = displayFields
+    .map((field) => ({
+      field,
+      label: HISTORY_FIELD_LABELS[field] ?? field,
+      oldVal: String(prevSnap[field] ?? ''),
+      newVal: String(currSnap[field] ?? ''),
+    }))
+    .filter(({ oldVal, newVal }) => oldVal !== newVal);
+
+  return (
+    <div data-testid="history-entry" className="border border-gray-200 dark:border-gray-600 rounded p-3">
+      <div className="flex items-center gap-2 flex-wrap">
+        <button type="button" onClick={() => setIsOpen((o) => !o)}
+          className="text-xs px-1.5 py-0.5 border border-gray-300 dark:border-gray-600 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+          {isOpen ? '▲' : '▼'}
+        </button>
+        <span className="text-sm font-medium">#{entry.sequence}</span>
+        <span className="text-xs text-gray-500">{new Date(entry.createdAt).toLocaleString()}</span>
+        {isCurrent && <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">(current)</span>}
+      </div>
+      <p className="text-xs text-gray-500 mt-1 ml-7">
+        {isCreation ? 'Created application' : isRestored ? 'Restored to version' : displayFields.slice(0, 2).map((f) => {
+          const val = currSnap[f];
+          return val != null ? String(val) : (HISTORY_FIELD_LABELS[f] ?? f);
+        }).join(', ')}
+      </p>
+
+      {isOpen && (
+        <div className="mt-2 ml-7 space-y-1">
+          {!isCreation && changedDiffFields.map(({ field, label, oldVal, newVal }) => (
+            <div key={field} className="text-xs">
+              <span className="font-medium text-gray-700 dark:text-gray-300">{label}:</span>{' '}
+              {oldVal && (
+                <span className="line-through text-gray-400 mr-1">{oldVal}</span>
+              )}
+              <span className="text-green-600 dark:text-green-400">{newVal}</span>
+            </div>
+          ))}
+          {!isCurrent && (
+            <button type="button"
+              onClick={() => onRestore(entry.sequence)}
+              className="mt-2 text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+              Restore to this point
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function HistoryPanel({ applicationId, onClose, onRestore }: HistoryPanelProps) {
   const { data, loading } = useQuery(GET_HISTORY, { variables: { applicationId, page: 1, limit: 20 } });
   const entries: HistoryEntry[] = data?.applicationHistory?.items ?? [];
 
-  // entries are sorted DESC by sequence — entries[0] is current, last is creation
-  const maxSequence = entries.length > 0 ? Math.max(...entries.map((e) => e.sequence)) : 0;
-  const minSequence = entries.length > 0 ? Math.min(...entries.map((e) => e.sequence)) : 0;
+  // entries sorted DESC by sequence — entries[0] is newest (current)
+  const sortedEntries = [...entries].sort((a, b) => b.sequence - a.sequence);
+  const maxSequence = sortedEntries.length > 0 ? sortedEntries[0].sequence : 0;
+  const minSequence = sortedEntries.length > 0 ? sortedEntries[sortedEntries.length - 1].sequence : 0;
 
   return (
     <div data-testid="history-panel" className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
@@ -539,37 +651,18 @@ function HistoryPanel({ applicationId, onClose, onRestore }: HistoryPanelProps) 
           className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm">Close</button>
       </div>
       {loading && <Spinner />}
-      {!loading && entries.length === 0 && <p className="text-gray-500 text-sm text-center py-4">No history yet.</p>}
+      {!loading && sortedEntries.length === 0 && <p className="text-gray-500 text-sm text-center py-4">No history yet.</p>}
       <div className="space-y-2">
-        {entries.map((entry) => {
-          const changed: string[] = (() => {
-            try { return JSON.parse(entry.changedFields); } catch { return []; }
-          })();
-          const isCurrent = entry.sequence === maxSequence;
-          const isCreation = entry.sequence === minSequence;
-
-          return (
-            <div key={entry.id} data-testid="history-entry" className="flex items-start justify-between p-3 border border-gray-200 dark:border-gray-600 rounded">
-              <div>
-                <span className="text-sm font-medium">#{entry.sequence}</span>
-                <span className="ml-2 text-xs text-gray-500">{new Date(entry.createdAt).toLocaleString()}</span>
-                {isCurrent && <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 font-medium">(current)</span>}
-                {isCreation ? (
-                  <p className="text-xs text-gray-500 mt-0.5 font-medium">Created application</p>
-                ) : (
-                  <p className="text-xs text-gray-400 mt-0.5">{changed.join(', ')}</p>
-                )}
-              </div>
-              {!isCurrent && (
-                <button type="button"
-                  onClick={() => onRestore(entry.sequence)}
-                  className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shrink-0">
-                  Restore to this point
-                </button>
-              )}
-            </div>
-          );
-        })}
+        {sortedEntries.map((entry, idx) => (
+          <HistoryEntryRow
+            key={entry.id}
+            entry={entry}
+            prevEntry={sortedEntries[idx + 1]}
+            isCurrent={entry.sequence === maxSequence}
+            isCreation={entry.sequence === minSequence}
+            onRestore={onRestore}
+          />
+        ))}
       </div>
     </div>
   );
