@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { CREATE_APPLICATION } from '../../graphql/mutations.js';
+import { CREATE_APPLICATION, CREATE_STAGE } from '../../graphql/mutations.js';
 import { GET_APPLICATIONS } from '../../graphql/queries.js';
 import { Button } from '../../components/ui/Button.js';
 import {
   type ApplicationStatus, type CompanyCategory, type JobSource,
   STATUS_LABELS, CATEGORY_LABELS, SOURCE_LABELS, COMPANY_CATEGORIES, JOB_SOURCES,
+  toApiStatus, toApiCategory, toApiSource,
 } from '../../types/application.js';
 
 export const Route = createFileRoute('/applications/new')({
@@ -17,11 +18,11 @@ const STATUS_OPTIONS: { value: ApplicationStatus; label: string }[] = [
   { value: 'unsubmitted', label: STATUS_LABELS.unsubmitted },
   { value: 'applied', label: STATUS_LABELS.applied },
   { value: 'interviewing', label: STATUS_LABELS.interviewing },
-  { value: 'given_offer', label: STATUS_LABELS.given_offer },
-  { value: 'accepted_offer', label: STATUS_LABELS.accepted_offer },
-  { value: 'declined_offer', label: STATUS_LABELS.declined_offer },
+  { value: 'given offer', label: STATUS_LABELS['given offer'] },
+  { value: 'accepted offer', label: STATUS_LABELS['accepted offer'] },
+  { value: 'declined offer', label: STATUS_LABELS['declined offer'] },
   { value: 'rejected', label: STATUS_LABELS.rejected },
-  { value: 'no_offer', label: STATUS_LABELS.no_offer },
+  { value: 'no offer', label: STATUS_LABELS['no offer'] },
 ];
 
 function NewApplicationPage() {
@@ -43,9 +44,15 @@ function NewApplicationPage() {
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Interview stages state
+  const [pendingStages, setPendingStages] = useState<Array<{ name: string; order: number }>>([]);
+  const [showStageForm, setShowStageForm] = useState(false);
+  const [stageForm, setStageForm] = useState({ name: '', order: '0' });
+
   const [createApplication, { loading }] = useMutation(CREATE_APPLICATION, {
     refetchQueries: [GET_APPLICATIONS],
   });
+  const [createStage] = useMutation(CREATE_STAGE);
 
   const handleStatusChange = (newStatus: ApplicationStatus) => {
     setStatus(newStatus);
@@ -62,6 +69,12 @@ function NewApplicationPage() {
     if (!companyName.trim()) newErrors.companyName = 'Company name is required';
     if (!positionTitle.trim()) newErrors.positionTitle = 'Position title is required';
 
+    const minVal = salaryMin ? parseInt(salaryMin, 10) : null;
+    const maxVal = salaryMax ? parseInt(salaryMax, 10) : null;
+    if (minVal != null && maxVal != null && minVal > maxVal) {
+      newErrors.salary = 'Minimum salary must not exceed maximum';
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -74,13 +87,13 @@ function NewApplicationPage() {
           input: {
             companyName: companyName.trim(),
             positionTitle: positionTitle.trim(),
-            status,
+            status: toApiStatus(status) as unknown as ApplicationStatus,
             dateApplied: dateApplied || null,
             companyUrl: companyUrl || null,
             jobPostingUrl: jobPostingUrl || null,
             companyCareerUrl: companyCareerUrl || null,
-            companyCategory: companyCategory || null,
-            jobSource: jobSource || null,
+            companyCategory: companyCategory ? (toApiCategory(companyCategory) as unknown as CompanyCategory) : null,
+            jobSource: jobSource ? (toApiSource(jobSource) as unknown as JobSource) : null,
             skillsMatch: skillsMatch ? parseInt(skillsMatch, 10) : null,
             coverLetterRequired,
             specialRequirements: specialRequirements || null,
@@ -92,6 +105,14 @@ function NewApplicationPage() {
       });
       const app = result.data?.createApplication;
       if (app) {
+        for (const stage of pendingStages) {
+          await createStage({
+            variables: {
+              applicationId: app.id,
+              input: { name: stage.name, order: stage.order, notes: null },
+            },
+          });
+        }
         navigate({ to: '/applications/$id', params: { id: app.id } });
       }
     } catch (err) {
@@ -119,7 +140,7 @@ function NewApplicationPage() {
             variant="secondary"
             onClick={() => navigate({ to: '/' })}
           >
-            Cancel
+            Back to List
           </Button>
         </div>
       </div>
@@ -312,6 +333,10 @@ function NewApplicationPage() {
           </div>
         </div>
 
+        {errors.salary && (
+          <p className="text-sm text-red-600">{errors.salary}</p>
+        )}
+
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <input
@@ -350,6 +375,75 @@ function NewApplicationPage() {
             rows={3}
             className={`${inputClass()} resize-y`}
           />
+        </div>
+      </div>
+
+      {/* Interview Stages */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Interview Stages</h2>
+          <button
+            type="button"
+            onClick={() => {
+              setShowStageForm(true);
+              setStageForm({ name: '', order: String(pendingStages.length) });
+            }}
+            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Add Stage
+          </button>
+        </div>
+
+        {showStageForm && (
+          <form className="border border-blue-200 dark:border-blue-700 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20 mb-3" onSubmit={(e) => e.preventDefault()}>
+            <div className="mb-3">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stage Name *</label>
+              <input
+                type="text"
+                value={stageForm.name}
+                onChange={(e) => setStageForm({ ...stageForm, name: e.target.value })}
+                placeholder="Phone Screen, Technical Interview..."
+                className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowStageForm(false)}
+                className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!stageForm.name.trim()) return;
+                  setPendingStages((prev) => [
+                    ...prev,
+                    { name: stageForm.name.trim(), order: prev.length },
+                  ]);
+                  setShowStageForm(false);
+                  setStageForm({ name: '', order: '0' });
+                }}
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Add Stage
+              </button>
+            </div>
+          </form>
+        )}
+
+        {pendingStages.length === 0 && !showStageForm && (
+          <p className="text-gray-500 dark:text-gray-400 text-center py-4 text-sm">No interview stages added yet.</p>
+        )}
+
+        <div className="space-y-2">
+          {pendingStages.map((s, i) => (
+            <div key={i} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
+              <span className="font-medium text-sm">{s.name}</span>
+              <span className="text-xs text-gray-500">#{s.order}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

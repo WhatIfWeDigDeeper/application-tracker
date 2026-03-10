@@ -14,7 +14,7 @@ import {
   type Application, type ApplicationStatus, type InterviewStage, type HistoryEntry,
   type CompanyCategory, type JobSource,
   STATUS_LABELS, CATEGORY_LABELS, SOURCE_LABELS, COMPANY_CATEGORIES, JOB_SOURCES,
-  TERMINAL_STATUSES,
+  TERMINAL_STATUSES, fromApiApplication, toApiStatus, toApiCategory, toApiSource,
 } from '../../types/application.js';
 
 export const Route = createFileRoute('/applications/$id')({
@@ -25,11 +25,11 @@ const STATUS_OPTIONS: { value: ApplicationStatus; label: string }[] = [
   { value: 'unsubmitted', label: STATUS_LABELS.unsubmitted },
   { value: 'applied', label: STATUS_LABELS.applied },
   { value: 'interviewing', label: STATUS_LABELS.interviewing },
-  { value: 'given_offer', label: STATUS_LABELS.given_offer },
-  { value: 'accepted_offer', label: STATUS_LABELS.accepted_offer },
-  { value: 'declined_offer', label: STATUS_LABELS.declined_offer },
+  { value: 'given offer', label: STATUS_LABELS['given offer'] },
+  { value: 'accepted offer', label: STATUS_LABELS['accepted offer'] },
+  { value: 'declined offer', label: STATUS_LABELS['declined offer'] },
   { value: 'rejected', label: STATUS_LABELS.rejected },
-  { value: 'no_offer', label: STATUS_LABELS.no_offer },
+  { value: 'no offer', label: STATUS_LABELS['no offer'] },
 ];
 
 function ApplicationDetailPage() {
@@ -37,7 +37,8 @@ function ApplicationDetailPage() {
   const navigate = useNavigate();
 
   const { data, loading, error, refetch } = useQuery(GET_APPLICATION, { variables: { id } });
-  const app: Application | null = data?.application ?? null;
+  const rawApp = data?.application ?? null;
+  const app: Application | null = rawApp ? (fromApiApplication(rawApp) as unknown as Application) : null;
 
   const [form, setForm] = useState({
     companyName: '', positionTitle: '', status: 'unsubmitted' as ApplicationStatus,
@@ -116,12 +117,13 @@ function ApplicationDetailPage() {
           id,
           input: {
             companyName: form.companyName.trim(), positionTitle: form.positionTitle.trim(),
-            status: form.status, dateApplied: form.dateApplied || null,
+            status: toApiStatus(form.status) as unknown as ApplicationStatus,
+            dateApplied: form.dateApplied || null,
             jobPostingUrl: form.jobPostingUrl || null,
             companyUrl: form.companyUrl || null,
             companyCareerUrl: form.companyCareerUrl || null,
-            companyCategory: form.companyCategory || null,
-            jobSource: form.jobSource || null,
+            companyCategory: form.companyCategory ? (toApiCategory(form.companyCategory) as unknown as CompanyCategory) : null,
+            jobSource: form.jobSource ? (toApiSource(form.jobSource) as unknown as JobSource) : null,
             salaryMin: form.salaryMin ? parseInt(form.salaryMin, 10) : null,
             salaryMax: form.salaryMax ? parseInt(form.salaryMax, 10) : null,
             skillsMatch: form.skillsMatch ? parseInt(form.skillsMatch, 10) : null,
@@ -253,6 +255,7 @@ function ApplicationDetailPage() {
           <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name *</label>
           <input id="companyName" type="text" value={form.companyName}
             onChange={(e) => updateField('companyName', e.target.value)}
+            placeholder="Company Name *"
             className={inputClass(!!errors.companyName)} />
           {errors.companyName && <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>}
         </div>
@@ -261,6 +264,7 @@ function ApplicationDetailPage() {
           <label htmlFor="positionTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position Title *</label>
           <input id="positionTitle" type="text" value={form.positionTitle}
             onChange={(e) => updateField('positionTitle', e.target.value)}
+            placeholder="Position Title *"
             className={inputClass(!!errors.positionTitle)} />
           {errors.positionTitle && <p className="mt-1 text-sm text-red-600">{errors.positionTitle}</p>}
         </div>
@@ -284,7 +288,7 @@ function ApplicationDetailPage() {
           </div>
         </div>
 
-        {form.status === 'given_offer' && (
+        {form.status === 'given offer' && (
           <div>
             <label htmlFor="offerDueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Offer Due Date</label>
             <input id="offerDueDate" type="date" value={form.offerDueDate}
@@ -407,6 +411,7 @@ function ApplicationDetailPage() {
             onChange={setStageForm}
             onSave={handleAddStage}
             onCancel={() => setShowAddStage(false)}
+            mode="add"
           />
         )}
 
@@ -475,16 +480,17 @@ interface StageFormProps {
   onChange: (f: { name: string; order: string; notes: string }) => void;
   onSave: () => void;
   onCancel: () => void;
+  mode?: 'add' | 'edit';
 }
 
-function StageForm({ form, onChange, onSave, onCancel }: StageFormProps) {
+function StageForm({ form, onChange, onSave, onCancel, mode = 'edit' }: StageFormProps) {
   return (
-    <div className="border border-blue-200 dark:border-blue-700 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20 mb-3">
+    <form className="border border-blue-200 dark:border-blue-700 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20 mb-3" onSubmit={(e) => e.preventDefault()}>
       <div className="grid grid-cols-2 gap-3 mb-3">
         <div>
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Stage Name *</label>
           <input type="text" value={form.name} onChange={(e) => onChange({ ...form, name: e.target.value })}
-            placeholder="e.g., Phone Screen"
+            placeholder="e.g., Technical Interview"
             className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500" />
         </div>
         <div>
@@ -502,10 +508,12 @@ function StageForm({ form, onChange, onSave, onCancel }: StageFormProps) {
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onCancel}
           className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
-        <button type="button" data-testid="stage-form-save" onClick={onSave}
-          className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+        <button type="button" data-testid={mode === 'edit' ? 'stage-form-save' : undefined} onClick={onSave}
+          className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+          {mode === 'add' ? 'Add Stage' : 'Save'}
+        </button>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -519,6 +527,10 @@ function HistoryPanel({ applicationId, onClose, onRestore }: HistoryPanelProps) 
   const { data, loading } = useQuery(GET_HISTORY, { variables: { applicationId, page: 1, limit: 20 } });
   const entries: HistoryEntry[] = data?.applicationHistory?.items ?? [];
 
+  // entries are sorted DESC by sequence — entries[0] is current, last is creation
+  const maxSequence = entries.length > 0 ? Math.max(...entries.map((e) => e.sequence)) : 0;
+  const minSequence = entries.length > 0 ? Math.min(...entries.map((e) => e.sequence)) : 0;
+
   return (
     <div data-testid="history-panel" className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
@@ -530,19 +542,31 @@ function HistoryPanel({ applicationId, onClose, onRestore }: HistoryPanelProps) 
       {!loading && entries.length === 0 && <p className="text-gray-500 text-sm text-center py-4">No history yet.</p>}
       <div className="space-y-2">
         {entries.map((entry) => {
-          const changed: string[] = JSON.parse(entry.changedFields);
+          const changed: string[] = (() => {
+            try { return JSON.parse(entry.changedFields); } catch { return []; }
+          })();
+          const isCurrent = entry.sequence === maxSequence;
+          const isCreation = entry.sequence === minSequence;
+
           return (
             <div key={entry.id} data-testid="history-entry" className="flex items-start justify-between p-3 border border-gray-200 dark:border-gray-600 rounded">
               <div>
                 <span className="text-sm font-medium">#{entry.sequence}</span>
                 <span className="ml-2 text-xs text-gray-500">{new Date(entry.createdAt).toLocaleString()}</span>
-                <p className="text-xs text-gray-400 mt-0.5">{changed.join(', ')}</p>
+                {isCurrent && <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 font-medium">(current)</span>}
+                {isCreation ? (
+                  <p className="text-xs text-gray-500 mt-0.5 font-medium">Created application</p>
+                ) : (
+                  <p className="text-xs text-gray-400 mt-0.5">{changed.join(', ')}</p>
+                )}
               </div>
-              <button type="button"
-                onClick={() => onRestore(entry.sequence)}
-                className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shrink-0">
-                Restore
-              </button>
+              {!isCurrent && (
+                <button type="button"
+                  onClick={() => onRestore(entry.sequence)}
+                  className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shrink-0">
+                  Restore to this point
+                </button>
+              )}
             </div>
           );
         })}

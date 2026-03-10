@@ -18,14 +18,15 @@ export function ImportModal({ onClose }: ImportModalProps) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleImport = async () => {
-    if (!file) return;
+    const fileToUpload = fileRef.current?.files?.[0] ?? file;
+    if (!fileToUpload) return;
     setLoading(true);
     setError(null);
     setResult(null);
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', fileToUpload);
       const res = await fetch('/api/applications/import', {
         method: 'POST',
         body: formData,

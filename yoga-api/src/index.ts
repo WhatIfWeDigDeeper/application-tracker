@@ -3,8 +3,68 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { createYoga } from 'graphql-yoga';
 import { schema } from './schema/index.js';
 import { prisma } from './db/client.js';
-import { getAllApplications, deleteApplication } from './services/application.service.js';
+import { getAllApplications, deleteApplication, createApplication, updateApplication } from './services/application.service.js';
+import { createStage } from './services/stages.service.js';
 import Busboy from 'busboy';
+
+const STATUS_DISPLAY_TO_PRISMA: Record<string, string> = {
+  'given offer': 'given_offer',
+  'accepted offer': 'accepted_offer',
+  'declined offer': 'declined_offer',
+  'no offer': 'no_offer',
+};
+
+async function readJsonBody(req: IncomingMessage): Promise<Record<string, unknown>> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on('data', (d: Buffer) => chunks.push(d));
+    req.on('end', () => {
+      try { resolve(JSON.parse(Buffer.concat(chunks).toString('utf-8') || '{}')); }
+      catch { resolve({}); }
+    });
+    req.on('error', reject);
+  });
+}
+
+async function handleRestCreate(req: IncomingMessage, res: ServerResponse) {
+  const body = await readJsonBody(req);
+  const app = await createApplication({
+    companyName: String(body.companyName ?? ''),
+    positionTitle: String(body.positionTitle ?? ''),
+    status: (body.status as import('@prisma/client').ApplicationStatus | undefined) ?? undefined,
+    dateApplied: body.dateApplied ? String(body.dateApplied) : null,
+  });
+  res.writeHead(201, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({
+    id: app.id, companyName: app.companyName,
+    positionTitle: app.positionTitle, status: app.status,
+    dateApplied: app.dateApplied ? app.dateApplied.toISOString().split('T')[0] : null,
+  }));
+}
+
+async function handleRestUpdate(req: IncomingMessage, res: ServerResponse, id: string) {
+  const body = await readJsonBody(req);
+  const input: Record<string, unknown> = {};
+  if (body.companyName !== undefined) input.companyName = String(body.companyName);
+  if (body.positionTitle !== undefined) input.positionTitle = String(body.positionTitle);
+  if (body.status !== undefined) input.status = body.status;
+  const app = await updateApplication(id, input as Parameters<typeof updateApplication>[1]);
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({
+    id: app.id, companyName: app.companyName,
+    positionTitle: app.positionTitle, status: app.status,
+  }));
+}
+
+async function handleRestCreateStage(req: IncomingMessage, res: ServerResponse, applicationId: string) {
+  const body = await readJsonBody(req);
+  const stage = await createStage(applicationId, {
+    name: String(body.name ?? ''),
+    order: typeof body.order === 'number' ? body.order : parseInt(String(body.order ?? '0'), 10),
+  });
+  res.writeHead(201, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ id: stage.id, name: stage.name, order: stage.order }));
+}
 
 const yoga = createYoga({
   schema,
@@ -183,8 +243,9 @@ async function handleImport(req: IncomingMessage, res: ServerResponse) {
     }
 
     const statusRaw = get(cols, 'status');
-    const validStatuses = ['unsubmitted', 'applied', 'interviewing', 'given offer', 'accepted offer', 'declined offer', 'rejected', 'no offer'];
-    const status = validStatuses.includes(statusRaw) ? statusRaw : 'unsubmitted';
+    const validStatuses = ['unsubmitted', 'applied', 'interviewing', 'given offer', 'accepted offer', 'declined offer', 'rejected', 'no offer', 'given_offer', 'accepted_offer', 'declined_offer', 'no_offer'];
+    const statusDisplay = validStatuses.includes(statusRaw) ? statusRaw : 'unsubmitted';
+    const status = (STATUS_DISPLAY_TO_PRISMA[statusDisplay] ?? statusDisplay);
 
     const dateAppliedRaw = get(cols, 'dateApplied');
     const dateApplied = dateAppliedRaw ? new Date(dateAppliedRaw) : null;
@@ -269,6 +330,27 @@ const server = createServer((req, res) => {
   if (req.method === 'GET' && url.startsWith('/api/applications') && !url.includes('/graphql')) {
     handleGetApplications(res).catch(() => { res.writeHead(500); res.end(); });
     return;
+  }
+
+  if (req.method === 'POST' && url === '/api/applications') {
+    handleRestCreate(req, res).catch(() => { res.writeHead(500); res.end(); });
+    return;
+  }
+
+  if (req.method === 'PATCH' && /^\/api\/applications\/[^/]+$/.test(url)) {
+    const patchMatch = url.match(/^\/api\/applications\/([^/?]+)/);
+    if (patchMatch) {
+      handleRestUpdate(req, res, patchMatch[1]).catch(() => { res.writeHead(500); res.end(); });
+      return;
+    }
+  }
+
+  if (req.method === 'POST' && /^\/api\/applications\/[^/]+\/interview-stages$/.test(url)) {
+    const stageMatch = url.match(/^\/api\/applications\/([^/?]+)\/interview-stages/);
+    if (stageMatch) {
+      handleRestCreateStage(req, res, stageMatch[1]).catch(() => { res.writeHead(500); res.end(); });
+      return;
+    }
   }
 
   const match = url.match(/^\/api\/applications\/([^/?]+)/);

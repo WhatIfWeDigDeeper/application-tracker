@@ -20,11 +20,11 @@ const STATUS_OPTIONS: { value: ApplicationStatus; label: string }[] = [
   { value: 'unsubmitted', label: STATUS_LABELS.unsubmitted },
   { value: 'applied', label: STATUS_LABELS.applied },
   { value: 'interviewing', label: STATUS_LABELS.interviewing },
-  { value: 'given_offer', label: STATUS_LABELS.given_offer },
-  { value: 'accepted_offer', label: STATUS_LABELS.accepted_offer },
-  { value: 'declined_offer', label: STATUS_LABELS.declined_offer },
+  { value: 'given offer', label: STATUS_LABELS['given offer'] },
+  { value: 'accepted offer', label: STATUS_LABELS['accepted offer'] },
+  { value: 'declined offer', label: STATUS_LABELS['declined offer'] },
   { value: 'rejected', label: STATUS_LABELS.rejected },
-  { value: 'no_offer', label: STATUS_LABELS.no_offer },
+  { value: 'no offer', label: STATUS_LABELS['no offer'] },
 ];
 
 const CATEGORY_OPTIONS = COMPANY_CATEGORIES.map((v) => ({ value: v, label: CATEGORY_LABELS[v] }));

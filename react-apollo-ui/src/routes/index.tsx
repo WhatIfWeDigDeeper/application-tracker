@@ -9,6 +9,7 @@ import { Spinner } from '../components/ui/Spinner.js';
 import { Modal } from '../components/ui/Modal.js';
 import { ImportModal } from '../components/applications/ImportModal.js';
 import type { Application, ApplicationStatus, CompanyCategory, JobSource } from '../types/application.js';
+import { fromApiApplication, toApiStatus, toApiCategory, toApiSource } from '../types/application.js';
 import type { Filters } from '../components/applications/FilterBar.js';
 
 export const Route = createFileRoute('/')({
@@ -82,9 +83,9 @@ function ListPage() {
 
   const { data, loading, error, refetch } = useQuery(GET_APPLICATIONS, {
     variables: {
-      status: filters.status as ApplicationStatus | undefined,
-      companyCategory: filters.companyCategory as CompanyCategory | undefined,
-      jobSource: filters.jobSource as JobSource | undefined,
+      status: filters.status ? (toApiStatus(filters.status) as unknown as ApplicationStatus) : undefined,
+      companyCategory: filters.companyCategory ? (toApiCategory(filters.companyCategory) as unknown as CompanyCategory) : undefined,
+      jobSource: filters.jobSource ? (toApiSource(filters.jobSource) as unknown as JobSource) : undefined,
       skillsMatchMin: filters.skillsMatchMin,
       includeArchived: filters.includeArchived,
       sortBy: filters.sortBy,
@@ -99,7 +100,7 @@ function ListPage() {
   const [restoreApp] = useMutation(RESTORE_APPLICATION, { onCompleted: () => refetch() });
   const [deleteApp] = useMutation(DELETE_APPLICATION, { onCompleted: () => refetch() });
 
-  const applications: Application[] = data?.applications?.items ?? [];
+  const applications: Application[] = (data?.applications?.items ?? []).map(fromApiApplication);
   const total: number = data?.applications?.total ?? 0;
   const totalPages: number = data?.applications?.totalPages ?? 1;
 
@@ -119,9 +120,16 @@ function ListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-bold">Applications</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => navigate({ to: '/applications/new' })}
+            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Add Application
+          </button>
           <span className="text-sm text-gray-500 dark:text-gray-400">{total} total</span>
           <button
             type="button"
