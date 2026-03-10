@@ -387,7 +387,7 @@ npx skills add -y whatifwedigdeeper/agent-skills
 Other skills
 
 ```bash
-npx skills add -y https://github.com/microsoft/playwright-cli
+npx skills add -y https://github.com/microsoft/playwright-cli --skill playwright-cli
 ```
 
 
