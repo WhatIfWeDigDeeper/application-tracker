@@ -42,15 +42,16 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(headers).toContain("salaryMax");
       expect(headers).toContain("notes");
       expect(headers).toContain("offerDueDate");
-      expect(headers.length).toBe(16);
+      expect(headers).toContain("isArchived");
+      expect(headers.length).toBe(17);
     });
   });
 
   describe("POST /applications/import", () => {
     it("should import valid CSV with all fields", async () => {
       const csv = [
-        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate",
-        'CSV Test Corp,Frontend Dev,2026-01-10,applied,https://csvtest.com,https://csvtest.com/jobs/1,https://csvtest.com/careers,ai,4,linkedin,false,React experience required,90000,130000,Great opportunity,2026-03-15',
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived",
+        'CSV Test Corp,Frontend Dev,2026-01-10,applied,https://csvtest.com,https://csvtest.com/jobs/1,https://csvtest.com/careers,ai,4,linkedin,false,React experience required,90000,130000,Great opportunity,2026-03-15,false',
       ].join("\n");
 
       const formData = new FormData();
@@ -83,12 +84,43 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(created.skillsMatch).toBe(4);
       expect(created.salaryMin).toBe(90000);
       expect(created.salaryMax).toBe(130000);
+      expect(created.isArchived).toBe(false);
+    });
+
+    it("should import isArchived=true and create an archived application", async () => {
+      const uniqueCompany = `Archived Import Corp ${Date.now()}`;
+      const csv = [
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived",
+        `${uniqueCompany},Archived Role,,,,,,,,,,,,,,,true`,
+      ].join("\n");
+
+      const formData = new FormData();
+      formData.append("file", new Blob([csv], { type: "text/csv" }), "test.csv");
+
+      const response = await fetch(`${API_BASE}/applications/import`, {
+        method: "POST",
+        body: formData,
+      });
+
+      expect(response.status).toBe(200);
+      const result = await response.json();
+      expect(result.imported).toBe(1);
+      expect(result.errors).toEqual([]);
+
+      const listResponse = await fetch(`${API_BASE}/applications?limit=100&includeArchived=true`);
+      const listData = await listResponse.json();
+      const created = listData.items.find(
+        (a: Record<string, unknown>) => a.companyName === uniqueCompany
+      );
+      expect(created).toBeDefined();
+      if (created) createdApplicationIds.push(created.id);
+      expect(created.isArchived).toBe(true);
     });
 
     it("should import CSV with only required fields and apply defaults", async () => {
       const csv = [
-        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate",
-        "Minimal Corp,Junior Dev,,,,,,,,,,,,,,",
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived",
+        "Minimal Corp,Junior Dev,,,,,,,,,,,,,,,",
       ].join("\n");
 
       const formData = new FormData();
@@ -118,10 +150,10 @@ describe("CSV Import/Export Integration Tests", () => {
 
     it("should report validation errors with row numbers", async () => {
       const csv = [
-        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate",
-        ",Missing Title,,,,,,,,,,,,,,",
-        "Missing Position,,,,,,,,,,,,,,,",
-        "Valid Row,Valid Title,,,,,,,,,,,,,,",
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived",
+        ",Missing Title,,,,,,,,,,,,,,,",
+        "Missing Position,,,,,,,,,,,,,,,,",
+        "Valid Row,Valid Title,,,,,,,,,,,,,,,",
       ].join("\n");
 
       const formData = new FormData();
@@ -165,8 +197,8 @@ describe("CSV Import/Export Integration Tests", () => {
 
       // Now import a CSV with the same URL
       const csv = [
-        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate",
-        "Duplicate Corp,Duplicate Role,,,,https://existing.com/jobs/dedup-test,,,,,,,,,,",
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived",
+        "Duplicate Corp,Duplicate Role,,,,https://existing.com/jobs/dedup-test,,,,,,,,,,,",
       ].join("\n");
 
       const formData = new FormData();
@@ -186,9 +218,9 @@ describe("CSV Import/Export Integration Tests", () => {
     it("should skip duplicate jobPostingUrl within the same file", async () => {
       const uniqueUrl = `https://intra-dedup-${Date.now()}.com/jobs/1`;
       const csv = [
-        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate",
-        `First Corp,First Role,,,,${uniqueUrl},,,,,,,,,,`,
-        `Second Corp,Second Role,,,,${uniqueUrl},,,,,,,,,,`,
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived",
+        `First Corp,First Role,,,,${uniqueUrl},,,,,,,,,,,`,
+        `Second Corp,Second Role,,,,${uniqueUrl},,,,,,,,,,,`,
       ].join("\n");
 
       const formData = new FormData();
@@ -215,9 +247,9 @@ describe("CSV Import/Export Integration Tests", () => {
 
     it("should never skip rows with empty jobPostingUrl", async () => {
       const csv = [
-        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate",
-        "No URL Corp A,Role A,,,,,,,,,,,,,,",
-        "No URL Corp B,Role B,,,,,,,,,,,,,,",
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived",
+        "No URL Corp A,Role A,,,,,,,,,,,,,,,",
+        "No URL Corp B,Role B,,,,,,,,,,,,,,,",
       ].join("\n");
 
       const formData = new FormData();
@@ -246,7 +278,7 @@ describe("CSV Import/Export Integration Tests", () => {
 
     it("should handle empty CSV (headers only)", async () => {
       const csv =
-        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate\n";
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived\n";
 
       const formData = new FormData();
       formData.append("file", new Blob([csv], { type: "text/csv" }), "test.csv");
@@ -312,7 +344,7 @@ describe("CSV Import/Export Integration Tests", () => {
 
       // Check headers
       const headers = lines[0].split(",");
-      expect(headers.length).toBe(16);
+      expect(headers.length).toBe(17);
       expect(headers[0]).toBe("companyName");
 
       // Find our test row
@@ -373,10 +405,20 @@ describe("CSV Import/Export Integration Tests", () => {
         method: "POST",
       });
 
-      // Export should include it
+      // Export should include it with isArchived=true
       const response = await fetch(`${API_BASE}/applications/export`);
       const csv = await response.text();
       expect(csv).toContain("Archived Export Corp");
+      const lines = csv.split("\n");
+      const headers = lines[0].trim().split(",");
+      const isArchivedIdx = headers.indexOf("isArchived");
+      expect(isArchivedIdx).toBeGreaterThan(-1);
+      const archivedRow = lines.find((l: string) => l.includes("Archived Export Corp"));
+      expect(archivedRow).toBeDefined();
+      if (archivedRow) {
+        const cols = archivedRow.trim().split(",");
+        expect(cols[isArchivedIdx]).toBe("true");
+      }
     });
 
     it("should produce round-trip compatible CSV (export then import)", async () => {

@@ -194,6 +194,7 @@ class CsvRow(BaseModel):
     )
     notes: str | None = Field(default=None, max_length=5000)
     offer_due_date: str | None = Field(default=None, alias="offerDueDate", pattern=r"^\d{4}-\d{2}-\d{2}$")
+    is_archived: Annotated[bool | None, BeforeValidator(_coerce_bool)] = Field(default=None, alias="isArchived")
 
     model_config = ConfigDict(populate_by_name=True)
 

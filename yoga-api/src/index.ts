@@ -87,7 +87,7 @@ const CSV_COLUMNS = [
   'companyName', 'positionTitle', 'dateApplied', 'status',
   'companyUrl', 'jobPostingUrl', 'companyCareerUrl', 'companyCategory',
   'skillsMatch', 'jobSource', 'coverLetterRequired', 'specialRequirements',
-  'salaryMin', 'salaryMax', 'notes', 'offerDueDate',
+  'salaryMin', 'salaryMax', 'notes', 'offerDueDate', 'isArchived',
 ] as const;
 
 function escapeCSV(value: string | null | undefined): string {
@@ -146,6 +146,7 @@ async function handleExport(res: ServerResponse) {
     salaryMax: app.salaryMax != null ? String(app.salaryMax) : '',
     notes: app.notes ?? '',
     offerDueDate: app.offerDueDate ? app.offerDueDate.toISOString().split('T')[0] : '',
+    isArchived: String(app.isArchived),
   }));
   const csv = [header, ...rows].join('\n') + '\n';
   const date = new Date().toISOString().split('T')[0];
@@ -158,7 +159,7 @@ async function handleExport(res: ServerResponse) {
 
 function handleSampleCSV(res: ServerResponse) {
   const header = CSV_COLUMNS.join(',');
-  const example = 'Acme Corp,Software Engineer,2026-01-15,applied,https://acme.com,https://acme.com/jobs/123,https://acme.com/careers,ai,4,linkedin,false,Must have 3+ years experience,80000,120000,Great company culture,';
+  const example = 'Acme Corp,Software Engineer,2026-01-15,applied,https://acme.com,https://acme.com/jobs/123,https://acme.com/careers,ai,4,linkedin,false,Must have 3+ years experience,80000,120000,Great company culture,,false';
   const csv = `${header}\n${example}\n`;
   res.writeHead(200, {
     'Content-Type': 'text/csv',
@@ -279,6 +280,9 @@ async function handleImport(req: IncomingMessage, res: ServerResponse) {
     const coverLetterRaw = get(cols, 'coverLetterRequired');
     const coverLetterRequired = coverLetterRaw === 'true';
 
+    const isArchivedRaw = get(cols, 'isArchived');
+    const isArchived = isArchivedRaw.toLowerCase() === 'true';
+
     try {
       await prisma.application.create({
         data: {
@@ -298,6 +302,7 @@ async function handleImport(req: IncomingMessage, res: ServerResponse) {
           salaryMax,
           notes: get(cols, 'notes') || null,
           offerDueDate: get(cols, 'offerDueDate') ? new Date(get(cols, 'offerDueDate')) : null,
+          isArchived,
         },
       });
       result.imported++;

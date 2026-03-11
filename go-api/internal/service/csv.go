@@ -21,6 +21,7 @@ var CSVHeaders = []string{
 	"companyUrl", "jobPostingUrl", "companyCareerUrl", "companyCategory",
 	"skillsMatch", "jobSource", "salaryMin", "salaryMax",
 	"coverLetterRequired", "offerDueDate", "specialRequirements", "notes",
+	"isArchived",
 }
 
 // ImportError represents a single row-level error during CSV import.
@@ -219,6 +220,11 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 			notesPtr = &notes
 		}
 
+		isArchived := false
+		if ia := getField("isArchived"); ia == "true" || ia == "1" {
+			isArchived = true
+		}
+
 		input := ApplicationInput{
 			CompanyName:         companyName,
 			PositionTitle:       positionTitle,
@@ -238,9 +244,15 @@ func ImportCSV(ctx context.Context, pool *pgxpool.Pool, reader io.Reader) (Impor
 			Notes:               notesPtr,
 		}
 
-		if _, err := CreateApplication(ctx, pool, input); err != nil {
+		created, err := CreateApplication(ctx, pool, input)
+		if err != nil {
 			result.Errors = append(result.Errors, ImportError{Row: rowNum, Message: err.Error()})
 		} else {
+			if isArchived {
+				if _, archiveErr := ArchiveApplication(ctx, pool, created.ID); archiveErr != nil {
+					result.Errors = append(result.Errors, ImportError{Row: rowNum, Message: fmt.Sprintf("created but failed to archive: %v", archiveErr)})
+				}
+			}
 			result.Imported++
 			if jobPostingURL != "" {
 				existingURLs[jobPostingURL] = true
@@ -307,6 +319,7 @@ func GetTemplate() []byte {
 		"",
 		"",
 		"",
+		"false",
 	})
 	w.Flush()
 	return buf.Bytes()
@@ -381,5 +394,6 @@ func appToCSVRow(app db.Application) []string {
 		offerDueDate,
 		specialRequirements,
 		notes,
+		strconv.FormatBool(app.IsArchived),
 	}
 }
