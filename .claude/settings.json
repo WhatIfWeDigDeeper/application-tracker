@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude Code needs your permission\" with title \"Claude Code\"'"
+            "command": "terminal-notifier -title 'Claude Code' -message 'Claude needs your permission' -sound Glass"
           }
         ]
       },
@@ -49,7 +49,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude has a question for you\" with title \"Claude Code\"'"
+            "command": "terminal-notifier -title 'Claude Code' -message 'Claude has a question for you' -sound Glass"
           }
         ]
       },
@@ -58,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude is waiting for your input\" with title \"Claude Code\"'"
+            "command": "terminal-notifier -title 'Claude Code' -message 'Claude is waiting for your input' -sound Glass"
           }
         ]
       }
