@@ -84,6 +84,37 @@ describe("CSV Import/Export Integration Tests", () => {
       expect(created.skillsMatch).toBe(4);
       expect(created.salaryMin).toBe(90000);
       expect(created.salaryMax).toBe(130000);
+      expect(created.isArchived).toBe(false);
+    });
+
+    it("should import isArchived=true and create an archived application", async () => {
+      const uniqueCompany = `Archived Import Corp ${Date.now()}`;
+      const csv = [
+        "companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived",
+        `${uniqueCompany},Archived Role,,,,,,,,,,,,,,,true`,
+      ].join("\n");
+
+      const formData = new FormData();
+      formData.append("file", new Blob([csv], { type: "text/csv" }), "test.csv");
+
+      const response = await fetch(`${API_BASE}/applications/import`, {
+        method: "POST",
+        body: formData,
+      });
+
+      expect(response.status).toBe(200);
+      const result = await response.json();
+      expect(result.imported).toBe(1);
+      expect(result.errors).toEqual([]);
+
+      const listResponse = await fetch(`${API_BASE}/applications?limit=100&includeArchived=true`);
+      const listData = await listResponse.json();
+      const created = listData.items.find(
+        (a: Record<string, unknown>) => a.companyName === uniqueCompany
+      );
+      expect(created).toBeDefined();
+      if (created) createdApplicationIds.push(created.id);
+      expect(created.isArchived).toBe(true);
     });
 
     it("should import CSV with only required fields and apply defaults", async () => {
@@ -374,10 +405,20 @@ describe("CSV Import/Export Integration Tests", () => {
         method: "POST",
       });
 
-      // Export should include it
+      // Export should include it with isArchived=true
       const response = await fetch(`${API_BASE}/applications/export`);
       const csv = await response.text();
       expect(csv).toContain("Archived Export Corp");
+      const lines = csv.split("\n");
+      const headers = lines[0].trim().split(",");
+      const isArchivedIdx = headers.indexOf("isArchived");
+      expect(isArchivedIdx).toBeGreaterThan(-1);
+      const archivedRow = lines.find((l: string) => l.includes("Archived Export Corp"));
+      expect(archivedRow).toBeDefined();
+      if (archivedRow) {
+        const cols = archivedRow.trim().split(",");
+        expect(cols[isArchivedIdx]).toBe("true");
+      }
     });
 
     it("should produce round-trip compatible CSV (export then import)", async () => {

@@ -281,7 +281,7 @@ async function handleImport(req: IncomingMessage, res: ServerResponse) {
     const coverLetterRequired = coverLetterRaw === 'true';
 
     const isArchivedRaw = get(cols, 'isArchived');
-    const isArchived = isArchivedRaw === 'true';
+    const isArchived = isArchivedRaw.toLowerCase() === 'true';
 
     try {
       await prisma.application.create({
