@@ -417,7 +417,11 @@ Claude Code hooks in `.claude/settings.json` send macOS notifications when Claud
 brew install terminal-notifier
 ```
 
-No configuration needed — the hooks are already in `.claude/settings.json`. If you don't install it, hooks fail silently with no impact.
+After installing, grant notification permissions so alerts appear:
+
+**System Settings → Notifications → terminal-notifier → Allow Notifications**
+
+No other configuration needed — the hooks are already in `.claude/settings.json`. If you don't install it, hooks fail silently with no impact.
 
 ## License
 
