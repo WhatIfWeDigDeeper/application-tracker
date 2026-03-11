@@ -1,6 +1,6 @@
 # Help Options
 
-Read the skill's SKILL.md file and display its content as formatted documentation (title, arguments, process steps, and notes). Then present two questions using `AskUserQuestion`. After the user selects options, store their choices and apply them during the workflow.
+Display a brief summary of what the skill does and its available options, then present two questions using `AskUserQuestion`. After the user selects options, store their choices and apply them during the workflow.
 
 ## Question 1: Workflow scope
 
@@ -20,7 +20,7 @@ Use `multiSelect: true`. These can be combined. Skip this question if the user s
 |--------|-------------|
 | Standard PR (Recommended) | No extra options, just create the PR |
 | Draft PR | Create the pull request as a draft |
-| Self-merge | Create the PR and immediately merge it |
+| Self-merge | Create the PR and immediately merge it (bypasses code review — use only for solo repos or documentation-only changes) |
 
 ## How to Apply
 
