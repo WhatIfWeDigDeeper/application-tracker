@@ -57,7 +57,7 @@ public class ApplicationService {
     private static final String CSV_HEADER =
         "companyName,positionTitle,status,dateApplied,companyUrl,jobPostingUrl,companyCareerUrl," +
         "companyCategory,skillsMatch,jobSource,salaryMin,salaryMax,coverLetterRequired," +
-        "offerDueDate,specialRequirements,notes\n";
+        "offerDueDate,specialRequirements,notes,isArchived\n";
 
     private static final Set<String> DIFF_EXCLUDED_FIELDS = Set.of(
         "interviewStages", "createdAt", "updatedAt", "id"
@@ -216,7 +216,6 @@ public class ApplicationService {
 
     public String exportCsv() {
         List<Application> apps = applicationRepository.findAll(
-            Specification.where(ApplicationSpecifications.isArchived(false)),
             Sort.by(Sort.Direction.DESC, "updatedAt")
         );
         StringBuilder sb = new StringBuilder();
@@ -229,7 +228,7 @@ public class ApplicationService {
 
     public String getSampleCsv() {
         return CSV_HEADER
-            + "Acme Corp,Software Engineer,applied,2024-01-15,https://acme.com,https://acme.com/jobs/123,,ai,8,linkedin,120000,160000,false,,Java Spring experience preferred,Great team culture\n";
+            + "Acme Corp,Software Engineer,applied,2024-01-15,https://acme.com,https://acme.com/jobs/123,,ai,8,linkedin,120000,160000,false,,Java Spring experience preferred,Great team culture,false\n";
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -514,7 +513,8 @@ public class ApplicationService {
             + (app.getCoverLetterRequired() != null ? app.getCoverLetterRequired() : "") + ","
             + csvEscape(app.getOfferDueDate() != null ? app.getOfferDueDate().toString() : "") + ","
             + csvEscape(app.getSpecialRequirements()) + ","
-            + csvEscape(app.getNotes()) + "\n";
+            + csvEscape(app.getNotes()) + ","
+            + app.isArchived() + "\n";
     }
 
     private Application buildApplicationFromRow(Map<String, Integer> headerMap, String[] cols,
@@ -537,6 +537,8 @@ public class ApplicationService {
         parseOptionalDate(headerMap, cols, "offerDueDate").ifPresent(app::setOfferDueDate);
         setIfNotBlank(getCol(headerMap, cols, "specialRequirements"), app::setSpecialRequirements);
         setIfNotBlank(getCol(headerMap, cols, "notes"), app::setNotes);
+        String isArchivedVal = getCol(headerMap, cols, "isArchived");
+        if (!isArchivedVal.isEmpty()) app.setArchived(Boolean.parseBoolean(isArchivedVal));
         return app;
     }
 
