@@ -71,7 +71,11 @@
       "allowUnixSockets": [
         "/var/run/docker.sock"
       ],
-      "allowLocalBinding": true
+      "allowLocalBinding": true,
+      "allowedHosts": [
+        "github.com",
+        "registry.npmjs.org"
+      ]
     },
     "excludedCommands": [
       "docker",

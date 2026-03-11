@@ -22,11 +22,13 @@ words:
   - govulncheck
   - gradlew
   - Hono
+  - mongosh
   - mypy
   - Nuxt
   - osascript
   - Pydantic
   - pyproject
+  - psql
   - pytest
   - RYUK
   - specifykit
