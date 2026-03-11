@@ -13,6 +13,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [6. React SSR + TanStack Start + FastAPI](#6-react-ssr--tanstack-start--fastapi)
   - [7. Angular + Go Gin + pgx/sqlc](#7-angular--go-gin--pgxsqlc)
   - [8. Angular + Spring Boot + JPA/Hibernate](#8-angular--spring-boot--jpahibernate)
+  - [9. GraphQL Yoga + React Apollo](#9-graphql-yoga--react-apollo)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -109,6 +110,15 @@ This repository contains a complete job application tracker built with multiple 
 - Snapshot-based history with field diffs and restore
 - Gradle 8.x (Kotlin DSL) build system
 
+### 9. GraphQL Yoga + React Apollo
+**Directories**: `react-apollo-ui/` + `yoga-api/`
+**Stack**:
+- Frontend: React 19 + Apollo Client 3 + TanStack Router + TypeScript + Vite + Tailwind CSS — port 3080
+- Backend: GraphQL Yoga 5 + Pothos schema builder + Prisma ORM — port 5080
+- Database: PostgreSQL via `graphql_yoga` schema (Prisma migrations)
+- GraphQL API with full query/mutation support for applications, stages, and history
+- Snapshot-based history with field diffs and restore
+
 ## Core Features
 
 All implementations provide:
@@ -135,6 +145,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
 | `go_gin` | Angular + Go Gin API | [schema docs](docs/schema/go-gin/README.md) |
 | `java_spring` | Angular + Spring Boot + JPA | [schema docs](docs/schema/java-spring/README.md) |
+| `graphql_yoga` | GraphQL Yoga + React Apollo | [schema docs](docs/schema/graphql-yoga/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -151,6 +162,8 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [tanstack-start-ui](docs/types/tanstack-start-ui/application.mermaid) - React SSR + TanStack Start
 - [angular-ui](docs/types/angular-ui/application.model.mermaid) - Angular + Go Gin
 - [angular-spring-ui](docs/types/angular-spring-ui/application.model.mermaid) - Angular + Spring Boot
+- [react-apollo-ui](docs/types/react-apollo-ui/application.mermaid) - React Apollo + GraphQL Yoga
+- [yoga-api](docs/types/yoga-api/application.service.mermaid) - GraphQL Yoga API (service input/filter types)
 
 Regenerate with `npm run docs:types`.
 
@@ -370,6 +383,13 @@ Since `npx skills check` and `npx skills update` apparently do not work with the
 ```bash
 npx skills add -y whatifwedigdeeper/agent-skills
 ```
+
+Other skills
+
+```bash
+npx skills add -y https://github.com/microsoft/playwright-cli --skill playwright-cli
+```
+
 
 See [.claude/](.claude/) for all available commands and skills.
 

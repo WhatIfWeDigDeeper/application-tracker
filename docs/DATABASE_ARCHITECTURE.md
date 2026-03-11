@@ -51,6 +51,14 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - Snapshot-based history (like Hono, NestJS, FastAPI)
 - No ORM — uses raw SQL queries via pgx v5
 
+**GraphQL-Yoga-Prisma:**
+- Schema defined in: `yoga-api/prisma/schema.prisma`
+- Uses Prisma migrations with `DATABASE_URL` containing `?schema=graphql_yoga`
+- Prisma client output: `node_modules/.prisma/client`
+- Pothos schema builder generates GraphQL types from Prisma models
+- Snapshot-based history (like Hono, NestJS, FastAPI, Go, Spring)
+- Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=graphql_yoga`
+
 **Java-Spring-JPA:**
 - Schema defined in: `spring-api/src/main/resources/db/migration/V1__initial.sql`
 - Flyway migration runs automatically on startup; creates `java_spring` schema and PostgreSQL enum types

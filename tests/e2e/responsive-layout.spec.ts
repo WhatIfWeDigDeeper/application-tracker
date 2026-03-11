@@ -17,7 +17,7 @@ test.describe('Responsive layout', () => {
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto('/applications/new');
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
     await page.fill('input[placeholder="Company Name *"]', TEST_COMPANY);
     await page.fill('input[placeholder="Position Title *"]', 'Test Engineer');
     await page.selectOption('#status', 'applied');

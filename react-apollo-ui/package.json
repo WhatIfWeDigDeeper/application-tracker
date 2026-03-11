@@ -1,0 +1,41 @@
+{
+  "name": "react-apollo-ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3080",
+    "build": "tsc -p tsconfig.node.json --noEmit && tsc --noEmit && vite build",
+    "lint": "eslint src",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@apollo/client": "4.1.6",
+    "@tanstack/react-router": "1.166.6",
+    "graphql": "16.13.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tanstack/router-vite-plugin": "1.166.6",
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.3.0",
+    "@testing-library/user-event": "14.6.1",
+    "@types/node": "25.4.0",
+    "@types/react": "19.2.3",
+    "@types/react-dom": "19.2.3",
+    "@typescript-eslint/eslint-plugin": "8.57.0",
+    "@typescript-eslint/parser": "8.57.0",
+    "@vitejs/plugin-react": "5.1.4",
+    "@tailwindcss/vite": "4.2.1",
+    "@playwright/test": "1.58.2",
+    "eslint": "10.0.3",
+    "jsdom": "26.1.0",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vite": "7.3.1",
+    "vitest": "3.1.1"
+  }
+}

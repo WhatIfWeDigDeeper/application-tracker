@@ -22,7 +22,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 
 ## Documentation Guidelines
 
-- **NEVER create documentation at repository root** - use `/docs/` or `implementations/<name>/docs/`
+- **NEVER create documentation at repository root** - use `/docs/` or `<package-name>/docs/` (e.g., `yoga-api/docs/`)
 
 ## Database Architecture
 
@@ -45,6 +45,8 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 **When fixing a bug or test failure, automatically run the relevant tests after applying the fix** — do not wait for the user to ask. Use the most targeted test command available (e.g., `test:e2e:react-ui` for a react-ui failure). Report pass/fail results immediately.
 
+**When fixing a shared E2E test failure** — shared tests in `tests/e2e/` run against all stacks. After applying a fix, run `bash scripts/run-e2e.sh all` (or `npm run test:e2e:all`) to confirm no other stack regressed. Do not stop after the originally failing stack passes.
+
 1. **Add tests** — Create or update tests for new functionality. Include E2E tests when the change affects user-visible behavior (labels, UI interactions, API contracts). **When fixing a bug, write a failing test first that reproduces the issue, then fix it** — this ensures the bug is understood and won't regress.
 2. **Build** - `npm run build:<stack>` (runs per-package build; catches compilation errors)
 3. **Lint** - `npm run lint:<stack>` (ESLint/ruff across packages)
@@ -56,15 +58,17 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 **When adding or changing packages** — run two additional steps before the validation chain:
 - `npm run install:<stack>` — keeps the lockfile in sync
-- `npm run audit:ci:<stack>` — fails on known vulnerabilities (e.g. `audit:ci:angular-ui`, `audit:ci:fastapi`)
+- `npm run audit:ci:<stack>` — fails on known vulnerabilities (e.g. `audit:ci:angular-ui`, `audit:ci:fastapi`). If it fails, try `npm audit fix` (npm) or `uv lock --upgrade-package <package>` (Python) first; if that doesn't resolve it, upgrade the offending package manually or find an alternative.
 Then proceed with the full build → lint → test → e2e chain as normal.
+
+**When adding a new implementation** — run `audit:ci:<stack>` for both the API and UI packages before considering the implementation complete. High or critical vulnerabilities must be fixed — do not merge with known high/critical CVEs. For npm-based stacks, try `npm audit fix` first; if that doesn't resolve it, upgrade the offending package manually or find an alternative.
 
 **When changing public TypeScript types** — regenerate the type diagrams for the affected stack:
 - `npm run docs:types:<stack>` (e.g. `docs:types:angular-ui`, `docs:types:nuxt`)
 
 ## Dependency Management
 
-When installing **new npm packages**: use latest stable version, exact versions (no ^ or ~), install `@types/*` if needed. Note: `npm install pkg@x.y.z` silently adds a `^` caret — verify package.json afterward and remove it to restore exact pinning.
+When installing **new npm packages**: use the latest stable major.minor.patch version, exact versions (no ^ or ~), install `@types/*` if needed. Exception: if the latest major is at `x.0.0` with no patches yet, stay on the previous major until `x.0.1+` is available — brand-new majors at `.0.0` have no patch history and may have rough edges. Note: `npm install pkg@x.y.z` silently adds a `^` caret — verify package.json afterward and remove it to restore exact pinning.
 
 When installing **new Python packages**: `cd fastapi && uv add <package>` (or `uv add --dev <package>` for dev deps). Use exact versions in `pyproject.toml`.
 
@@ -95,6 +99,11 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Angular `[hidden]` vs `@if` for Playwright gates**: `[hidden]="!expr"` keeps the element in the DOM (just invisible); in webkit, `expect(locator).toBeVisible()` can pass immediately while the element's content/state is still stale/default, so later assertions may read the wrong value. Use `@if (expr)` instead of `[hidden]="!expr"` whenever a Playwright assertion waits for an element to appear.
 - **Modal re-open timing in webkit**: After clicking Close on a modal/panel and immediately re-opening it, webkit can interact with stale DOM from the previous open cycle. Assert `await expect(page.locator('text=<panel heading>')).not.toBeVisible()` after Close before triggering the second open.
 
+## CSV Import Patterns
+
+- **Multi-line fields**: Never pre-split CSV content by newlines before parsing — quoted fields can contain embedded newlines. Process the entire file character-by-character, tracking `inQuotes` state, and only treat `\n` as a row separator when `inQuotes` is false.
+- **Prisma enum `@map` values**: CSVs store `@map` display values (e.g. `"company-website"`, `"media-entertainment"`) but Prisma `create()`/`update()` requires the enum identifier name (`company_website`, `media_entertainment`). Add a lookup table (like `STATUS_DISPLAY_TO_PRISMA`) for each enum with hyphenated/spaced `@map` values and apply it during import.
+
 ## Angular Patterns
 
 - **Confirm dialog `role="dialog"`**: Locators using `[role="dialog"] button:has-text(...)` require the inner dialog container div to have `role="dialog"` — Angular components don't add it automatically. Always include `role="dialog"` on the modal content div in `ConfirmDialogComponent`.
@@ -118,15 +127,16 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`isXxx` field naming**: JPA boolean fields named `isXxx` conflict with getter naming; name the field `archived` (not `isArchived`) — getter `isArchived()`, setter `setArchived()`
 - **Flyway auto-migration**: Flyway runs on startup — `./gradlew flywayMigrate` is only needed for manual runs; migrations live in `classpath:db/migration/`
 - **Gradle Kotlin DSL**: Uses `build.gradle.kts` — Kotlin syntax for plugin/dependency blocks
-- **Commit message file**: Multi-line `git commit -m` strings cause a `dquote>` hang in zsh. Write the message with `create_file` to `/tmp/commit-msg.txt`, then run `git commit -F /tmp/commit-msg.txt`
+- **Commit message file**: Multi-line `git commit -m` strings cause a `dquote>` hang in zsh. Write the message to `$TMPDIR/commit-msg.txt` using the Write tool, then run `git commit -F $TMPDIR/commit-msg.txt`
 - **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
 - **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
 - **Jackson date serialization**: `LocalDate`/`LocalDateTime` serialize as arrays (e.g. `[2026,3,5]`) by default — add `.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)` to `ObjectMapper` config to get ISO strings (`"2026-03-05"`, `"2026-03-05T13:00:00Z"`)
 
 ## Terminal Management
 
+- **PostgreSQL prerequisite**: Before starting any API server or running E2E tests, verify the PostgreSQL Docker container is running: `docker compose ps db`. If it's not running, `docker compose up -d db` first. A server started without the DB will hang or crash and may be unkillable without a reboot.
 - **Repeated test runs**: Run iterative/debugging test commands as foreground tasks in one shared terminal rather than spawning a new background terminal each iteration — background terminals accumulate and are never auto-cleaned.
-- **Kill background terminals promptly**: Call `kill_terminal` immediately after a background process is no longer needed; IDs are only available in the current session and cannot be recovered later.
+- **Kill background processes promptly**: Stop background Bash tasks via `TaskStop` (by task ID) or `kill <pid>` as soon as they're no longer needed — task IDs are only available in the current session.
 
 ## Subagent Usage
 
@@ -145,13 +155,11 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Post-merge cleanup**: After squash merging a PR, immediately switch to main, pull, and delete the local branch (`git checkout main && git pull && git branch -d <branch>`). Never commit cleanup work (e.g. spec status updates) directly to local main — branch protection will reject the push, and the resulting squash PR will diverge from the local commit, causing a merge commit on the next pull instead of a fast-forward.
 - **Resolving PR review threads**: `gh` CLI has no resolve command. Use `gh api graphql` — fetch thread IDs via `pullRequest.reviewThreads`, resolve with `resolveReviewThread` mutation. Reply to each thread before resolving.
 - **CI toolchain parity**: When adding a new language/toolchain to the monorepo (e.g., Python/uv), update `.github/workflows/verify-pr.yaml` in the same PR to install the required tools
-- **Documentation**: When adding a new implementation, update: `README.md` (TOC, implementations, running instructions, test commands), and as needed `CLAUDE.md`. When DB schema changes are involved, update `docs/DATABASE_ARCHITECTURE.md`, `scripts/generate-schema-docs.sh`, and run `npm run docs:schema`. When adding a TypeScript implementation, add a `docs:types:<stack>` script. Also add a debug configuration to `.vscode/launch.json` for the new API backend (use the appropriate debug type: `node` for TS/Node APIs, `debugpy` for Python, `go` for Go). For Java/Spring, use `type: java, request: attach` on port 5005 and add a `dev:<stack>:debug` npm script that runs `./gradlew bootRun --debug-jvm` — do not use `request: launch` as it requires full Java extension project resolution which is fragile. Do not wait to be asked — include docs in the implementation plan.
+- **Documentation**: When adding a new implementation, update: `README.md` (TOC, implementations table, running instructions, test commands, **schema docs table link**, and **Type Diagrams list**), and as needed `CLAUDE.md`. Every new implementation adds a new DB schema — always update `docs/DATABASE_ARCHITECTURE.md` and `scripts/generate-schema-docs.sh` (add the new `schema_name:dir-name` entry to the SCHEMAS array), then run `npm run docs:schema`. When adding a TypeScript implementation, add a `docs:types:<stack>` script to `package.json` pointing to the main types/service file, add it to the `docs:types` all-script, **run it** (`npm run docs:types:<stack>`), and **add the generated file link to the Type Diagrams list in `README.md`**. Also add a debug configuration to `.vscode/launch.json` for the new API backend (use the appropriate debug type: `node` for TS/Node APIs, `debugpy` for Python, `go` for Go). For Java/Spring, use `type: java, request: attach` on port 5005 and add a `dev:<stack>:debug` npm script that runs `./gradlew bootRun --debug-jvm` — do not use `request: launch` as it requires full Java extension project resolution which is fragile. Do not wait to be asked — include docs in the implementation plan.
 
 ## Running E2E Tests
 
 **Server lifecycle**: For fully managed runs (API auto-start/stop), use `bash scripts/run-e2e.sh [stack|all]` — `npm run test:e2e:all` also uses this. To run manually when servers are already up, use `npm run test:e2e:<stack>` directly and leave pre-existing servers running afterward. **`npm run test:e2e:<stack>` only starts the UI dev server** (via playwright `webServer`), not the API backend — if you've killed the backend manually, use `bash scripts/run-e2e.sh <stack>` to restart it before running tests.
-
-Run all: `npm run test:e2e:all`. Run one stack: `npm run test:e2e:<stack>` (e.g., `react-next-ui`, `vue-ui`).
 
 Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
 

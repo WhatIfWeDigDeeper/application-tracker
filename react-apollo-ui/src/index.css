@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --gql-pink: #E10098;
+  --gql-pink-dark: #b8007c;
+  --gql-pink-light: #ff33b8;
+  --gql-pink-muted: rgba(225, 0, 152, 0.12);
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+}

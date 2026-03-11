@@ -56,6 +56,7 @@ SCHEMAS=(
   "python_fastapi:python-fastapi"
   "go_gin:go-gin"
   "java_spring:java-spring"
+  "graphql_yoga:graphql-yoga"
 )
 
 for entry in "${SCHEMAS[@]}"; do

@@ -4,6 +4,10 @@ dictionaryDefinitions: []
 dictionaries: []
 words:
   - asyncpg
+  - debugpy
+  - dquote
+  - networkidle
+  - VARCHAR
   - auditconfig
   - beforeunload
   - dedup
@@ -20,6 +24,7 @@ words:
   - Hono
   - mypy
   - Nuxt
+  - osascript
   - Pydantic
   - pyproject
   - pytest
@@ -38,5 +43,6 @@ words:
   - uvx
   - venv
   - whatifwedigdeeper
+  - worktree
 ignoreWords: []
 import: []

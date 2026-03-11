@@ -11,12 +11,14 @@ PORTS=(
   3050  # TanStack UI
   3060  # Angular UI
   3070  # Angular Spring UI
+  3080  # React Apollo UI
   5010  # Koa API
   5030  # Hono API
   5040  # Nuxt API
   5050  # Nest API
   5070  # Go API
   5160  # FastAPI
+  5080  # Yoga API (GraphQL)
   8080  # Spring Boot API
 )
 

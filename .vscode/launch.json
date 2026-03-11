@@ -99,5 +99,16 @@
       "hostName": "localhost",
       "port": 5005
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "yoga-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/yoga-api",
+      "env": { "NODE_ENV": "development" },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
   ]
 }

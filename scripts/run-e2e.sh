@@ -2,7 +2,7 @@
 set -euo pipefail
 
 STACK="${1:-all}"
-STACKS=(react-next-ui react-ui vue-ui svelte-ui tanstack-start-ui tanstack-ui angular-ui angular-spring-ui)
+STACKS=(react-next-ui react-ui vue-ui svelte-ui tanstack-start-ui tanstack-ui angular-ui angular-spring-ui react-apollo-ui)
 STARTED_PORTS=()
 
 api_port() {
@@ -15,6 +15,7 @@ api_port() {
     tanstack-ui)         echo 5050 ;;
     angular-ui)          echo 5070 ;;
     angular-spring-ui)   echo 8080 ;;
+    react-apollo-ui)     echo 5080 ;;
   esac
 }
 
@@ -28,6 +29,7 @@ api_script() {
     tanstack-ui)         echo "dev:nest-api" ;;
     angular-ui)          echo "dev:go-api" ;;
     angular-spring-ui)   echo "dev:spring-api" ;;
+    react-apollo-ui)     echo "dev:yoga-api" ;;
   esac
 }
 

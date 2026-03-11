@@ -1,0 +1,94 @@
+classDiagram
+  %% Legend
+  %% --|> : Inheritance (extends)
+  %% ..|> : Implementation (implements)
+  %% --* : Composition (has/contains)
+  %% -- : Association
+
+  class ApplicationStatus {
+    <<enumeration>>
+    'accepted offer'
+    'applied'
+    'declined offer'
+    'given offer'
+    'interviewing'
+    'no offer'
+    'rejected'
+    'unsubmitted'
+  }
+
+  class CompanyCategory {
+  }
+
+  class JobSource {
+  }
+
+  class InterviewStage {
+    <<interface>>
+    +id: string
+    +applicationId: string
+    +name: string
+    +order: number
+    +isCompleted: boolean
+    -completedDate?: string or null
+    -notes?: string or null
+    -performanceRating?: number or null
+    +createdAt: string
+    +updatedAt: string
+  }
+
+  class Application {
+    <<interface>>
+    +id: string
+    +companyName: string
+    +positionTitle: string
+    +status: ApplicationStatus
+    -dateApplied?: string or null
+    -jobPostingUrl?: string or null
+    -companyUrl?: string or null
+    -companyCareerUrl?: string or null
+    -companyCategory?: ComplexUnion
+    -jobSource?: ComplexUnion
+    -skillsMatch?: number or null
+    +coverLetterRequired: boolean
+    -specialRequirements?: string or null
+    -salaryMin?: number or null
+    -salaryMax?: number or null
+    -notes?: string or null
+    -offerDueDate?: string or null
+    +isArchived: boolean
+    +createdAt: string
+    +updatedAt: string
+    -interviewStages?: InterviewStageArray~~
+  }
+
+  class HistoryEntry {
+    <<interface>>
+    +id: string
+    +applicationId: string
+    +sequence: number
+    +snapshot: string
+    +changedFields: string
+    +createdAt: string
+  }
+
+  class ApplicationListResult {
+    <<interface>>
+    +items: ApplicationArray~~
+    +total: number
+    +page: number
+    +totalPages: number
+  }
+
+  class HistoryListResult {
+    <<interface>>
+    +items: HistoryEntryArray~~
+    +total: number
+    +page: number
+    +totalPages: number
+  }
+
+  Application --* ApplicationStatus : status
+  Application --* InterviewStage : interviewStages
+  ApplicationListResult --* Application : items
+  HistoryListResult --* HistoryEntry : items
