@@ -372,7 +372,6 @@ Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIf
 
 | Skill | Description |
 |-------|-------------|
-| `learn` | Extract lessons from conversations |
 | `js-deps` | Update npm dependencies and/or fix audit errors |
 | `uv-deps` | Audit and update Python dependencies |
 | `ship-it` | Branch, commit, push, and open a PR |
