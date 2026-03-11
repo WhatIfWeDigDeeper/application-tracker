@@ -98,9 +98,11 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Submit button type changes**: When changing a button from `type="submit"` to `type="button"`, unit tests using `querySelector('button[type="submit"]')` will silently return `null`. Prefer `getByTestId()` or `getByRole('button', { name: /save/i })` instead.
 - **Angular `[hidden]` vs `@if` for Playwright gates**: `[hidden]="!expr"` keeps the element in the DOM (just invisible); in webkit, `expect(locator).toBeVisible()` can pass immediately while the element's content/state is still stale/default, so later assertions may read the wrong value. Use `@if (expr)` instead of `[hidden]="!expr"` whenever a Playwright assertion waits for an element to appear.
 - **Modal re-open timing in webkit**: After clicking Close on a modal/panel and immediately re-opening it, webkit can interact with stale DOM from the previous open cycle. Assert `await expect(page.locator('text=<panel heading>')).not.toBeVisible()` after Close before triggering the second open.
+- **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
 
 ## CSV Import Patterns
 
+- **Stacks with CSV support**: nest-api, fastapi, go-api, spring-api, yoga-api — all 5 must be updated when changing the CSV format or column list.
 - **Multi-line fields**: Never pre-split CSV content by newlines before parsing — quoted fields can contain embedded newlines. Process the entire file character-by-character, tracking `inQuotes` state, and only treat `\n` as a row separator when `inQuotes` is false.
 - **Prisma enum `@map` values**: CSVs store `@map` display values (e.g. `"company-website"`, `"media-entertainment"`) but Prisma `create()`/`update()` requires the enum identifier name (`company_website`, `media_entertainment`). Add a lookup table (like `STATUS_DISPLAY_TO_PRISMA`) for each enum with hyphenated/spaced `@map` values and apply it during import.
 
@@ -163,9 +165,11 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
 
+**`run-e2e.sh all` stops at the first failing stack** — if a flaky test causes early exit, run the remaining stacks individually (`bash scripts/run-e2e.sh <stack>`) to get full coverage rather than re-running all from scratch.
+
 **E2E test data cleanup**: Tests that create data must clean up in `afterAll` using API calls (e.g., `page.request.delete('/api/applications/${id}')`) — not fragile UI interactions. Cleanup must run even if individual tests fail.
 
-**Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 8 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs, while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
+**Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 8 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
 
 **E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. Note: some backends also strip unknown POST fields, so status cannot always be set at create time — a two-step POST + full PATCH is the safe pattern for all stacks.
 
