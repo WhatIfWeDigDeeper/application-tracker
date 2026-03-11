@@ -226,6 +226,17 @@ export const CsvRowSchema = z.object({
   salaryMax: z.coerce.number().int().min(0).optional(),
   notes: z.string().max(5000).optional(),
   offerDueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD format').optional(),
+  isArchived: z.preprocess(
+    (val) => {
+      if (typeof val === 'string') {
+        const lower = val.toLowerCase();
+        if (lower === 'true') return true;
+        if (lower === 'false') return false;
+      }
+      return val;
+    },
+    z.boolean().optional(),
+  ),
 });
 
 export type CsvRow = z.infer<typeof CsvRowSchema>;

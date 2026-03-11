@@ -44,7 +44,7 @@ test.describe('CSV Import/Export', () => {
     expect(lines.length).toBeGreaterThanOrEqual(2);
 
     const headers = lines[0].split(',');
-    expect(headers.length).toBe(16);
+    expect(headers.length).toBe(17);
     expect(headers[0]).toBe('companyName');
     expect(headers[1]).toBe('positionTitle');
   });
@@ -58,8 +58,8 @@ test.describe('CSV Import/Export', () => {
 
   test('should import a valid CSV file and show results', async ({ page }) => {
     const csv = [
-      'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate',
-      'E2E Import Corp,E2E Developer,2026-02-10,applied,,,,,,,,,,,,'
+      'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
+      'E2E Import Corp,E2E Developer,2026-02-10,applied,,,,,,,,,,,,,'
     ].join('\n');
 
     const csvPath = path.join(tmpDir, 'import-test.csv');
@@ -102,14 +102,14 @@ test.describe('CSV Import/Export', () => {
     expect(lines.length).toBeGreaterThanOrEqual(1); // At least headers
 
     const headers = lines[0].split(',');
-    expect(headers.length).toBe(16);
+    expect(headers.length).toBe(17);
   });
 
   test('should show errors for invalid CSV rows', async ({ page }) => {
     const csv = [
-      'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate',
-      ',Missing Company,,,,,,,,,,,,,,',
-      'Valid E2E Corp,Valid Role,,,,,,,,,,,,,,'
+      'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
+      ',Missing Company,,,,,,,,,,,,,,,',
+      'Valid E2E Corp,Valid Role,,,,,,,,,,,,,,,'
     ].join('\n');
 
     const csvPath = path.join(tmpDir, 'errors-test.csv');
@@ -139,8 +139,8 @@ test.describe('CSV Import/Export', () => {
     const uniqueId = crypto.randomUUID();
     const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${uniqueId}`;
     const csv1 = [
-      'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate',
-      `Dedup E2E Corp,Dedup Role,,,,${uniqueUrl},,,,,,,,,,`
+      'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
+      `Dedup E2E Corp,Dedup Role,,,,${uniqueUrl},,,,,,,,,,,`
     ].join('\n');
 
     const csvPath1 = path.join(tmpDir, `dedup-test-${uniqueId}.csv`);

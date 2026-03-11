@@ -10,7 +10,7 @@ const CSV_COLUMNS = [
   'companyName', 'positionTitle', 'dateApplied', 'status',
   'companyUrl', 'jobPostingUrl', 'companyCareerUrl', 'companyCategory',
   'skillsMatch', 'jobSource', 'coverLetterRequired', 'specialRequirements',
-  'salaryMin', 'salaryMax', 'notes', 'offerDueDate',
+  'salaryMin', 'salaryMax', 'notes', 'offerDueDate', 'isArchived',
 ] as const;
 
 @Injectable()
@@ -88,6 +88,7 @@ export class CsvService {
           salaryMax: row.salaryMax ?? null,
           notes: row.notes ?? null,
           offerDueDate: row.offerDueDate ?? null,
+          isArchived: row.isArchived ?? false,
         }).returning();
 
         await this.historyService.recordHistory(app.id, buildDescription('create', 'Imported from CSV'));
@@ -123,6 +124,7 @@ export class CsvService {
       salaryMax: app.salaryMax !== null ? String(app.salaryMax) : '',
       notes: app.notes ?? '',
       offerDueDate: app.offerDueDate ?? '',
+      isArchived: String(app.isArchived),
     }));
 
     return Papa.unparse(csvRows, { columns: [...CSV_COLUMNS] });
@@ -130,7 +132,7 @@ export class CsvService {
 
   getSampleCsv(): string {
     const header = CSV_COLUMNS.join(',');
-    const example = 'Acme Corp,Software Engineer,2026-01-15,applied,https://acme.com,https://acme.com/jobs/123,https://acme.com/careers,ai,4,linkedin,false,Must have 3+ years React experience,80000,120000,Great company culture,';
+    const example = 'Acme Corp,Software Engineer,2026-01-15,applied,https://acme.com,https://acme.com/jobs/123,https://acme.com/careers,ai,4,linkedin,false,Must have 3+ years React experience,80000,120000,Great company culture,,false';
     return `${header}\n${example}\n`;
   }
 }

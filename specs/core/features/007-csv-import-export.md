@@ -58,7 +58,7 @@ Job seekers who track applications in spreadsheets or other tools need a way to 
 
 3. **Given** the export completes
    **When** I open the file
-   **Then** it contains 16 columns matching the CSV format specification
+   **Then** it contains 17 columns matching the CSV format specification
 
 4. **Given** an application has interview stages
    **When** it is exported
@@ -76,7 +76,7 @@ Job seekers who track applications in spreadsheets or other tools need a way to 
 
 1. **Given** I want to prepare data for import
    **When** I download the template
-   **Then** I receive a CSV file with all 16 column headers
+   **Then** I receive a CSV file with all 17 column headers
 
 2. **Given** I have downloaded the template
    **When** I open it
@@ -108,7 +108,7 @@ Job seekers who track applications in spreadsheets or other tools need a way to 
 
 ## CSV Format
 
-16 columns in the following order:
+17 columns in the following order:
 
 | Column | Required | Type | Notes |
 |--------|----------|------|-------|
@@ -128,6 +128,7 @@ Job seekers who track applications in spreadsheets or other tools need a way to 
 | salaryMax | No | number | |
 | notes | No | string | |
 | offerDueDate | No | date | YYYY-MM-DD format |
+| isArchived | No | boolean | true/false; default false |
 
 ---
 
@@ -163,7 +164,7 @@ Input: (none)
 Process:
   1. Query all applications (active + archived)
   2. Order by dateApplied descending
-  3. Format each application as a CSV row (16 columns)
+  3. Format each application as a CSV row (17 columns)
   4. Prepend header row
   5. Return as text/csv with filename applications-YYYY-MM-DD.csv
 Output: CSV file
@@ -174,7 +175,7 @@ Output: CSV file
 ```
 Input: (none)
 Process:
-  1. Generate header row with all 16 column names
+  1. Generate header row with all 17 column names
   2. Generate example row with sample data:
      - "Acme Corp", "Software Engineer", "2026-01-15", "applied",
        "https://acme.com", "https://acme.com/jobs/123", "https://acme.com/careers",
@@ -193,7 +194,7 @@ Output: CSV file
 |----------|----------|
 | Empty file (no data rows) | Return imported=0, skipped=0, errors=[] |
 | Missing required columns | Reject entire file with error listing missing columns |
-| Extra columns beyond 16 | Ignore extra columns silently |
+| Extra columns beyond 17 | Ignore extra columns silently |
 | Round-trip (export then import) | Produces identical applications (format is compatible) |
 | Very large file (1000+ rows) | Process all rows; no artificial limit |
 | Invalid enum value in status column | Row-level error (e.g., "Row 5: invalid status 'pending'") |
