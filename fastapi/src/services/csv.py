@@ -25,6 +25,7 @@ CSV_COLUMNS = [
     "salaryMax",
     "notes",
     "offerDueDate",
+    "isArchived",
 ]
 
 
@@ -33,7 +34,7 @@ def get_sample_csv() -> str:
     example = (
         "Acme Corp,Software Engineer,2026-01-15,applied,"
         "https://acme.com,https://acme.com/jobs/123,https://acme.com/careers,"
-        "ai,4,linkedin,false,Must have 3+ years React experience,80000,120000,Great company culture,"
+        "ai,4,linkedin,false,Must have 3+ years React experience,80000,120000,Great company culture,,false"
     )
     return f"{header}\n{example}\n"
 
@@ -68,6 +69,7 @@ async def export_to_csv(pool: asyncpg.Pool) -> str:
                 "salaryMax": str(row["salary_max"]) if row["salary_max"] is not None else "",
                 "notes": row["notes"] or "",
                 "offerDueDate": row["offer_due_date"].isoformat() if row["offer_due_date"] else "",
+                "isArchived": str(row["is_archived"]).lower(),
             }
         )
 
@@ -125,13 +127,15 @@ async def import_from_csv(pool: asyncpg.Pool, content: bytes) -> ImportResult:
                     company_url, job_posting_url, company_career_url,
                     company_category, skills_match, job_source,
                     cover_letter_required, special_requirements,
-                    salary_min, salary_max, notes, offer_due_date
+                    salary_min, salary_max, notes, offer_due_date,
+                    is_archived
                 ) VALUES (
                     $1, $2, $3, $4::python_fastapi.application_status,
                     $5, $6, $7,
                     $8::python_fastapi.company_category, $9, $10::python_fastapi.job_source,
                     $11, $12,
-                    $13, $14, $15, $16
+                    $13, $14, $15, $16,
+                    $17
                 )
                 RETURNING id
                 """,
@@ -151,6 +155,7 @@ async def import_from_csv(pool: asyncpg.Pool, content: bytes) -> ImportResult:
                 row.salary_max,
                 row.notes,
                 parse_date(row.offer_due_date),
+                row.is_archived if row.is_archived is not None else False,
             )
             assert app_row is not None
             app_id: UUID = app_row["id"]
