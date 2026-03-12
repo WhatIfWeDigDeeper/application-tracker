@@ -1,3 +1,4 @@
+from datetime import date as date_type
 from uuid import UUID
 
 import asyncpg
@@ -142,7 +143,6 @@ async def create_application(
     data: CreateApplicationRequest,
 ) -> ApplicationResponse:
     """Create a new application."""
-    from datetime import date as date_type
     status = data.status.value if data.status else "unsubmitted"
     if status == "unsubmitted":
         date_applied = None
