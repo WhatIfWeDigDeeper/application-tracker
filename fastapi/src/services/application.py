@@ -141,7 +141,15 @@ async def create_application(
     pool: asyncpg.Pool,
     data: CreateApplicationRequest,
 ) -> ApplicationResponse:
-    """Create a new application (always unsubmitted, no date_applied)."""
+    """Create a new application."""
+    from datetime import date as date_type
+    status = data.status.value if data.status else "unsubmitted"
+    if status == "unsubmitted":
+        date_applied = None
+    elif data.date_applied:
+        date_applied = parse_date(data.date_applied)
+    else:
+        date_applied = date_type.today()
     app_row = await pool.fetchrow(
         """
         INSERT INTO applications (
@@ -151,16 +159,18 @@ async def create_application(
             cover_letter_required, special_requirements,
             salary_min, salary_max, notes
         ) VALUES (
-            $1, $2, NULL, 'unsubmitted'::python_fastapi.application_status,
-            $3, $4, $5,
-            $6::python_fastapi.company_category, $7, $8::python_fastapi.job_source,
-            $9, $10,
-            $11, $12, $13
+            $1, $2, $3, $4::python_fastapi.application_status,
+            $5, $6, $7,
+            $8::python_fastapi.company_category, $9, $10::python_fastapi.job_source,
+            $11, $12,
+            $13, $14, $15
         )
         RETURNING *
         """,
         data.company_name,
         data.position_title,
+        date_applied,
+        status,
         data.company_url,
         data.job_posting_url,
         data.company_career_url,

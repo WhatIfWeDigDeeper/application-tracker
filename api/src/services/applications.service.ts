@@ -87,11 +87,12 @@ export class ApplicationService {
 
   async createApplication(input: CreateApplicationInput): Promise<ApplicationWithStages> {
     const preparedInput = prepareDateFields(input);
-    // When status is unsubmitted (the default), dateApplied must be null
+    const status = preparedInput.status ?? "unsubmitted";
+    const dateApplied = status === "unsubmitted" ? null : (preparedInput.dateApplied ?? new Date());
     const data = {
       ...preparedInput,
-      status: "unsubmitted" as const,
-      dateApplied: null,
+      status,
+      dateApplied,
     };
     const app = await prisma.application.create({
       data,

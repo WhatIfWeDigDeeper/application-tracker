@@ -108,14 +108,15 @@ export async function getApplication(id: string): Promise<ApplicationResponse | 
 }
 
 export async function createApplication(input: CreateApplicationInput): Promise<ApplicationResponse> {
-  // Status defaults to 'unsubmitted'; force dateApplied to null for unsubmitted
-  const dateApplied = null;
+  const status = input.status ?? 'unsubmitted';
+  const dateApplied = status === 'unsubmitted' ? null : (input.dateApplied ?? new Date().toISOString().split('T')[0]);
 
   const [app] = await db
     .insert(applications)
     .values({
       companyName: input.companyName,
       positionTitle: input.positionTitle,
+      status,
       dateApplied,
       companyUrl: input.companyUrl || null,
       jobPostingUrl: input.jobPostingUrl || null,

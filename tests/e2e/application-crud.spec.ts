@@ -169,6 +169,36 @@ test.describe('Application CRUD - Inline Edit', () => {
     await expect(page.locator('#dateApplied')).toHaveValue(today);
   });
 
+  test('should preserve status and date applied after creating application', async ({ page }) => {
+    const today = new Date().toISOString().split('T')[0];
+
+    await page.goto('/applications/new');
+    await page.waitForLoadState('domcontentloaded');
+
+    await page.fill('input[placeholder="Company Name *"]', 'Status Persist Co');
+    await page.fill('input[placeholder="Position Title *"]', 'Engineer');
+    await page.selectOption('#status', 'applied');
+
+    // Date should be auto-filled with today
+    await expect(page.locator('#dateApplied')).toHaveValue(today);
+
+    await page.click('button:has-text("Create Application")');
+    await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
+    const idPersist = page.url().split('/').pop()!;
+    createdApps.push({ id: idPersist, url: page.url() });
+
+    // Status and dateApplied should not have reset after redirect
+    await expect(page.locator('#status')).toHaveValue('applied');
+    await expect(page.locator('#dateApplied')).toHaveValue(today);
+
+    // Reload to confirm persistence in the database
+    await page.reload();
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForSelector('#status', { timeout: 10000 });
+    await expect(page.locator('#status')).toHaveValue('applied');
+    await expect(page.locator('#dateApplied')).toHaveValue(today);
+  });
+
   test('should create application without date applied and display em dash', async ({ page }) => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
