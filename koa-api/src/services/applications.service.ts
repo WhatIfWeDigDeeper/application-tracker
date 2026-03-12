@@ -233,7 +233,8 @@ export class ApplicationService {
 
   async createApplication(input: CreateApplicationInput): Promise<Application> {
     const id = uuid();
-    // Status defaults to 'unsubmitted'; force dateApplied to null for unsubmitted
+    const status = input.status ?? 'unsubmitted';
+    const dateApplied = status === 'unsubmitted' ? null : (input.dateApplied ?? new Date().toISOString().split('T')[0]);
     const result = await query<ApplicationRow>(
       `INSERT INTO applications (
         id, company_name, position_title, date_applied, status,
@@ -242,14 +243,15 @@ export class ApplicationService {
         cover_letter_required, special_requirements,
         salary_min, salary_max, notes
       ) VALUES (
-        $1, $2, $3, $4, 'unsubmitted',
-        $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+        $1, $2, $3, $4, $5,
+        $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
       ) RETURNING *`,
       [
         id,
         input.companyName.trim(),
         input.positionTitle.trim(),
-        null,
+        dateApplied,
+        status,
         input.companyUrl || null,
         input.jobPostingUrl || null,
         input.companyCareerUrl || null,

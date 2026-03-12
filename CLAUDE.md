@@ -13,11 +13,13 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
 - **Plan Execution**: Plans must end with a statement of how the work will be run — e.g., single session (sequential), parallel subagents, agent team, or isolated worktree — so the approach is visible before implementation begins.
+- **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant section of `CLAUDE.md` before ending the session — so teammates and future agents benefit. For repeatable multi-step processes, create a skill in `.claude/skills/`. Do not store project knowledge in per-user memory files (`~/.claude/projects/.../memory/`) — they are invisible to other contributors and may be reset.
+- **Searching files**: Use `rg` (ripgrep) instead of `grep` or `find` for better performance and features.
 
 ## Active Technologies
 
 - TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite
-- Python 3.12+ with FastAPI, asyncpg, Pydantic v2, uv
+- Python 3.12+ (fastapi package uses 3.14) with FastAPI, asyncpg, Pydantic v2, uv
 - PostgreSQL 18 (single database with multiple schemas)
 
 ## Documentation Guidelines
@@ -34,6 +36,7 @@ Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolat
 - **react_nestjs** — `nest-api/src/database/schema.ts` (Drizzle)
 - **python_fastapi** — `fastapi/migrations/001_initial.sql` (asyncpg, raw SQL); also used by `tanstack-start-ui/` (React SSR via TanStack Start, port 3040)
 - **java_spring** — `spring-api/src/main/resources/db/migration/V1__initial.sql` (Spring Data JPA + Hibernate 6, Flyway auto-migration)
+- **go_gin** — `go-api/migrations/001_initial.up.sql` (pgx/sqlc, raw SQL)
 
 Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 
@@ -84,21 +87,12 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **API 204 handling**: `response.json()` on 204 throws — check `response.status === 204` first
 - **Zod optional vs null**: `z.string().optional()` rejects `null` — use `undefined` so `JSON.stringify` omits the key
 - **React Router useBlocker**: Only works with `createBrowserRouter` + `RouterProvider`, not `<BrowserRouter>`
-- **SvelteKit SSR**: Add `export const ssr = false` in `src/routes/+layout.ts` for SPA mode with Playwright
-- **Svelte 5 bind:value**: Doesn't propagate with callback `onchange` — use local `$state` + `$effect`, call callback in `oninput`
-- **Shared E2E history tests**: `history.spec.ts` has a single `History Panel` block shared by Vue and Svelte; stacks without history use `--grep-invert 'History Panel'` (Playwright CLI flag)
 - **Avoid absolute positioning for sibling elements**: When multiple elements share the same corner (e.g., badge + action menu), use flexbox flow instead of `absolute` — prevents overlap
 - **Validation limit changes**: When updating max lengths in constants/schemas, rg (ripgrep) for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
-- **Svelte 5 event delegation**: `stopPropagation()` doesn't prevent parent `<a>` navigation — avoid wrapping interactive cards in `<a>` tags; use `onclick` with `goto()` instead
 - **Zod boolean coercion**: `z.coerce.boolean()` treats any non-empty string (including `"false"`) as `true` — use `z.preprocess((val) => val === 'true' || val === true, z.boolean())` for query params
-- **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
-- **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
 - **Null vs undefined in validation**: API fields that are "not set" often return `null`, not `undefined`. Strict `!== undefined` checks let `null` slip into range/format validators where JS coercion causes false failures (e.g. `null < 1` → `true`) — use `!= null` (loose equality) to treat both as absent.
-- **webkit + React 19 form submission**: Playwright's `requestSubmit()`, button `.click()`, and `press('Enter')` do not fire React's `onSubmit` in webkit for multi-input forms. Workaround: extract a `doSubmit()` function, add `type="button"` + `data-testid="<form>-save"` + `onClick={doSubmit}` to the submit button, and use `page.locator('[data-testid="<form>-save"]').click()` in tests.
-- **Submit button type changes**: When changing a button from `type="submit"` to `type="button"`, unit tests using `querySelector('button[type="submit"]')` will silently return `null`. Prefer `getByTestId()` or `getByRole('button', { name: /save/i })` instead.
-- **Angular `[hidden]` vs `@if` for Playwright gates**: `[hidden]="!expr"` keeps the element in the DOM (just invisible); in webkit, `expect(locator).toBeVisible()` can pass immediately while the element's content/state is still stale/default, so later assertions may read the wrong value. Use `@if (expr)` instead of `[hidden]="!expr"` whenever a Playwright assertion waits for an element to appear.
-- **Modal re-open timing in webkit**: After clicking Close on a modal/panel and immediately re-opening it, webkit can interact with stale DOM from the previous open cycle. Assert `await expect(page.locator('text=<panel heading>')).not.toBeVisible()` after Close before triggering the second open.
-- **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
+- **Drizzle `date()` columns** (hono-api, nest-api, nuxt-api): expect YYYY-MM-DD strings, not `Date` objects — use `new Date().toISOString().split('T')[0]` for today, not `new Date()` directly
+- **Default sort order**: All stacks sort applications by `updatedAt` descending, not `dateApplied` — do not assume date-applied ordering in queries or E2E tests
 
 ## CSV Import Patterns
 
@@ -114,6 +108,16 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 - **Router component reuse**: `onMounted` won't re-fire on param change — use `watch(() => props.id)` to reload data
 - **Nav guard bypass**: `onBeforeRouteLeave` fires on `router.push()` — use a `skipNavGuard` ref, set `true` before push
+- **Pinia setup stores**: vue-ui uses setup stores (not options API) with Immer `produceWithPatches` for event sourcing — do not convert to composable style
+- **Event sourcing schema**: `vue_nuxt` has `application_events` + `application_snapshots` tables; history is event-sourced
+- **Validation limit sync**: Frontend and backend validation limits (e.g. max events list) must stay in sync
+- **`@shared` alias**: Shared types live in `nuxt-api/shared/`; both `tsconfig.json` and `vite.config.ts` need the alias configured
+
+## Svelte Patterns
+
+- **SvelteKit SSR**: Add `export const ssr = false` in `src/routes/+layout.ts` for SPA mode with Playwright
+- **Svelte 5 bind:value**: Doesn't propagate with callback `onchange` — use local `$state` + `$effect`, call callback in `oninput`
+- **Svelte 5 event delegation**: `stopPropagation()` doesn't prevent parent `<a>` navigation — avoid wrapping interactive cards in `<a>` tags; use `onclick` with `goto()` instead
 
 ## Java/Spring Patterns
 
@@ -129,16 +133,64 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`isXxx` field naming**: JPA boolean fields named `isXxx` conflict with getter naming; name the field `archived` (not `isArchived`) — getter `isArchived()`, setter `setArchived()`
 - **Flyway auto-migration**: Flyway runs on startup — `./gradlew flywayMigrate` is only needed for manual runs; migrations live in `classpath:db/migration/`
 - **Gradle Kotlin DSL**: Uses `build.gradle.kts` — Kotlin syntax for plugin/dependency blocks
-- **Commit message file**: Multi-line `git commit -m` strings cause a `dquote>` hang in zsh. Write the message to `$TMPDIR/commit-msg.txt` using the Write tool, then run `git commit -F $TMPDIR/commit-msg.txt`
 - **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
 - **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
 - **Jackson date serialization**: `LocalDate`/`LocalDateTime` serialize as arrays (e.g. `[2026,3,5]`) by default — add `.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)` to `ObjectMapper` config to get ISO strings (`"2026-03-05"`, `"2026-03-05T13:00:00Z"`)
+- **Managed version overrides**: Use `extra["tomcat.version"]`, `extra["postgresql.version"]`, `extra["log4j2.version"]` in `build.gradle.kts` to pin patch versions ahead of Spring Boot's BOM — preferred for CVE fixes
+- **InterviewStageResponse DTO**: Uses `name`/`order` (not `stageName`/`stageOrder`) to match Angular frontend model
+- **HistoryEntry DTO**: Uses `sequence`/`changes` (not `sequenceNumber`/`diffs`) to match frontend model
+
+## TanStack UI + NestJS Patterns
+
+- Stack: React 19 + TanStack Query v5 + TanStack Router + NestJS (Fastify adapter) + Drizzle; tanstack-ui port 3050, nest-api port 5050, DB schema `react_nestjs`; snapshot-based history
+- **TanStack Router file-based routing**: `src/routes/__root.tsx`, `index.tsx`, `applications/new.tsx`, `applications/$id.tsx`
+- **TanStack Query**: Query key factory pattern in `src/queries/queryKeys.ts`
+- **NestJS DI with tsx**: Must use explicit `@Inject(ServiceClass)` on constructor params — tsx/esbuild doesn't emit decorator metadata, so parameter-based injection fails silently
+- **Zod validation pipe**: Custom Zod validation pipe used, not class-validator — do not add class-validator decorators
+- **Vite proxy**: `/api` → `http://localhost:5050` with path rewrite
+
+## FastAPI Patterns
+
+- Stack: Python 3.14 + FastAPI + asyncpg (raw SQL) + Pydantic v2, managed by `uv`; port 5160 (5060 reserved by macOS SIP), DB schema `python_fastapi`
+- **Functional style**: Service functions take `asyncpg.Pool` as first arg — no service classes, only Pydantic model classes
+- **Pydantic CamelModel**: Base class uses `alias_generator=to_camel`; use `model_dump(by_alias=True)` for API responses
+- **Partial PATCH via `model_fields_set`**: Distinguishes explicitly-set fields from absent ones — required for correct partial update behavior
+- **asyncpg DATE columns**: Require `datetime.date` objects, not strings — use the `parse_date()` helper in `src/services/shared.py`
+- **asyncpg SSL**: Pass `ssl=False` for local Docker PostgreSQL — asyncpg defaults to SSL which fails locally
+- **python-dotenv scope**: `load_dotenv()` walks up the directory tree — restrict it to `fastapi/.env` explicitly to avoid picking up a root `.env`
+- **PostgreSQL enum casts**: Need explicit schema-qualified casts, e.g. `$1::python_fastapi.application_status`
+- **Dev deps**: `uv sync --extra dev`; run server via `uv run python -m src`
+
+## Go API Patterns
+
+- Stack: Go + Gin + pgx/sqlc; go-api port 5070, angular-ui port 3060, DB schema `go_gin`
+- **StageInput JSON keys**: Uses `name`/`order` (not `stageName`/`stageOrder`) — must match what Angular frontend sends
+- **ApplicationInput validation**: No `binding:"required"` struct tags — validation done in service layer; `UpdateApplication` falls back to existing `companyName`/`positionTitle` when omitted
+- **angular-ui proxy**: `/api` → `http://localhost:5070` with `pathRewrite: {'^/api': ''}` in Angular dev proxy config
+- **Server startup**: `go run ./cmd/server` compiles and starts; `run-e2e.sh` manages lifecycle via `dev:go-api` npm script
+- **Manual restart after kill**: If go-api is killed manually, use `bash scripts/run-e2e.sh angular-ui` (not `npm run test:e2e:angular-ui`) — the npm script does not start the API backend
 
 ## Terminal Management
 
 - **PostgreSQL prerequisite**: Before starting any API server or running E2E tests, verify the PostgreSQL Docker container is running: `docker compose ps db`. If it's not running, `docker compose up -d db` first. A server started without the DB will hang or crash and may be unkillable without a reboot.
 - **Repeated test runs**: Run iterative/debugging test commands as foreground tasks in one shared terminal rather than spawning a new background terminal each iteration — background terminals accumulate and are never auto-cleaned.
 - **Kill background processes promptly**: Stop background Bash tasks via `TaskStop` (by task ID) or `kill <pid>` as soon as they're no longer needed — task IDs are only available in the current session.
+
+## Sandbox Notes
+
+Commands that require `dangerouslyDisableSandbox: true`:
+- `npm install` — network access for package downloads
+- `docker compose` — `.env` file access
+- `drizzle-kit` commands — filesystem access outside project
+- `nuxt dev/build/prepare` — filesystem access
+- `git commit` with GPG signing — `~/.gnupg/` access
+- `gh` CLI — network access
+- Playwright tests (WebKit/Chromium) on macOS — `bootstrap_check_in` permissions
+
+Additional notes:
+- **Heredoc in sandbox**: `$(cat <<'EOF'...EOF)` in commit messages fails in sandbox — use plain quoted strings or write to `$TMPDIR/commit-msg.txt` and use `git commit -F`
+- **`uv sync`**: Requires sandbox override for network; `uv run python -m src` works in sandbox after initial sync
+- **`permissions.allow` vs `sandbox.network.allowedHosts`**: `WebFetch(*)` in permissions controls whether the tool can be called without prompting — it does NOT bypass sandbox network restrictions. External hosts also need `sandbox.network.allowedHosts` in `.claude/settings.json`; `github.com` and `registry.npmjs.org` are already added
 
 ## Subagent Usage
 
@@ -171,10 +223,18 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 
 **Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 8 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
 
-**E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. Note: some backends also strip unknown POST fields, so status cannot always be set at create time — a two-step POST + full PATCH is the safe pattern for all stacks.
+**E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create (fixed in PR #229) — status can be set at create time directly.
 
 **`test.describe.serial` for `beforeAll`-dependent tests**: With `fullyParallel: true`, `test.describe` (non-serial) runs each worker with an independent module load — module-scope variables like `const company = uniqueCompanyName(...)` produce different values per worker, so `beforeAll`-created data is invisible to `beforeEach` in other workers. Use `test.describe.serial` for any describe block whose tests share `beforeAll` setup data.
 
-## Searching files
+### Playwright / webkit Quirks
 
--  **Use 'rg' (ripgrep)** instead of 'grep' or 'find' for better performance and features
+- **webkit + React 19 form submission**: Playwright's `requestSubmit()`, button `.click()`, and `press('Enter')` do not fire React's `onSubmit` in webkit for multi-input forms. Workaround: extract a `doSubmit()` function, add `type="button"` + `data-testid="<form>-save"` + `onClick={doSubmit}` to the submit button, and use `page.locator('[data-testid="<form>-save"]').click()` in tests.
+- **Submit button type changes**: When changing a button from `type="submit"` to `type="button"`, unit tests using `querySelector('button[type="submit"]')` will silently return `null`. Prefer `getByTestId()` or `getByRole('button', { name: /save/i })` instead.
+- **Angular `[hidden]` vs `@if` for Playwright gates**: `[hidden]="!expr"` keeps the element in the DOM (just invisible); in webkit, `expect(locator).toBeVisible()` can pass immediately while the element's content/state is still stale/default, so later assertions may read the wrong value. Use `@if (expr)` instead of `[hidden]="!expr"` whenever a Playwright assertion waits for an element to appear.
+- **Modal re-open timing in webkit**: After clicking Close on a modal/panel and immediately re-opening it, webkit can interact with stale DOM from the previous open cycle. Assert `await expect(page.locator('text=<panel heading>')).not.toBeVisible()` after Close before triggering the second open.
+- **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
+- **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
+- **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
+- **Shared E2E history tests**: `history.spec.ts` has a single `History Panel` block shared by Vue and Svelte; stacks without history use `--grep-invert 'History Panel'` (Playwright CLI flag)
+

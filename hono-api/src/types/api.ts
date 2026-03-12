@@ -111,6 +111,7 @@ export const CreateApplicationSchema = z.object({
   companyName: z.string().min(1).max(200),
   positionTitle: z.string().min(1).max(200),
   dateApplied: z.string().optional(),
+  status: ApplicationStatusSchema.optional(),
   companyUrl: z.string().url().optional(),
   jobPostingUrl: z.string().url().optional(),
   companyCareerUrl: z.string().url().optional(),

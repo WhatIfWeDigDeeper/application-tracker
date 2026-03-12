@@ -63,6 +63,7 @@ export const CreateApplicationSchema = z.object({
     .min(1, "Position title is required")
     .max(200, "Position title must be between 1 and 200 characters"),
   dateApplied: z.string().date().optional(),
+  status: ApplicationStatusSchema.optional(),
   companyUrl: z
     .string()
     .url("Invalid company URL format")

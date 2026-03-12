@@ -107,7 +107,9 @@ This document defines validation rules for domain entities, independent of any v
 
 - All required field validations apply
 - Default values are applied before validation where specified
-- Default status is `unsubmitted` with `dateApplied` as null
+- Status defaults to `unsubmitted` if not provided; `dateApplied` defaults to null
+- If a non-unsubmitted status is provided at creation and `dateApplied` is omitted, it is auto-populated with today's date
+- If status is `unsubmitted` (or defaulted), `dateApplied` is forced to null regardless of input
 - Invalid input prevents creation and returns validation errors
 
 ### On Update (Partial)

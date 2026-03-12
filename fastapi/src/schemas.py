@@ -75,6 +75,7 @@ class ApplicationResponse(CamelModel):
 class CreateApplicationRequest(CamelModel):
     company_name: str = Field(min_length=1, max_length=200)
     position_title: str = Field(min_length=1, max_length=200)
+    status: ApplicationStatus | None = None
     date_applied: str | None = None
     company_url: str | None = None
     job_posting_url: str | None = None

@@ -10,7 +10,7 @@ This document defines the valid state transitions for domain entities and their 
 
 ```
                        ┌───────────────┐
-                       │ unsubmitted  │ (initial state)
+                       │ unsubmitted  │ (default initial state)
                        └──────┬────────┘
                               │
                               ▼

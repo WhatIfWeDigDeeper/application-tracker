@@ -164,6 +164,7 @@ paths:
                 value:
                   companyName: Acme Corp
                   positionTitle: Software Engineer
+                  status: applied
                   dateApplied: '2024-01-15'
                   companyUrl: https://acme.com
                   jobPostingUrl: https://linkedin.com/jobs/123
@@ -815,10 +816,14 @@ components:
           type: string
           minLength: 1
           maxLength: 200
+        status:
+          $ref: '#/components/schemas/ApplicationStatus'
+          description: Initial status. Defaults to "unsubmitted" if omitted.
         dateApplied:
           type: string
           format: date
           nullable: true
+          description: Required to be null when status is "unsubmitted". Auto-populated with today if status is non-unsubmitted and dateApplied is not provided.
         companyUrl:
           type: string
           format: uri
