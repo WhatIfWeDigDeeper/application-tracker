@@ -13,7 +13,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
 - **Plan Execution**: Plans must end with a statement of how the work will be run — e.g., single session (sequential), parallel subagents, agent team, or isolated worktree — so the approach is visible before implementation begins.
-- **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant section of `CLAUDE.md` before ending the session — so teammates and future agents benefit. For repeatable multi-step processes, create a skill in `.claude/skills/`. Do not store project knowledge in per-user memory files (`~/.claude/projects/.../memory/`) — they are invisible to other contributors and may be reset.
+- **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant section of `CLAUDE.md` before ending the session — so teammates and future agents benefit. For repeatable multi-step processes, create a skill in `.claude/skills/`. Do not store project knowledge in per-user memory files (`~/.claude/projects/.../memory/`) — they are invisible to other contributors and may be reset. If `MEMORY.md` exists in the memory directory, delete it.
 - **Searching files**: Use `rg` (ripgrep) instead of `grep` or `find` for better performance and features.
 
 ## Active Technologies
