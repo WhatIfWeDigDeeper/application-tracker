@@ -10,7 +10,9 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 
 // Override managed versions to address CVEs
-extra["tomcat.version"] = "10.1.45"
+extra["tomcat.version"] = "10.1.52"       // CVE-2025-66614, CVE-2026-24734, CVE-2025-61795, CVE-2026-24733
+extra["postgresql.version"] = "42.7.7"   // CVE-2025-49146
+extra["log4j2.version"] = "2.25.3"       // CVE-2025-68161
 
 java {
     toolchain {

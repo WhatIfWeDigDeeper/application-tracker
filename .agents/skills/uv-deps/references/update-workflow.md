@@ -40,13 +40,13 @@ Compare each outdated package's current and latest versions to determine its upd
   )
   ```
 
+**Non-semver versions:** Some packages use CalVer (`2024.1.0`), pre-releases (`3.0a1`), or post-releases (`1.0.post1`). Version tuple comparisons won't work reliably for these. If a package's current or latest version can't be parsed as `(major, minor, patch)` integers, skip the version-scope filter and include it if `uv pip list --outdated` reports it as outdated — let uv resolve whether an upgrade is possible.
+
 ### Determine Strategy
 
-Per directory:
-- **1-3 packages**: Update sequentially
-- **4+ packages**: Use parallel Task subagents (2 packages per agent)
+Always update packages **sequentially within a directory** — parallel updates cause `uv.lock` contention.
 
-If multiple directories have outdated packages, process them in parallel using separate Task subagents (general-purpose), running in background. Collect results from all agents before generating the final report.
+Parallelize **across directories** only: if multiple directories have outdated packages, process them in parallel using separate Task subagents (general-purpose), running in background. Collect results from all agents before generating the final report.
 
 ### Update Packages
 
@@ -100,8 +100,26 @@ For uv workspaces (`[tool.uv.workspace]` in root `pyproject.toml`), run all `uv 
 After updating, check for new vulnerabilities (see [uv-commands.md](uv-commands.md) for details on this pattern):
 ```bash
 cd "$WORKTREE_PATH/<directory>"
-AUDIT_JSON=$(uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+AUDIT_JSON=$(uv export --frozen --no-emit-project | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
 AUDIT_EXIT=$?
+
+# Retry without --strict only when strict run found no real vulns
+# (distinguishes database-coverage warning from actual vulnerabilities)
+if [ "$AUDIT_EXIT" -ne 0 ]; then
+  STRICT_VULN_COUNT=$(echo "$AUDIT_JSON" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(sum(len(d['vulns']) for d in data['dependencies']))
+except Exception:
+    print(-1)
+" 2>/dev/null)
+  if [ "$STRICT_VULN_COUNT" = "0" ] || [ "$STRICT_VULN_COUNT" = "-1" ]; then
+    AUDIT_JSON=$(uv export --frozen --no-emit-project | uvx pip-audit --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+    AUDIT_EXIT=0
+  fi
+fi
+
 VULN_COUNT=$(echo "$AUDIT_JSON" | python3 -c "import json,sys; data=json.load(sys.stdin); print(sum(len(d['vulns']) for d in data['dependencies']))" 2>/dev/null || echo "unknown")
 ```
 
@@ -111,7 +129,7 @@ Report a clean/vulnerable summary (e.g. "0 vulnerabilities" or "2 vulnerabilitie
 
 ### On Success
 
-1. Commit changes per SKILL.md step 7
+1. Set `COMMIT_MSG="chore: update Python dependencies"` and commit per SKILL.md step 7
 2. Push branch to remote:
    ```bash
    git push -u origin "$BRANCH_NAME"

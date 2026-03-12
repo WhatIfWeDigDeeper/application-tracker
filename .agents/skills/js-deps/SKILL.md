@@ -38,14 +38,12 @@ WORKTREE_PATH="$(dirname "$(git rev-parse --show-toplevel)")/$BRANCH_NAME"
 git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME"
 ```
 
-If `git worktree add` fails (e.g., sandbox permission error), prompt the user:
-> `git worktree` requires write access outside the project root. Choose an option:
-> 1. Add the parent directory (one level above the repo root) to your sandbox allowlist in `settings.json` (recommended)
-> 2. Fall back to branch+stash approach
+If `git worktree add` fails due to a sandbox permission error:
+> `git worktree` requires write access outside the project root. Grant that access in your assistant's settings (in Claude Code: add the parent directory to your sandbox allowlist in `settings.json`) and retry.
 
 **All subsequent steps operate within `$WORKTREE_PATH`.** Discovery, installs, edits, and commits all happen there. Paths like `cd <directory>` in reference files are relative to `$WORKTREE_PATH`.
 
-`gh`, `git push`, and `git commit` require `dangerouslyDisableSandbox: true` (keyring access for auth).
+`gh`, `git push`, and `git commit` require OS keyring/credential helper access — lift any sandbox restrictions that block this (in Claude Code: `dangerouslyDisableSandbox: true`).
 
 ### 2. Detect Package Manager
 
@@ -56,7 +54,7 @@ Detect from lock files and `package.json` `packageManager` field (which takes pr
 Verify the package manager CLI is available and, for npm, that it can reach the registry. See [references/package-managers.md](references/package-managers.md) for manager-specific verification commands.
 
 If verification fails, prompt user with a message appropriate to what was checked:
-- **npm or pnpm** (registry connectivity verified): "Cannot reach package registry. Sandbox may be blocking network access. To allow package manager commands in sandbox mode, update settings.json."
+- **npm or pnpm** (registry connectivity verified): "Cannot reach package registry. A sandbox or network restriction may be blocking access. Lift network restrictions in your assistant's settings and retry."
 - **yarn or bun** (CLI availability only): "Package manager CLI not found or not executable. Ensure yarn/bun is installed and available in PATH."
 
 Do not proceed until verification passes.
@@ -65,23 +63,23 @@ Do not proceed until verification passes.
 
 Find all `package.json` files within `$WORKTREE_PATH` excluding `node_modules`, `dist`, `.cache`, `coverage`, `.next`, and `.nuxt` directories. Store results as an array of directories to process.
 
-### 5. Install Dependencies
+### 5. Identify Packages
+
+- Parse `$ARGUMENTS` to determine target packages
+- For globs, expand against all four dependency fields (`dependencies`, `devDependencies`, `optionalDependencies`, `peerDependencies`) in each discovered `package.json`
+- For `.` or no arguments, process all packages in all discovered directories
+
+### 6. Install Dependencies
 
 **Skip this step for security audit workflows** — `$PM audit` reads from lock files and does not require `node_modules`.
 
-For dependency update workflows only: install dependencies so that `$PM outdated` can accurately compare installed vs. registry versions. Without `node_modules`, exact-pinned packages (no `^` or `~`) won't appear in outdated reports. If `$ARGUMENTS` specifies particular packages (not `.`), only install in directories where those packages appear in `package.json`. Check `dependencies`, `devDependencies`, `optionalDependencies`, and `peerDependencies` fields when scanning for package presence. For glob arguments, expand against all four fields before filtering directories.
-
-### 6. Identify Packages
-
-- Parse `$ARGUMENTS` to determine packages
-- For globs, expand against package.json dependencies
-- For `.`, process all packages
+For dependency update workflows only: install dependencies so that `$PM outdated` can accurately compare installed vs. registry versions. Without `node_modules`, exact-pinned packages (no `^` or `~`) won't appear in outdated reports. If specific packages were identified in step 5 (not `.`), only install in directories where those packages appear. For glob arguments, use the expanded package list from step 5 to filter directories.
 
 ### 7. Validate Changes
 
 Run validation **per directory** after each package update. Check `package.json` scripts and run available commands using `$PM run <script>` in order: build, lint, test. Skip any that don't exist.
 
-**For audit workflows only:** if `node_modules` does not exist in the directory being validated (step 5 skips installation for audits), run `$PM install` before executing validation scripts. This is a validation-only install and does not affect the audit results already collected.
+**If `node_modules` does not exist** in the directory being validated, run `$PM install` before executing validation scripts. This applies to audit workflows (which skip step 6) and any update workflow directory where install was skipped. The install is validation-only and does not affect already-collected results.
 
 - **Build failure** is a hard failure: revert the package before continuing.
 - **Lint or test failure** is a soft failure: report it but continue with remaining packages.
@@ -119,9 +117,11 @@ Handled by the reference workflow. See the **On Success** section of [references
 
 Remove the worktree. The main working directory was never modified, so no stash restore is needed.
 
+**Always run cleanup**, even if the skill fails mid-run (e.g., registry unreachable, build failure, unexpected error). If a step fails, run cleanup before surfacing the error to the user.
+
 ```bash
 git worktree remove "$WORKTREE_PATH" --force
-# Only delete branch if no PR was created (requires dangerouslyDisableSandbox: true)
+# Only delete branch if no PR was created (requires keyring/network access)
 if [ -z "$(gh pr list --head "$BRANCH_NAME" --json url --jq '.[0].url' 2>/dev/null)" ]; then
   git branch -D "$BRANCH_NAME"
 fi

@@ -9,12 +9,7 @@
     "js-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "08c5e55b53bc30753d6672b24ccfaf6c64e94461e8aed7f1b9dd452269c3be8f"
-    },
-    "learn": {
-      "source": "whatifwedigdeeper/agent-skills",
-      "sourceType": "github",
-      "computedHash": "f5ceaf17d0aeebfaf15db5980c0fa63e27a65ba9fa52caccd7d3f45190da10bc"
+      "computedHash": "fe2259f19925c26d3c4ac7358ae93a0f9c04e55815ce61ba4e5ee17830cdd81c"
     },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
@@ -24,17 +19,17 @@
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "2d9d0c4ddbb17b50cb2056e8d45a3c953a755a4908686281a3c5adcdfe109382"
+      "computedHash": "9206c779309c7e543b267eb2d16231a251d3be9b482d55499248c8d4e834ac4f"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "391bb1480e99f38b18fda1eddaefb36d767e930ebfb2ce915f28eb643731c71e"
+      "computedHash": "435aec06043fdd4c0d3aa72e84efa4f04e16848fa906b34eb2a8742511c6f2f2"
     },
     "uv-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "751e4d056aa8841709c6065aa688ce704c25e1b054f14bfffb83a8727f0cab40"
+      "computedHash": "75f4864d7c92bb30d1289ae841e2ade1ab8379a7a9162cd0d5e6a48d41161794"
     }
   }
 }

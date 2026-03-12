@@ -12,7 +12,7 @@ For each directory containing pyproject.toml, use the `uv export` pipeline patte
 
 ```bash
 cd "$WORKTREE_PATH/<directory>"
-AUDIT_JSON=$(uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+AUDIT_JSON=$(uv export --frozen --no-emit-project | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
 AUDIT_EXIT=$?
 # Extract only packages with vulnerabilities
 VULN_JSON=$(echo "$AUDIT_JSON" | python3 -c "
@@ -35,7 +35,7 @@ fi
 
 > **Note on `--strict`:** This flag causes pip-audit to exit non-zero on warnings (e.g., packages with no OSV/PyPI safety DB entry). If the audit exits non-zero but `VULN_JSON` parses as empty, the warning above will fire. Retry without `--strict` to distinguish true vulnerabilities from database-coverage warnings:
 > ```bash
-> AUDIT_JSON=$(uv export --frozen | uvx pip-audit --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+> AUDIT_JSON=$(uv export --frozen --no-emit-project | uvx pip-audit --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
 > AUDIT_EXIT=$?
 > VULN_JSON=$(echo "$AUDIT_JSON" | python3 -c "
 > import json, sys
@@ -95,12 +95,16 @@ for pkg in data:
         for alias in vuln.get('aliases', []):
             if alias.startswith('GHSA-'):
                 print(alias)
-" | while read GHSA_ID; do
+" | while read -r GHSA_ID; do
+  # Validate GHSA ID format to prevent shell injection from malformed aliases
+  if ! printf '%s\n' "$GHSA_ID" | grep -Eq '^GHSA-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}$'; then
+    continue
+  fi
   # Use jq's '//' operator to default null to "high" (handles rate-limit responses that return null)
-  SEVERITY=$(gh api /advisories/$GHSA_ID --jq '.severity // "high"' 2>/dev/null || echo "high")
-  # Normalize "low" to "moderate" to match the filter option labels
-  # (GitHub Advisory API returns: low, moderate, high, critical — "medium" is not used)
-  SEVERITY=$(echo "$SEVERITY" | sed -E 's/^low$/moderate/')
+  SEVERITY=$(gh api "/advisories/$GHSA_ID" --jq '.severity // "high"' 2>/dev/null || echo "high")
+  # Normalize "low" and "medium" to "moderate" to match the filter option labels
+  # (GitHub Advisory API returns: low, medium, moderate, high, critical)
+  SEVERITY=$(echo "$SEVERITY" | sed -E 's/^low$/moderate/; s/^medium$/moderate/')
   echo "$GHSA_ID: $SEVERITY" >> "$SEVERITY_MAP_FILE"
 done
 SEVERITY_MAP=$(cat "$SEVERITY_MAP_FILE")
@@ -111,20 +115,23 @@ If no GHSA alias exists or the lookup fails, treat as "high" by default.
 
 ### Apply Severity Filter
 
-If the user selected specific severity levels (not "All vulnerabilities"), build a map of vuln ID → severity from the GHSA lookups above, then filter `VULN_JSON`:
+Write the filter script to a temp file once — it's reused in the Post-Audit Scan below:
 
 ```bash
 # SELECTED_SEVERITIES: space-separated lowercase severity names derived from the user's
 # multiSelect answers in interactive-help.md (e.g. "critical high" or "moderate").
 # Leave empty (unset) to include all severities — do not set it when "All vulnerabilities" is selected.
 # Valid values match the normalized GitHub API severities: critical, high, moderate (includes low).
-if [ -n "$SELECTED_SEVERITIES" ]; then
-  VULN_JSON=$(echo "$VULN_JSON" | SELECTED_SEVERITIES="$SELECTED_SEVERITIES" SEVERITY_MAP="$SEVERITY_MAP" python3 -c "
+SEVERITY_FILTER_BASE=$(mktemp -t severity_filter.XXXXXX)
+SEVERITY_FILTER="${SEVERITY_FILTER_BASE}.py"
+mv "$SEVERITY_FILTER_BASE" "$SEVERITY_FILTER"
+trap "rm -f '$SEVERITY_FILTER'" EXIT
+cat > "$SEVERITY_FILTER" << 'PYEOF'
 import json, sys, os
 selected = set(os.environ.get('SELECTED_SEVERITIES', '').lower().split())
 # severity_map built from GHSA lookups: {'GHSA-xxxx-xxxx-xxxx': 'high', ...}
 severity_map = {}
-for line in os.environ.get('SEVERITY_MAP', '').strip().split('\n'):
+for line in os.environ.get('SEVERITY_MAP', '').strip().splitlines():
     if ': ' in line:
         ghsa_id, sev = line.split(': ', 1)
         severity_map[ghsa_id.strip()] = sev.strip().lower()
@@ -136,7 +143,10 @@ def pkg_matches(pkg):
                 return True
     return False
 print(json.dumps([p for p in data if pkg_matches(p)], indent=2))
-")
+PYEOF
+
+if [ -n "$SELECTED_SEVERITIES" ]; then
+  VULN_JSON=$(echo "$VULN_JSON" | SELECTED_SEVERITIES="$SELECTED_SEVERITIES" SEVERITY_MAP="$SEVERITY_MAP" python3 "$SEVERITY_FILTER")
 fi
 ```
 
@@ -183,19 +193,51 @@ Validate after each update per SKILL.md step 6. If validation fails, revert (see
 
 ### Post-Audit Scan
 
-Re-run the audit to confirm fixes:
+Re-run the audit to confirm fixes. Apply the same severity filter used to compute `TARGET_COUNT` so the "Fixed X of Y" math is accurate for filtered runs (not inflated by out-of-scope severities):
+
 ```bash
 cd "$WORKTREE_PATH/<directory>"
-# REAUDIT_JSON is raw pip-audit output (a dict with a 'dependencies' key),
-# unlike VULN_JSON above which is a pre-filtered list of dicts.
-REAUDIT_JSON=$(uv export --frozen | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+REAUDIT_JSON=$(uv export --frozen --no-emit-project | uvx pip-audit --strict --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
 REAUDIT_EXIT=$?
-REMAINING=$(echo "$REAUDIT_JSON" | python3 -c "
+
+# Retry without --strict only when strict run found no real vulns
+# (distinguishes database-coverage warning from actual vulnerabilities)
+if [ "$REAUDIT_EXIT" -ne 0 ]; then
+  STRICT_REAUDIT_COUNT=$(echo "$REAUDIT_JSON" | python3 -c "
 import json, sys
 try:
     data = json.load(sys.stdin)
-    remaining = sum(len(d['vulns']) for d in data['dependencies'])
-    print(remaining)
+    print(sum(len(d['vulns']) for d in data['dependencies']))
+except Exception:
+    print(-1)
+" 2>/dev/null)
+  if [ "$STRICT_REAUDIT_COUNT" = "0" ] || [ "$STRICT_REAUDIT_COUNT" = "-1" ]; then
+    REAUDIT_JSON=$(uv export --frozen --no-emit-project | uvx pip-audit --format json --desc -r /dev/stdin --disable-pip --no-deps 2>/dev/null)
+    REAUDIT_EXIT=0
+  fi
+fi
+
+# Extract vulnerable packages from re-audit (same shape as VULN_JSON)
+REMAINING_VULN_JSON=$(echo "$REAUDIT_JSON" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    vulns = [d for d in data['dependencies'] if d['vulns']]
+    print(json.dumps(vulns, indent=2))
+except (json.JSONDecodeError, KeyError):
+    print('[]')
+")
+
+# Apply same severity filter as TARGET_COUNT so the math is apples-to-apples
+if [ -n "$SELECTED_SEVERITIES" ]; then
+  REMAINING_VULN_JSON=$(echo "$REMAINING_VULN_JSON" | SELECTED_SEVERITIES="$SELECTED_SEVERITIES" SEVERITY_MAP="$SEVERITY_MAP" python3 "$SEVERITY_FILTER")
+fi
+
+REMAINING=$(echo "$REMAINING_VULN_JSON" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(sum(len(p['vulns']) for p in data))
 except (json.JSONDecodeError, KeyError):
     print('unknown')
 ")
@@ -211,7 +253,7 @@ fi
 ### On Success
 
 1. Generate consolidated security report
-2. Commit changes per SKILL.md step 7
+2. Set `COMMIT_MSG="fix: patch vulnerable Python dependencies"` and commit per SKILL.md step 7
 3. Push branch to remote:
    ```bash
    git push -u origin "$BRANCH_NAME"
