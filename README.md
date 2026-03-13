@@ -376,6 +376,8 @@ Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIf
 | `uv-deps` | Audit and update Python dependencies |
 | `ship-it` | Branch, commit, push, and open a PR |
 | `pr-comments` | Address review comments on a pull request |
+| `vercel-react-best-practices` | React/Next.js performance optimization guidelines from Vercel Engineering |
+| `mermaid-diagrams` | Generate Mermaid diagrams (flowcharts, sequence, ERD, C4, and more) |
 
 Since `npx skills check` and `npx skills update` apparently do not work with the above repo at this time, you may force update all skills:
 
