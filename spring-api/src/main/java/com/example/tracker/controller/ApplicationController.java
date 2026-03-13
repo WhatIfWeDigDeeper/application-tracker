@@ -5,6 +5,7 @@ import com.example.tracker.dto.ApplicationResponse;
 import com.example.tracker.dto.HistoryEntry;
 import com.example.tracker.dto.ImportResult;
 import com.example.tracker.dto.InterviewStageRequest;
+import com.example.tracker.dto.InterviewStageResponse;
 import com.example.tracker.dto.PaginatedResponse;
 import com.example.tracker.service.ApplicationService;
 import jakarta.validation.Valid;
@@ -84,13 +85,13 @@ public class ApplicationController {
     }
 
     @PostMapping("/{id}/interview-stages")
-    public ApplicationResponse addStage(@PathVariable UUID id,
+    public ResponseEntity<InterviewStageResponse> addStage(@PathVariable UUID id,
                                         @Valid @RequestBody InterviewStageRequest req) {
-        return service.addStage(id, req);
+        return ResponseEntity.status(201).body(service.addStage(id, req));
     }
 
     @PatchMapping("/{id}/interview-stages/{stageId}")
-    public ApplicationResponse updateStage(@PathVariable UUID id,
+    public InterviewStageResponse updateStage(@PathVariable UUID id,
                                            @PathVariable UUID stageId,
                                            @Valid @RequestBody InterviewStageRequest req) {
         return service.updateStage(id, stageId, req);

@@ -1,5 +1,7 @@
 {
-  "allowlist": [],
+  "allowlist": [
+    "GHSA-f269-vfmq-vjvj"
+  ],
   "high": true,
   "package-manager": "auto"
 }

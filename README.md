@@ -25,6 +25,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [Schema Documentation](#schema-documentation)
 - [Testing](#testing)
   - [Unit Tests](#unit-tests)
+  - [API Integration Tests](#api-integration-tests)
   - [End-to-End Tests](#end-to-end-tests)
   - [Build Verification](#build-verification)
   - [Per-Stack Validation](#per-stack-validation)
@@ -313,6 +314,32 @@ Run all unit tests:
 
 ```bash
 npm run test:all          # Run all implementation tests
+```
+
+### API Integration Tests
+
+Cross-stack API tests run Jest integration tests against each REST API backend. All 9 implementations are tested with a shared test suite covering CRUD, date formats, CSV import/export, and application status.
+
+Run tests for a single API (requires the API server to be running):
+
+```bash
+npm run test:api:express-api   # Express + Prisma API (port 3001)
+npm run test:api:koa-api       # Koa API (port 5010)
+npm run test:api:nuxt-api      # Nuxt server API (port 5040)
+npm run test:api:hono-api      # Hono API (port 5030)
+npm run test:api:fastapi       # FastAPI (port 5160)
+npm run test:api:nest-api      # NestJS API (port 5050)
+npm run test:api:go-api        # Go Gin API (port 5070)
+npm run test:api:spring-api    # Spring Boot API (port 8080)
+npm run test:api:yoga-api      # GraphQL Yoga REST API (port 5080)
+```
+
+Run all API tests with automatic server lifecycle management:
+
+```bash
+npm run test:api:all           # Start all APIs, run tests, stop APIs
+# or
+bash scripts/run-api-tests.sh
 ```
 
 ### End-to-End Tests

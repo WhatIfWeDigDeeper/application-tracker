@@ -13,7 +13,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
 - **Plan Execution**: Plans must end with a statement of how the work will be run — e.g., single session (sequential), parallel subagents, agent team, or isolated worktree — so the approach is visible before implementation begins.
-- **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant section of `CLAUDE.md` before ending the session — so teammates and future agents benefit. For repeatable multi-step processes, create a skill in `.claude/skills/`. Do not store project knowledge in per-user memory files (`~/.claude/projects/.../memory/`) — they are invisible to other contributors and may be reset. If `MEMORY.md` exists in the memory directory, delete it.
+- **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant section of `CLAUDE.md` before ending the session — so teammates and future agents benefit. For repeatable multi-step processes, create a skill in `.claude/skills/`. **NEVER write to `~/.claude/projects/.../memory/` for this project** — those files are invisible to other contributors, may be reset, and are not the persistence mechanism for this repo. `CLAUDE.md` is the only approved place for project learnings. If any files exist in the memory directory, delete them.
 - **Searching files**: Use `rg` (ripgrep) instead of `grep` or `find` for better performance and features.
 
 ## Active Technologies
@@ -45,6 +45,8 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 ## Code Quality Requirements
 
 **Always complete the full validation chain before committing** — `tsc --noEmit` alone is not sufficient. Re-run the entire chain after every round of changes — not just the initial implementation. Fixing a bug introduced during review still requires the full chain.
+
+**When adding or modifying tests, automatically run them after implementation** — do not wait for the user to ask. Use the most targeted test command available. Report pass/fail results immediately.
 
 **When fixing a bug or test failure, automatically run the relevant tests after applying the fix** — do not wait for the user to ask. Use the most targeted test command available (e.g., `test:e2e:react-ui` for a react-ui failure). Report pass/fail results immediately.
 
@@ -139,6 +141,9 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Managed version overrides**: Use `extra["tomcat.version"]`, `extra["postgresql.version"]`, `extra["log4j2.version"]` in `build.gradle.kts` to pin patch versions ahead of Spring Boot's BOM — preferred for CVE fixes
 - **InterviewStageResponse DTO**: Uses `name`/`order` (not `stageName`/`stageOrder`) to match Angular frontend model
 - **HistoryEntry DTO**: Uses `sequence`/`changes` (not `sequenceNumber`/`diffs`) to match frontend model
+- **`POST /interview-stages` returns 201 + `InterviewStageResponse`**: The `addStage` and `updateStage` service methods must use `stageRepository.saveAndFlush(stage)` (not cascade via `applicationRepository.saveAndFlush(app)`) to get the stage entity with its assigned UUID — `GenerationType.UUID` does not populate the ID on cascade-saved children in the caller's scope
+- **`HttpMessageNotReadableException` handler**: Invalid JSON (malformed date strings, wrong type coercions) throws `HttpMessageNotReadableException` which extends `RuntimeException`. Add an explicit `@ExceptionHandler(HttpMessageNotReadableException.class)` returning 400 with `{"code": "validation_error"}` before the generic `RuntimeException` catch-all handler to distinguish client errors from server errors
+- **Angular Spring UI endpoint mismatch**: `angular-spring-ui` calls `/api/applications/:id/interview-n` (not `/interview-stages`) — the interview-stage feature in the Angular Spring UI is broken by design; do not route-match or rename `/interview-stages` to `/interview-n`
 
 ## TanStack UI + NestJS Patterns
 
@@ -210,6 +215,18 @@ Additional notes:
 - **Resolving PR review threads**: `gh` CLI has no resolve command. Use `gh api graphql` — fetch thread IDs via `pullRequest.reviewThreads`, resolve with `resolveReviewThread` mutation. Reply to each thread before resolving.
 - **CI toolchain parity**: When adding a new language/toolchain to the monorepo (e.g., Python/uv), update `.github/workflows/verify-pr.yaml` in the same PR to install the required tools
 - **Documentation**: When adding a new implementation, update: `README.md` (TOC, implementations table, running instructions, test commands, **schema docs table link**, and **Type Diagrams list**), and as needed `CLAUDE.md`. Every new implementation adds a new DB schema — always update `docs/DATABASE_ARCHITECTURE.md` and `scripts/generate-schema-docs.sh` (add the new `schema_name:dir-name` entry to the SCHEMAS array), then run `npm run docs:schema`. When adding a TypeScript implementation, add a `docs:types:<stack>` script to `package.json` pointing to the main types/service file, add it to the `docs:types` all-script, **run it** (`npm run docs:types:<stack>`), and **add the generated file link to the Type Diagrams list in `README.md`**. Also add a debug configuration to `.vscode/launch.json` for the new API backend (use the appropriate debug type: `node` for TS/Node APIs, `debugpy` for Python, `go` for Go). For Java/Spring, use `type: java, request: attach` on port 5005 and add a `dev:<stack>:debug` npm script that runs `./gradlew bootRun --debug-jvm` — do not use `request: launch` as it requires full Java extension project resolution which is fragile. Do not wait to be asked — include docs in the implementation plan.
+
+## Running API Integration Tests
+
+**Server lifecycle**: For fully managed runs (API auto-start/stop for all 9 stacks), use `bash scripts/run-api-tests.sh [stack|all]` or `npm run test:api:all`. To run against a single already-running API, use `npm run test:api:<stack>` (e.g., `npm run test:api:nest-api`).
+
+**All stacks run sequentially with `--runInBand`** — tests share a DB schema per stack; parallel Jest workers cause state contamination (race conditions in export/import round-trip tests). The script passes `--runInBand` to ensure test files run sequentially within each stack run.
+
+**`run-api-tests.sh all` continues on failure** — unlike `run-e2e.sh`, it accumulates `FAILED_STACKS` and reports them all at the end, so all stacks are tested even when one fails.
+
+**Cross-stack PATCH compatibility**: Go API and Spring API require all non-optional fields in PATCH requests. Always include `companyName` + `positionTitle` for application PATCH, and `name` + `order` for interview stage PATCH.
+
+**Stack-specific flags in `tests/api/helpers.ts`**: `validatesDates` (true only for stacks that return 400 + `code: validation_error` for bad dates), `hasInterviewStageDates` (false for go-api which lacks `completedDate` on stages). Update these when adding a new stack.
 
 ## Running E2E Tests
 

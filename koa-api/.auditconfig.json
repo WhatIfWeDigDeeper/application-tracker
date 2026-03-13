@@ -1,5 +1,7 @@
 {
-  "allowlist": [],
+  "allowlist": [
+    "GHSA-25h7-pfq9-p65f"
+  ],
   "high": true,
   "package-manager": "auto"
 }

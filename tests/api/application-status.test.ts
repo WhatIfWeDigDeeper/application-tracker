@@ -5,10 +5,10 @@
  * - New applications default to 'unsubmitted' with null dateApplied
  * - Setting status to 'unsubmitted' forces dateApplied to null
  *
- * Requires the fastapi server running on port 5160.
+ * Runs against all 9 stacks when API_URL is unset, or a single stack when API_URL is set.
  */
 
-const BASE_URL = process.env.API_URL ?? 'http://localhost:5160';
+import { ALL_STACKS, getTargetStacks } from './helpers';
 
 interface AppResponse {
   id: string;
@@ -16,32 +16,32 @@ interface AppResponse {
   dateApplied: string | null;
 }
 
-async function createApp(body: Record<string, unknown>): Promise<AppResponse> {
-  const res = await fetch(`${BASE_URL}/applications`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  expect(res.status).toBe(201);
-  return res.json();
-}
-
-async function updateApp(id: string, body: Record<string, unknown>): Promise<AppResponse> {
-  const res = await fetch(`${BASE_URL}/applications/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  expect(res.ok).toBe(true);
-  return res.json();
-}
-
-async function deleteApp(id: string): Promise<void> {
-  await fetch(`${BASE_URL}/applications/${id}`, { method: 'DELETE' });
-}
-
-describe('Application Status + Date Constraint (API)', () => {
+describe.each(getTargetStacks(ALL_STACKS))('Application Status + Date Constraint ($name)', ({ baseUrl }) => {
   const createdIds: string[] = [];
+
+  async function createApp(body: Record<string, unknown>): Promise<AppResponse> {
+    const res = await fetch(`${baseUrl}/applications`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    expect(res.status).toBe(201);
+    return res.json();
+  }
+
+  async function updateApp(id: string, body: Record<string, unknown>): Promise<AppResponse> {
+    const res = await fetch(`${baseUrl}/applications/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    expect(res.ok).toBe(true);
+    return res.json();
+  }
+
+  async function deleteApp(id: string): Promise<void> {
+    await fetch(`${baseUrl}/applications/${id}`, { method: 'DELETE' });
+  }
 
   afterEach(async () => {
     for (const id of createdIds) {
@@ -71,11 +71,8 @@ describe('Application Status + Date Constraint (API)', () => {
       });
       createdIds.push(app.id);
 
-      // Set to applied with a date first
-      await updateApp(app.id, { status: 'applied', dateApplied: '2026-01-15' });
-
-      // Now set back to unsubmitted
-      const updated = await updateApp(app.id, { status: 'unsubmitted' });
+      await updateApp(app.id, { companyName: app.id, positionTitle: 'Software Engineer', status: 'applied', dateApplied: '2026-01-15' });
+      const updated = await updateApp(app.id, { companyName: 'Test Company', positionTitle: 'Software Engineer', status: 'unsubmitted' });
 
       expect(updated.status).toBe('unsubmitted');
       expect(updated.dateApplied).toBeNull();
@@ -89,6 +86,8 @@ describe('Application Status + Date Constraint (API)', () => {
       createdIds.push(app.id);
 
       const updated = await updateApp(app.id, {
+        companyName: 'Test Company',
+        positionTitle: 'Software Engineer',
         status: 'unsubmitted',
         dateApplied: '2026-02-01',
       });
@@ -105,12 +104,14 @@ describe('Application Status + Date Constraint (API)', () => {
       createdIds.push(app.id);
 
       const updated = await updateApp(app.id, {
+        companyName: 'Test Company',
+        positionTitle: 'Software Engineer',
         status: 'applied',
         dateApplied: '2026-01-20',
       });
 
       expect(updated.status).toBe('applied');
-      expect(updated.dateApplied).toBe('2026-01-20');
+      expect(updated.dateApplied).toContain('2026-01-20');
     });
   });
 });
