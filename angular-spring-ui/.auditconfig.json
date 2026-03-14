@@ -1,6 +1,8 @@
 {
   "allowlist": [
-    "GHSA-f269-vfmq-vjvj"
+    "GHSA-f269-vfmq-vjvj",
+    "GHSA-v9p9-hfj2-hcw8",
+    "GHSA-vrm6-8vpv-qv8q"
   ],
   "high": true,
   "package-manager": "auto"
