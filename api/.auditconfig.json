@@ -1,8 +1,7 @@
 {
   "allowlist": [
     "GHSA-q5qw-h33p-qvwr",
-    "GHSA-wc8c-qw6v-h7f6",
-    "GHSA-25h7-pfq9-p65f"
+    "GHSA-wc8c-qw6v-h7f6"
   ],
   "high": true,
   "package-manager": "auto"
