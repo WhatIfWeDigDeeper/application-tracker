@@ -16,7 +16,7 @@ export const CSV_STACKS = ALL_STACKS.filter(s =>
 
 // API_URL env var → single-stack mode; unset → all stacks
 // STACK_NAME env var → used to filter stacks (e.g. skip CSV tests for non-CSV stacks)
-export function getTargetStacks(stacks: typeof ALL_STACKS) {
+export function getTargetStacks(stacks: typeof ALL_STACKS): typeof ALL_STACKS {
   const url = process.env.API_URL;
   if (!url) return stacks;
   const stackName = process.env.STACK_NAME;
