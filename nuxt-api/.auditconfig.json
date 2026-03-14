@@ -1,6 +1,7 @@
 {
   "allowlist": [
-    "GHSA-5c6j-r48x-rmvq"
+    "GHSA-5c6j-r48x-rmvq",
+    "GHSA-25h7-pfq9-p65f"
   ],
   "high": true,
   "package-manager": "auto"

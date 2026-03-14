@@ -156,27 +156,37 @@ public class ApplicationService {
         return toResponse(app);
     }
 
-    public ApplicationResponse addStage(UUID appId, InterviewStageRequest req) {
+    public InterviewStageResponse addStage(UUID appId, InterviewStageRequest req) {
         Application app = findById(appId);
         InterviewStage stage = new InterviewStage();
         stage.setApplication(app);
         applyStageRequest(stage, req);
-        app.getInterviewStages().add(stage);
-        applicationRepository.saveAndFlush(app);
+        InterviewStage savedStage = stageRepository.saveAndFlush(stage);
+        app.getInterviewStages().add(savedStage);
         captureSnapshot(app, "Stage added");
-        return toResponse(app);
+        return new InterviewStageResponse(
+            savedStage.getId(), appId,
+            savedStage.getStageName(), savedStage.getStageOrder(),
+            savedStage.isCompleted(), savedStage.getCompletedDate(),
+            savedStage.getNotes(), savedStage.getPerformanceRating()
+        );
     }
 
-    public ApplicationResponse updateStage(UUID appId, UUID stageId, InterviewStageRequest req) {
+    public InterviewStageResponse updateStage(UUID appId, UUID stageId, InterviewStageRequest req) {
         Application app = findById(appId);
         InterviewStage stage = app.getInterviewStages().stream()
             .filter(s -> s.getId().equals(stageId))
             .findFirst()
             .orElseThrow(() -> new EntityNotFoundException("Stage not found"));
         applyStageRequest(stage, req);
-        applicationRepository.saveAndFlush(app);
+        InterviewStage savedStage = stageRepository.saveAndFlush(stage);
         captureSnapshot(app, "Stage updated");
-        return toResponse(app);
+        return new InterviewStageResponse(
+            savedStage.getId(), appId,
+            savedStage.getStageName(), savedStage.getStageOrder(),
+            savedStage.isCompleted(), savedStage.getCompletedDate(),
+            savedStage.getNotes(), savedStage.getPerformanceRating()
+        );
     }
 
     public ApplicationResponse deleteStage(UUID appId, UUID stageId) {

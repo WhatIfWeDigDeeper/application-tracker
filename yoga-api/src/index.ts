@@ -3,8 +3,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { createYoga } from 'graphql-yoga';
 import { schema } from './schema/index.js';
 import { prisma } from './db/client.js';
-import { getAllApplications, deleteApplication, createApplication, updateApplication } from './services/application.service.js';
-import { createStage } from './services/stages.service.js';
+import { getAllApplications, deleteApplication, createApplication, updateApplication, archiveApplication } from './services/application.service.js';
+import { createStage, updateStage } from './services/stages.service.js';
 import Busboy from 'busboy';
 
 const STATUS_DISPLAY_TO_PRISMA: Record<string, string> = {
@@ -44,12 +44,23 @@ async function handleRestCreate(req: IncomingMessage, res: ServerResponse) {
     positionTitle: String(body.positionTitle ?? ''),
     status: (body.status as import('@prisma/client').ApplicationStatus | undefined) ?? undefined,
     dateApplied: body.dateApplied ? String(body.dateApplied) : null,
+    jobPostingUrl: body.jobPostingUrl ? String(body.jobPostingUrl) : null,
+    companyUrl: body.companyUrl ? String(body.companyUrl) : null,
+    companyCareerUrl: body.companyCareerUrl ? String(body.companyCareerUrl) : null,
+    skillsMatch: body.skillsMatch != null ? Number(body.skillsMatch) : null,
+    salaryMin: body.salaryMin != null ? Number(body.salaryMin) : null,
+    salaryMax: body.salaryMax != null ? Number(body.salaryMax) : null,
+    coverLetterRequired: body.coverLetterRequired != null ? Boolean(body.coverLetterRequired) : null,
+    notes: body.notes ? String(body.notes) : null,
+    offerDueDate: body.offerDueDate ? String(body.offerDueDate) : null,
   });
   res.writeHead(201, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({
     id: app.id, companyName: app.companyName,
     positionTitle: app.positionTitle, status: app.status,
     dateApplied: app.dateApplied ? app.dateApplied.toISOString().split('T')[0] : null,
+    companyUrl: app.companyUrl ?? null,
+    jobPostingUrl: app.jobPostingUrl ?? null,
   }));
 }
 
@@ -59,11 +70,15 @@ async function handleRestUpdate(req: IncomingMessage, res: ServerResponse, id: s
   if (body.companyName !== undefined) input.companyName = String(body.companyName);
   if (body.positionTitle !== undefined) input.positionTitle = String(body.positionTitle);
   if (body.status !== undefined) input.status = body.status;
+  if (body.dateApplied !== undefined) input.dateApplied = body.dateApplied ? String(body.dateApplied) : null;
+  if (body.offerDueDate !== undefined) input.offerDueDate = body.offerDueDate ? String(body.offerDueDate) : null;
   const app = await updateApplication(id, input as Parameters<typeof updateApplication>[1]);
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({
     id: app.id, companyName: app.companyName,
     positionTitle: app.positionTitle, status: app.status,
+    dateApplied: app.dateApplied ? app.dateApplied.toISOString().split('T')[0] : null,
+    offerDueDate: app.offerDueDate ? app.offerDueDate.toISOString().split('T')[0] : null,
   }));
 }
 
@@ -72,9 +87,37 @@ async function handleRestCreateStage(req: IncomingMessage, res: ServerResponse, 
   const stage = await createStage(applicationId, {
     name: String(body.name ?? ''),
     order: typeof body.order === 'number' ? body.order : parseInt(String(body.order ?? '0'), 10),
+    isCompleted: Boolean(body.isCompleted),
+    completedDate: body.completedDate ? String(body.completedDate) : null,
+    performanceRating: body.performanceRating != null ? Number(body.performanceRating) : null,
+    notes: body.notes ? String(body.notes) : null,
   });
   res.writeHead(201, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ id: stage.id, name: stage.name, order: stage.order }));
+  res.end(JSON.stringify({
+    id: stage.id, name: stage.name, order: stage.order,
+    isCompleted: stage.isCompleted,
+    completedDate: stage.completedDate ? stage.completedDate.toISOString().split('T')[0] : null,
+    performanceRating: stage.performanceRating,
+  }));
+}
+
+async function handleRestUpdateStage(req: IncomingMessage, res: ServerResponse, applicationId: string, stageId: string) {
+  const body = await readJsonBody(req);
+  const input: Record<string, unknown> = {};
+  if (body.name !== undefined) input.name = String(body.name);
+  if (body.order !== undefined) input.order = Number(body.order);
+  if (body.isCompleted !== undefined) input.isCompleted = Boolean(body.isCompleted);
+  if (body.completedDate !== undefined) input.completedDate = body.completedDate ? String(body.completedDate) : null;
+  if (body.performanceRating !== undefined) input.performanceRating = body.performanceRating != null ? Number(body.performanceRating) : null;
+  if (body.notes !== undefined) input.notes = body.notes ? String(body.notes) : null;
+  const stage = await updateStage(applicationId, stageId, input as Parameters<typeof updateStage>[2]);
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({
+    id: stage.id, name: stage.name, order: stage.order,
+    isCompleted: stage.isCompleted,
+    completedDate: stage.completedDate ? stage.completedDate.toISOString().split('T')[0] : null,
+    performanceRating: stage.performanceRating,
+  }));
 }
 
 const yoga = createYoga({
@@ -127,7 +170,10 @@ function parseCSV(content: string): string[][] {
 }
 
 async function handleExport(res: ServerResponse) {
-  const apps = await getAllApplications();
+  const apps = await prisma.application.findMany({
+    orderBy: { updatedAt: 'desc' },
+    include: { interviewStages: { orderBy: { order: 'asc' } } },
+  });
   const header = CSV_COLUMNS.join(',');
   const rows = apps.map((app) => rowToCSV({
     companyName: app.companyName,
@@ -315,15 +361,49 @@ async function handleImport(req: IncomingMessage, res: ServerResponse) {
   res.end(JSON.stringify(result));
 }
 
-async function handleGetApplications(res: ServerResponse) {
-  const apps = await getAllApplications();
-  const items = apps.map((app) => ({
+function appToJson(app: Awaited<ReturnType<typeof getAllApplications>>[number]) {
+  return {
     id: app.id,
     companyName: app.companyName,
     positionTitle: app.positionTitle,
     status: app.status,
     dateApplied: app.dateApplied ? app.dateApplied.toISOString().split('T')[0] : null,
-  }));
+    offerDueDate: app.offerDueDate ? app.offerDueDate.toISOString().split('T')[0] : null,
+    companyUrl: app.companyUrl ?? null,
+    jobPostingUrl: app.jobPostingUrl ?? null,
+    companyCareerUrl: app.companyCareerUrl ?? null,
+    skillsMatch: app.skillsMatch ?? null,
+    salaryMin: app.salaryMin ?? null,
+    salaryMax: app.salaryMax ?? null,
+    isArchived: app.isArchived,
+    coverLetterRequired: app.coverLetterRequired,
+  };
+}
+
+async function handleGetApplicationById(res: ServerResponse, id: string) {
+  const app = await prisma.application.findUnique({
+    where: { id },
+    include: { interviewStages: { orderBy: { order: 'asc' } } },
+  });
+  if (!app) { res.writeHead(404); res.end(); return; }
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(appToJson(app)));
+}
+
+async function handleGetApplications(res: ServerResponse, query: URLSearchParams) {
+  const status = query.get('status');
+  const limit = query.get('limit') ? parseInt(query.get('limit')!, 10) : undefined;
+  const includeArchived = query.get('includeArchived') === 'true';
+  const apps = await prisma.application.findMany({
+    where: {
+      ...(status ? { status: status as import('@prisma/client').ApplicationStatus } : {}),
+      ...(!includeArchived ? { isArchived: false } : {}),
+    },
+    orderBy: { updatedAt: 'desc' },
+    include: { interviewStages: { orderBy: { order: 'asc' } } },
+    ...(limit ? { take: limit } : {}),
+  });
+  const items = apps.map(appToJson);
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ items, total: items.length }));
 }
@@ -346,8 +426,15 @@ const server = createServer((req, res) => {
     return;
   }
 
+  const getByIdMatch = url.match(/^\/api\/applications\/([^/?]+)(\?.*)?$/);
+  if (req.method === 'GET' && getByIdMatch && !url.includes('/interview-stages') && !url.includes('/export') && !url.includes('/sample-csv') && !url.includes('/import')) {
+    handleGetApplicationById(res, getByIdMatch[1]).catch(() => { res.writeHead(500); res.end(); });
+    return;
+  }
+
   if (req.method === 'GET' && url.startsWith('/api/applications') && !url.includes('/graphql')) {
-    handleGetApplications(res).catch(() => { res.writeHead(500); res.end(); });
+    const query = new URLSearchParams(url.includes('?') ? url.split('?')[1] : '');
+    handleGetApplications(res, query).catch(() => { res.writeHead(500); res.end(); });
     return;
   }
 
@@ -370,6 +457,22 @@ const server = createServer((req, res) => {
       handleRestCreateStage(req, res, stageMatch[1]).catch(() => { res.writeHead(500); res.end(); });
       return;
     }
+  }
+
+  if (req.method === 'PATCH' && /^\/api\/applications\/[^/]+\/interview-stages\/[^/?]+$/.test(url)) {
+    const stageMatch = url.match(/^\/api\/applications\/([^/?]+)\/interview-stages\/([^/?]+)/);
+    if (stageMatch) {
+      handleRestUpdateStage(req, res, stageMatch[1], stageMatch[2]).catch(() => { res.writeHead(500); res.end(); });
+      return;
+    }
+  }
+
+  const archiveMatch = url.match(/^\/api\/applications\/([^/?]+)\/archive$/);
+  if (req.method === 'POST' && archiveMatch) {
+    archiveApplication(archiveMatch[1])
+      .then(() => { res.writeHead(204); res.end(); })
+      .catch(() => { res.writeHead(404); res.end(); });
+    return;
   }
 
   const match = url.match(/^\/api\/applications\/([^/?]+)/);
