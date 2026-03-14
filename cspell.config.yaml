@@ -4,15 +4,13 @@ dictionaryDefinitions: []
 dictionaries: []
 words:
   - asyncpg
-  - debugpy
-  - dquote
-  - networkidle
-  - VARCHAR
   - auditconfig
   - beforeunload
+  - debugpy
   - dedup
   - Dedup
   - domcontentloaded
+  - dquote
   - fastapi
   - golangci
   - gopath
@@ -24,11 +22,13 @@ words:
   - Hono
   - mongosh
   - mypy
+  - networkidle
   - Nuxt
+  - opusplan
   - osascript
+  - psql
   - Pydantic
   - pyproject
-  - psql
   - pytest
   - RYUK
   - specifykit
@@ -43,6 +43,7 @@ words:
   - unsubmitted
   - Unsubmitted
   - uvx
+  - VARCHAR
   - venv
   - whatifwedigdeeper
   - worktree
