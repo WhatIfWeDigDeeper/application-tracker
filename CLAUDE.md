@@ -135,6 +135,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`isXxx` field naming**: JPA boolean fields named `isXxx` conflict with getter naming; name the field `archived` (not `isArchived`) — getter `isArchived()`, setter `setArchived()`
 - **Flyway auto-migration**: Flyway runs on startup — `./gradlew flywayMigrate` is only needed for manual runs; migrations live in `classpath:db/migration/`
 - **Gradle Kotlin DSL**: Uses `build.gradle.kts` — Kotlin syntax for plugin/dependency blocks
+- **OWASP dependency-check heap**: `dependencyCheckAnalyze` can OOM with default Gradle heap on this repo; run it with `-Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1024m'` (wired in `audit:ci:spring-api`)
 - **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
 - **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
 - **Jackson date serialization**: `LocalDate`/`LocalDateTime` serialize as arrays (e.g. `[2026,3,5]`) by default — add `.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)` to `ObjectMapper` config to get ISO strings (`"2026-03-05"`, `"2026-03-05T13:00:00Z"`)
