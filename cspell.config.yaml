@@ -3,6 +3,7 @@ ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
 words:
+  - anthropics
   - asyncpg
   - auditconfig
   - beforeunload
