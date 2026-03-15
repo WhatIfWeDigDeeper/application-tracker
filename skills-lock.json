@@ -9,7 +9,7 @@
     "js-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "44799ddd4e6dfa5518a16a0b9c8a9810019406e2b0fea2e410b7a76950c6e3f0"
+      "computedHash": "a12b89d2b71746cea8211d1fd8c5e3392f83c2b271b79b8ced9244729136f50a"
     },
     "mermaid-diagrams": {
       "source": "softaworks/agent-toolkit",
@@ -24,17 +24,17 @@
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "022036f031f60651b5200f4456fdca826d8b6c142bf16b25a6aa9bf617e988bc"
+      "computedHash": "20f840b9c160e118266c6d6172fdfe309c24e8c3e6dda741002cdfbcb1c04b41"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "7032f9795746e07828d88b0447a994fd9e2672547ef8669fe38ea186a16bdce1"
+      "computedHash": "5eeef20e8e8a61364577b5fee42a3337f9023153019404bcd5e714f5fb8cd6c0"
     },
     "uv-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "75678a7fa8421e85ab1c40650f1d806a1cced259f0ddb716db34853934edf8bd"
+      "computedHash": "fd4eed7de050f3e3411dcd985072b8ea6c5fc6d508e13aec28e108a1de0dcbbf"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
