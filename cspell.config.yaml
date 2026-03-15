@@ -47,5 +47,14 @@ words:
   - venv
   - whatifwedigdeeper
   - worktree
+  - worktrees
+  - EPERM
+  - GHSA
+  - flexbox
+  - jvmargs
+  - Metaspace
+  - npmjs
+  - oneline
+  - unkillable
 ignoreWords: []
 import: []

@@ -197,11 +197,14 @@ Additional notes:
 - **Heredoc in sandbox**: `$(cat <<'EOF'...EOF)` in commit messages fails in sandbox — use plain quoted strings or write to `$TMPDIR/commit-msg.txt` and use `git commit -F`
 - **`uv sync`**: Requires sandbox override for network; `uv run python -m src` works in sandbox after initial sync
 - **`permissions.allow` vs `sandbox.network.allowedHosts`**: `WebFetch(*)` in permissions controls whether the tool can be called without prompting — it does NOT bypass sandbox network restrictions. External hosts also need `sandbox.network.allowedHosts` in `.claude/settings.json`; `github.com` and `registry.npmjs.org` are already added
+- **npm cache permission error (EPERM)**: If `npm` fails with `Your cache folder contains root-owned files` (can recur after `sudo npm install -g`), pass `--cache /tmp/npm-cache-$$` to redirect to a writable temp dir (e.g. `npm outdated --cache /tmp/npm-cache-$$`). Permanent fix: `sudo chown -R 501:20 ~/.npm`
+- **Subagent `cd` does not persist across Bash calls**: Shell working directory resets between Bash tool calls. Never instruct a subagent to `cd <dir>` in one call and `npm install` in the next — npm will run in the wrong directory (typically the main repo root), silently modifying the wrong `package.json`. Always use `npm install --prefix <absolute-path>` so no `cd` is needed.
 
 ## Subagent Usage
 
 - **Prefer blocking parallel**: Use normal parallel `Task` calls when no other work to do. Only `run_in_background: true` when continuing other work.
 - **Monitor proactively**: Check background agent progress via `TaskOutput`/`Read`. Don't wait for the user to ask.
+- **npm outdated without fresh install**: Run `npm outdated` against the main repo (which already has `node_modules`) to discover what needs updating, then apply version changes in a worktree. Avoids the cost of `npm install` in every worktree directory just to get an outdated report.
 
 ## Commit and Review Workflow
 
