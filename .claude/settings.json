@@ -12,9 +12,7 @@
       "Read(*)",
       "Glob(*)",
       "Grep(*)",
-      "mcp__plugin_playwright_playwright__browser_*",
       "WebFetch(*)",
-      "Search(*)",
       "Skill(playwright-cli:*)"
     ],
     "deny": [
@@ -75,6 +73,7 @@
       ],
       "allowLocalBinding": true,
       "allowedHosts": [
+        "api.github.com",
         "github.com",
         "registry.npmjs.org"
       ]
