@@ -15,6 +15,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Plan Execution**: Plans must end with a statement of how the work will be run — e.g., single session (sequential), parallel subagents, agent team, or isolated worktree — so the approach is visible before implementation begins.
 - **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant section of `CLAUDE.md` before ending the session — so teammates and future agents benefit. For repeatable multi-step processes, create a skill in `.claude/skills/`. **NEVER write to `~/.claude/projects/.../memory/` for this project** — those files are invisible to other contributors, may be reset, and are not the persistence mechanism for this repo. `CLAUDE.md` is the only approved place for project learnings. If any files exist in the memory directory, delete them.
 - **Searching files**: Use `rg` (ripgrep) instead of `grep` or `find` for better performance and features.
+- **Agent Skills Policy**: Skills in `.agents/skills/` are treated like external packages — do not edit them directly in PR reviews or routine work. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (including `pr-comments`, `ship-it`, `learn`, etc.) are maintained upstream; propose changes as recommendations in the PR thread rather than direct edits. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for direct modification during a PR review.
 
 ## Active Technologies
 

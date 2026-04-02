@@ -25,7 +25,11 @@
     {
       "label": "wait-fastapi-ready",
       "type": "shell",
-      "command": "for i in {1..60}; do curl -sf http://localhost:5160/health >/dev/null && exit 0; sleep 1; done; echo 'FastAPI did not become ready on http://localhost:5160/health in 60s' >&2; exit 1",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "for i in {1..60}; do curl -sf http://localhost:5160/health >/dev/null && exit 0; sleep 1; done; echo 'FastAPI did not become ready on http://localhost:5160/health in 60s' >&2; exit 1"
+      ],
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"

@@ -27,6 +27,10 @@
 - Skills index (reuse Claude skills): `.github/agents/skills-index.md`
 - Agent operating guide: `.github/agents/AGENT.md`
 
+## Agent Skills Policy
+
+Skills in `.agents/skills/` are treated like external packages — do not edit them directly during PR reviews or routine work. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (e.g., `pr-comments`, `ship-it`, `learn`) are maintained upstream; surface suggestions as PR thread recommendations rather than direct edits. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for direct edits during a PR review.
+
 ## Cross-Cutting Patterns
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
 
