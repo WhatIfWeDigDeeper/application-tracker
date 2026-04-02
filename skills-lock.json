@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "a12b89d2b71746cea8211d1fd8c5e3392f83c2b271b79b8ced9244729136f50a"
     },
+    "learn": {
+      "source": "whatifwedigdeeper/agent-skills",
+      "sourceType": "github",
+      "computedHash": "f3c748fd50ad6d57ce0f015c384c0c62b4a830ce9f4063f6c424eb76057b7aed"
+    },
     "mermaid-diagrams": {
       "source": "softaworks/agent-toolkit",
       "sourceType": "github",
@@ -19,17 +24,17 @@
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",
-      "computedHash": "7075ab30f588019197a2f1518bb4c9d33d69d33352af079b5f9c60303ad3886e"
+      "computedHash": "b59ec572042f6191e62c2fcf11623846769bfdf26582540daf0ddd69bf401be3"
     },
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "20f840b9c160e118266c6d6172fdfe309c24e8c3e6dda741002cdfbcb1c04b41"
+      "computedHash": "7487e4a4e06c727762a44e72fa00aad20f1702754dedb50ec91503c223cbdd79"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "5eeef20e8e8a61364577b5fee42a3337f9023153019404bcd5e714f5fb8cd6c0"
+      "computedHash": "f8fc2b7ef2eb0f8548a73a40f3db7e7e02b4b4fbef81892a4517a0f47327ec1b"
     },
     "uv-deps": {
       "source": "whatifwedigdeeper/agent-skills",

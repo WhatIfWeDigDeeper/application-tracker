@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Application Tracker — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    /* Surfaces */
+    --bg-page: #F8FAFB;
+    --bg-sidebar: #0F172A;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F1F5F9;
+    --bg-elevated: #FFFFFF;
+    --border-subtle: #E2E8F0;
+    --border-strong: #CBD5E1;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --text-tertiary: #94A3B8;
+    --text-on-dark: #E2E8F0;
+    --text-on-dark-dim: #8B9BB4;
+
+    /* Accent */
+    --accent: #4F46E5;
+    --accent-hover: #4338CA;
+    --accent-light: #EEF2FF;
+
+    /* Status Colors */
+    --status-unsubmitted: #94A3B8;
+    --status-unsubmitted-bg: #F1F5F9;
+    --status-applied: #3B82F6;
+    --status-applied-bg: #DBEAFE;
+    --status-interviewing: #F59E0B;
+    --status-interviewing-bg: #FEF3C7;
+    --status-offered: #10B981;
+    --status-offered-bg: #D1FAE5;
+    --status-accepted: #22C55E;
+    --status-accepted-bg: #BBF7D0;
+    --status-rejected: #F43F5E;
+    --status-rejected-bg: #FFE4E6;
+    --status-declined: #71717A;
+    --status-declined-bg: #F4F4F5;
+    --status-no-offer: #F97316;
+    --status-no-offer-bg: #FFEDD5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ────────────────────────────────────────── */
+  :root {
+    --sidebar-w: 240px;
+    --sidebar-icon-w: 56px;
+    --panel-w: 380px;
+  }
+
+  .app-layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr var(--panel-w);
+    min-height: 100vh;
+    transition: grid-template-columns 0.25s ease;
+  }
+
+  .app-layout.sidebar-collapsed {
+    grid-template-columns: var(--sidebar-icon-w) 1fr var(--panel-w);
+  }
+
+  .app-layout.panel-closed {
+    grid-template-columns: var(--sidebar-w) 1fr 0px;
+  }
+
+  .app-layout.sidebar-collapsed.panel-closed {
+    grid-template-columns: var(--sidebar-icon-w) 1fr 0px;
+  }
+
+  /* ── Sidebar ───────────────────────────────────────── */
+  .sidebar {
+    background: var(--bg-sidebar);
+    color: var(--text-on-dark);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .sidebar-logo svg {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo span {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .sidebar nav {
+    padding: 12px 8px;
+    flex: 1;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--text-on-dark-dim);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+    cursor: pointer;
+  }
+
+  .nav-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-on-dark);
+  }
+
+  .nav-item.active {
+    background: rgba(79, 70, 229, 0.15);
+    color: #A5B4FC;
+    border-left: 3px solid #818CF8;
+    margin-left: -3px;
+  }
+
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active svg { opacity: 1; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.08);
+    color: var(--text-on-dark-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .sidebar-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255,255,255,0.3);
+    padding: 16px 12px 6px;
+  }
+
+  .sidebar-stats {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .stat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-on-dark-dim);
+    padding: 4px 0;
+  }
+
+  .stat-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .stat-urgent { color: #FCA5A5; font-weight: 600; }
+
+  .sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    gap: 8px;
+  }
+
+  .sidebar-footer button {
+    background: rgba(255,255,255,0.06);
+    border: none;
+    color: var(--text-on-dark-dim);
+    font-size: 12px;
+    font-family: var(--font-sans);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .sidebar-footer button:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-on-dark);
+  }
+
+  /* ── Sidebar Toggle Button ─────────────────────────── */
+  .sidebar-toggle-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-on-dark-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .sidebar-toggle-btn:hover {
+    background: rgba(255,255,255,0.14);
+    color: var(--text-on-dark);
+  }
+
+  .sidebar-toggle-btn svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+  }
+
+  /* Collapsed sidebar overrides */
+  .app-layout.sidebar-collapsed .sidebar-logo span,
+  .app-layout.sidebar-collapsed .sidebar-logo svg:first-child,
+  .app-layout.sidebar-collapsed .nav-badge,
+  .app-layout.sidebar-collapsed .sidebar-section-label,
+  .app-layout.sidebar-collapsed .sidebar-stats,
+  .app-layout.sidebar-collapsed .sidebar-footer {
+    display: none;
+  }
+
+  .app-layout.sidebar-collapsed .nav-item {
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .app-layout.sidebar-collapsed .sidebar-logo {
+    justify-content: center;
+    padding: 14px 0;
+  }
+
+  .app-layout.sidebar-collapsed .sidebar-toggle-btn {
+    margin-left: 0 !important;
+  }
+
+  .app-layout.sidebar-collapsed .sidebar-toggle-btn svg {
+    transform: rotate(180deg);
+  }
+
+  /* ── Main Content ──────────────────────────────────── */
+  .main-content {
+    padding: 24px 32px;
+    overflow-y: auto;
+  }
+
+  /* ── Pipeline Summary Bar ──────────────────────────── */
+  .pipeline-bar {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  .pipeline-segment {
+    flex: var(--weight, 1);
+    min-width: 80px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-top: 3px solid var(--seg-color);
+    background: var(--seg-bg);
+    text-align: center;
+    position: relative;
+  }
+
+  .pipeline-segment:hover {
+    filter: brightness(0.97);
+  }
+
+  .pipeline-segment.active {
+    background: var(--seg-color);
+    color: white;
+  }
+
+  .pipeline-segment.active .seg-count,
+  .pipeline-segment.active .seg-label {
+    color: white;
+  }
+
+  .seg-count {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    font-family: var(--font-mono);
+  }
+
+  .seg-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Top Controls ──────────────────────────────────── */
+  .top-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .search-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 8px 14px;
+    width: 280px;
+    transition: all 0.15s;
+  }
+
+  .search-input:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .search-input svg { width: 16px; height: 16px; color: var(--text-tertiary); flex-shrink: 0; }
+
+  .search-input input {
+    border: none;
+    outline: none;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-primary);
+    background: transparent;
+    width: 100%;
+  }
+
+  .search-input input::placeholder { color: var(--text-tertiary); }
+
+  .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  .filter-btn svg { width: 14px; height: 14px; }
+
+  .filter-active-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .sort-btn:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  .spacer { flex: 1; }
+
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 18px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3);
+  }
+
+  .add-btn:hover {
+    background: var(--accent-hover);
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .add-btn svg { width: 16px; height: 16px; }
+
+  .results-text {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+  }
+
+  .results-text strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  /* ── View Toggle ───────────────────────────────────── */
+  .view-toggle {
+    display: flex;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .view-btn {
+    padding: 5px 9px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    transition: all 0.15s;
+  }
+
+  .view-btn:hover {
+    color: var(--text-secondary);
+    background: var(--bg-card-hover);
+  }
+
+  .view-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  .view-btn svg { width: 15px; height: 15px; }
+
+  /* ── Card Grid ─────────────────────────────────────── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  /* ── List View ─────────────────────────────────────── */
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .list-row {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--card-status-color);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+  }
+
+  .list-row:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+    border-left-width: 5px;
+  }
+
+  .list-row.selected {
+    border-color: var(--accent);
+    border-left-color: var(--card-status-color);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+  }
+
+  .list-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.02em;
+  }
+
+  .list-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+  }
+
+  .list-company {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .list-sep {
+    color: var(--text-tertiary);
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .list-position {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .list-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .list-date, .list-cat {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+  }
+
+  .list-salary {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .list-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    padding: 4px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.1s;
+    flex-shrink: 0;
+  }
+
+  .list-row:hover .list-action { opacity: 1; }
+
+  .list-action:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-secondary);
+  }
+
+  /* ── Application Card ──────────────────────────────── */
+  .app-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--card-status-color);
+    border-radius: 12px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+    position: relative;
+  }
+
+  .app-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    border-left-width: 5px;
+    transform: translateY(-1px);
+  }
+
+  .app-card.selected {
+    border-color: var(--accent);
+    border-left-color: var(--card-status-color);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15), 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .company-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .card-titles {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-company {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  .card-position {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1.5px solid var(--badge-color);
+    color: var(--badge-color);
+    background: var(--badge-bg);
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+  }
+
+  .status-badge svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+  }
+
+  .card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-meta-item svg { width: 13px; height: 13px; opacity: 0.6; }
+
+  .card-salary {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .card-progress {
+    margin-top: 2px;
+  }
+
+  .progress-bar-track {
+    height: 4px;
+    background: #E2E8F0;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+
+  .card-offer-banner {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-offer-banner svg { width: 14px; height: 14px; }
+
+  .offer-urgent {
+    background: #FEF3C7;
+    color: #92400E;
+  }
+
+  .offer-critical {
+    background: #FFE4E6;
+    color: #9F1239;
+  }
+
+  .card-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+
+  .app-card:hover .card-actions {
+    opacity: 1;
+  }
+
+  .card-actions button {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  .card-actions button:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-secondary);
+  }
+
+  /* ── Context Panel ─────────────────────────────────── */
+  .context-panel {
+    background: var(--bg-card);
+    border-left: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.25s ease;
+    min-width: 0;
+  }
+
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .panel-tabs {
+    display: flex;
+    gap: 0;
+  }
+
+  .panel-tab {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: var(--font-sans);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .panel-tab:hover {
+    color: var(--text-secondary);
+  }
+
+  .panel-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .panel-close {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.1s;
+  }
+
+  .panel-close:hover {
+    background: #F1F5F9;
+    color: var(--text-primary);
+  }
+
+  .panel-close svg { width: 18px; height: 18px; }
+
+  .panel-body {
+    padding: 20px;
+    flex: 1;
+  }
+
+  .panel-company {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    letter-spacing: -0.02em;
+  }
+
+  .panel-position {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .panel-status-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .status-pill {
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border-subtle);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    transition: all 0.15s;
+  }
+
+  .status-pill:hover {
+    border-color: var(--border-strong);
+  }
+
+  .status-pill.selected {
+    border-color: var(--pill-color);
+    background: var(--pill-bg);
+    color: var(--pill-color);
+  }
+
+  .panel-section {
+    margin-bottom: 20px;
+  }
+
+  .panel-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .panel-section-title svg { width: 14px; height: 14px; }
+
+  .panel-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 13px;
+  }
+
+  .panel-field:last-child { border-bottom: none; }
+
+  .field-label {
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  .field-value {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .field-value a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .field-value a:hover {
+    text-decoration: underline;
+  }
+
+  .stars {
+    color: #F59E0B;
+    letter-spacing: 1px;
+    font-size: 14px;
+  }
+
+  .stars .empty { color: #E2E8F0; }
+
+  /* ── Interview Timeline ────────────────────────────── */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: #E2E8F0;
+    border-radius: 1px;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-dot {
+    position: absolute;
+    left: -20px;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .timeline-dot.completed {
+    background: var(--status-accepted);
+  }
+
+  .timeline-dot.completed svg { width: 10px; height: 10px; color: white; }
+
+  .timeline-dot.current {
+    background: var(--status-interviewing);
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+    animation: pulse 2s infinite;
+  }
+
+  .timeline-dot.upcoming {
+    background: white;
+    border: 2px solid #E2E8F0;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2); }
+    50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.1); }
+  }
+
+  .timeline-content {
+    padding-left: 4px;
+  }
+
+  .timeline-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .timeline-date {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+  }
+
+  .timeline-rating {
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .timeline-item.upcoming .timeline-title {
+    color: var(--text-tertiary);
+  }
+
+  /* ── Panel Footer ──────────────────────────────────── */
+  .panel-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    gap: 8px;
+    background: var(--bg-card);
+    position: sticky;
+    bottom: 0;
+  }
+
+  .panel-footer button {
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border-subtle);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--status-rejected);
+    border-color: transparent;
+  }
+
+  .btn-danger:hover {
+    background: var(--status-rejected-bg);
+  }
+
+  .footer-spacer { flex: 1; }
+
+  /* ── Notes ─────────────────────────────────────────── */
+  .panel-notes {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    background: #F8FAFC;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #F1F5F9;
+  }
+
+  /* ── Pagination ────────────────────────────────────── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 20px;
+  }
+
+  .page-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+
+  .page-btn:hover {
+    background: var(--bg-card-hover);
+  }
+
+  .page-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* ── Dark Mode Toggle (for demo) ───────────────────── */
+  .mode-label {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--bg-sidebar);
+    color: var(--text-on-dark);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 100;
+    border: none;
+    font-family: var(--font-sans);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  /* ── Dark Mode ─────────────────────────────────────── */
+  .dark {
+    --bg-page: #0B1121;
+    --bg-sidebar: #070D1A;
+    --bg-card: #162032;
+    --bg-card-hover: #1C2942;
+    --bg-elevated: #1E293B;
+    --border-subtle: #243352;
+    --border-strong: #334866;
+    --text-primary: #E2E8F0;
+    --text-secondary: #8B9BB4;
+    --text-tertiary: #5A6B83;
+    --text-on-dark: #E2E8F0;
+    --text-on-dark-dim: #6B7B94;
+    --accent: #818CF8;
+    --accent-hover: #6366F1;
+    --accent-light: rgba(99, 102, 241, 0.1);
+    --status-unsubmitted-bg: rgba(148, 163, 184, 0.1);
+    --status-applied-bg: rgba(59, 130, 246, 0.1);
+    --status-interviewing-bg: rgba(245, 158, 11, 0.1);
+    --status-offered-bg: rgba(16, 185, 129, 0.1);
+    --status-accepted-bg: rgba(34, 197, 94, 0.1);
+    --status-rejected-bg: rgba(244, 63, 94, 0.1);
+    --status-declined-bg: rgba(113, 113, 122, 0.1);
+    --status-no-offer-bg: rgba(249, 115, 22, 0.1);
+  }
+
+  .dark .pipeline-segment { background: var(--bg-card); }
+  .dark .search-input { background: var(--bg-card); }
+  .dark .search-input input { color: var(--text-primary); }
+  .dark .filter-btn, .dark .sort-btn { background: var(--bg-card); }
+  .dark .panel-field { border-bottom-color: #1E293B; }
+  .dark .panel-notes { background: #1A2940; border-color: #243352; }
+  .dark .progress-bar-track { background: #243352; }
+  .dark .timeline::before { background: #243352; }
+  .dark .timeline-dot.upcoming { background: var(--bg-card); border-color: #334866; }
+  .dark .panel-close:hover { background: #1E293B; }
+  .dark .card-actions button:hover { background: var(--bg-card-hover); }
+  .dark .page-btn:hover { background: var(--bg-card-hover); }
+  .dark .stars .empty { color: #334866; }
+  .dark .list-row { background: var(--bg-card); }
+  .dark .view-toggle { background: var(--bg-card); }
+  .dark .view-btn:hover { background: var(--bg-card-hover); }
+
+  /* ── Mobile Nav ─────────────────────────────────────── */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--bg-sidebar);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    z-index: 60;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 4px;
+  }
+
+  .mobile-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-on-dark-dim);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+
+  .mobile-nav-btn.active { color: #A5B4FC; }
+  .mobile-nav-btn svg { width: 20px; height: 20px; }
+
+  /* ── Panel Overlay Backdrop ─────────────────────────── */
+  .panel-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 49;
+    backdrop-filter: blur(2px);
+  }
+
+  .panel-backdrop.visible { display: block; }
+
+  /* ── Responsive: Tablet (≤1200px) ──────────────────── */
+  @media (max-width: 1200px) {
+    .app-layout,
+    .app-layout.sidebar-collapsed,
+    .app-layout.panel-closed,
+    .app-layout.sidebar-collapsed.panel-closed {
+      grid-template-columns: var(--sidebar-icon-w) 1fr !important;
+    }
+
+    .app-layout.sidebar-collapsed .sidebar-logo span,
+    .app-layout.sidebar-collapsed .nav-badge,
+    .app-layout.sidebar-collapsed .sidebar-section-label,
+    .app-layout.sidebar-collapsed .sidebar-stats,
+    .app-layout.sidebar-collapsed .sidebar-footer {
+      display: none;
+    }
+
+    /* Force sidebar into icon rail on tablet */
+    .sidebar-logo span,
+    .nav-badge,
+    .sidebar-section-label,
+    .sidebar-stats,
+    .sidebar-footer {
+      display: none;
+    }
+
+    .nav-item {
+      justify-content: center;
+      padding: 10px 0;
+    }
+
+    .sidebar-logo {
+      justify-content: center;
+      padding: 14px 0;
+    }
+
+    /* Context panel becomes fixed overlay */
+    .context-panel {
+      position: fixed !important;
+      right: 0; top: 0; bottom: 0;
+      width: var(--panel-w) !important;
+      height: 100dvh !important;
+      transform: translateX(100%);
+      z-index: 50;
+      box-shadow: -6px 0 40px rgba(0,0,0,0.15);
+      transition: transform 0.25s ease !important;
+    }
+
+    .context-panel.panel-open {
+      transform: translateX(0);
+    }
+  }
+
+  /* ── Responsive: Mobile (≤768px) ───────────────────── */
+  @media (max-width: 768px) {
+    .app-layout,
+    .app-layout.sidebar-collapsed,
+    .app-layout.panel-closed,
+    .app-layout.sidebar-collapsed.panel-closed {
+      grid-template-columns: 1fr !important;
+      padding-bottom: 60px;
+    }
+
+    .sidebar { display: none !important; }
+    .mobile-nav { display: flex; }
+
+    .main-content { padding: 16px; }
+
+    .card-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    .context-panel {
+      width: 100% !important;
+    }
+
+    .search-input { width: 100% !important; }
+
+    .top-controls {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .top-controls .search-input {
+      order: -1;
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-layout" id="app">
+  <!-- ═══ Sidebar ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="28" height="28" rx="7" fill="#4F46E5"/>
+        <path d="M7 9h14M7 14h10M7 19h6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="21" cy="19" r="3" fill="#A5B4FC"/>
+      </svg>
+      <span>AppTracker</span>
+      <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Collapse sidebar" style="margin-left:auto;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+
+    <nav>
+      <div class="sidebar-section-label">Views</div>
+      <a class="nav-item active" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Pipeline
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
+        All Applications
+        <span class="nav-badge">42</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 8v13H3V8M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+        Archived
+        <span class="nav-badge">7</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-stats">
+      <div class="sidebar-section-label" style="padding-left: 0;">Attention</div>
+      <div class="stat-row">
+        <div class="stat-dot" style="background: var(--status-interviewing);"></div>
+        3 Interviewing
+      </div>
+      <div class="stat-row stat-urgent">
+        <div class="stat-dot" style="background: var(--status-rejected);"></div>
+        1 Offer expires in 2d
+      </div>
+      <div class="stat-row">
+        <div class="stat-dot" style="background: var(--status-applied);"></div>
+        5 Applied this week
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button onclick="toggleDarkMode()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"><circle cx="8" cy="8" r="3.5"/><path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M3.4 12.6l.7-.7M11.9 4.1l.7-.7"/></svg>
+        Theme
+      </button>
+      <button>Import</button>
+      <button>Export</button>
+    </div>
+
+  </aside>
+
+  <!-- ═══ Main Content ═══ -->
+  <main class="main-content">
+    <!-- Pipeline Summary Bar -->
+    <div class="pipeline-bar">
+      <div class="pipeline-segment" style="--weight: 5; --seg-color: var(--status-unsubmitted); --seg-bg: var(--status-unsubmitted-bg);">
+        <div class="seg-count">5</div>
+        <div class="seg-label">Draft</div>
+      </div>
+      <div class="pipeline-segment active" style="--weight: 15; --seg-color: var(--status-applied); --seg-bg: var(--status-applied-bg);">
+        <div class="seg-count">15</div>
+        <div class="seg-label">Applied</div>
+      </div>
+      <div class="pipeline-segment" style="--weight: 8; --seg-color: var(--status-interviewing); --seg-bg: var(--status-interviewing-bg);">
+        <div class="seg-count">8</div>
+        <div class="seg-label">Interviewing</div>
+      </div>
+      <div class="pipeline-segment" style="--weight: 3; --seg-color: var(--status-offered); --seg-bg: var(--status-offered-bg);">
+        <div class="seg-count">3</div>
+        <div class="seg-label">Offered</div>
+      </div>
+      <div class="pipeline-segment" style="--weight: 11; --seg-color: var(--status-declined); --seg-bg: var(--status-declined-bg);">
+        <div class="seg-count">11</div>
+        <div class="seg-label">Closed</div>
+      </div>
+    </div>
+
+    <!-- Top Controls -->
+    <div class="top-controls">
+      <div class="search-input">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search companies or positions...">
+      </div>
+      <button class="filter-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
+        Filters
+        <div class="filter-active-dot"></div>
+      </button>
+      <button class="sort-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5h10M11 9h7M11 13h4"/><path d="m3 6 4-4 4 4M7 2v16"/></svg>
+        Updated
+      </button>
+      <div class="spacer"></div>
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="grid" onclick="setViewMode('grid')" title="Grid view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+        <button class="view-btn" data-view="list" onclick="setViewMode('list')" title="List view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </button>
+      </div>
+      <button class="add-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Add Application
+      </button>
+    </div>
+
+    <div class="results-text">Showing <strong>15</strong> of 42 applications &middot; Status: Applied</div>
+
+    <!-- Card Grid -->
+    <div class="card-grid" id="cardGrid">
+      <!-- Card 1: Applied -->
+      <div class="app-card selected" style="--card-status-color: var(--status-applied);">
+        <div class="card-actions"><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div>
+        <div class="card-header">
+          <div class="company-avatar" style="background: linear-gradient(135deg, #6366F1, #818CF8);">S</div>
+          <div class="card-titles">
+            <div class="card-company">Stripe</div>
+            <div class="card-position">Senior Frontend Engineer</div>
+          </div>
+          <div class="status-badge" style="--badge-color: var(--status-applied); --badge-bg: var(--status-applied-bg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            Applied
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Mar 10
+          </span>
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Fintech
+          </span>
+          <span class="card-meta-item">
+            <span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="empty">&#9733;</span></span>
+          </span>
+          <span class="card-salary">$180K–$220K</span>
+        </div>
+        <div class="card-progress">
+          <div class="progress-bar-track"><div class="progress-bar-fill" style="width: 33%; background: var(--status-interviewing);"></div></div>
+          <span class="progress-label">2/6 Interview stages</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Applied -->
+      <div class="app-card" style="--card-status-color: var(--status-applied);">
+        <div class="card-actions"><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div>
+        <div class="card-header">
+          <div class="company-avatar" style="background: linear-gradient(135deg, #059669, #34D399);">V</div>
+          <div class="card-titles">
+            <div class="card-company">Vercel</div>
+            <div class="card-position">Staff Software Engineer</div>
+          </div>
+          <div class="status-badge" style="--badge-color: var(--status-applied); --badge-bg: var(--status-applied-bg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            Applied
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Mar 8
+          </span>
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Dev Tools
+          </span>
+          <span class="card-meta-item">
+            <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          </span>
+          <span class="card-salary">$200K–$260K</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Interviewing -->
+      <div class="app-card" style="--card-status-color: var(--status-interviewing);">
+        <div class="card-actions"><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div>
+        <div class="card-header">
+          <div class="company-avatar" style="background: linear-gradient(135deg, #EA580C, #FB923C);">L</div>
+          <div class="card-titles">
+            <div class="card-company">Linear</div>
+            <div class="card-position">Product Engineer</div>
+          </div>
+          <div class="status-badge" style="--badge-color: var(--status-interviewing); --badge-bg: var(--status-interviewing-bg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            Interviewing
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Feb 25
+          </span>
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Dev Tools
+          </span>
+          <span class="card-meta-item">
+            <span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="empty">&#9733;</span></span>
+          </span>
+          <span class="card-salary">$160K–$200K</span>
+        </div>
+        <div class="card-progress">
+          <div class="progress-bar-track"><div class="progress-bar-fill" style="width: 66%; background: var(--status-interviewing);"></div></div>
+          <span class="progress-label">4/6 Interview stages</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Given Offer -->
+      <div class="app-card" style="--card-status-color: var(--status-offered);">
+        <div class="card-actions"><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div>
+        <div class="card-header">
+          <div class="company-avatar" style="background: linear-gradient(135deg, #0891B2, #22D3EE);">A</div>
+          <div class="card-titles">
+            <div class="card-company">Anthropic</div>
+            <div class="card-position">Platform Engineer</div>
+          </div>
+          <div class="status-badge" style="--badge-color: var(--status-offered); --badge-bg: var(--status-offered-bg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+            Given Offer
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Feb 1
+          </span>
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            AI/ML
+          </span>
+          <span class="card-meta-item">
+            <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          </span>
+          <span class="card-salary">$250K–$320K</span>
+        </div>
+        <div class="card-offer-banner offer-urgent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Offer expires in 2 days
+        </div>
+      </div>
+
+      <!-- Card 5: Applied -->
+      <div class="app-card" style="--card-status-color: var(--status-applied);">
+        <div class="card-actions"><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div>
+        <div class="card-header">
+          <div class="company-avatar" style="background: linear-gradient(135deg, #7C3AED, #A78BFA);">N</div>
+          <div class="card-titles">
+            <div class="card-company">Notion</div>
+            <div class="card-position">Senior Full Stack Engineer</div>
+          </div>
+          <div class="status-badge" style="--badge-color: var(--status-applied); --badge-bg: var(--status-applied-bg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            Applied
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Mar 12
+          </span>
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Productivity
+          </span>
+          <span class="card-meta-item">
+            <span class="stars">&#9733;&#9733;&#9733;<span class="empty">&#9733;</span><span class="empty">&#9733;</span></span>
+          </span>
+          <span class="card-salary">$170K–$210K</span>
+        </div>
+      </div>
+
+      <!-- Card 6: Rejected -->
+      <div class="app-card" style="--card-status-color: var(--status-rejected); opacity: 0.7;">
+        <div class="card-actions"><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div>
+        <div class="card-header">
+          <div class="company-avatar" style="background: linear-gradient(135deg, #DC2626, #F87171);">G</div>
+          <div class="card-titles">
+            <div class="card-company">Google</div>
+            <div class="card-position">L5 Software Engineer</div>
+          </div>
+          <div class="status-badge" style="--badge-color: var(--status-rejected); --badge-bg: var(--status-rejected-bg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+            Rejected
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Jan 15
+          </span>
+          <span class="card-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Big Tech
+          </span>
+          <span class="card-meta-item">
+            <span class="stars">&#9733;&#9733;&#9733;<span class="empty">&#9733;</span><span class="empty">&#9733;</span></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- List View -->
+    <div class="card-list" id="cardList" style="display:none">
+      <!-- Row 1: Stripe - Applied (selected) -->
+      <div class="list-row selected" style="--card-status-color: var(--status-applied);">
+        <div class="list-avatar" style="background: linear-gradient(135deg, #6366F1, #818CF8);">S</div>
+        <div class="list-main">
+          <span class="list-company">Stripe</span>
+          <span class="list-sep">—</span>
+          <span class="list-position">Senior Frontend Engineer</span>
+        </div>
+        <div class="status-badge" style="--badge-color: var(--status-applied); --badge-bg: var(--status-applied-bg);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Applied
+        </div>
+        <div class="list-meta">
+          <span class="list-date">Mar 10</span>
+          <span class="list-cat">Fintech</span>
+          <span class="stars" style="font-size:13px;">&#9733;&#9733;&#9733;&#9733;<span class="empty">&#9733;</span></span>
+          <span class="list-salary">$180K–$220K</span>
+        </div>
+        <button class="list-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+      <!-- Row 2: Vercel - Applied -->
+      <div class="list-row" style="--card-status-color: var(--status-applied);">
+        <div class="list-avatar" style="background: linear-gradient(135deg, #059669, #34D399);">V</div>
+        <div class="list-main">
+          <span class="list-company">Vercel</span>
+          <span class="list-sep">—</span>
+          <span class="list-position">Staff Software Engineer</span>
+        </div>
+        <div class="status-badge" style="--badge-color: var(--status-applied); --badge-bg: var(--status-applied-bg);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Applied
+        </div>
+        <div class="list-meta">
+          <span class="list-date">Mar 8</span>
+          <span class="list-cat">Dev Tools</span>
+          <span class="stars" style="font-size:13px;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <span class="list-salary">$200K–$260K</span>
+        </div>
+        <button class="list-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+      <!-- Row 3: Linear - Interviewing -->
+      <div class="list-row" style="--card-status-color: var(--status-interviewing);">
+        <div class="list-avatar" style="background: linear-gradient(135deg, #EA580C, #FB923C);">L</div>
+        <div class="list-main">
+          <span class="list-company">Linear</span>
+          <span class="list-sep">—</span>
+          <span class="list-position">Product Engineer</span>
+        </div>
+        <div class="status-badge" style="--badge-color: var(--status-interviewing); --badge-bg: var(--status-interviewing-bg);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Interviewing
+        </div>
+        <div class="list-meta">
+          <span class="list-date">Feb 25</span>
+          <span class="list-cat">Dev Tools</span>
+          <span class="stars" style="font-size:13px;">&#9733;&#9733;&#9733;&#9733;<span class="empty">&#9733;</span></span>
+          <span class="list-salary">$160K–$200K</span>
+        </div>
+        <button class="list-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+      <!-- Row 4: Anthropic - Given Offer -->
+      <div class="list-row" style="--card-status-color: var(--status-offered);">
+        <div class="list-avatar" style="background: linear-gradient(135deg, #0891B2, #22D3EE);">A</div>
+        <div class="list-main">
+          <span class="list-company">Anthropic</span>
+          <span class="list-sep">—</span>
+          <span class="list-position">Platform Engineer</span>
+        </div>
+        <div class="status-badge" style="--badge-color: var(--status-offered); --badge-bg: var(--status-offered-bg);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+          Given Offer
+        </div>
+        <div class="list-meta">
+          <span class="list-date">Feb 1</span>
+          <span class="list-cat">AI/ML</span>
+          <span class="stars" style="font-size:13px;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <span class="list-salary" style="color: var(--status-offered); font-weight: 600;">$250K–$320K</span>
+        </div>
+        <button class="list-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+      <!-- Row 5: Notion - Applied -->
+      <div class="list-row" style="--card-status-color: var(--status-applied);">
+        <div class="list-avatar" style="background: linear-gradient(135deg, #7C3AED, #A78BFA);">N</div>
+        <div class="list-main">
+          <span class="list-company">Notion</span>
+          <span class="list-sep">—</span>
+          <span class="list-position">Senior Full Stack Engineer</span>
+        </div>
+        <div class="status-badge" style="--badge-color: var(--status-applied); --badge-bg: var(--status-applied-bg);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Applied
+        </div>
+        <div class="list-meta">
+          <span class="list-date">Mar 12</span>
+          <span class="list-cat">Productivity</span>
+          <span class="stars" style="font-size:13px;">&#9733;&#9733;&#9733;<span class="empty">&#9733;</span><span class="empty">&#9733;</span></span>
+          <span class="list-salary">$170K–$210K</span>
+        </div>
+        <button class="list-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+      <!-- Row 6: Google - Rejected -->
+      <div class="list-row" style="--card-status-color: var(--status-rejected); opacity: 0.65;">
+        <div class="list-avatar" style="background: linear-gradient(135deg, #DC2626, #F87171);">G</div>
+        <div class="list-main">
+          <span class="list-company">Google</span>
+          <span class="list-sep">—</span>
+          <span class="list-position">L5 Software Engineer</span>
+        </div>
+        <div class="status-badge" style="--badge-color: var(--status-rejected); --badge-bg: var(--status-rejected-bg);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+          Rejected
+        </div>
+        <div class="list-meta">
+          <span class="list-date">Jan 15</span>
+          <span class="list-cat">Big Tech</span>
+          <span class="stars" style="font-size:13px;">&#9733;&#9733;&#9733;<span class="empty">&#9733;</span><span class="empty">&#9733;</span></span>
+          <span class="list-salary">—</span>
+        </div>
+        <button class="list-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button class="page-btn">&laquo;</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">&raquo;</button>
+    </div>
+  </main>
+
+  <!-- ═══ Context Panel ═══ -->
+  <div class="context-panel panel-open" id="contextPanel">
+    <div class="panel-header">
+      <div class="panel-tabs">
+        <button class="panel-tab active">Details</button>
+        <button class="panel-tab">Interview</button>
+        <button class="panel-tab">History</button>
+      </div>
+      <button class="panel-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="panel-body">
+      <div class="panel-company">Stripe</div>
+      <div class="panel-position">Senior Frontend Engineer</div>
+
+      <!-- Status Pills -->
+      <div class="panel-status-pills">
+        <button class="status-pill" style="--pill-color: var(--status-unsubmitted); --pill-bg: var(--status-unsubmitted-bg);">Draft</button>
+        <button class="status-pill selected" style="--pill-color: var(--status-applied); --pill-bg: var(--status-applied-bg);">Applied</button>
+        <button class="status-pill" style="--pill-color: var(--status-interviewing); --pill-bg: var(--status-interviewing-bg);">Interviewing</button>
+        <button class="status-pill" style="--pill-color: var(--status-offered); --pill-bg: var(--status-offered-bg);">Offered</button>
+        <button class="status-pill" style="--pill-color: var(--status-accepted); --pill-bg: var(--status-accepted-bg);">Accepted</button>
+        <button class="status-pill" style="--pill-color: var(--status-rejected); --pill-bg: var(--status-rejected-bg);">Rejected</button>
+      </div>
+
+      <!-- Application Info -->
+      <div class="panel-section">
+        <div class="panel-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Application Info
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Applied</span>
+          <span class="field-value" style="font-family: var(--font-mono); font-size: 12px;">Mar 10, 2026</span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Category</span>
+          <span class="field-value">Fintech</span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Source</span>
+          <span class="field-value">Company Website</span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Skills Match</span>
+          <span class="field-value"><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="empty">&#9733;</span></span></span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Cover Letter</span>
+          <span class="field-value">Required</span>
+        </div>
+      </div>
+
+      <!-- Salary -->
+      <div class="panel-section">
+        <div class="panel-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Compensation
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Salary Range</span>
+          <span class="field-value" style="font-family: var(--font-mono); font-size: 13px; font-weight: 600;">$180K – $220K</span>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="panel-section">
+        <div class="panel-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          Links
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Company</span>
+          <span class="field-value"><a href="#">stripe.com</a></span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Job Posting</span>
+          <span class="field-value"><a href="#">stripe.com/jobs/...</a></span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Careers</span>
+          <span class="field-value"><a href="#">stripe.com/careers</a></span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="panel-section">
+        <div class="panel-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+          Notes
+        </div>
+        <div class="panel-notes">
+          Referred by Sarah from the payments team. Great culture fit based on Glassdoor reviews. Prepare system design for payments infrastructure.
+        </div>
+      </div>
+
+      <!-- Interview Timeline (preview) -->
+      <div class="panel-section">
+        <div class="panel-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          Interview Progress
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot completed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">Recruiter Screen</div>
+              <div class="timeline-date">Completed Mar 12</div>
+              <div class="timeline-rating"><span class="stars" style="font-size:11px;">&#9733;&#9733;&#9733;&#9733;<span class="empty">&#9733;</span></span></div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot completed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">Hiring Manager</div>
+              <div class="timeline-date">Completed Mar 14</div>
+              <div class="timeline-rating"><span class="stars" style="font-size:11px;">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot current"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Technical Interview</div>
+              <div class="timeline-date" style="color: var(--status-interviewing); font-weight: 500;">Scheduled Mar 18</div>
+            </div>
+          </div>
+          <div class="timeline-item upcoming">
+            <div class="timeline-dot upcoming"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">System Design</div>
+            </div>
+          </div>
+          <div class="timeline-item upcoming">
+            <div class="timeline-dot upcoming"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Team Fit</div>
+            </div>
+          </div>
+          <div class="timeline-item upcoming">
+            <div class="timeline-dot upcoming"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Final Round</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-footer">
+      <button class="btn-primary">Edit</button>
+      <button class="btn-secondary">Archive</button>
+      <div class="footer-spacer"></div>
+      <button class="btn-danger">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Panel backdrop (tablet/mobile) -->
+<div class="panel-backdrop" id="panelBackdrop" onclick="closePanel()"></div>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav">
+  <button class="mobile-nav-btn active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Pipeline
+  </button>
+  <button class="mobile-nav-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
+    All
+  </button>
+  <button class="mobile-nav-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+    Archived
+  </button>
+  <button class="mobile-nav-btn" onclick="toggleDarkMode()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    Theme
+  </button>
+</nav>
+
+<button class="mode-label" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+<script>
+const app = document.getElementById('app');
+const contextPanel = document.getElementById('contextPanel');
+const panelBackdrop = document.getElementById('panelBackdrop');
+const cardGrid = document.getElementById('cardGrid');
+const cardList = document.getElementById('cardList');
+
+// ── Dark Mode ───────────────────────────────────────────
+function toggleDarkMode() {
+  app.classList.toggle('dark');
+}
+
+// ── Sidebar collapse ────────────────────────────────────
+function toggleSidebar() {
+  app.classList.toggle('sidebar-collapsed');
+}
+
+// ── Panel open/close ────────────────────────────────────
+function openPanel() {
+  app.classList.remove('panel-closed');
+  contextPanel.classList.add('panel-open');
+  // Show backdrop only on tablet/mobile
+  if (window.innerWidth <= 1200) {
+    panelBackdrop.classList.add('visible');
+  }
+}
+
+function closePanel() {
+  app.classList.add('panel-closed');
+  contextPanel.classList.remove('panel-open');
+  panelBackdrop.classList.remove('visible');
+}
+
+// Panel close button
+document.querySelector('.panel-close').addEventListener('click', closePanel);
+
+// ── View toggle ─────────────────────────────────────────
+function setViewMode(mode) {
+  const saved = localStorage.getItem('app-view-mode');
+  localStorage.setItem('app-view-mode', mode);
+
+  if (mode === 'grid') {
+    cardGrid.style.display = 'grid';
+    cardList.style.display = 'none';
+  } else {
+    cardGrid.style.display = 'none';
+    cardList.style.display = 'flex';
+  }
+
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === mode);
+  });
+}
+
+// Init view mode from localStorage
+(function initViewMode() {
+  const saved = localStorage.getItem('app-view-mode') || 'grid';
+  setViewMode(saved);
+})();
+
+// ── Tab switching ───────────────────────────────────────
+document.querySelectorAll('.panel-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+// ── Pipeline segment clicking ───────────────────────────
+document.querySelectorAll('.pipeline-segment').forEach(seg => {
+  seg.addEventListener('click', () => {
+    document.querySelectorAll('.pipeline-segment').forEach(s => s.classList.remove('active'));
+    seg.classList.add('active');
+  });
+});
+
+// ── Card selection (grid) ───────────────────────────────
+document.querySelectorAll('.app-card').forEach(card => {
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.card-actions')) return;
+    document.querySelectorAll('.app-card, .list-row').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    openPanel();
+  });
+});
+
+// ── Row selection (list) ────────────────────────────────
+document.querySelectorAll('.list-row').forEach(row => {
+  row.addEventListener('click', (e) => {
+    if (e.target.closest('.list-action')) return;
+    document.querySelectorAll('.app-card, .list-row').forEach(c => c.classList.remove('selected'));
+    row.classList.add('selected');
+    openPanel();
+  });
+});
+
+// ── Status pill demo ────────────────────────────────────
+document.querySelectorAll('.status-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+  });
+});
+
+// ── Responsive: auto-manage panel on resize ─────────────
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 1200) {
+    panelBackdrop.classList.remove('visible');
+  }
+});
+</script>
+</body>
+</html>

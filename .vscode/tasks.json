@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "start-tanstack-start-ui",
+      "type": "shell",
+      "command": "npm run dev:tanstack-start-ui",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Local:\\s+http://localhost:3040/?"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "wait-fastapi-ready",
+      "type": "shell",
+      "command": "for i in {1..60}; do curl -sf http://localhost:5160/health >/dev/null && exit 0; sleep 1; done; echo 'FastAPI did not become ready on http://localhost:5160/health in 60s' >&2; exit 1",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "start-tanstack-start-ui-when-fastapi-ready",
+      "dependsOn": [
+        "start-tanstack-start-ui",
+        "wait-fastapi-ready"
+      ],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "cleanup-tanstack-fastapi",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/scripts/kill-ports.sh 5160 3040 && pkill -f 'dev:tanstack-start-ui|dev:fastapi' || true",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "isBackground": false
+    }
+  ]
+}
