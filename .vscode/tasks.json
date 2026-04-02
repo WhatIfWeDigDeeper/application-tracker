@@ -46,7 +46,11 @@
     {
       "label": "cleanup-tanstack-fastapi",
       "type": "shell",
-      "command": "bash ${workspaceFolder}/scripts/kill-ports.sh 5160 3040; pkill -f 'dev:tanstack-start-ui|dev:fastapi' || true",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "\"${workspaceFolder}/scripts/kill-ports.sh\" 5160 3040; pkill -f 'dev:tanstack-start-ui|dev:fastapi' || true"
+      ],
       "presentation": {
         "reveal": "silent",
         "panel": "shared"
