@@ -29,7 +29,7 @@
 
 ## Agent Skills Policy
 
-Skills in `.agents/skills/` are treated like external packages — do not edit them directly during PR reviews or routine work. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (e.g., `pr-comments`, `ship-it`, `learn`) are maintained upstream; surface suggestions as PR thread recommendations rather than direct edits. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for direct edits during a PR review.
+When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (e.g., `pr-comments`, `ship-it`, `learn`, `playwright-cli`) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
 
 ## Cross-Cutting Patterns
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
