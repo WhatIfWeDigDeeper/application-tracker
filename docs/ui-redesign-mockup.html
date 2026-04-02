@@ -2112,7 +2112,7 @@ document.querySelectorAll('.status-pill').forEach(pill => {
 window.addEventListener('resize', () => {
   if (window.innerWidth > 1200) {
     panelBackdrop.classList.remove('visible');
-  } else if (panel.classList.contains('open')) {
+  } else if (contextPanel.classList.contains('panel-open')) {
     panelBackdrop.classList.add('visible');
   }
 });
