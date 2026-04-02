@@ -7,6 +7,11 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
+if ! command -v lsof >/dev/null 2>&1; then
+  echo "Error: 'lsof' is required by $0 but is not installed or not in PATH." >&2
+  exit 1
+fi
+
 for port in "$@"; do
   pids=$(lsof -ti:"$port" 2>/dev/null)
 

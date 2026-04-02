@@ -299,10 +299,12 @@
     padding: 12px 16px;
     cursor: pointer;
     transition: all 0.15s;
+    border: 0;
     border-top: 3px solid var(--seg-color);
     background: var(--seg-bg);
     text-align: center;
     position: relative;
+    font: inherit;
   }
 
   .pipeline-segment:hover {
@@ -1435,26 +1437,26 @@
   <main class="main-content">
     <!-- Pipeline Summary Bar -->
     <div class="pipeline-bar">
-      <div class="pipeline-segment" style="--weight: 5; --seg-color: var(--status-unsubmitted); --seg-bg: var(--status-unsubmitted-bg);">
-        <div class="seg-count">5</div>
-        <div class="seg-label">Draft</div>
-      </div>
-      <div class="pipeline-segment active" style="--weight: 15; --seg-color: var(--status-applied); --seg-bg: var(--status-applied-bg);">
-        <div class="seg-count">15</div>
-        <div class="seg-label">Applied</div>
-      </div>
-      <div class="pipeline-segment" style="--weight: 8; --seg-color: var(--status-interviewing); --seg-bg: var(--status-interviewing-bg);">
-        <div class="seg-count">8</div>
-        <div class="seg-label">Interviewing</div>
-      </div>
-      <div class="pipeline-segment" style="--weight: 3; --seg-color: var(--status-offered); --seg-bg: var(--status-offered-bg);">
-        <div class="seg-count">3</div>
-        <div class="seg-label">Offered</div>
-      </div>
-      <div class="pipeline-segment" style="--weight: 11; --seg-color: var(--status-declined); --seg-bg: var(--status-declined-bg);">
-        <div class="seg-count">11</div>
-        <div class="seg-label">Closed</div>
-      </div>
+      <button type="button" class="pipeline-segment" style="--weight: 5; --seg-color: var(--status-unsubmitted); --seg-bg: var(--status-unsubmitted-bg);">
+        <span class="seg-count">5</span>
+        <span class="seg-label">Draft</span>
+      </button>
+      <button type="button" class="pipeline-segment active" style="--weight: 15; --seg-color: var(--status-applied); --seg-bg: var(--status-applied-bg);">
+        <span class="seg-count">15</span>
+        <span class="seg-label">Applied</span>
+      </button>
+      <button type="button" class="pipeline-segment" style="--weight: 8; --seg-color: var(--status-interviewing); --seg-bg: var(--status-interviewing-bg);">
+        <span class="seg-count">8</span>
+        <span class="seg-label">Interviewing</span>
+      </button>
+      <button type="button" class="pipeline-segment" style="--weight: 3; --seg-color: var(--status-offered); --seg-bg: var(--status-offered-bg);">
+        <span class="seg-count">3</span>
+        <span class="seg-label">Offered</span>
+      </button>
+      <button type="button" class="pipeline-segment" style="--weight: 11; --seg-color: var(--status-declined); --seg-bg: var(--status-declined-bg);">
+        <span class="seg-count">11</span>
+        <span class="seg-label">Closed</span>
+      </button>
     </div>
 
     <!-- Top Controls -->
@@ -1810,7 +1812,7 @@
     <!-- Pagination -->
     <div class="pagination">
       <button class="page-btn" aria-label="Previous page" title="Previous page">&laquo;</button>
-      <button class="page-btn active">1</button>
+      <button class="page-btn active" aria-current="page">1</button>
       <button class="page-btn">2</button>
       <button class="page-btn">3</button>
       <button class="page-btn" aria-label="Next page" title="Next page">&raquo;</button>
