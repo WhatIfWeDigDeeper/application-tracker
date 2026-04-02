@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@fastify/multipart": "9.4.0",
-    "@nestjs/common": "11.1.16",
+    "@nestjs/common": "11.1.17",
     "@nestjs/core": "11.1.16",
     "@nestjs/platform-fastify": "11.1.16",
     "dotenv": "17.3.1",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@nestjs/cli": "11.0.16",
+    "@nestjs/cli": "11.0.17",
     "@nestjs/testing": "11.1.16",
     "@types/node": "25.3.5",
     "@types/papaparse": "5.5.2",
