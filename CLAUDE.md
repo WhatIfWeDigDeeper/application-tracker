@@ -6,7 +6,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 
 ## Key Patterns
 
-- **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`. After a worktree agent completes, always verify the commit landed on a feature branch — not on `main` — by checking `git log --oneline --decorate -3`. If the commit is on `main`, first create a feature branch from it and push it (`git checkout -b <branch> && git push -u origin <branch>`), then reset local main (`git checkout main && git reset --hard origin/main`).
+- **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`. Always specify `origin/main` as the base when creating: `git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME" origin/main` — omitting the start-point defaults to the current HEAD, which causes the PR to include unintended commits. After a worktree agent completes, always verify the commit landed on a feature branch — not on `main` — by checking `git log --oneline --decorate -3`. If the commit is on `main`, first create a feature branch from it and push it (`git checkout -b <branch> && git push -u origin <branch>`), then reset local main (`git checkout main && git reset --hard origin/main`).
 - **Validation Chain**: `build:*` → `lint:*` → `test:*` → `test:e2e:*`
 - **Script Naming**: Scripts follow `verb:package-name` (e.g., `build:react-next-ui`, `lint:angular-ui`). Use `:all` suffix for scripts that run across all packages. `test:e2e:*` uses the UI package name (e.g., `test:e2e:react-next-ui`, `test:e2e:tanstack-ui`). When adding a new implementation, add per-package scripts for every verb (`dev`, `build`, `lint`, `test`) and add each to its `*:all` script and to `scripts/stop-all.sh`. When adding a new script group (new verb pattern like `validate:*`), also update `README.md` — add a TOC entry and a usage section so the pattern is discoverable. Do not wait to be asked.
 - **Parallel Execution**: 3+ items use Task tool subagents
@@ -74,11 +74,17 @@ Then proceed with the full build → lint → test → e2e chain as normal.
 
 ## Dependency Management
 
-When installing **new npm packages**: use the latest stable major.minor.patch version, exact versions (no ^ or ~), install `@types/*` if needed. Exception: if the latest major is at `x.0.0` with no patches yet, stay on the previous major until `x.0.1+` is available — brand-new majors at `.0.0` have no patch history and may have rough edges. Note: `npm install pkg@x.y.z` silently adds a `^` caret — verify package.json afterward and remove it to restore exact pinning.
+When installing **new npm packages**: use the latest stable major.minor.patch version, exact versions (no ^ or ~), install `@types/*` if needed. Exception: if the latest major is at `x.0.0` with no patches yet, stay on the previous major until `x.0.1+` is available — brand-new majors at `.0.0` have no patch history and may have rough edges. Use `npm install pkg@x.y.z --save-exact` (or `-E`) to pin the exact version — this prevents npm from silently adding a `^` caret. If you omitted `--save-exact`: verify package.json afterward and remove the caret to restore exact pinning; the lockfile's `packages[""]` section also picks up the caret, so after removing it from `package.json`, re-run `npm install` in the affected npm package directory (the one containing that `package.json`/`package-lock.json`) to regenerate the correct lockfile with exact specifiers, or use the corresponding `npm run install:<stack>` script if one exists.
 
 When installing **new Python packages**: `cd fastapi && uv add <package>` (or `uv add --dev <package>` for dev deps). Use exact versions in `pyproject.toml`.
 
 When **updating**: use the `update-deps` skill (npm only), then run the full validation chain. For Python deps, use `uv lock --upgrade-package <package>`.
+
+**npm overrides for security vulnerabilities** — When a transitive dependency is vulnerable but the fix is within the same major version (e.g., `path-to-regexp@8.3.0` → `8.4.2`), add an `"overrides"` block to the package's `package.json` to force the patched version rather than allowlisting in `.auditconfig.json`. This keeps `npm audit` meaningful and avoids accumulating stale allowlist entries. Example: `"overrides": { "path-to-regexp": "8.4.2", "picomatch": "4.0.4" }`. After adding overrides, run `npm install` in that package's directory (or `npm run install:<stack>` if available) and verify with `npm run audit:ci:<stack>` (or explicitly `npx -y audit-ci --config .auditconfig.json`), to avoid accidentally modifying the root lockfile or another stack's lockfile.
+
+**`audit-ci` vs `npm audit` divergence** — The advisory database can update between runs. Local `npm audit` may show 0 vulnerabilities while CI `npm run audit:ci:<stack>` / `npm run audit:ci:all` can find new advisories. Always verify security status using the repo's canonical audit-ci invocation (`npm run audit:ci:<stack>`, `npm run audit:ci:all`, or explicitly `npx -y audit-ci --config .auditconfig.json`) — not just `npm audit` — before declaring a package clean.
+
+**Prisma client regeneration** — After bumping `prisma` + `@prisma/client` (or `@prisma/adapter-pg`), run `npx prisma generate` in the package directory before building — otherwise TypeScript compilation fails with "Module '@prisma/client' has no exported member 'Prisma'".
 
 ## API Design Patterns
 
@@ -200,6 +206,7 @@ Additional notes:
 - **`permissions.allow` vs `sandbox.network.allowedHosts`**: `WebFetch(*)` in permissions controls whether the tool can be called without prompting — it does NOT bypass sandbox network restrictions. External hosts also need `sandbox.network.allowedHosts` in `.claude/settings.json`; `github.com` and `registry.npmjs.org` are already added
 - **npm cache permission error (EPERM)**: If `npm` fails with `Your cache folder contains root-owned files` (can recur after `sudo npm install -g`), pass `--cache /tmp/npm-cache-$$` to redirect to a writable temp dir (e.g. `npm outdated --cache /tmp/npm-cache-$$`). Permanent fix: `sudo chown -R 501:20 ~/.npm`
 - **Subagent `cd` does not persist across Bash calls**: Shell working directory resets between Bash tool calls. Never instruct a subagent to `cd <dir>` in one call and `npm install` in the next — npm will run in the wrong directory (typically the main repo root), silently modifying the wrong `package.json`. Always use `npm install --prefix <absolute-path>` so no `cd` is needed.
+- **`GH_TOKEN` env var overrides keyring for `gh` CLI**: If `GH_TOKEN` is set (e.g., a fine-grained PAT without PR write permissions), it takes precedence over the keyring token, causing `gh api` write calls to fail with 403. Run `unset GH_TOKEN` before any `gh pr create`, `gh pr edit`, or `gh api` calls that require write access.
 
 ## Subagent Usage
 
