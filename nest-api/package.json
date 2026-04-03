@@ -38,5 +38,9 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.1",
     "vitest": "4.0.18"
+  },
+  "overrides": {
+    "path-to-regexp": "8.4.2",
+    "picomatch": "4.0.4"
   }
 }

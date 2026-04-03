@@ -1,10 +1,5 @@
 {
-  "allowlist": [
-    "GHSA-j3q9-mxjg-w52f",
-    "GHSA-27v5-c462-wpq7",
-    "GHSA-3v7f-55p6-f55p",
-    "GHSA-c2c7-rcm5-vvqj"
-  ],
+  "allowlist": [],
   "high": true,
   "package-manager": "auto"
 }
