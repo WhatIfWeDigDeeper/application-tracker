@@ -82,7 +82,11 @@
       "module": "src",
       "cwd": "${workspaceFolder}/fastapi",
       "jinja": true,
-      "envFile": "${workspaceFolder}/fastapi/.env"
+      "envFile": "${workspaceFolder}/fastapi/.env",
+      "env": {
+        "FASTAPI_RELOAD": "false"
+      },
+      "postDebugTask": "cleanup-tanstack-fastapi"
     },
     {
       "name": "Go Gin API (port 5070)",
@@ -104,11 +108,37 @@
       "request": "launch",
       "name": "yoga-api",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "cwd": "${workspaceFolder}/yoga-api",
-      "env": { "NODE_ENV": "development" },
+      "env": {
+        "NODE_ENV": "development"
+      },
       "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "type": "editor-browser",
+      "request": "launch",
+      "name": "Tanstack Start UI (port 3040)",
+      "url": "http://localhost:3040",
+      "webRoot": "${workspaceFolder}/tanstack-start-ui",
+      "preLaunchTask": "start-tanstack-start-ui-when-fastapi-ready",
+      "postDebugTask": "cleanup-tanstack-fastapi"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Tanstack Start + FastAPI (Debug)",
+      "configurations": [
+        "FastAPI (port 5160)",
+        "Tanstack Start UI (port 3040)"
+      ],
+      "stopAll": true
     }
   ]
 }

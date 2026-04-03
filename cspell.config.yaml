@@ -7,12 +7,17 @@ words:
   - asyncpg
   - auditconfig
   - beforeunload
+  - choco
   - debugpy
   - dedup
   - Dedup
   - domcontentloaded
+  - Dorg
   - dquote
+  - EPERM
   - fastapi
+  - flexbox
+  - GHSA
   - golangci
   - gopath
   - GOPATH
@@ -21,41 +26,46 @@ words:
   - govulncheck
   - gradlew
   - Hono
+  - Jdbc
+  - jvmargs
+  - keyboxd
+  - Metaspace
   - mongosh
   - mypy
   - networkidle
+  - npmjs
   - Nuxt
+  - oneline
   - opusplan
   - osascript
+  - PGPASSWORD
+  - pids
   - psql
   - Pydantic
   - pyproject
   - pytest
   - RYUK
   - specifykit
+  - speckit
   - sqlc
   - sslmode
+  - Supabase
   - tanstack
   - tbls
   - temurin
   - testname
   - textareas
   - Textareas
+  - unkillable
   - unsubmitted
   - Unsubmitted
   - uvx
   - VARCHAR
   - venv
+  - Vinxi
   - whatifwedigdeeper
+  - wireframes
   - worktree
   - worktrees
-  - EPERM
-  - GHSA
-  - flexbox
-  - jvmargs
-  - Metaspace
-  - npmjs
-  - oneline
-  - unkillable
 ignoreWords: []
 import: []
