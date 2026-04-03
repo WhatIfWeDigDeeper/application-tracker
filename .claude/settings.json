@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'application-tracker' -message 'Claude needs your permission' -sound Glass"
+            "command": "terminal-notifier -title 'application-tracker' -message 'Claude needs your permission' -sound Glass -activate com.microsoft.VSCode"
           }
         ]
       },
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'application-tracker' -message 'Claude has a question for you' -sound Glass"
+            "command": "terminal-notifier -title 'application-tracker' -message 'Claude has a question for you' -sound Glass -activate com.microsoft.VSCode"
           }
         ]
       },
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'application-tracker' -message 'Claude is waiting for your input' -sound Glass"
+            "command": "terminal-notifier -title 'application-tracker' -message 'Claude is waiting for your input' -sound Glass -activate com.microsoft.VSCode"
           }
         ]
       }
