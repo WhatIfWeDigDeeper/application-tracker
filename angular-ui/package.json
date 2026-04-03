@@ -30,7 +30,7 @@
     "@angular-eslint/eslint-plugin-template": "21.3.0",
     "@angular-eslint/schematics": "21.3.0",
     "@angular-eslint/template-parser": "21.3.0",
-    "@angular/cli": "21.2.2",
+    "@angular/cli": "21.2.6",
     "@angular/compiler-cli": "21.2.4",
     "@tailwindcss/postcss": "4.2.1",
     "@testing-library/angular": "19.1.1",

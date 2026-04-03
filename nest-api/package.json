@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "@fastify/multipart": "9.4.0",
-    "@nestjs/common": "11.1.16",
-    "@nestjs/core": "11.1.16",
-    "@nestjs/platform-fastify": "11.1.16",
+    "@nestjs/common": "11.1.17",
+    "@nestjs/core": "11.1.17",
+    "@nestjs/platform-fastify": "11.1.17",
     "dotenv": "17.3.1",
     "drizzle-orm": "0.45.1",
     "papaparse": "5.5.3",
@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@nestjs/cli": "11.0.16",
-    "@nestjs/testing": "11.1.16",
+    "@nestjs/cli": "11.0.17",
+    "@nestjs/testing": "11.1.17",
     "@types/node": "25.3.5",
     "@types/papaparse": "5.5.2",
     "drizzle-kit": "0.31.9",
@@ -38,5 +38,9 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.1",
     "vitest": "4.0.18"
+  },
+  "overrides": {
+    "path-to-regexp": "8.4.2",
+    "picomatch": "4.0.4"
   }
 }
