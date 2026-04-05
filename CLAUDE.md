@@ -2,7 +2,7 @@
 
 ## Repository Overview
 
-Monorepo with multiple frontend+backend implementation pairs sharing a single PostgreSQL database. Skills in `.claude/skills/`, commands in `.claude/commands/`.
+Monorepo with multiple frontend+backend implementation pairs sharing a single PostgreSQL database. Skills in `.claude/skills/` (project-local and upstream-synced) and `.agents/skills/` (upstream-installed originals — see Agent Skills Policy), commands in `.claude/commands/`.
 
 ## Key Patterns
 
@@ -38,6 +38,7 @@ Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolat
 - **python_fastapi** — `fastapi/migrations/001_initial.sql` (asyncpg, raw SQL); also used by `tanstack-start-ui/` (React SSR via TanStack Start, port 3040)
 - **java_spring** — `spring-api/src/main/resources/db/migration/V1__initial.sql` (Spring Data JPA + Hibernate 6, Flyway auto-migration)
 - **go_gin** — `go-api/migrations/001_initial.up.sql` (pgx/sqlc, raw SQL)
+- **graphql_yoga** — `yoga-api/prisma/schema.prisma` (Prisma); paired with `react-apollo-ui` (port 3080)
 
 Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 
@@ -202,7 +203,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`hono/aws-lambda` import**: Built into the main `hono` package (not a separate npm package); use `import { handle } from 'hono/aws-lambda'`
 - **`.env` blocked by sandbox**: Use `.env.example` as template; create `.env` manually or rely on command-line env vars for CI
 - **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
-- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency). The `docs:types:lambda-api` script was removed; update the mermaid file manually when `api.ts` types change. Also note: Mermaid erDiagram reserves `PK`/`FK`/`UK` as attribute key constraint tokens — use `PartitionKey`/`SortKey` as attribute names in erDiagram blocks for DynamoDB key attributes (lowercase `pk`/`sk` also fail). Avoid `|` inside quoted annotations; write `0or1` instead.
+- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency). The `docs:types:lambda-api` script was removed; update the mermaid file manually when `api.ts` types change. Also note: Mermaid erDiagram reserves exactly `PK`/`FK`/`UK` as attribute key constraint tokens — use `PartitionKey`/`SortKey` for DynamoDB PK/SK (lowercase `pk`/`sk` also fail); multi-letter names like `GSI1PK` are NOT reserved and render fine. `map` is also a valid erDiagram type (not reserved). Avoid `|` inside quoted annotations; write `0or1` instead. For classDiagram enumeration members: values with spaces need quotes (e.g. `"given offer"`), hyphenated values work unquoted (e.g. `enterprise-software`). When documenting optional+nullable fields: `nullable().optional()` → `type|null?`; `.optional()` only → `type?`.
 
 ## Terminal Management
 
@@ -254,7 +255,7 @@ Additional notes:
 
 ## Running API Integration Tests
 
-**Server lifecycle**: For fully managed runs (API auto-start/stop for all 9 stacks), use `bash scripts/run-api-tests.sh [stack|all]` or `npm run test:api:all`. To run against a single already-running API, use `npm run test:api:<stack>` (e.g., `npm run test:api:nest-api`).
+**Server lifecycle**: For fully managed runs (API auto-start/stop for all 10 stacks), use `bash scripts/run-api-tests.sh [stack|all]` or `npm run test:api:all`. To run against a single already-running API, use `npm run test:api:<stack>` (e.g., `npm run test:api:nest-api`).
 
 **All stacks run sequentially with `--runInBand`** — tests share a DB schema per stack; parallel Jest workers cause state contamination (race conditions in export/import round-trip tests). The script passes `--runInBand` to ensure test files run sequentially within each stack run.
 
@@ -274,7 +275,7 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 
 **E2E test data cleanup**: Tests that create data must clean up in `afterAll` using API calls (e.g., `page.request.delete('/api/applications/${id}')`) — not fragile UI interactions. Cleanup must run even if individual tests fail.
 
-**Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 8 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
+**Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 9 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
 
 **E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create (fixed in PR #229) — status can be set at create time directly.
 
@@ -289,5 +290,5 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 - **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
 - **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
 - **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
-- **Shared E2E history tests**: `history.spec.ts` has a single `History Panel` block shared by Vue and Svelte; stacks without history use `--grep-invert 'History Panel'` (Playwright CLI flag)
+- **Shared E2E history tests**: `history.spec.ts` runs against all 9 stacks — all implementations support the History Panel feature
 
