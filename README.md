@@ -335,6 +335,7 @@ npm run test:angular-ui   # Angular UI tests (Jest + @testing-library/angular)
 npm run test:spring-api   # Spring Boot API tests (JUnit 5)
 npm run test:angular-spring-ui  # Angular Spring UI tests (Jest + @testing-library/angular)
 npm run test:lambda-api         # Lambda + DynamoDB unit tests (vitest, no Docker needed)
+npm run test:lambda-api-cdk     # CDK assertions tests (vitest, no Docker needed)
 ```
 
 Run all unit tests:
