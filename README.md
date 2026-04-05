@@ -14,6 +14,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [7. Angular + Go Gin + pgx/sqlc](#7-angular--go-gin--pgxsqlc)
   - [8. Angular + Spring Boot + JPA/Hibernate](#8-angular--spring-boot--jpahibernate)
   - [9. GraphQL Yoga + React Apollo](#9-graphql-yoga--react-apollo)
+  - [10. Lambda + DynamoDB (API only)](#10-lambda--dynamodb-api-only)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -120,6 +121,17 @@ This repository contains a complete job application tracker built with multiple 
 - GraphQL API with full query/mutation support for applications, stages, and history
 - Snapshot-based history with field diffs and restore
 
+### 10. Lambda + DynamoDB (API only)
+**Directory**: `lambda-api/`
+**Stack**:
+- Backend: TypeScript + Hono + AWS Lambda + DynamoDB — port 5090 (local)
+- Database: DynamoDB (single-table design, `lambda_api_applications` table) — **no PostgreSQL**
+- Local development: Hono runs directly via `@hono/node-server`; DynamoDB Local via Docker
+- Lambda deployment: same Hono app wrapped with `@hono/aws-lambda` adapter
+- Infrastructure: AWS CDK (TypeScript) — deferred to v2
+- First serverless, non-relational backend in the monorepo
+- UI: TBD (separate spec)
+
 ## Core Features
 
 All implementations provide:
@@ -148,6 +160,12 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `java_spring` | Angular + Spring Boot + JPA | [schema docs](docs/schema/java-spring/README.md) |
 | `graphql_yoga` | GraphQL Yoga + React Apollo | [schema docs](docs/schema/graphql-yoga/README.md) |
 
+**DynamoDB (non-relational):**
+
+| Table | Apps | Notes |
+|-------|------|-------|
+| `lambda_api_applications` | Lambda + DynamoDB API | Single-table design with GSIs; no PostgreSQL |
+
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
 ## Type Diagrams
@@ -165,6 +183,7 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [angular-spring-ui](docs/types/angular-spring-ui/application.model.mermaid) - Angular + Spring Boot
 - [react-apollo-ui](docs/types/react-apollo-ui/application.mermaid) - React Apollo + GraphQL Yoga
 - [yoga-api](docs/types/yoga-api/application.service.mermaid) - GraphQL Yoga API (service input/filter types)
+- [lambda-api](docs/types/lambda-api/api.mermaid) - Lambda + DynamoDB API
 
 Regenerate with `npm run docs:types`.
 
@@ -188,6 +207,7 @@ Regenerate with `npm run docs:types`.
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
 ├── go-api/                       # Go Gin API
+├── lambda-api/                   # AWS Lambda + DynamoDB API
 ├── specs/                        # Feature specifications
 ├── docs/                         # Documentation
 ├── .claude/                      # Claude Code skills and commands
@@ -275,6 +295,11 @@ npm run dev:angular-ui
 # Angular + Spring Boot (UI 3070 + API 8080)
 npm run dev:spring-api
 npm run dev:angular-spring-ui
+
+# Lambda + DynamoDB (API only — port 5090)
+# Requires DynamoDB Local: docker compose up -d dynamodb-local
+npm run migrate:lambda-api       # create/update DynamoDB table
+npm run dev:lambda-api           # start Hono server on port 5090
 ```
 
 ### Schema Documentation
@@ -308,6 +333,7 @@ npm run test:go-api       # Go Gin API integration tests (testcontainers-go)
 npm run test:angular-ui   # Angular UI tests (Jest + @testing-library/angular)
 npm run test:spring-api   # Spring Boot API tests (JUnit 5)
 npm run test:angular-spring-ui  # Angular Spring UI tests (Jest + @testing-library/angular)
+npm run test:lambda-api         # Lambda + DynamoDB unit tests (vitest, no Docker needed)
 ```
 
 Run all unit tests:
@@ -332,6 +358,7 @@ npm run test:api:nest-api      # NestJS API (port 5050)
 npm run test:api:go-api        # Go Gin API (port 5070)
 npm run test:api:spring-api    # Spring Boot API (port 8080)
 npm run test:api:yoga-api      # GraphQL Yoga REST API (port 5080)
+npm run test:api:lambda-api    # Lambda + DynamoDB API (port 5090)
 ```
 
 Run all API tests with automatic server lifecycle management:

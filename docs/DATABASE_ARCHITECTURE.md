@@ -68,3 +68,21 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - JSONB snapshots via `@JdbcTypeCode(SqlTypes.JSON)` with Hibernate 6
 - Snapshot-based history (like Hono, NestJS, FastAPI, Go)
 - Spring Data JPA `Specification<T>` + `JpaSpecificationExecutor` for multi-criteria filters
+
+---
+
+## DynamoDB (Non-Relational)
+
+**Lambda-DynamoDB:**
+- Table: `lambda_api_applications` (single-table design — no PostgreSQL schema)
+- Single table stores applications, interview stages, and history snapshots as separate item types, distinguished by `SK` prefix:
+  - Application: `PK=APP#<uuid>`, `SK=APP#<uuid>`
+  - Stage: `PK=APP#<uuid>`, `SK=STAGE#<uuid>`
+  - History: `PK=APP#<uuid>`, `SK=HIST#<zero-padded-seq>`
+- Global Secondary Indexes:
+  - `GSI1`: `GSI1PK=STATUS#<status>#ARCHIVED#<0|1>` / `GSI1SK=UPDATED#<timestamp>#<id>` — filter by status + archive flag, sort by updatedAt
+  - `GSI2`: `GSI2PK=ACTIVE` / `GSI2SK=UPDATED#<timestamp>#<id>` — all non-archived apps sorted by updatedAt
+- Table setup: `npm run migrate:lambda-api` (runs `lambda-api/scripts/setup-dynamodb.ts` — idempotent)
+- Local development: `amazon/dynamodb-local` Docker container on port 8000 (configured via `DYNAMODB_ENDPOINT` env var)
+- AWS SDK: `@aws-sdk/lib-dynamodb` (DynamoDB DocumentClient) with `removeUndefinedValues: true`
+- Connection config: `DYNAMODB_ENDPOINT=http://localhost:8000`, `AWS_REGION=us-east-1`, credentials `local/local` for DynamoDB Local
