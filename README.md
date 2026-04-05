@@ -298,8 +298,9 @@ npm run dev:angular-spring-ui
 
 # Lambda + DynamoDB (API only — port 5090)
 # Requires DynamoDB Local: docker compose up -d dynamodb-local
-npm run migrate:lambda-api       # create/update DynamoDB table
-npm run dev:lambda-api           # start Hono server on port 5090
+cp lambda-api/.env.example lambda-api/.env  # sets DYNAMODB_ENDPOINT/local AWS creds for DynamoDB Local
+npm run migrate:lambda-api                  # create/update DynamoDB table
+npm run dev:lambda-api                      # start Hono server on port 5090
 ```
 
 ### Schema Documentation

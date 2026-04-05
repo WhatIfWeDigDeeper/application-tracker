@@ -77,6 +77,9 @@ ensure_dynamodb_local() {
     sleep 3
   fi
   echo "[lambda-api] Running table migration..."
+  DYNAMODB_ENDPOINT="http://localhost:${DYNAMODB_PORT:-8000}" \
+  AWS_ACCESS_KEY_ID=local \
+  AWS_SECRET_ACCESS_KEY=local \
   npm run migrate:lambda-api
 }
 

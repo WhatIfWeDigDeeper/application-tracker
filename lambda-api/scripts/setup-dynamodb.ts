@@ -9,6 +9,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const endpoint = process.env.DYNAMODB_ENDPOINT;
+
+if (!endpoint) {
+  console.error(
+    'Error: DYNAMODB_ENDPOINT is not set. This script is intended for use with DynamoDB Local.\n' +
+    'Copy lambda-api/.env.example to lambda-api/.env and set DYNAMODB_ENDPOINT=http://localhost:8000.'
+  );
+  process.exit(1);
+}
+
 const region = process.env.AWS_REGION || 'us-east-1';
 const tableName = process.env.DYNAMODB_TABLE || 'lambda_api_applications';
 
