@@ -1,4 +1,205 @@
-%% Type diagram generation for lambda-api is temporarily unavailable.
-%% The docs:types:lambda-api script requires zod to be resolvable as a TypeScript module,
-%% which is not currently supported by the ts-to-mermaid conversion tooling.
-%% This file will be updated once the tooling issue is resolved.
+classDiagram
+
+  class ApplicationStatus {
+    <<enumeration>>
+    unsubmitted
+    applied
+    rejected
+    interviewing
+    "given offer"
+    "accepted offer"
+    "declined offer"
+    "no offer"
+  }
+
+  class CompanyCategory {
+    <<enumeration>>
+    education
+    health
+    climate
+    ai
+    energy
+    finance
+    enterprise-software
+    consumer-tech
+    e-commerce
+    cybersecurity
+    gaming
+    media-entertainment
+    consulting
+    government
+    nonprofit
+    retail
+    restaurant
+    hospitality
+    other
+  }
+
+  class JobSource {
+    <<enumeration>>
+    recruiter
+    linkedin
+    indeed
+    friend
+    colleague
+    company-website
+    other
+  }
+
+  class InterviewStageResponse {
+    +string id
+    +string name
+    +number order
+    +boolean isCompleted
+    +string|null completedDate
+    +string|null notes
+    +number|null performanceRating
+  }
+
+  class CreateInterviewStageInput {
+    +string name
+    +number order
+    +boolean isCompleted
+    +string? completedDate
+    +string? notes
+    +number? performanceRating
+  }
+
+  class UpdateInterviewStageInput {
+    +string? name
+    +number? order
+    +boolean? isCompleted
+    +string|null? completedDate
+    +string|null? notes
+    +number|null? performanceRating
+  }
+
+  class ApplicationResponse {
+    +string id
+    +string companyName
+    +string positionTitle
+    +string|null dateApplied
+    +ApplicationStatus status
+    +string createdAt
+    +string updatedAt
+    +string|null companyUrl
+    +string|null jobPostingUrl
+    +string|null companyCareerUrl
+    +CompanyCategory|null companyCategory
+    +number|null skillsMatch
+    +JobSource|null jobSource
+    +boolean|null coverLetterRequired
+    +string|null specialRequirements
+    +number|null salaryMin
+    +number|null salaryMax
+    +string|null notes
+    +string|null offerDueDate
+    +boolean isArchived
+    +InterviewStageResponse[] interviewStages
+  }
+
+  class CreateApplicationInput {
+    +string companyName
+    +string positionTitle
+    +string? dateApplied
+    +ApplicationStatus? status
+    +string? companyUrl
+    +string? jobPostingUrl
+    +string? companyCareerUrl
+    +CompanyCategory? companyCategory
+    +number? skillsMatch
+    +JobSource? jobSource
+    +boolean? coverLetterRequired
+    +string? specialRequirements
+    +number? salaryMin
+    +number? salaryMax
+    +string? notes
+  }
+
+  class UpdateApplicationInput {
+    +string? companyName
+    +string? positionTitle
+    +string|null? dateApplied
+    +ApplicationStatus? status
+    +string|null? companyUrl
+    +string|null? jobPostingUrl
+    +string|null? companyCareerUrl
+    +CompanyCategory|null? companyCategory
+    +number|null? skillsMatch
+    +JobSource|null? jobSource
+    +boolean|null? coverLetterRequired
+    +string|null? specialRequirements
+    +number|null? salaryMin
+    +number|null? salaryMax
+    +string|null? notes
+    +string|null? offerDueDate
+  }
+
+  class ListApplicationsQuery {
+    +string? status
+    +CompanyCategory? companyCategory
+    +JobSource? jobSource
+    +number? skillsMatchMin
+    +boolean includeArchived
+    +string sortBy
+    +string sortDir
+    +number page
+    +number limit
+  }
+
+  class PaginatedApplicationsResponse {
+    +ApplicationResponse[] items
+    +number page
+    +number limit
+    +number total
+  }
+
+  class FieldChange {
+    +string field
+    +string label
+    +unknown oldValue
+    +unknown newValue
+  }
+
+  class HistoryEntryResponse {
+    +string id
+    +number sequence
+    +string description
+    +FieldChange[] changes
+    +string createdAt
+  }
+
+  class PaginatedHistoryResponse {
+    +HistoryEntryResponse[] entries
+    +number total
+    +number page
+    +number limit
+  }
+
+  class ErrorDetail {
+    +string field
+    +string message
+  }
+
+  class ErrorResponse {
+    +string code
+    +string message
+    +ErrorDetail[]? details
+  }
+
+  ApplicationResponse --> ApplicationStatus
+  ApplicationResponse --> CompanyCategory
+  ApplicationResponse --> JobSource
+  ApplicationResponse --> InterviewStageResponse
+  CreateApplicationInput --> ApplicationStatus
+  CreateApplicationInput --> CompanyCategory
+  CreateApplicationInput --> JobSource
+  UpdateApplicationInput --> ApplicationStatus
+  UpdateApplicationInput --> CompanyCategory
+  UpdateApplicationInput --> JobSource
+  ListApplicationsQuery --> CompanyCategory
+  ListApplicationsQuery --> JobSource
+  PaginatedApplicationsResponse --> ApplicationResponse
+  HistoryEntryResponse --> FieldChange
+  PaginatedHistoryResponse --> HistoryEntryResponse
+  ErrorResponse --> ErrorDetail

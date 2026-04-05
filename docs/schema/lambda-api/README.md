@@ -95,15 +95,17 @@ Single-table design. All item types share the `lambda_api_applications` table an
 
 ## Relations
 
+> **Key name note:** Mermaid reserves `PK`, `FK`, and `UK` as attribute key constraint tokens, so DynamoDB key attributes are spelled out: `PartitionKey` = DynamoDB `PK`, `SortKey` = DynamoDB `SK`. Also, `|` is not allowed inside Mermaid quoted annotations — `0or1` is a rendering-safe placeholder for `0|1`.
+
 ```mermaid
 erDiagram
 
-APPLICATION ||--o{ INTERVIEW_STAGE : "PK=APP#id"
-APPLICATION ||--o{ HISTORY : "PK=APP#id"
+APPLICATION ||--o{ INTERVIEW_STAGE : "has stages"
+APPLICATION ||--o{ HISTORY : "has history"
 
 APPLICATION {
-  string PK "APP#uuid"
-  string SK "APP#uuid"
+  string PartitionKey "APP#uuid"
+  string SortKey "APP#uuid"
   string id
   string companyName
   string positionTitle
@@ -113,45 +115,45 @@ APPLICATION {
   string jobPostingUrl
   string companyCareerUrl
   string companyCategory
-  number skillsMatch
+  int skillsMatch
   string jobSource
   boolean coverLetterRequired
   string specialRequirements
-  number salaryMin
-  number salaryMax
+  int salaryMin
+  int salaryMax
   string notes
   string offerDueDate
   boolean isArchived
-  number historySequence
+  int historySequence
   string createdAt
   string updatedAt
-  string GSI1PK "STATUS#status#ARCHIVED#0|1"
+  string GSI1PK "STATUS#status#ARCHIVED#0or1"
   string GSI1SK "UPDATED#ts#id"
-  string GSI2PK "ACTIVE (non-archived only)"
+  string GSI2PK "ACTIVE"
   string GSI2SK "UPDATED#ts#id"
 }
 
 INTERVIEW_STAGE {
-  string PK "APP#uuid (parent)"
-  string SK "STAGE#uuid"
+  string PartitionKey "APP#uuid"
+  string SortKey "STAGE#uuid"
   string id
   string applicationId
   string name
-  number order
+  int order
   boolean isCompleted
   string completedDate
   string notes
-  number performanceRating
+  int performanceRating
 }
 
 HISTORY {
-  string PK "APP#uuid (parent)"
-  string SK "HIST#00000001"
+  string PartitionKey "APP#uuid"
+  string SortKey "HIST#00000001"
   string id
   string applicationId
-  number sequence
+  int sequence
   string description
-  map snapshot "full ApplicationResponse"
+  map snapshot "full ApplicationResponse as DynamoDB Map"
   string createdAt
 }
 ```
