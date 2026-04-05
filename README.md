@@ -128,7 +128,7 @@ This repository contains a complete job application tracker built with multiple 
 - Database: DynamoDB (single-table design, `lambda_api_applications` table) — **no PostgreSQL**
 - Local development: Hono runs directly via `@hono/node-server`; DynamoDB Local via Docker
 - Lambda deployment: same Hono app wrapped with `@hono/aws-lambda` adapter
-- Infrastructure: AWS CDK (TypeScript) — deferred to v2
+- Infrastructure: AWS CDK (TypeScript) at `lambda-api/cdk/` — DynamoDB + Lambda + HTTP API Gateway v2
 - First serverless, non-relational backend in the monorepo
 - UI: TBD (separate spec)
 
@@ -301,6 +301,12 @@ npm run dev:angular-spring-ui
 cp lambda-api/.env.example lambda-api/.env  # sets DYNAMODB_ENDPOINT/local AWS creds for DynamoDB Local
 npm run migrate:lambda-api                  # create/update DynamoDB table
 npm run dev:lambda-api                      # start Hono server on port 5090
+
+# CDK — synthesize / deploy (real AWS or LocalStack)
+npm run cdk:synth                           # synthesize CloudFormation template (no AWS needed)
+npm run cdk:deploy                          # deploy to real AWS
+docker compose --profile localstack up -d localstack  # start LocalStack (opt-in)
+npm run cdk:deploy:local                    # deploy to LocalStack
 ```
 
 ### Schema Documentation
