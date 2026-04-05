@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
-import { Template } from 'aws-cdk-lib/assertions';
-import { describe, it } from 'vitest';
+import { Match, Template } from 'aws-cdk-lib/assertions';
+import { describe, expect, it } from 'vitest';
 import { LambdaApiStack } from '../lib/lambda-api-stack';
 
 function buildTemplate(): Template {
@@ -47,6 +47,60 @@ describe('DynamoDB Table', () => {
           ],
         },
       ],
+    });
+  });
+});
+
+describe('Lambda Function', () => {
+  it('creates a Lambda function with Node.js 22.x runtime', () => {
+    const template = buildTemplate();
+    template.hasResourceProperties('AWS::Lambda::Function', {
+      Runtime: 'nodejs22.x',
+      Timeout: 29,
+      MemorySize: 256,
+    });
+  });
+
+  it('sets DYNAMODB_TABLE environment variable pointing to the applications table', () => {
+    const template = buildTemplate();
+    // DYNAMODB_TABLE resolves to a CloudFormation Ref at synth time (not a literal string)
+    template.hasResourceProperties('AWS::Lambda::Function', {
+      Environment: {
+        Variables: {
+          DYNAMODB_TABLE: Match.anyValue(),
+        },
+      },
+    });
+    // Verify the Ref points to the DynamoDB table resource (table name is hardcoded in that resource)
+    const resources = template.findResources('AWS::Lambda::Function', {
+      Properties: {
+        Environment: {
+          Variables: {
+            DYNAMODB_TABLE: Match.anyValue(),
+          },
+        },
+      },
+    });
+    const fnProps = Object.values(resources)[0].Properties;
+    const tableRef: unknown = fnProps.Environment.Variables.DYNAMODB_TABLE;
+    // The value should be a Ref to the DynamoDB table logical ID
+    expect(tableRef).toMatchObject({ Ref: expect.stringContaining('ApplicationsTable') });
+  });
+});
+
+describe('HTTP API Gateway', () => {
+  it('creates an HttpApi named lambda-api', () => {
+    const template = buildTemplate();
+    template.hasResourceProperties('AWS::ApiGatewayV2::Api', {
+      Name: 'lambda-api',
+      ProtocolType: 'HTTP',
+    });
+  });
+
+  it('creates a catch-all proxy route', () => {
+    const template = buildTemplate();
+    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
+      RouteKey: 'ANY /{proxy+}',
     });
   });
 });
