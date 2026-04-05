@@ -1,7 +1,7 @@
 # Lambda API CDK Deployment Design
 
 **Date:** 2026-04-05  
-**Status:** Approved  
+**Status:** Complete  
 **Scope:** Add AWS CDK infrastructure-as-code to `lambda-api` for learning/experimentation; enable optional LocalStack deployment; add HTTP API Gateway v2.
 
 ---
