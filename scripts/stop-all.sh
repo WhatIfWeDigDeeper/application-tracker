@@ -19,6 +19,7 @@ PORTS=(
   5070  # Go API
   5160  # FastAPI
   5080  # Yoga API (GraphQL)
+  5090  # Lambda API
   8080  # Spring Boot API
 )
 

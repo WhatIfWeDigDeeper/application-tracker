@@ -1,4 +1,16 @@
 services:
+  dynamodb-local:
+    image: amazon/dynamodb-local:2.5.4
+    container_name: app_tracker_dynamodb
+    ports:
+      - "${DYNAMODB_PORT:-8000}:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+    user: root
+    volumes:
+      - ./data/dynamodb:/data
+    networks:
+      - app_tracker_network
+
   postgres:
     image: postgres:18-alpine
     container_name: app_tracker_postgres

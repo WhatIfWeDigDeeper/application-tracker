@@ -183,11 +183,32 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Server startup**: `go run ./cmd/server` compiles and starts; `run-e2e.sh` manages lifecycle via `dev:go-api` npm script
 - **Manual restart after kill**: If go-api is killed manually, use `bash scripts/run-e2e.sh angular-ui` (not `npm run test:e2e:angular-ui`) — the npm script does not start the API backend
 
+## Lambda + DynamoDB API Patterns
+
+- Stack: TypeScript + Hono + AWS Lambda + DynamoDB; lambda-api port 5090, DB `lambda_api_applications` (DynamoDB, NOT PostgreSQL)
+- **Local dev approach**: Same Hono app runs as local server (`server.ts` via `@hono/node-server`) and as Lambda handler (`handler.ts` via `hono/aws-lambda`) — no LocalStack needed
+- **DynamoDB Local**: `amazon/dynamodb-local` Docker container on port 8000 (configurable via `DYNAMODB_PORT` env var in docker-compose.yml); start with `docker compose up -d dynamodb-local`. Uses a bind mount (`./data/dynamodb:/data`) with `user: root` to avoid SQLite permission issues that occur with named Docker volumes. The `data/` directory is gitignored.
+- **Table setup**: `npm run migrate:lambda-api` runs `lambda-api/scripts/setup-dynamodb.ts` (idempotent — skips if table exists). Data persists across container restarts via the bind mount.
+- **`dotenv` + ESM module init order**: `tsx` injects `.env` AFTER module-level code runs. `dynamodb.client.ts` creates the `DynamoDBClient` at module load time, so it must `import 'dotenv/config'` as its first line — otherwise `DYNAMODB_ENDPOINT` is unset and the client silently targets real AWS. Do not rely on `dotenv.config()` in `server.ts` to cover this.
+- **`GlobalSecondaryIndex` has no `BillingMode` field**: `BillingMode` is a top-level `CreateTableCommand` property only — do not set it on individual GSI definitions or TypeScript will reject the call.
+- **Removing a stopped Docker container before deleting its volume**: `docker volume rm` fails with "volume is in use" even for stopped containers — run `docker rm <container>` first, then `docker volume rm`.
+- **Single-table design**: All items share the `lambda_api_applications` table; item types distinguished by SK prefix (`APP#`, `STAGE#`, `HIST#`)
+- **GSI1**: `GSI1PK=STATUS#<status>#ARCHIVED#<0|1>` / `GSI1SK=UPDATED#<timestamp>#<id>` — filter by status + archived, sort by updatedAt
+- **GSI2**: `GSI2PK=ACTIVE` / `GSI2SK=UPDATED#<timestamp>#<id>` — all non-archived apps, sorted by updatedAt
+- **Pagination**: API contract uses offset-based pagination (`page`/`limit`); DynamoDB scan + in-memory slice (appropriate at job-tracker scale)
+- **Cascade delete**: Querying `PK=APP#<id>` returns all related items (stages + history); `DeleteCommand` each one
+- **History sequence**: Stored as atomic counter on the application item (`historySequence`); incremented via `UpdateCommand ADD historySequence :inc` before writing HIST# items
+- **Unit tests**: Vitest; pure function tests (no Docker needed): `npm test` in lambda-api/. API integration tests require DynamoDB Local running: `npm run test:api:lambda-api`
+- **`hono/aws-lambda` import**: Built into the main `hono` package (not a separate npm package); use `import { handle } from 'hono/aws-lambda'`
+- **`.env` blocked by sandbox**: Use `.env.example` as template; create `.env` manually or rely on command-line env vars for CI
+- **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
+
 ## Terminal Management
 
 - **PostgreSQL prerequisite**: Before starting any API server or running E2E tests, verify the PostgreSQL Docker container is running: `docker compose ps db`. If it's not running, `docker compose up -d db` first. A server started without the DB will hang or crash and may be unkillable without a reboot.
 - **Repeated test runs**: Run iterative/debugging test commands as foreground tasks in one shared terminal rather than spawning a new background terminal each iteration — background terminals accumulate and are never auto-cleaned.
 - **Kill background processes promptly**: Stop background Bash tasks via `TaskStop` (by task ID) or `kill <pid>` as soon as they're no longer needed — task IDs are only available in the current session.
+- **DynamoDB Local (port 8000) must be stopped via Docker, not `lsof`**: `kill $(lsof -ti :8000)` terminates the Java process inside the container, which stops the container and can bring down Docker entirely. Use `docker compose stop dynamodb-local` to stop it cleanly, or `docker compose restart dynamodb-local` to restart. If Docker becomes unavailable, restart via `colima restart`. Killing port 5090 (lambda-api Hono server) via `lsof` is fine — it's a plain Node.js process.
 
 ## Sandbox Notes
 

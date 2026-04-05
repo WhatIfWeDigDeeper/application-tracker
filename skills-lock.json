@@ -21,6 +21,11 @@
       "sourceType": "github",
       "computedHash": "6d36e69adad781f106a2fb4b19ebc22bf0c211babdc0d1ae5822fa65abb48bd8"
     },
+    "peer-review": {
+      "source": "whatifwedigdeeper/agent-skills",
+      "sourceType": "github",
+      "computedHash": "35d581447ccdd3ac61a9fb7ddce7bfa8dc360e31da19f5b7c586009e029a452f"
+    },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",
@@ -29,7 +34,7 @@
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "7487e4a4e06c727762a44e72fa00aad20f1702754dedb50ec91503c223cbdd79"
+      "computedHash": "cdbe6a6f3dbf46ce84d8f49d3fc13475179c088ae15453f7afa3b0a1a8d7ba5a"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
