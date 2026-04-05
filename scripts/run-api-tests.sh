@@ -6,6 +6,18 @@ STACK="${1:-all}"
 STACKS=(express-api koa-api nuxt-api hono-api fastapi nest-api go-api spring-api yoga-api lambda-api)
 STARTED_PORTS=()
 FAILED_STACKS=()
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+
+load_env_file() {
+  local env_file=$1
+  if [ -f "$env_file" ]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "$env_file"
+    set +a
+  fi
+}
 
 api_port() {
   case "$1" in
@@ -71,15 +83,17 @@ wait_for_port() {
 }
 
 ensure_dynamodb_local() {
+  load_env_file "$ROOT_DIR/lambda-api/.env"
+
   if ! docker compose ps dynamodb-local 2>/dev/null | grep -q "running"; then
     echo "[lambda-api] Starting DynamoDB Local..."
     docker compose up -d dynamodb-local
     sleep 3
   fi
   echo "[lambda-api] Running table migration..."
-  DYNAMODB_ENDPOINT="http://localhost:${DYNAMODB_PORT:-8000}" \
-  AWS_ACCESS_KEY_ID=local \
-  AWS_SECRET_ACCESS_KEY=local \
+  DYNAMODB_ENDPOINT="${DYNAMODB_ENDPOINT:-http://localhost:${DYNAMODB_PORT:-8000}}" \
+  AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-local}" \
+  AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-local}" \
   npm run migrate:lambda-api
 }
 
