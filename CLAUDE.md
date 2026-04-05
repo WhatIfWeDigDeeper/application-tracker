@@ -202,7 +202,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`hono/aws-lambda` import**: Built into the main `hono` package (not a separate npm package); use `import { handle } from 'hono/aws-lambda'`
 - **`.env` blocked by sandbox**: Use `.env.example` as template; create `.env` manually or rely on command-line env vars for CI
 - **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
-- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency). The `docs:types:lambda-api` script was removed; update the mermaid file manually when `api.ts` types change. Also note: Mermaid erDiagram reserves `PK`/`FK`/`UK` as attribute key tokens — use lowercase (`pk`, `sk`) for attribute names in erDiagram blocks to avoid parse errors. Avoid `|` inside quoted annotations; write `0or1` instead.
+- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency). The `docs:types:lambda-api` script was removed; update the mermaid file manually when `api.ts` types change. Also note: Mermaid erDiagram reserves `PK`/`FK`/`UK` as attribute key constraint tokens — use `PartitionKey`/`SortKey` as attribute names in erDiagram blocks for DynamoDB key attributes (lowercase `pk`/`sk` also fail). Avoid `|` inside quoted annotations; write `0or1` instead.
 
 ## Terminal Management
 

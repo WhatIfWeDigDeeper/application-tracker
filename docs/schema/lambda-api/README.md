@@ -95,6 +95,8 @@ Single-table design. All item types share the `lambda_api_applications` table an
 
 ## Relations
 
+> **Key name note:** Mermaid reserves `PK`, `FK`, and `UK` as attribute key constraint tokens, so DynamoDB key attributes are spelled out: `PartitionKey` = DynamoDB `PK`, `SortKey` = DynamoDB `SK`.
+
 ```mermaid
 erDiagram
 
@@ -102,8 +104,8 @@ APPLICATION ||--o{ INTERVIEW_STAGE : "has stages"
 APPLICATION ||--o{ HISTORY : "has history"
 
 APPLICATION {
-  string pk "APP#uuid"
-  string sk "APP#uuid"
+  string PartitionKey "APP#uuid"
+  string SortKey "APP#uuid"
   string id
   string companyName
   string positionTitle
@@ -132,8 +134,8 @@ APPLICATION {
 }
 
 INTERVIEW_STAGE {
-  string pk "APP#uuid"
-  string sk "STAGE#uuid"
+  string PartitionKey "APP#uuid"
+  string SortKey "STAGE#uuid"
   string id
   string applicationId
   string name
@@ -145,8 +147,8 @@ INTERVIEW_STAGE {
 }
 
 HISTORY {
-  string pk "APP#uuid"
-  string sk "HIST#00000001"
+  string PartitionKey "APP#uuid"
+  string SortKey "HIST#00000001"
   string id
   string applicationId
   int sequence
