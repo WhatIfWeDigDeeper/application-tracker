@@ -1,6 +1,6 @@
 # Spec 024: AWS Lambda + DynamoDB + API Gateway Backend
 
-**Status:** Planning
+**Status:** Complete
 **Stack:** TypeScript + Hono + AWS Lambda + DynamoDB + API Gateway + AWS CDK
 
 ---
