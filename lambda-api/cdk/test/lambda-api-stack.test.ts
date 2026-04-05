@@ -3,10 +3,17 @@ import { Match, Template } from 'aws-cdk-lib/assertions';
 import { describe, expect, it } from 'vitest';
 import { LambdaApiStack } from '../lib/lambda-api-stack';
 
+let cachedTemplate: Template | undefined;
+
 function buildTemplate(): Template {
+  if (cachedTemplate) {
+    return cachedTemplate;
+  }
+
   const app = new cdk.App();
   const stack = new LambdaApiStack(app, 'TestStack');
-  return Template.fromStack(stack);
+  cachedTemplate = Template.fromStack(stack);
+  return cachedTemplate;
 }
 
 describe('DynamoDB Table', () => {

@@ -538,7 +538,7 @@ services:
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=lambda,dynamodb,apigatewayv2
+      - SERVICES=lambda,dynamodb,apigatewayv2,cloudformation,s3,iam,sts
       - DEFAULT_REGION=${AWS_REGION:-us-east-1}
       - LAMBDA_EXECUTOR=local
     volumes:

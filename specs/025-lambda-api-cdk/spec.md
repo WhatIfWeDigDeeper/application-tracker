@@ -78,7 +78,7 @@ localstack:
   profiles: [localstack]
   ports: ["4566:4566"]
   environment:
-    - SERVICES=lambda,dynamodb,apigatewayv2
+    - SERVICES=lambda,dynamodb,apigatewayv2,cloudformation,s3,iam,sts
     - DEFAULT_REGION=us-east-1
     - LAMBDA_EXECUTOR=local
   volumes:
@@ -87,7 +87,7 @@ localstack:
 ```
 
 - Start with: `docker compose --profile localstack up -d localstack`
-- `data/localstack/` added to `.gitignore`
+- `data/localstack/` remains ignored via the existing `data/` rule in `.gitignore`
 - `aws-cdk-local` package provides the `cdklocal` CLI wrapper that redirects all AWS SDK calls to `localhost:4566`
 - No real AWS credentials needed for LocalStack deployments
 
@@ -139,7 +139,7 @@ npm run cdk:deploy:local
 # → prints LocalStack API Gateway URL
 
 # Tear down
-npm run cdk:destroy
+npm run cdk:destroy:local
 ```
 
 ### Real AWS deployment (future)
