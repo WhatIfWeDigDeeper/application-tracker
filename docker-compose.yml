@@ -11,6 +11,23 @@ services:
     networks:
       - app_tracker_network
 
+  localstack:
+    image: localstack/localstack:4
+    container_name: app_tracker_localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=lambda,dynamodb,apigatewayv2
+      - DEFAULT_REGION=${AWS_REGION:-us-east-1}
+      - LAMBDA_EXECUTOR=local
+    volumes:
+      - ./data/localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    profiles:
+      - localstack
+    networks:
+      - app_tracker_network
+
   postgres:
     image: postgres:18-alpine
     container_name: app_tracker_postgres
