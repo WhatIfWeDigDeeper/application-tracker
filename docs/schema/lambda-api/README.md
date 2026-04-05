@@ -127,10 +127,10 @@ APPLICATION {
   int historySequence
   string createdAt
   string updatedAt
-  string gsi1pk "STATUS#status#ARCHIVED#0or1"
-  string gsi1sk "UPDATED#ts#id"
-  string gsi2pk "ACTIVE"
-  string gsi2sk "UPDATED#ts#id"
+  string GSI1PK "STATUS#status#ARCHIVED#0or1"
+  string GSI1SK "UPDATED#ts#id"
+  string GSI2PK "ACTIVE"
+  string GSI2SK "UPDATED#ts#id"
 }
 
 INTERVIEW_STAGE {

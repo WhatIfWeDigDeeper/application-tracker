@@ -69,9 +69,9 @@ classDiagram
     +string? name
     +number? order
     +boolean? isCompleted
-    +string? completedDate
-    +string? notes
-    +number? performanceRating
+    +string|null? completedDate
+    +string|null? notes
+    +number|null? performanceRating
   }
 
   class ApplicationResponse {
@@ -119,20 +119,20 @@ classDiagram
   class UpdateApplicationInput {
     +string? companyName
     +string? positionTitle
-    +string? dateApplied
+    +string|null? dateApplied
     +ApplicationStatus? status
-    +string? companyUrl
-    +string? jobPostingUrl
-    +string? companyCareerUrl
-    +CompanyCategory? companyCategory
-    +number? skillsMatch
-    +JobSource? jobSource
-    +boolean? coverLetterRequired
-    +string? specialRequirements
-    +number? salaryMin
-    +number? salaryMax
-    +string? notes
-    +string? offerDueDate
+    +string|null? companyUrl
+    +string|null? jobPostingUrl
+    +string|null? companyCareerUrl
+    +CompanyCategory|null? companyCategory
+    +number|null? skillsMatch
+    +JobSource|null? jobSource
+    +boolean|null? coverLetterRequired
+    +string|null? specialRequirements
+    +number|null? salaryMin
+    +number|null? salaryMax
+    +string|null? notes
+    +string|null? offerDueDate
   }
 
   class ListApplicationsQuery {
