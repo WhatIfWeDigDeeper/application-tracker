@@ -516,7 +516,7 @@ git commit -m "feat(lambda-api): add Lambda NodejsFunction and HTTP API Gateway 
 
 - [ ] **Step 1: Add LocalStack service to `docker-compose.yml`**
 
-The current `docker-compose.yml` ends at line 41. Add the LocalStack service before the `volumes:` block. The final file should be:
+Add the LocalStack service before the `volumes:` block. The final file should be:
 
 ```yaml
 services:

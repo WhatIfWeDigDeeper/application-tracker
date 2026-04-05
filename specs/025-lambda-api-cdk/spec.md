@@ -62,7 +62,7 @@ Replicates the schema defined in `lambda-api/scripts/setup-dynamodb.ts` exactly:
 - **API name:** `lambda-api`
 - **Route:** `/{proxy+}` ANY — Hono handles all routing internally
 - **Integration:** `HttpLambdaIntegration` → Lambda function
-- **CORS:** mirrors `app.ts` config (`localhost:3000`, `localhost:3090`, all methods)
+- **CORS:** origins/headers mirror `app.ts` (`localhost:3000`, `localhost:3090`); allows all methods via `CorsHttpMethod.ANY`
 - **Output:** `CfnOutput` prints the API URL after deployment
 
 ---
@@ -104,18 +104,24 @@ The existing `dynamodb-local` service is unchanged — it remains the default fo
 | `cdk:synth` | `npm run --prefix lambda-api/cdk synth` |
 | `cdk:deploy` | `npm run --prefix lambda-api/cdk deploy` |
 | `cdk:deploy:local` | `npm run --prefix lambda-api/cdk deploy:local` |
+| `cdk:bootstrap:local` | `npm run --prefix lambda-api/cdk bootstrap:local` |
 | `cdk:diff` | `npm run --prefix lambda-api/cdk diff` |
 | `cdk:destroy` | `npm run --prefix lambda-api/cdk destroy` |
+| `cdk:destroy:local` | `npm run --prefix lambda-api/cdk destroy:local` |
 
 ### `lambda-api/cdk/package.json` scripts
 
 | Script | Command |
 |--------|---------|
 | `synth` | `cdk synth` |
-| `deploy` | `cdk deploy` |
-| `deploy:local` | `cdklocal deploy` |
+| `deploy` | `cdk deploy --require-approval never` |
+| `deploy:local` | `cdklocal deploy --require-approval never` |
+| `bootstrap:local` | `cdklocal bootstrap` |
 | `diff` | `cdk diff` |
-| `destroy` | `cdk destroy` |
+| `destroy` | `cdk destroy --force` |
+| `destroy:local` | `cdklocal destroy --force` |
+| `test` | `vitest run` |
+| `typecheck` | `tsc --noEmit` |
 
 ---
 
