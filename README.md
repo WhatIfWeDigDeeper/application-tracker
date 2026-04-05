@@ -183,9 +183,9 @@ Mermaid class diagrams generated from TypeScript type definitions:
 - [angular-spring-ui](docs/types/angular-spring-ui/application.model.mermaid) - Angular + Spring Boot
 - [react-apollo-ui](docs/types/react-apollo-ui/application.mermaid) - React Apollo + GraphQL Yoga
 - [yoga-api](docs/types/yoga-api/application.service.mermaid) - GraphQL Yoga API (service input/filter types)
-- [lambda-api](docs/types/lambda-api/api.mermaid) - Lambda + DynamoDB API
+- [lambda-api](docs/types/lambda-api/api.mermaid) - Lambda + DynamoDB API *(hand-maintained — `ts-to-mermaid` does not support zod)*
 
-Regenerate with `npm run docs:types`.
+Regenerate with `npm run docs:types` (all stacks except lambda-api, which is hand-maintained).
 
 ## Repository Structure
 
