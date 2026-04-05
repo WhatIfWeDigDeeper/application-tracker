@@ -186,3 +186,6 @@ __pycache__/
 
 # DynamoDB Local persistent data
 data/
+
+# AWS CDK synthesis output
+cdk.out/

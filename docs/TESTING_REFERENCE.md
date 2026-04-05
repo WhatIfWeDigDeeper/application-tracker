@@ -66,7 +66,7 @@ Runs `scripts/generate-schema-docs.sh`, generates Mermaid ERDs under `docs/schem
 Regenerate TypeScript type diagrams after type changes:
 ```bash
 npm run docs:types         # All implementations
-npm run docs:types:nuxt    # Individual implementation
+npm run docs:types:nuxt-api    # Individual implementation
 ```
 Uses `ts-to-mermaid` via npx. Output: `docs/types/{implementation}/`.
 Note: hono-api excluded (types are Zod-inferred, tool can't resolve).

@@ -2,7 +2,7 @@
 
 ## Repository Overview
 
-Monorepo with multiple frontend+backend implementation pairs sharing a single PostgreSQL database. Skills in `.claude/skills/`, commands in `.claude/commands/`.
+Monorepo with multiple frontend+backend implementation pairs sharing a single PostgreSQL database. Skills in `.claude/skills/` (project-local and upstream-synced) and `.agents/skills/` (upstream-installed originals — see Agent Skills Policy), commands in `.claude/commands/`.
 
 ## Key Patterns
 
@@ -38,6 +38,7 @@ Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolat
 - **python_fastapi** — `fastapi/migrations/001_initial.sql` (asyncpg, raw SQL); also used by `tanstack-start-ui/` (React SSR via TanStack Start, port 3040)
 - **java_spring** — `spring-api/src/main/resources/db/migration/V1__initial.sql` (Spring Data JPA + Hibernate 6, Flyway auto-migration)
 - **go_gin** — `go-api/migrations/001_initial.up.sql` (pgx/sqlc, raw SQL)
+- **graphql_yoga** — `yoga-api/prisma/schema.prisma` (Prisma); paired with `react-apollo-ui` (port 3080)
 
 Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 
@@ -70,7 +71,7 @@ Then proceed with the full build → lint → test → e2e chain as normal.
 **When adding a new implementation** — run `audit:ci:<stack>` for both the API and UI packages before considering the implementation complete. High or critical vulnerabilities must be fixed — do not merge with known high/critical CVEs. For npm-based stacks, try `npm audit fix` first; if that doesn't resolve it, upgrade the offending package manually or find an alternative.
 
 **When changing public TypeScript types** — regenerate the type diagrams for the affected stack:
-- `npm run docs:types:<stack>` (e.g. `docs:types:angular-ui`, `docs:types:nuxt`)
+- `npm run docs:types:<stack>` (e.g. `docs:types:angular-ui`, `docs:types:nuxt-api`)
 
 ## Dependency Management
 
@@ -202,7 +203,20 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`hono/aws-lambda` import**: Built into the main `hono` package (not a separate npm package); use `import { handle } from 'hono/aws-lambda'`
 - **`.env` blocked by sandbox**: Use `.env.example` as template; create `.env` manually or rely on command-line env vars for CI
 - **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
-- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency). The `docs:types:lambda-api` script was removed; update the mermaid file manually when `api.ts` types change. Also note: Mermaid erDiagram reserves `PK`/`FK`/`UK` as attribute key constraint tokens — use `PartitionKey`/`SortKey` as attribute names in erDiagram blocks for DynamoDB key attributes (lowercase `pk`/`sk` also fail). Avoid `|` inside quoted annotations; write `0or1` instead.
+- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency). The `docs:types:lambda-api` script was removed; update the mermaid file manually when `api.ts` types change. Also note: Mermaid erDiagram reserves exactly `PK`/`FK`/`UK` as attribute key constraint tokens — use `PartitionKey`/`SortKey` for DynamoDB PK/SK (lowercase `pk`/`sk` also fail); multi-letter names like `GSI1PK` are NOT reserved and render fine. `map` is also a valid erDiagram type (not reserved). Avoid `|` inside quoted annotations; write `0or1` instead. For classDiagram enumeration members: values with spaces need quotes (e.g. `"given offer"`), hyphenated values work unquoted (e.g. `enterprise-software`). When documenting optional+nullable fields: `nullable().optional()` → `type|null?`; `.optional()` only → `type?`.
+
+## AWS CDK Patterns (lambda-api/cdk/)
+
+- Stack: AWS CDK v2 (`aws-cdk-lib`) + `NodejsFunction` (esbuild) + `TableV2` (DynamoDB) + `HttpApi` (API Gateway v2); CDK package lives at `lambda-api/cdk/` with its own isolated `package.json`
+- **CDK tsconfig must use `module: CommonJS`**: ts-node (used to run CDK apps) requires CJS — intentionally different from the parent `lambda-api/tsconfig.json` which uses ESM. Use `moduleResolution: "node"` (not `"bundler"`)
+- **`esbuild` must be an explicit devDependency** in `lambda-api/cdk/package.json`: `NodejsFunction` requires it at synth time. In a monorepo, don't rely on it being resolved from the parent's `node_modules` — that's fragile if the parent ever removes it
+- **`aws-cdk-local` v3 strips `AWS_*` env vars**: v3 (unlike v2) strips all `AWS_*` env vars before invoking `cdk`, then sets its own endpoint. Scripts like `bootstrap:local` should just be `cdklocal bootstrap` — don't set `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` inline, they'll be silently dropped
+- **`TableV2` → `AWS::DynamoDB::GlobalTable`**: CDK's `TableV2` synthesizes to `AWS::DynamoDB::GlobalTable`, not `AWS::DynamoDB::Table`. Use the correct type name in CDK assertions tests
+- **`tableName` is a CloudFormation token, not a literal**: `this.table.tableName` resolves to `{ Ref: "ApplicationsTableXXXXXXXX" }` at synth time. Assertions that expect a literal string (e.g. `'lambda_api_applications'`) will fail — use `Match.anyValue()` plus a `findResources` check that the Ref contains `'ApplicationsTable'`
+- **CDK subpackage needs its own `vitest.config.ts`**: the parent `lambda-api/vitest.config.ts` has `include: ['src/**/*.test.ts']` which misses `cdk/test/`. Add a `vitest.config.ts` in `lambda-api/cdk/` with `include: ['test/**/*.test.ts']`
+- **`cdk.out/` must be gitignored**: CDK writes synthesized CloudFormation templates to `cdk.out/` at synth/test time — add it to `.gitignore`
+- **`aws-cdk` CLI version vs `aws-cdk-lib` version**: these are on separate version tracks within the 2.x major; a mismatch in minor/patch is normal and not a problem
+- **`HttpApi` is stable in `aws-cdk-lib` since ~v2.130**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed for current CDK versions
 
 ## Terminal Management
 
@@ -254,7 +268,7 @@ Additional notes:
 
 ## Running API Integration Tests
 
-**Server lifecycle**: For fully managed runs (API auto-start/stop for all 9 stacks), use `bash scripts/run-api-tests.sh [stack|all]` or `npm run test:api:all`. To run against a single already-running API, use `npm run test:api:<stack>` (e.g., `npm run test:api:nest-api`).
+**Server lifecycle**: For fully managed runs (API auto-start/stop for all 10 stacks), use `bash scripts/run-api-tests.sh [stack|all]` or `npm run test:api:all`. To run against a single already-running API, use `npm run test:api:<stack>` (e.g., `npm run test:api:nest-api`).
 
 **All stacks run sequentially with `--runInBand`** — tests share a DB schema per stack; parallel Jest workers cause state contamination (race conditions in export/import round-trip tests). The script passes `--runInBand` to ensure test files run sequentially within each stack run.
 
@@ -274,7 +288,7 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 
 **E2E test data cleanup**: Tests that create data must clean up in `afterAll` using API calls (e.g., `page.request.delete('/api/applications/${id}')`) — not fragile UI interactions. Cleanup must run even if individual tests fail.
 
-**Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 8 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
+**Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 9 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
 
 **E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create (fixed in PR #229) — status can be set at create time directly.
 
@@ -289,5 +303,5 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 - **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
 - **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
 - **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
-- **Shared E2E history tests**: `history.spec.ts` has a single `History Panel` block shared by Vue and Svelte; stacks without history use `--grep-invert 'History Panel'` (Playwright CLI flag)
+- **Shared E2E history tests**: `history.spec.ts` runs against all 9 stacks — all implementations support the History Panel feature
 

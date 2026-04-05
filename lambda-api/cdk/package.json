@@ -1,0 +1,30 @@
+{
+  "name": "job-tracker-lambda-api-cdk",
+  "version": "1.0.0",
+  "description": "AWS CDK stack for Lambda API deployment",
+  "private": true,
+  "scripts": {
+    "synth": "cdk synth",
+    "deploy": "cdk deploy --require-approval never",
+    "deploy:local": "cdklocal deploy --require-approval never",
+    "diff": "cdk diff",
+    "destroy": "cdk destroy --force",
+    "destroy:local": "cdklocal destroy --force",
+    "bootstrap:local": "cdklocal bootstrap",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "25.3.5",
+    "aws-cdk": "2.1117.0",
+    "aws-cdk-local": "3.0.4",
+    "esbuild": "0.27.7",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3",
+    "vitest": "4.1.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.248.0",
+    "constructs": "10.6.0"
+  }
+}
