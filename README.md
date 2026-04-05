@@ -415,6 +415,10 @@ Run everything across all stacks:
 npm run validate:all
 ```
 
+### CI Workflows
+
+The **Claude Code Review** workflow (`claude-code-review`) is triggered manually — it does not run automatically on pull requests. To run it, go to **Actions → Claude Code Review → Run workflow** and enter the PR number.
+
 ## Development Tools
 
 This repository includes Claude Code commands and skills for common development tasks:
