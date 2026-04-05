@@ -205,6 +205,19 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
 - **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency). The `docs:types:lambda-api` script was removed; update the mermaid file manually when `api.ts` types change. Also note: Mermaid erDiagram reserves exactly `PK`/`FK`/`UK` as attribute key constraint tokens — use `PartitionKey`/`SortKey` for DynamoDB PK/SK (lowercase `pk`/`sk` also fail); multi-letter names like `GSI1PK` are NOT reserved and render fine. `map` is also a valid erDiagram type (not reserved). Avoid `|` inside quoted annotations; write `0or1` instead. For classDiagram enumeration members: values with spaces need quotes (e.g. `"given offer"`), hyphenated values work unquoted (e.g. `enterprise-software`). When documenting optional+nullable fields: `nullable().optional()` → `type|null?`; `.optional()` only → `type?`.
 
+## AWS CDK Patterns (lambda-api/cdk/)
+
+- Stack: AWS CDK v2 (`aws-cdk-lib`) + `NodejsFunction` (esbuild) + `TableV2` (DynamoDB) + `HttpApi` (API Gateway v2); CDK package lives at `lambda-api/cdk/` with its own isolated `package.json`
+- **CDK tsconfig must use `module: CommonJS`**: ts-node (used to run CDK apps) requires CJS — intentionally different from the parent `lambda-api/tsconfig.json` which uses ESM. Use `moduleResolution: "node"` (not `"bundler"`)
+- **`esbuild` must be an explicit devDependency** in `lambda-api/cdk/package.json`: `NodejsFunction` requires it at synth time. In a monorepo, don't rely on it being resolved from the parent's `node_modules` — that's fragile if the parent ever removes it
+- **`aws-cdk-local` v3 strips `AWS_*` env vars**: v3 (unlike v2) strips all `AWS_*` env vars before invoking `cdk`, then sets its own endpoint. Scripts like `bootstrap:local` should just be `cdklocal bootstrap` — don't set `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` inline, they'll be silently dropped
+- **`TableV2` → `AWS::DynamoDB::GlobalTable`**: CDK's `TableV2` synthesizes to `AWS::DynamoDB::GlobalTable`, not `AWS::DynamoDB::Table`. Use the correct type name in CDK assertions tests
+- **`tableName` is a CloudFormation token, not a literal**: `this.table.tableName` resolves to `{ Ref: "ApplicationsTableXXXXXXXX" }` at synth time. Assertions that expect a literal string (e.g. `'lambda_api_applications'`) will fail — use `Match.anyValue()` plus a `findResources` check that the Ref contains `'ApplicationsTable'`
+- **CDK subpackage needs its own `vitest.config.ts`**: the parent `lambda-api/vitest.config.ts` has `include: ['src/**/*.test.ts']` which misses `cdk/test/`. Add a `vitest.config.ts` in `lambda-api/cdk/` with `include: ['test/**/*.test.ts']`
+- **`cdk.out/` must be gitignored**: CDK writes synthesized CloudFormation templates to `cdk.out/` at synth/test time — add it to `.gitignore`
+- **`aws-cdk` CLI version vs `aws-cdk-lib` version**: these are on separate version tracks within the 2.x major; a mismatch in minor/patch is normal and not a problem
+- **`HttpApi` is stable in `aws-cdk-lib` since ~v2.130**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed for current CDK versions
+
 ## Terminal Management
 
 - **PostgreSQL prerequisite**: Before starting any API server or running E2E tests, verify the PostgreSQL Docker container is running: `docker compose ps db`. If it's not running, `docker compose up -d db` first. A server started without the DB will hang or crash and may be unkillable without a reboot.
