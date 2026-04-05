@@ -1,6 +1,6 @@
 services:
   dynamodb-local:
-    image: amazon/dynamodb-local:latest
+    image: amazon/dynamodb-local:2.5.4
     container_name: app_tracker_dynamodb
     ports:
       - "${DYNAMODB_PORT:-8000}:8000"

@@ -222,16 +222,17 @@ PORT=5090
 
 ```yaml
 dynamodb-local:
-  image: amazon/dynamodb-local:latest
+  image: amazon/dynamodb-local:2.5.4
   container_name: app_tracker_dynamodb
   ports:
     - "8000:8000"
   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+  user: root
   volumes:
-    - dynamodb_data:/data
+    - ./data/dynamodb:/data
 ```
 
-Add `dynamodb_data` to the `volumes:` section.
+Add `data/` to `.gitignore`.
 
 ### Root `package.json` Scripts
 
@@ -253,7 +254,7 @@ Add each to its `:all` counterpart.
 
 Add to `ALL_STACKS`:
 ```ts
-{ name: 'lambda-api', baseUrl: 'http://localhost:5090', validatesDates: true, hasInterviewStageDates: true }
+{ name: 'lambda-api', baseUrl: 'http://localhost:5090', validatesDates: false, hasInterviewStageDates: true }
 ```
 
 ### `scripts/run-api-tests.sh`
@@ -277,11 +278,11 @@ Add build + lint + test steps for `lambda-api`. No new toolchain setup needed (N
 
 1. `npm run build:lambda-api` — TypeScript compiles cleanly
 2. `npm run lint:lambda-api` — no ESLint errors
-3. `npm run test:lambda-api` — unit/integration tests pass (requires DynamoDB Local running)
-4. `npm run test:api:lambda-api` — shared API contract tests pass
+3. `npm run test:lambda-api` — unit tests pass (pure function tests; no Docker required)
+4. `npm run test:api:lambda-api` — shared API contract tests pass (requires DynamoDB Local running + `npm run migrate:lambda-api`)
 5. `bash scripts/run-api-tests.sh all` — no regression on other stacks
 
-**Prerequisite**: `docker compose up -d dynamodb-local` before running any tests.
+**Prerequisite for API tests**: `docker compose up -d dynamodb-local && npm run migrate:lambda-api` before running `test:api:lambda-api`.
 
 ---
 

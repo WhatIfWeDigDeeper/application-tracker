@@ -14,11 +14,15 @@ const tableName = process.env.DYNAMODB_TABLE || 'lambda_api_applications';
 
 const client = new DynamoDBClient({
   region,
-  ...(endpoint ? { endpoint } : {}),
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
-  },
+  ...(endpoint
+    ? {
+        endpoint,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
+        },
+      }
+    : {}),
 });
 
 async function tableExists(): Promise<boolean> {

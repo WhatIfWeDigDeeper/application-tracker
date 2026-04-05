@@ -70,8 +70,21 @@ wait_for_port() {
   echo " ready (${elapsed}s)"
 }
 
+ensure_dynamodb_local() {
+  if ! docker compose ps dynamodb-local 2>/dev/null | grep -q "running"; then
+    echo "[lambda-api] Starting DynamoDB Local..."
+    docker compose up -d dynamodb-local
+    sleep 3
+  fi
+  echo "[lambda-api] Running table migration..."
+  npm run migrate:lambda-api
+}
+
 ensure_api() {
   local stack=$1 port; port=$(api_port "$stack")
+  if [ "$stack" = "lambda-api" ]; then
+    ensure_dynamodb_local
+  fi
   if port_in_use "$port"; then
     echo "[$stack] API already running on :$port"
   else
