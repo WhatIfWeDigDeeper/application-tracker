@@ -164,7 +164,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 
 | Table | Apps | Notes |
 |-------|------|-------|
-| `lambda_api_applications` | Lambda + DynamoDB API | Single-table design with GSIs; no PostgreSQL |
+| `lambda_api_applications` | Lambda + DynamoDB API | Single-table design with GSIs; no PostgreSQL — [schema docs](docs/schema/lambda-api/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
