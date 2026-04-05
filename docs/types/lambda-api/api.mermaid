@@ -6,10 +6,10 @@ classDiagram
     applied
     rejected
     interviewing
-    given_offer
-    accepted_offer
-    declined_offer
-    no_offer
+    "given offer"
+    "accepted offer"
+    "declined offer"
+    "no offer"
   }
 
   class CompanyCategory {
@@ -20,12 +20,12 @@ classDiagram
     ai
     energy
     finance
-    enterprise_software
-    consumer_tech
-    e_commerce
+    enterprise-software
+    consumer-tech
+    e-commerce
     cybersecurity
     gaming
-    media_entertainment
+    media-entertainment
     consulting
     government
     nonprofit
@@ -42,7 +42,7 @@ classDiagram
     indeed
     friend
     colleague
-    company_website
+    company-website
     other
   }
 
@@ -176,10 +176,15 @@ classDiagram
     +number limit
   }
 
+  class ErrorDetail {
+    +string field
+    +string message
+  }
+
   class ErrorResponse {
     +string code
     +string message
-    +object[]? details
+    +ErrorDetail[]? details
   }
 
   ApplicationResponse --> ApplicationStatus
@@ -197,3 +202,4 @@ classDiagram
   PaginatedApplicationsResponse --> ApplicationResponse
   HistoryEntryResponse --> FieldChange
   PaginatedHistoryResponse --> HistoryEntryResponse
+  ErrorResponse --> ErrorDetail

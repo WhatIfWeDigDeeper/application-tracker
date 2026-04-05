@@ -95,7 +95,7 @@ Single-table design. All item types share the `lambda_api_applications` table an
 
 ## Relations
 
-> **Key name note:** Mermaid reserves `PK`, `FK`, and `UK` as attribute key constraint tokens, so DynamoDB key attributes are spelled out: `PartitionKey` = DynamoDB `PK`, `SortKey` = DynamoDB `SK`.
+> **Key name note:** Mermaid reserves `PK`, `FK`, and `UK` as attribute key constraint tokens, so DynamoDB key attributes are spelled out: `PartitionKey` = DynamoDB `PK`, `SortKey` = DynamoDB `SK`. Also, `|` is not allowed inside Mermaid quoted annotations — `0or1` is a rendering-safe placeholder for `0|1`.
 
 ```mermaid
 erDiagram
@@ -153,7 +153,7 @@ HISTORY {
   string applicationId
   int sequence
   string description
-  string snapshot "full ApplicationResponse JSON"
+  map snapshot "full ApplicationResponse as DynamoDB Map"
   string createdAt
 }
 ```
