@@ -71,7 +71,7 @@ Then proceed with the full build → lint → test → e2e chain as normal.
 **When adding a new implementation** — run `audit:ci:<stack>` for both the API and UI packages before considering the implementation complete. High or critical vulnerabilities must be fixed — do not merge with known high/critical CVEs. For npm-based stacks, try `npm audit fix` first; if that doesn't resolve it, upgrade the offending package manually or find an alternative.
 
 **When changing public TypeScript types** — regenerate the type diagrams for the affected stack:
-- `npm run docs:types:<stack>` (e.g. `docs:types:angular-ui`, `docs:types:nuxt`)
+- `npm run docs:types:<stack>` (e.g. `docs:types:angular-ui`, `docs:types:nuxt-api`)
 
 ## Dependency Management
 

@@ -49,7 +49,7 @@ Create `lambda-api/cdk/package.json`:
     "diff": "cdk diff",
     "destroy": "cdk destroy --force",
     "destroy:local": "cdklocal destroy --force",
-    "bootstrap:local": "AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test cdklocal bootstrap",
+    "bootstrap:local": "cdklocal bootstrap",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

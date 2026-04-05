@@ -25,11 +25,13 @@ export class LambdaApiStack extends cdk.Stack {
           indexName: 'GSI1',
           partitionKey: { name: 'GSI1PK', type: dynamodb.AttributeType.STRING },
           sortKey: { name: 'GSI1SK', type: dynamodb.AttributeType.STRING },
+          projectionType: dynamodb.ProjectionType.ALL,
         },
         {
           indexName: 'GSI2',
           partitionKey: { name: 'GSI2PK', type: dynamodb.AttributeType.STRING },
           sortKey: { name: 'GSI2SK', type: dynamodb.AttributeType.STRING },
+          projectionType: dynamodb.ProjectionType.ALL,
         },
       ],
       removalPolicy: cdk.RemovalPolicy.DESTROY,

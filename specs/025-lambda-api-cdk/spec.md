@@ -55,7 +55,6 @@ Replicates the schema defined in `lambda-api/scripts/setup-dynamodb.ts` exactly:
 - **Memory:** 256 MB
 - **Environment variables injected by CDK:**
   - `DYNAMODB_TABLE` — table name from the stack
-  - `AWS_REGION` — stack region
 - **IAM:** `table.grantReadWriteData(fn)` — CDK generates the policy automatically
 
 ### HTTP API Gateway v2 (`HttpApi`)
@@ -133,7 +132,7 @@ npm run dev:lambda-api
 docker compose --profile localstack up -d localstack
 
 # First time only — bootstrap LocalStack
-AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test npx cdklocal bootstrap
+npm run cdk:bootstrap:local
 
 # Deploy
 npm run cdk:deploy:local

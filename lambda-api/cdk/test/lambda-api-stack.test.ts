@@ -28,7 +28,7 @@ describe('DynamoDB Table', () => {
     });
   });
 
-  it('has GSI1 and GSI2 indexes', () => {
+  it('has GSI1 and GSI2 indexes with ALL projection', () => {
     const template = buildTemplate();
     template.hasResourceProperties('AWS::DynamoDB::GlobalTable', {
       GlobalSecondaryIndexes: [
@@ -38,6 +38,7 @@ describe('DynamoDB Table', () => {
             { AttributeName: 'GSI1PK', KeyType: 'HASH' },
             { AttributeName: 'GSI1SK', KeyType: 'RANGE' },
           ],
+          Projection: { ProjectionType: 'ALL' },
         },
         {
           IndexName: 'GSI2',
@@ -45,6 +46,7 @@ describe('DynamoDB Table', () => {
             { AttributeName: 'GSI2PK', KeyType: 'HASH' },
             { AttributeName: 'GSI2SK', KeyType: 'RANGE' },
           ],
+          Projection: { ProjectionType: 'ALL' },
         },
       ],
     });
