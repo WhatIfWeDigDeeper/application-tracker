@@ -16,6 +16,14 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["node_modules/**", "**/node_modules/**", "tests/**/*.js"],
+    ignores: [
+      "node_modules/**",
+      "**/node_modules/**",
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      "**/*.min.js",
+      "tests/**/*.js",
+    ],
   }
 );

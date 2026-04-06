@@ -18,6 +18,7 @@ const webServerCommands: Record<number, WebServerConfig | string> = {
   3060: 'cd angular-ui && npm run start',
   3070: { command: 'npm run dev:angular-spring-ui', timeout: 120_000 },
   3080: 'cd react-apollo-ui && npm run dev',
+  3090: 'cd lambda-react-ui && npm run dev',
 };
 
 export default defineConfig({

@@ -12,6 +12,7 @@ PORTS=(
   3060  # Angular UI
   3070  # Angular Spring UI
   3080  # React Apollo UI
+  3090  # Lambda React UI
   5010  # Koa API
   5030  # Hono API
   5040  # Nuxt API

@@ -2,3 +2,8 @@
 **/.next
 **/dist
 .git
+**/coverage
+**/*.log*
+**/.env*
+Dockerfile*
+.dockerignore

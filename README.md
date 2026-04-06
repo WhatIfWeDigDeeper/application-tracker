@@ -15,6 +15,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [8. Angular + Spring Boot + JPA/Hibernate](#8-angular--spring-boot--jpahibernate)
   - [9. GraphQL Yoga + React Apollo](#9-graphql-yoga--react-apollo)
   - [10. Lambda + DynamoDB (API only)](#10-lambda--dynamodb-api-only)
+  - [11. Lambda React UI + Lambda API + DynamoDB](#11-lambda-react-ui--lambda-api--dynamodb)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Type Diagrams](#type-diagrams)
@@ -45,6 +46,20 @@ This repository contains a complete job application tracker built with multiple 
 ![Sample Edit Job Application with history](docs/imgs/vue-app-details.png)
 
 ## Implementations
+
+| Implementation | Directories | UI Port | API Port | Notes |
+|---|---|---:|---:|---|
+| Vue + Nuxt + Drizzle | `vue-ui/` + `nuxt-api/` | 3020 | 5040 | PostgreSQL (`vue_nuxt`) |
+| Next.js + Express + Prisma | `ui/` + `api/` | 3000 | 3001 | PostgreSQL (`express_prisma`) |
+| React + Koa + PostgreSQL | `react-ui/` + `koa-api/` | 3010 | 5010 | Raw SQL (`react_koa`) |
+| Svelte + Hono + Drizzle | `svelte-ui/` + `hono-api/` | 3030 | 5030 | PostgreSQL (`svelte_hono`) |
+| React + TanStack + NestJS + Drizzle | `tanstack-ui/` + `nest-api/` | 3050 | 5050 | PostgreSQL (`react_nestjs`) |
+| React SSR + TanStack Start + FastAPI | `tanstack-start-ui/` + `fastapi/` | 3040 | 5160 | PostgreSQL (`python_fastapi`) |
+| Angular + Go Gin + pgx/sqlc | `angular-ui/` + `go-api/` | 3060 | 5070 | PostgreSQL (`go_gin`) |
+| Angular + Spring Boot + JPA/Hibernate | `angular-spring-ui/` + `spring-api/` | 3070 | 8080 | PostgreSQL (`java_spring`) |
+| GraphQL Yoga + React Apollo | `react-apollo-ui/` + `yoga-api/` | 3080 | 5080 | PostgreSQL (`graphql_yoga`) |
+| Lambda + DynamoDB (API only) | `lambda-api/` | - | 5090 | DynamoDB (`lambda_api_applications`) |
+| Lambda React UI + Lambda API + DynamoDB | `lambda-react-ui/` + `lambda-api/` | 3090 | 5090 | Zustand + React 19 + Vite, DynamoDB-backed |
 
 ### 1. Vue + Nuxt + Drizzle
 **Directories**: `vue-ui/` + `nuxt-api/`
@@ -130,7 +145,14 @@ This repository contains a complete job application tracker built with multiple 
 - Lambda deployment: same Hono app wrapped with `@hono/aws-lambda` adapter
 - Infrastructure: AWS CDK (TypeScript) at `lambda-api/cdk/` — DynamoDB + Lambda + HTTP API Gateway v2
 - First serverless, non-relational backend in the monorepo
-- UI: TBD (separate spec)
+
+### 11. Lambda React UI + Lambda API + DynamoDB
+**Directories**: `lambda-react-ui/` + `lambda-api/`
+**Stack**:
+- Frontend: React 19 + TypeScript + Vite + Zustand + React Router — port 3090
+- Backend: TypeScript + Hono + AWS Lambda-compatible runtime (local dev server) — port 5090
+- Database: DynamoDB single-table design (`lambda_api_applications`) via `lambda-api` endpoints only
+- Includes responsive three-pane UI, context panel workflows, CSV import/export, history diff view, and shared E2E compatibility
 
 ## Core Features
 
@@ -164,7 +186,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 
 | Table | Apps | Notes |
 |-------|------|-------|
-| `lambda_api_applications` | Lambda + DynamoDB API | Single-table design with GSIs; no PostgreSQL — [schema docs](docs/schema/lambda-api/README.md) |
+| `lambda_api_applications` | Lambda + DynamoDB API + Lambda React UI | Single-table design with GSIs; no PostgreSQL — [schema docs](docs/schema/lambda-api/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
 
@@ -302,6 +324,10 @@ cp lambda-api/.env.example lambda-api/.env  # sets DYNAMODB_ENDPOINT/local AWS c
 npm run migrate:lambda-api                  # create/update DynamoDB table
 npm run dev:lambda-api                      # start Hono server on port 5090
 
+# Lambda React UI + Lambda API (UI 3090 + API 5090)
+npm run dev:lambda-api
+npm run dev:lambda-react-ui
+
 # CDK — synthesize / deploy (real AWS or LocalStack)
 npm run cdk:synth                           # synthesize CloudFormation template (no AWS needed)
 npm run cdk:deploy                          # deploy to real AWS
@@ -341,6 +367,7 @@ npm run test:angular-ui   # Angular UI tests (Jest + @testing-library/angular)
 npm run test:spring-api   # Spring Boot API tests (JUnit 5)
 npm run test:angular-spring-ui  # Angular Spring UI tests (Jest + @testing-library/angular)
 npm run test:lambda-api         # Lambda + DynamoDB unit tests (vitest, no Docker needed)
+npm run test:lambda-react-ui    # Lambda React UI tests (Vitest + Testing Library)
 npm run test:lambda-api-cdk     # CDK assertions tests (vitest, no Docker needed)
 ```
 
@@ -390,6 +417,7 @@ npm run test:e2e:tanstack-start-ui  # React SSR + TanStack Start + FastAPI (port
 npm run test:e2e:tanstack-ui        # React + TanStack + NestJS (port 3050)
 npm run test:e2e:angular-ui         # Angular + Go Gin (port 3060)
 npm run test:e2e:angular-spring-ui  # Angular + Spring Boot (port 3070)
+npm run test:e2e:lambda-react-ui    # Lambda React UI + Lambda API (port 3090)
 npm run test:e2e:all                # Run all e2e tests
 ```
 

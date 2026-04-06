@@ -12,8 +12,57 @@ import {
 import * as applicationService from '../services/application.service.js';
 import * as interviewStageService from '../services/interview-stage.service.js';
 import * as historyService from '../services/history.service.js';
+import * as csvService from '../services/csv.service.js';
 
 const applications = new Hono();
+
+applications.get(
+  '/export',
+  zValidator(
+    'query',
+    z.object({
+      includeArchived: z
+        .preprocess((val) => val === 'true' || val === true, z.boolean())
+        .default(false),
+    })
+  ),
+  async (c) => {
+    try {
+      const { includeArchived } = c.req.valid('query');
+      const csv = await csvService.exportApplications(undefined, includeArchived);
+      c.header('Content-Type', 'text/csv');
+      c.header('Content-Disposition', 'attachment; filename="applications-export.csv"');
+      return c.text(csv);
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      return c.json({ code: 'internal_error', message: 'An unexpected error occurred' }, 500);
+    }
+  }
+);
+
+applications.get('/sample-csv', (c) => {
+  c.header('Content-Type', 'text/csv');
+  c.header('Content-Disposition', 'attachment; filename="applications-template.csv"');
+  return c.text(csvService.sampleCsvHeader());
+});
+
+applications.post('/import', async (c) => {
+  try {
+    const body = await c.req.parseBody();
+    const file = body.file;
+
+    if (!(file instanceof File)) {
+      return c.json({ code: 'validation_error', message: 'No CSV file provided' }, 400);
+    }
+
+    const text = await file.text();
+    const result = await csvService.importApplications(text);
+    return c.json(result);
+  } catch (error) {
+    console.error('Error importing CSV:', error);
+    return c.json({ code: 'internal_error', message: 'An unexpected error occurred' }, 500);
+  }
+});
 
 // List applications
 applications.get('/', zValidator('query', ListApplicationsQuerySchema), async (c) => {
