@@ -46,6 +46,7 @@ export function TextArea({
         {required ? <span className="ml-1 text-[var(--status-rejected)]">*</span> : null}
       </div>
       <textarea
+        {...props}
         ref={textareaRef}
         id={textAreaId}
         required={required}
@@ -56,7 +57,6 @@ export function TextArea({
           error ? 'border-[var(--status-rejected)]' : 'border-[var(--border-subtle)]',
           className
         )}
-        {...props}
       />
       {error ? <div className="mt-1 text-xs text-[var(--status-rejected)]">{error}</div> : null}
     </label>
