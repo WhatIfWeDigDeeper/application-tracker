@@ -101,7 +101,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **React Router useBlocker**: Only works with `createBrowserRouter` + `RouterProvider`, not `<BrowserRouter>`
 - **Avoid absolute positioning for sibling elements**: When multiple elements share the same corner (e.g., badge + action menu), use flexbox flow instead of `absolute` — prevents overlap
 - **Validation limit changes**: When updating max lengths in constants/schemas, rg (ripgrep) for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
-- **Zod boolean coercion**: `z.coerce.boolean()` treats any non-empty string (including `"false"`) as `true` — use `z.preprocess((val) => val === 'true' || val === true, z.boolean())` for query params
+- **Zod boolean coercion**: `z.coerce.boolean()` treats any non-empty string (including `"false"`) as `true` — use `z.preprocess((val) => val === 'true' || val === true, z.boolean())` for query params. **`.default()` gotcha**: if the preprocess runs on `undefined` (absent param), it returns `false`, which is a valid boolean — so `.default(true)` never fires. Fix: return `undefined` from preprocess when `val === undefined` so `.default()` can apply.
 - **Null vs undefined in validation**: API fields that are "not set" often return `null`, not `undefined`. Strict `!== undefined` checks let `null` slip into range/format validators where JS coercion causes false failures (e.g. `null < 1` → `true`) — use `!= null` (loose equality) to treat both as absent.
 - **Drizzle `date()` columns** (hono-api, nest-api, nuxt-api): expect YYYY-MM-DD strings, not `Date` objects — use `new Date().toISOString().split('T')[0]` for today, not `new Date()` directly
 - **Default sort order**: All stacks sort applications by `updatedAt` descending, not `dateApplied` — do not assume date-applied ordering in queries or E2E tests
@@ -204,6 +204,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
 - **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency) — the `docs:types:lambda-api` script was removed. Update the mermaid file manually when `api.ts` types change.
 - **Mermaid erDiagram syntax gotchas**: `PK`/`FK`/`UK` are reserved attribute key constraint tokens — use `PartitionKey`/`SortKey` for DynamoDB keys (lowercase `pk`/`sk` also fail; multi-letter names like `GSI1PK` are fine). Avoid `|` inside quoted annotations (write `0or1`). `nullable().optional()` → `type|null?`; `.optional()` only → `type?`. classDiagram enum values with spaces need quotes (`"given offer"`); hyphenated values work unquoted.
+- **`void asyncFn()` in React event handlers**: `void` discards the promise, so rejections become unhandled. In `onClick`/`onConfirm` handlers, use `.catch()` to surface errors (e.g., `asyncFn().catch(err => setError(...))`) or wrap in an async IIFE with try/catch. This applies to all lambda-react-ui async actions: API calls, store dispatches, CSV export/import.
 
 ## AWS CDK Patterns (lambda-api/cdk/)
 
