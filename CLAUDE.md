@@ -18,7 +18,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Agent Skills Policy**: When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (including `pr-comments`, `ship-it`, `learn`, `playwright-cli`, etc.) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
 
 ## Active Technologies
-- TypeScript 5.x (strict mode) + React 19, Vite 6.x, Zustand 5.0.12, React Router 7.13.1, Tailwind CSS 4.x, @testing-library/react, Vites (026-lambda-react-ui)
+- TypeScript 5.x (strict mode) + React 19, Vite 7.x, Zustand 5.0.12, React Router 7.13.1, Tailwind CSS 4.x, @testing-library/react, Vitest (026-lambda-react-ui)
 - DynamoDB (via lambda-api — no direct DB access from frontend) (026-lambda-react-ui)
 
 - TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite

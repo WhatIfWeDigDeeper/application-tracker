@@ -106,7 +106,7 @@ uiStore           — sidebarCollapsed, panelOpen, panelTab, darkMode, viewMode 
 
 ## 6. Build Tooling
 
-**Decision**: Vite 6.x + TypeScript strict + Tailwind CSS 4.x + ESLint
+**Decision**: Vite 7.x + TypeScript strict + Tailwind CSS 4.x + ESLint
 
 **Rationale**: Consistent with `react-ui`, `tanstack-ui`, `react-apollo-ui` — all use Vite SPA pattern in this monorepo.
 

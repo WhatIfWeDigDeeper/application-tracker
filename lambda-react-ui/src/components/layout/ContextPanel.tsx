@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { HistoryPanel } from '@/components/applications/HistoryPanel';
 import { InterviewStageList } from '@/components/interviews/InterviewStageList';
+import { TextArea } from '@/components/ui/TextArea';
 import { useApplicationStore } from '@/stores/applicationStore';
 import { useFilterStore } from '@/stores/filterStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -172,31 +173,27 @@ export function ContextPanel() {
             </div>
 
             <div className="mt-3 space-y-2">
-              <label className="block text-xs text-[var(--text-secondary)]">
-                Notes
-                <input
-                  className="mt-1 w-full rounded border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-2 py-1 text-sm text-[var(--text-primary)]"
-                  value={detailDraft.notes}
-                  onChange={(event) => setDetailDraft((current) => ({ ...current, notes: event.target.value }))}
-                  onBlur={() => {
-                    void handleDetailBlur('notes');
-                  }}
-                />
-              </label>
+              <TextArea
+                label="Notes"
+                value={detailDraft.notes}
+                onChange={(event) => setDetailDraft((current) => ({ ...current, notes: event.target.value }))}
+                onBlur={() => {
+                  void handleDetailBlur('notes');
+                }}
+                rows={3}
+              />
 
-              <label className="block text-xs text-[var(--text-secondary)]">
-                Special Requirements
-                <input
-                  className="mt-1 w-full rounded border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-2 py-1 text-sm text-[var(--text-primary)]"
-                  value={detailDraft.specialRequirements}
-                  onChange={(event) =>
-                    setDetailDraft((current) => ({ ...current, specialRequirements: event.target.value }))
-                  }
-                  onBlur={() => {
-                    void handleDetailBlur('specialRequirements');
-                  }}
-                />
-              </label>
+              <TextArea
+                label="Special Requirements"
+                value={detailDraft.specialRequirements}
+                onChange={(event) =>
+                  setDetailDraft((current) => ({ ...current, specialRequirements: event.target.value }))
+                }
+                onBlur={() => {
+                  void handleDetailBlur('specialRequirements');
+                }}
+                rows={3}
+              />
 
               <div className="grid grid-cols-2 gap-2">
                 <label className="block text-xs text-[var(--text-secondary)]">

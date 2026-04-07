@@ -164,7 +164,7 @@ export async function exportCSV(): Promise<void> {
   link.href = url;
   link.download = `applications-${today}.csv`;
   link.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
 export async function importCSV(file: File): Promise<ImportResult> {
@@ -190,5 +190,5 @@ export async function downloadSampleCSV(): Promise<void> {
   link.href = url;
   link.download = 'applications-template.csv';
   link.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }

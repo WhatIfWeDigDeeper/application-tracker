@@ -227,6 +227,18 @@ export async function importApplications(
         continue;
       }
 
+      if (companyCategoryResult && !companyCategoryResult.success) {
+        result.failed += 1;
+        result.errors.push(`Row ${rowNumber}: invalid companyCategory "${row.companyCategory}"`);
+        continue;
+      }
+
+      if (jobSourceResult && !jobSourceResult.success) {
+        result.failed += 1;
+        result.errors.push(`Row ${rowNumber}: invalid jobSource "${row.jobSource}"`);
+        continue;
+      }
+
       const skillsMatchNum = toNumber(row.skillsMatch);
       if (skillsMatchNum !== undefined && (skillsMatchNum < 1 || skillsMatchNum > 5)) {
         result.failed += 1;
@@ -242,9 +254,9 @@ export async function importApplications(
         companyUrl: row.companyUrl || undefined,
         jobPostingUrl: row.jobPostingUrl || undefined,
         companyCareerUrl: row.companyCareerUrl || undefined,
-        companyCategory: companyCategoryResult?.success ? companyCategoryResult.data : undefined,
+        companyCategory: companyCategoryResult?.data,
         skillsMatch: skillsMatchNum,
-        jobSource: jobSourceResult?.success ? jobSourceResult.data : undefined,
+        jobSource: jobSourceResult?.data,
         coverLetterRequired: toBoolean(row.coverLetterRequired),
         specialRequirements: row.specialRequirements || undefined,
         salaryMin: toNumber(row.salaryMin),

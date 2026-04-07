@@ -66,7 +66,7 @@ Import applications from an uploaded CSV file.
 - Header row detected if first row matches the standard columns
 - Multi-line quoted fields MUST be supported (character-by-character parser, NOT line-split)
 - `isArchived` column: `true` → import as archived; `false` or empty → active
-- `status` column: defaults to `unsubmitted` if empty or invalid
+- `status` column: defaults to `unsubmitted` if empty; fails the row if an unrecognized value is provided
 - `dateApplied` column: ignored if status is `unsubmitted`
 
 **Duplicate detection**: If a row has a non-empty `jobPostingUrl` that matches an existing application's `jobPostingUrl`, the row is SKIPPED (not updated).
