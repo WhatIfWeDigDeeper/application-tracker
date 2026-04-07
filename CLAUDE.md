@@ -307,4 +307,4 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 
 
 ## Recent Changes
-- 026-lambda-react-ui: Added TypeScript 5.x (strict mode) + React 19, Vite 6.x, Zustand 5.0.12, React Router 7.13.1, Tailwind CSS 4.x, @testing-library/react, Vites
+- 026-lambda-react-ui: Added TypeScript 5.x (strict mode) + React 19, Vite 7.x, Zustand 5.0.12, React Router 7.13.1, Tailwind CSS 4.x, @testing-library/react, Vitest

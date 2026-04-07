@@ -289,10 +289,8 @@ export async function importApplications(
 }
 
 export async function exportApplications(
-  dynamodb: DynamoLike = docClient,
   includeArchived = false
 ): Promise<string> {
-  void dynamodb;
   const limit = 1000;
   const items: ApplicationResponse[] = [];
   let page = 1;

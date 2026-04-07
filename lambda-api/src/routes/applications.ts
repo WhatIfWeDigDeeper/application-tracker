@@ -29,7 +29,7 @@ applications.get(
   async (c) => {
     try {
       const { includeArchived } = c.req.valid('query');
-      const csv = await csvService.exportApplications(undefined, includeArchived);
+      const csv = await csvService.exportApplications(includeArchived);
       c.header('Content-Type', 'text/csv');
       c.header('Content-Disposition', 'attachment; filename="applications-export.csv"');
       return c.text(csv);

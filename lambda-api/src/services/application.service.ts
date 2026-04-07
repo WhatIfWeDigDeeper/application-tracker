@@ -264,7 +264,7 @@ export async function listApplications(
   const total = items.length;
 
   let page = offsetPage;
-  if (cursor) {
+  if (cursor !== undefined) {
     if (cursor === 'start') {
       page = 1;
     } else {
@@ -292,7 +292,7 @@ export async function listApplications(
     })
   );
 
-  if (cursor) {
+  if (cursor !== undefined) {
     const hasMore = offset + limit < total;
     const nextCursor = hasMore
       ? Buffer.from(JSON.stringify({ page: page + 1, limit }), 'utf8').toString('base64')
