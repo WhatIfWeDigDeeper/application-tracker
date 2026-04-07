@@ -111,12 +111,12 @@ Cursor-based pagination is added to the existing `GET /applications` endpoint as
 {
   "items": [ ...Application[] ],
   "limit": 20,
-  "nextCursor": "eyJwYWdlIjoyLCJsaW1pdCI6MjB9",
+  "nextCursor": "eyJwYWdlIjoyfQ==",
   "hasMore": true
 }
 ```
 
-- `nextCursor`: base64-encoded JSON `{ "page": N, "limit": L }`. `null` when on the last page.
+- `nextCursor`: base64-encoded JSON `{ "page": N }`. `null` when on the last page.
 - `hasMore`: `true` if more pages exist
 
 **Cursor implementation**: The cursor token encodes the logical page offset internally. This keeps the API surface cursor-based while the backend continues to use in-memory sort + slice. Cursor tokens are not stable across data mutations.

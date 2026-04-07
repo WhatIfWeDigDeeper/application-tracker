@@ -68,7 +68,7 @@ uiStore           — sidebarCollapsed, panelOpen, panelTab, darkMode, viewMode 
 **Cursor-based** (new, opt-in via `cursor` query param):
 - Query params: `cursor=<base64>&limit=20`
 - Response: `{ items, limit, nextCursor: string|null, hasMore: boolean }`
-- Implementation: cursor encodes `{ page, limit }` as base64 JSON — semantically cursor-based for frontend API but still uses in-memory pagination internally. This is appropriate because DynamoDB Scan + in-memory sort cannot use `LastEvaluatedKey` reliably (the key position in the raw scan does not match the sorted position)
+- Implementation: cursor encodes `{ page }` as base64 JSON — semantically cursor-based for frontend API but still uses in-memory pagination internally. This is appropriate because DynamoDB Scan + in-memory sort cannot use `LastEvaluatedKey` reliably (the key position in the raw scan does not match the sorted position)
 - When `cursor` is omitted: falls back to offset-based automatically
 - The lambda-react-ui frontend uses offset-based pagination (`page`/`limit`); cursor mode is supported by lambda-api but not used by the current frontend; shared E2E tests also use offset-based
 

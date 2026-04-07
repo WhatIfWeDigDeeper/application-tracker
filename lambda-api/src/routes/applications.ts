@@ -23,7 +23,7 @@ applications.get(
     z.object({
       includeArchived: z
         .preprocess((val) => val === 'true' || val === true, z.boolean())
-        .default(false),
+        .default(true),
     })
   ),
   async (c) => {
@@ -31,7 +31,7 @@ applications.get(
       const { includeArchived } = c.req.valid('query');
       const csv = await csvService.exportApplications(includeArchived);
       c.header('Content-Type', 'text/csv');
-      c.header('Content-Disposition', 'attachment; filename="applications-export.csv"');
+      c.header('Content-Disposition', `attachment; filename="applications-${new Date().toISOString().slice(0, 10)}.csv"`);
       return c.text(csv);
     } catch (error) {
       console.error('Error exporting CSV:', error);

@@ -15,8 +15,6 @@ export function Sidebar() {
   const setIncludeArchived = useFilterStore((state) => state.setIncludeArchived);
   const setStatusFilter = useFilterStore((state) => state.setStatusFilter);
 
-  const archivedCount = applications.filter((app) => app.isArchived).length;
-
   return (
     <>
       <aside
@@ -70,7 +68,7 @@ export function Sidebar() {
           }}
           type="button"
         >
-          {sidebarCollapsed ? 'S' : `Stored (${archivedCount})`}
+          {sidebarCollapsed ? 'S' : 'Stored'}
         </Button>
       </nav>
 

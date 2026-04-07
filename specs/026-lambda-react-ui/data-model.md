@@ -71,7 +71,7 @@ interface PaginatedApplicationsResponse {
 interface CursorPaginatedApplicationsResponse {
   items: Application[];
   limit: number;
-  nextCursor: string | null;    // base64 JSON { page, limit } or null if last page
+  nextCursor: string | null;    // base64 JSON { page } or null if last page
   hasMore: boolean;
 }
 ```

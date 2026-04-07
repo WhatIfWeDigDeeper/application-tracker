@@ -186,7 +186,8 @@ function toBoolean(input: string): boolean | undefined {
 function toNumber(input: string): number | undefined {
   if (!input) return undefined;
   const parsed = Number(input);
-  return Number.isFinite(parsed) ? parsed : undefined;
+  if (!Number.isFinite(parsed) || parsed < 0 || !Number.isInteger(parsed)) return undefined;
+  return parsed;
 }
 
 export async function importApplications(

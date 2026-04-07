@@ -69,9 +69,7 @@ export default function ApplicationEditPage() {
       } else {
         const created = await createApplication(payload as CreateApplicationInput);
         if (createStageDraft.length > 0) {
-          for (const [index, name] of createStageDraft.entries()) {
-            await addStage(created.id, { name, order: index });
-          }
+          await Promise.all(createStageDraft.map((name, index) => addStage(created.id, { name, order: index })));
         }
         navigateAfterSave(`/applications/${created.id}`);
       }
@@ -86,7 +84,7 @@ export default function ApplicationEditPage() {
   return (
     <section>
       <h1 style={{ margin: 0 }}>{id ? 'Edit Application' : 'New Application'}</h1>
-      <Button variant="ghost" size="sm" type="button" onClick={() => navigateAfterSave('/')}>
+      <Button variant="ghost" size="sm" type="button" onClick={() => navigate('/')}>
         Back to List
       </Button>
       <p style={{ color: 'var(--text-secondary)' }}>
