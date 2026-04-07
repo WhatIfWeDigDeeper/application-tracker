@@ -13,6 +13,7 @@ export default function ApplicationEditPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -63,6 +64,7 @@ export default function ApplicationEditPage() {
 
   const handleSubmit = async (payload: CreateApplicationInput | UpdateApplicationInput) => {
     setSaving(true);
+    setSubmitError(null);
     try {
       if (id) {
         await updateApplication(id, payload as UpdateApplicationInput);
@@ -76,6 +78,8 @@ export default function ApplicationEditPage() {
       if (id) {
         setIsDirty(false);
       }
+    } catch (caught) {
+      setSubmitError(caught instanceof Error ? caught.message : 'Failed to save application');
     } finally {
       setSaving(false);
     }
@@ -93,6 +97,7 @@ export default function ApplicationEditPage() {
 
       {selectedLoading ? <p>Loading application...</p> : null}
       {error ? <p style={{ color: 'var(--status-rejected)' }}>{error}</p> : null}
+      {submitError ? <p style={{ color: 'var(--status-rejected)' }}>{submitError}</p> : null}
 
       <div className="mt-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4">
         {canRenderForm ? (

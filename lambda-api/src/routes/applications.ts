@@ -22,7 +22,18 @@ applications.get(
     'query',
     z.object({
       includeArchived: z
-        .preprocess((val) => val === 'true' || val === true, z.boolean())
+        .preprocess((val) => {
+          if (val === undefined) {
+            return undefined;
+          }
+          if (val === 'true' || val === true) {
+            return true;
+          }
+          if (val === 'false' || val === false) {
+            return false;
+          }
+          return val;
+        }, z.boolean())
         .default(true),
     })
   ),

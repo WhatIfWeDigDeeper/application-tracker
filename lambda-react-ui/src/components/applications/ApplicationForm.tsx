@@ -31,6 +31,7 @@ interface ApplicationFormValues {
   salaryMin: string;
   salaryMax: string;
   notes: string;
+  offerDueDate: string;
 }
 
 interface ApplicationFormProps {
@@ -61,6 +62,7 @@ function normalizeInitialValues(values?: Partial<Application>): ApplicationFormV
     salaryMin: values?.salaryMin != null ? String(values.salaryMin) : '',
     salaryMax: values?.salaryMax != null ? String(values.salaryMax) : '',
     notes: values?.notes ?? '',
+    offerDueDate: values?.offerDueDate ?? '',
   };
 }
 
@@ -160,9 +162,20 @@ export function ApplicationForm({
       }
     }
 
+    const skillsMatchNum = values.skillsMatch ? Number(values.skillsMatch) : null;
+    if (skillsMatchNum !== null && (!Number.isInteger(skillsMatchNum) || skillsMatchNum < 1 || skillsMatchNum > 5)) {
+      nextErrors.skillsMatch = 'Skills match must be a whole number between 1 and 5';
+    }
+
     const min = values.salaryMin ? Number(values.salaryMin) : null;
     const max = values.salaryMax ? Number(values.salaryMax) : null;
-    if (min != null && max != null && min > max) {
+    if (min !== null && (!Number.isFinite(min) || !Number.isInteger(min) || min < 0)) {
+      nextErrors.salaryMin = 'Salary must be a non-negative whole number';
+    }
+    if (max !== null && (!Number.isFinite(max) || !Number.isInteger(max) || max < 0)) {
+      nextErrors.salaryMax = 'Salary must be a non-negative whole number';
+    }
+    if (min !== null && max !== null && !nextErrors.salaryMin && !nextErrors.salaryMax && min > max) {
       nextErrors.salaryMax = 'Minimum salary must not exceed maximum';
     }
 
@@ -191,6 +204,7 @@ export function ApplicationForm({
       salaryMin: values.salaryMin ? Number(values.salaryMin) : undefined,
       salaryMax: values.salaryMax ? Number(values.salaryMax) : undefined,
       notes: values.notes.trim() || undefined,
+      offerDueDate: values.offerDueDate || undefined,
     };
 
     const shouldCreateDefaultStages =
@@ -250,10 +264,8 @@ export function ApplicationForm({
             label="Offer Due Date"
             id="offerDueDate"
             type="date"
-            value={''}
-            onChange={() => {
-              // Detailed due date persistence is handled in edit workflows.
-            }}
+            value={values.offerDueDate}
+            onChange={(event) => setField('offerDueDate', event.target.value)}
           />
         ) : null}
       </section>
@@ -308,8 +320,10 @@ export function ApplicationForm({
           type="number"
           min={1}
           max={5}
+          step={1}
           value={values.skillsMatch}
           onChange={(event) => setField('skillsMatch', event.target.value)}
+          error={errors.skillsMatch}
         />
       </section>
 
@@ -318,13 +332,18 @@ export function ApplicationForm({
           label="Salary Min"
           id="salaryMin"
           type="number"
+          min={0}
+          step={1}
           value={values.salaryMin}
           onChange={(event) => setField('salaryMin', event.target.value)}
+          error={errors.salaryMin}
         />
         <Input
           label="Salary Max"
           id="salaryMax"
           type="number"
+          min={0}
+          step={1}
           value={values.salaryMax}
           onChange={(event) => setField('salaryMax', event.target.value)}
           error={errors.salaryMax}

@@ -15,12 +15,12 @@ Download all applications as a CSV file.
 **Query Parameters**:
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
-| `includeArchived` | boolean | `false` | Include archived applications in the export |
+| `includeArchived` | boolean | `true` | Include archived applications in the export |
 
 **Response**: `200 OK`
 ```
 Content-Type: text/csv
-Content-Disposition: attachment; filename="applications-export.csv"
+Content-Disposition: attachment; filename="applications-YYYY-MM-DD.csv"
 ```
 
 Body: CSV with header row followed by one row per application.
