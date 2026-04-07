@@ -28,5 +28,8 @@
     "eslint": "10.0.3",
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.1"
+  },
+  "overrides": {
+    "vite": "7.3.2"
   }
 }

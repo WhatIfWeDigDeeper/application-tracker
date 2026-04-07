@@ -26,5 +26,8 @@
   "dependencies": {
     "aws-cdk-lib": "2.248.0",
     "constructs": "10.6.0"
+  },
+  "overrides": {
+    "vite": "7.3.2"
   }
 }
