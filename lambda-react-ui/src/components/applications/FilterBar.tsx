@@ -153,26 +153,20 @@ export function FilterBar({ total, visibleCount, onImported }: FilterBarProps) {
           <Button size="sm" variant="secondary" type="button" onClick={() => setImportOpen(true)}>
             Import CSV
           </Button>
-          <a
-            href="#"
+          <button
+            type="button"
             className="inline-flex h-8 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-primary)]"
-            onClick={(event) => {
-              event.preventDefault();
-              void exportCSV();
-            }}
+            onClick={() => void exportCSV()}
           >
             Export CSV
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+            type="button"
             className="inline-flex h-8 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-primary)]"
-            onClick={(event) => {
-              event.preventDefault();
-              void downloadSampleCSV();
-            }}
+            onClick={() => void downloadSampleCSV()}
           >
             Template
-          </a>
+          </button>
           <Button
             variant={viewMode === 'grid' ? 'primary' : 'secondary'}
             size="sm"

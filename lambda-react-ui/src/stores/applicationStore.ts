@@ -143,9 +143,9 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
   },
 
   addDefaultStages: async (appId) => {
-    for (const [index, name] of DEFAULT_INTERVIEW_STAGES.entries()) {
-      await api.createStage(appId, { name, order: index });
-    }
+    await Promise.all(
+      DEFAULT_INTERVIEW_STAGES.map((name, index) => api.createStage(appId, { name, order: index }))
+    );
     await get().refreshSelected();
   },
 

@@ -271,7 +271,6 @@ export async function listApplications(
       try {
         const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8')) as {
           page?: number;
-          limit?: number;
         };
         page = Number.isInteger(decoded.page) && (decoded.page as number) > 0 ? (decoded.page as number) : 1;
       } catch {
@@ -295,7 +294,7 @@ export async function listApplications(
   if (cursor !== undefined) {
     const hasMore = offset + limit < total;
     const nextCursor = hasMore
-      ? Buffer.from(JSON.stringify({ page: page + 1, limit }), 'utf8').toString('base64')
+      ? Buffer.from(JSON.stringify({ page: page + 1 }), 'utf8').toString('base64')
       : null;
     return {
       items: responses,

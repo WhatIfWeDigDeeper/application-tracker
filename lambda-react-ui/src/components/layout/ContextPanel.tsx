@@ -65,31 +65,35 @@ export function ContextPanel() {
       return;
     }
 
-    if (field === 'notes' || field === 'specialRequirements') {
-      const currentValue = field === 'notes' ? selectedApplication.notes ?? '' : selectedApplication.specialRequirements ?? '';
-      const draftValue = detailDraft[field].trim();
-      if (draftValue === currentValue) {
-        return;
+    try {
+      if (field === 'notes' || field === 'specialRequirements') {
+        const currentValue = field === 'notes' ? selectedApplication.notes ?? '' : selectedApplication.specialRequirements ?? '';
+        const draftValue = detailDraft[field].trim();
+        if (draftValue === currentValue) {
+          return;
+        }
+        await updateApplication(selectedApplication.id, { [field]: draftValue || null });
       }
-      await updateApplication(selectedApplication.id, { [field]: draftValue || null });
-    }
 
-    if (field === 'salaryMin' || field === 'salaryMax') {
-      const rawValue = detailDraft[field].trim();
-      const parsed = rawValue ? Number(rawValue) : null;
-      if (parsed !== null && !Number.isFinite(parsed)) {
-        return;
+      if (field === 'salaryMin' || field === 'salaryMax') {
+        const rawValue = detailDraft[field].trim();
+        const parsed = rawValue ? Number(rawValue) : null;
+        if (parsed !== null && !Number.isFinite(parsed)) {
+          return;
+        }
+        const nextValue = parsed !== null ? Math.round(parsed) : null;
+        const currentValue = field === 'salaryMin' ? selectedApplication.salaryMin : selectedApplication.salaryMax;
+        if (nextValue === currentValue) {
+          return;
+        }
+        await updateApplication(selectedApplication.id, { [field]: nextValue });
       }
-      const nextValue = parsed !== null ? Math.round(parsed) : null;
-      const currentValue = field === 'salaryMin' ? selectedApplication.salaryMin : selectedApplication.salaryMax;
-      if (nextValue === currentValue) {
-        return;
-      }
-      await updateApplication(selectedApplication.id, { [field]: nextValue });
-    }
 
-    setSavedField(field);
-    setTimeout(() => setSavedField(null), 1200);
+      setSavedField(field);
+      setTimeout(() => setSavedField(null), 1200);
+    } catch {
+      // API error — do not show "Saved" indicator
+    }
   };
 
   const handleConfirm = async () => {

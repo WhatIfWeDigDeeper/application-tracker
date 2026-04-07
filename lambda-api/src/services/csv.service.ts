@@ -264,14 +264,14 @@ export async function importApplications(
         notes: row.notes || undefined,
       });
 
-      if (row.offerDueDate || row.isArchived === 'true') {
+      if (row.offerDueDate) {
         await applicationService.updateApplication(created.id, {
-          offerDueDate: row.offerDueDate || undefined,
+          offerDueDate: row.offerDueDate,
         });
+      }
 
-        if (row.isArchived === 'true') {
-          await applicationService.archiveApplication(created.id);
-        }
+      if (row.isArchived === 'true') {
+        await applicationService.archiveApplication(created.id);
       }
 
       if (row.jobPostingUrl) {
