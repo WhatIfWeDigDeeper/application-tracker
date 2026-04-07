@@ -62,18 +62,20 @@ export function ApplicationList({
       return;
     }
 
-    if (pendingAction.type === 'archive') {
-      await onArchive(pendingAction.id);
+    try {
+      if (pendingAction.type === 'archive') {
+        await onArchive(pendingAction.id);
+      }
+      if (pendingAction.type === 'restore') {
+        await onRestore(pendingAction.id);
+      }
+      if (pendingAction.type === 'delete') {
+        await onDelete(pendingAction.id);
+      }
+    } finally {
+      setPendingAction(null);
+      setOpenMenuForId(null);
     }
-    if (pendingAction.type === 'restore') {
-      await onRestore(pendingAction.id);
-    }
-    if (pendingAction.type === 'delete') {
-      await onDelete(pendingAction.id);
-    }
-
-    setPendingAction(null);
-    setOpenMenuForId(null);
   };
 
   if (loading) {

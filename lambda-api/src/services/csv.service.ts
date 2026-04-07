@@ -196,7 +196,14 @@ export async function importApplications(
 ): Promise<ImportResult> {
   const parsedRows = parseCsvRows(csvText);
   const hasCsvHeader = parsedRows.length > 0 && hasHeader(parsedRows[0]);
-  const rows = parseCSV(csvText);
+  const startIndex = hasCsvHeader ? 1 : 0;
+  const rows = parsedRows.slice(startIndex).map((columns) => {
+    const row = {} as CsvRow;
+    CSV_HEADERS.forEach((header, index) => {
+      row[header] = columns[index] ?? '';
+    });
+    return row;
+  });
   const existingUrls = await listExistingJobPostingUrls(dynamodb);
   const result: ImportResult = { imported: 0, skipped: 0, failed: 0, errors: [] };
 

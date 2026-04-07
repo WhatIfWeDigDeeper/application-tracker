@@ -112,7 +112,7 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
   selectApplication: (id) => set({ selectedId: id }),
 
   loadSelectedApplication: async (id) => {
-    set({ selectedLoading: true, error: null, selectedId: id });
+    set({ selectedLoading: true, error: null, selectedId: id, selectedApplication: null });
     try {
       const application = await api.getApplication(id);
       set({ selectedApplication: application, selectedLoading: false });
