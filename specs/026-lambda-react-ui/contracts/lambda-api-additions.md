@@ -104,7 +104,7 @@ Cursor-based pagination is added to the existing `GET /applications` endpoint as
 |------|------|---------|-------------|
 | `cursor` | string | — | Opaque cursor token. Use `"start"` for first page, or `nextCursor` value from previous response |
 
-**When `cursor` is present, existing params `page` and `total` are ignored**. Other params (`status`, `sortBy`, `limit`, etc.) continue to work as normal.
+**When `cursor` is present, the `page` param is ignored**. Other params (`status`, `sortBy`, `limit`, etc.) continue to work as normal.
 
 **Response Schema (cursor mode)**:
 ```json

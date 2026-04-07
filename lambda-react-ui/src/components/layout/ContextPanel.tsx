@@ -76,10 +76,11 @@ export function ContextPanel() {
 
     if (field === 'salaryMin' || field === 'salaryMax') {
       const rawValue = detailDraft[field].trim();
-      const nextValue = rawValue ? Number(rawValue) : null;
-      if (nextValue !== null && !Number.isFinite(nextValue)) {
+      const parsed = rawValue ? Number(rawValue) : null;
+      if (parsed !== null && !Number.isFinite(parsed)) {
         return;
       }
+      const nextValue = parsed !== null ? Math.round(parsed) : null;
       const currentValue = field === 'salaryMin' ? selectedApplication.salaryMin : selectedApplication.salaryMax;
       if (nextValue === currentValue) {
         return;

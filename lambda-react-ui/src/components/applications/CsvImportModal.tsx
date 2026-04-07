@@ -43,6 +43,9 @@ export function CsvImportModal({ open, onClose, onImported }: CsvImportModalProp
     <Modal open={open} onClose={onClose}>
       <div
         data-testid="import-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Import Applications"
         className="w-full max-w-lg rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4"
       >
         <h2 className="m-0 text-lg font-semibold text-[var(--text-primary)]">Import Applications</h2>
