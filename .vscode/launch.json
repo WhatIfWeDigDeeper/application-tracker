@@ -129,13 +129,6 @@
       "webRoot": "${workspaceFolder}/tanstack-start-ui",
       "preLaunchTask": "start-tanstack-start-ui-when-fastapi-ready",
       "postDebugTask": "cleanup-tanstack-fastapi"
-    },
-    {
-      "type": "chrome",
-      "request": "launch",
-      "name": "Lambda React UI (port 3090)",
-      "url": "http://localhost:3090",
-      "webRoot": "${workspaceFolder}/lambda-react-ui"
     }
   ],
   "compounds": [

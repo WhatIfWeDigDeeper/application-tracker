@@ -18,12 +18,12 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Agent Skills Policy**: When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (including `pr-comments`, `ship-it`, `learn`, `playwright-cli`, etc.) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
 
 ## Active Technologies
-- TypeScript 5.x (strict mode) + React 19, Vite 7.x, Zustand 5.0.12, React Router 7.13.1, Tailwind CSS 4.x, @testing-library/react, Vitest (026-lambda-react-ui)
-- DynamoDB (via lambda-api — no direct DB access from frontend) (026-lambda-react-ui)
-
-- TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite
+- TypeScript 5.x (strict mode) + React 19, Vite 7.x, Next.js 16, Tailwind CSS 4.x
+- Zustand 5, React Router 7, TanStack Query v5, TanStack Router, Apollo Client
+- Vitest, @testing-library/react, Playwright
 - Python 3.12+ (fastapi package uses 3.14) with FastAPI, asyncpg, Pydantic v2, uv
 - PostgreSQL 18 (single database with multiple schemas)
+- DynamoDB (via lambda-api — no direct DB access from frontend)
 
 ## Documentation Guidelines
 
@@ -86,6 +86,10 @@ When **updating**: use the `update-deps` skill (npm only), then run the full val
 **npm overrides for security vulnerabilities** — When a transitive dependency is vulnerable but the fix is within the same major version (e.g., `path-to-regexp@8.3.0` → `8.4.2`), add an `"overrides"` block to the package's `package.json` to force the patched version rather than allowlisting in `.auditconfig.json`. This keeps `npm audit` meaningful and avoids accumulating stale allowlist entries. Example: `"overrides": { "path-to-regexp": "8.4.2", "picomatch": "4.0.4" }`. After adding overrides, run `npm install` in that package's directory (or `npm run install:<stack>` if available) and verify with `npm run audit:ci:<stack>` (or explicitly `npx -y audit-ci --config .auditconfig.json`), to avoid accidentally modifying the root lockfile or another stack's lockfile.
 
 **`audit-ci` vs `npm audit` divergence** — The advisory database can update between runs. Local `npm audit` may show 0 vulnerabilities while CI `npm run audit:ci:<stack>` / `npm run audit:ci:all` can find new advisories. Always verify security status using the repo's canonical audit-ci invocation (`npm run audit:ci:<stack>`, `npm run audit:ci:all`, or explicitly `npx -y audit-ci --config .auditconfig.json`) — not just `npm audit` — before declaring a package clean.
+
+**`audit:ci:all` stops at first failure** — To find "Consider not allowlisting advisories" messages across all packages, run audit-ci per-package individually (`for dir in ...; do (cd "$dir" && npx -y audit-ci --config .auditconfig.json); done`) rather than `npm run audit:ci:all`, which halts at the first failing package and hides stale-allowlist warnings in later packages.
+
+**vitest 3.x is incompatible with vite 7.x** — Forcing vite 7.x via `"overrides": { "vite": "7.x.x" }` while a package still uses vitest 3.x causes `ReferenceError: __vite_ssr_exportName__ is not defined` at test time. vitest 4.x supports `vite ^6.0.0 || ^7.0.0 || ^8.0.0`. When adding a vite override, also upgrade vitest from 3.x to 4.x in the same package. If `vitest-mock-extended` is present, upgrade it to 4.0.0 as well (peer dep requires `vitest >=4.0.0`).
 
 **Prisma client regeneration** — After bumping `prisma` + `@prisma/client` (or `@prisma/adapter-pg`), run `npx prisma generate` in the package directory before building — otherwise TypeScript compilation fails with "Module '@prisma/client' has no exported member 'Prisma'".
 
@@ -217,7 +221,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **CDK subpackage needs its own `vitest.config.ts`**: the parent `lambda-api/vitest.config.ts` has `include: ['src/**/*.test.ts']` which misses `cdk/test/`. Add a `vitest.config.ts` in `lambda-api/cdk/` with `include: ['test/**/*.test.ts']`
 - **`cdk.out/` must be gitignored**: CDK writes synthesized CloudFormation templates to `cdk.out/` at synth/test time — add it to `.gitignore`
 - **`aws-cdk` CLI version vs `aws-cdk-lib` version**: these are on separate version tracks within the 2.x major; a mismatch in minor/patch is normal and not a problem
-- **`HttpApi` is stable in `aws-cdk-lib` since ~v2.130**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed for current CDK versions
+- **`HttpApi`**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed
 
 ## Terminal Management
 
@@ -291,7 +295,7 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 
 **Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 9 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
 
-**E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create (fixed in PR #229) — status can be set at create time directly.
+**E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create — status can be set at create time directly.
 
 **`test.describe.serial` for `beforeAll`-dependent tests**: With `fullyParallel: true`, `test.describe` (non-serial) runs each worker with an independent module load — module-scope variables like `const company = uniqueCompanyName(...)` produce different values per worker, so `beforeAll`-created data is invisible to `beforeEach` in other workers. Use `test.describe.serial` for any describe block whose tests share `beforeAll` setup data.
 
@@ -304,8 +308,5 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 - **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
 - **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
 - **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
-- **Shared E2E history tests**: `history.spec.ts` runs against all 9 stacks — all implementations support the History Panel feature
 
 
-## Recent Changes
-- 026-lambda-react-ui: Added TypeScript 5.x (strict mode) + React 19, Vite 7.x, Zustand 5.0.12, React Router 7.13.1, Tailwind CSS 4.x, @testing-library/react, Vitest
