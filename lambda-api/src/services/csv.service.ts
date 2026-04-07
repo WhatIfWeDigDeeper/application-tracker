@@ -2,7 +2,12 @@ import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { docClient, TABLE_NAME } from './dynamodb.client.js';
 import * as applicationService from './application.service.js';
 import type { ApplicationItem } from '../types/dynamo.js';
-import type { ImportResult } from '../types/api.js';
+import {
+  ApplicationStatusSchema,
+  CompanyCategorySchema,
+  JobSourceSchema,
+} from '../types/api.js';
+import type { ApplicationResponse, ImportResult } from '../types/api.js';
 
 const CSV_HEADERS = [
   'companyName',
@@ -210,17 +215,36 @@ export async function importApplications(
     }
 
     try {
+      const statusResult = ApplicationStatusSchema.safeParse(row.status || 'unsubmitted');
+      const companyCategoryResult = row.companyCategory
+        ? CompanyCategorySchema.safeParse(row.companyCategory)
+        : null;
+      const jobSourceResult = row.jobSource ? JobSourceSchema.safeParse(row.jobSource) : null;
+
+      if (!statusResult.success) {
+        result.failed += 1;
+        result.errors.push(`Row ${rowNumber}: invalid status "${row.status}"`);
+        continue;
+      }
+
+      const skillsMatchNum = toNumber(row.skillsMatch);
+      if (skillsMatchNum !== undefined && (skillsMatchNum < 1 || skillsMatchNum > 5)) {
+        result.failed += 1;
+        result.errors.push(`Row ${rowNumber}: skillsMatch must be between 1 and 5`);
+        continue;
+      }
+
       const created = await applicationService.createApplication({
         companyName: row.companyName,
         positionTitle: row.positionTitle,
         dateApplied: row.dateApplied || undefined,
-        status: (row.status || 'unsubmitted') as never,
+        status: statusResult.data,
         companyUrl: row.companyUrl || undefined,
         jobPostingUrl: row.jobPostingUrl || undefined,
         companyCareerUrl: row.companyCareerUrl || undefined,
-        companyCategory: (row.companyCategory || undefined) as never,
-        skillsMatch: toNumber(row.skillsMatch),
-        jobSource: (row.jobSource || undefined) as never,
+        companyCategory: companyCategoryResult?.success ? companyCategoryResult.data : undefined,
+        skillsMatch: skillsMatchNum,
+        jobSource: jobSourceResult?.success ? jobSourceResult.data : undefined,
         coverLetterRequired: toBoolean(row.coverLetterRequired),
         specialRequirements: row.specialRequirements || undefined,
         salaryMin: toNumber(row.salaryMin),
@@ -257,15 +281,29 @@ export async function exportApplications(
   includeArchived = false
 ): Promise<string> {
   void dynamodb;
-  const response = await applicationService.listApplications({
-    page: 1,
-    limit: 1000,
-    sortBy: 'updatedAt',
-    sortDir: 'desc',
-    includeArchived,
-  });
+  const limit = 1000;
+  const items: ApplicationResponse[] = [];
+  let page = 1;
 
-  return serializeToCSV(response.items);
+  while (true) {
+    const response = await applicationService.listApplications({
+      page,
+      limit,
+      sortBy: 'updatedAt',
+      sortDir: 'desc',
+      includeArchived,
+    });
+
+    items.push(...response.items);
+
+    if (response.items.length < limit) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return serializeToCSV(items);
 }
 
 export function sampleCsvHeader(): string {

@@ -41,7 +41,7 @@ companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCar
 
 ### GET /applications/sample-csv
 
-Download a CSV template with only the header row for use as an import template.
+Download a CSV template for use as an import guide.
 
 **Response**: `200 OK`
 ```
@@ -49,7 +49,7 @@ Content-Type: text/csv
 Content-Disposition: attachment; filename="applications-template.csv"
 ```
 
-Body: Single row — the 17-column header line only.
+Body: Two rows — the 17-column header line followed by one sample data row.
 
 ---
 
