@@ -18,6 +18,7 @@ const statusOptions = Object.entries(STATUS_LABELS) as Array<[ApplicationStatus,
 
 export function FilterBar({ total, visibleCount, onImported }: FilterBarProps) {
   const [importOpen, setImportOpen] = useState(false);
+  const [csvError, setCsvError] = useState<string | null>(null);
   const navigate = useNavigate();
   const status = useFilterStore((state) => state.status);
   const companyCategory = useFilterStore((state) => state.companyCategory);
@@ -156,14 +157,20 @@ export function FilterBar({ total, visibleCount, onImported }: FilterBarProps) {
           <button
             type="button"
             className="inline-flex h-8 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-primary)]"
-            onClick={() => void exportCSV()}
+            onClick={() => {
+              setCsvError(null);
+              exportCSV().catch((err: unknown) => setCsvError(err instanceof Error ? err.message : 'Export failed'));
+            }}
           >
             Export CSV
           </button>
           <button
             type="button"
             className="inline-flex h-8 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-primary)]"
-            onClick={() => void downloadSampleCSV()}
+            onClick={() => {
+              setCsvError(null);
+              downloadSampleCSV().catch((err: unknown) => setCsvError(err instanceof Error ? err.message : 'Download failed'));
+            }}
           >
             Template
           </button>
@@ -188,6 +195,8 @@ export function FilterBar({ total, visibleCount, onImported }: FilterBarProps) {
           </Button>
         </div>
       </div>
+
+      {csvError ? <p className="mt-2 text-sm text-[var(--status-rejected)]">{csvError}</p> : null}
 
       <p className="mb-0 mt-2 text-sm text-[var(--text-secondary)]">
         Showing {visibleCount} of {total} applications

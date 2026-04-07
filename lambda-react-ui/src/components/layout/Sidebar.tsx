@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { useApplicationStore } from '@/stores/applicationStore';
 import { useFilterStore } from '@/stores/filterStore';
 import { useUiStore } from '@/stores/uiStore';
 
@@ -11,7 +10,6 @@ export function Sidebar() {
   const toggleDarkMode = useUiStore((state) => state.toggleDarkMode);
   const darkMode = useUiStore((state) => state.darkMode);
 
-  const applications = useApplicationStore((state) => state.applications);
   const setIncludeArchived = useFilterStore((state) => state.setIncludeArchived);
   const setStatusFilter = useFilterStore((state) => state.setStatusFilter);
 
@@ -58,7 +56,7 @@ export function Sidebar() {
           }}
           type="button"
         >
-          {sidebarCollapsed ? 'A' : `All (${applications.length})`}
+          {sidebarCollapsed ? 'A' : 'All'}
         </Button>
         <Button
           variant="ghost"

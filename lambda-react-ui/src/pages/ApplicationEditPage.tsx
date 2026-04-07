@@ -194,8 +194,12 @@ export default function ApplicationEditPage() {
           }
           void (async () => {
             setShowDeleteDialog(false);
-            await deleteApplication(id);
-            navigate('/');
+            try {
+              await deleteApplication(id);
+              navigate('/');
+            } catch (caught) {
+              setSubmitError(caught instanceof Error ? caught.message : 'Failed to delete application');
+            }
           })();
         }}
         onCancel={() => setShowDeleteDialog(false)}

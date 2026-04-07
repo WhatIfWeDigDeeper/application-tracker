@@ -65,18 +65,8 @@ export function HistoryPanel({ applicationId }: HistoryPanelProps) {
 
     void load();
 
-    let followUpTimer: ReturnType<typeof setTimeout> | null = null;
-    if (page === 1) {
-      followUpTimer = setTimeout(() => {
-        void load();
-      }, 800);
-    }
-
     return () => {
       cancelled = true;
-      if (followUpTimer) {
-        clearTimeout(followUpTimer);
-      }
     };
   }, [applicationId, page]);
 
@@ -123,7 +113,9 @@ export function HistoryPanel({ applicationId }: HistoryPanelProps) {
                   size="sm"
                   variant="secondary"
                   onClick={() => {
-                    void restoreToVersion(applicationId, entry.sequence);
+                    restoreToVersion(applicationId, entry.sequence).catch((err: unknown) =>
+                      setError(err instanceof Error ? err.message : 'Failed to restore version')
+                    );
                   }}
                 >
                   Restore to this point

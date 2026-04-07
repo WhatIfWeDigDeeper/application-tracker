@@ -150,7 +150,12 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
   },
 
   restoreToVersion: async (appId, sequence) => {
-    await api.restoreToVersion(appId, sequence);
-    await get().refreshSelected();
+    try {
+      await api.restoreToVersion(appId, sequence);
+      await get().refreshSelected();
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to restore version' });
+      throw error;
+    }
   },
 }));

@@ -102,19 +102,24 @@ export function ContextPanel() {
       return;
     }
 
-    if (pendingAction === 'archive') {
-      await archiveApplication(selectedApplication.id);
-    }
-    if (pendingAction === 'restore') {
-      await restoreApplication(selectedApplication.id);
-    }
-    if (pendingAction === 'delete') {
-      await deleteApplication(selectedApplication.id);
-      closePanel();
-    }
+    try {
+      if (pendingAction === 'archive') {
+        await archiveApplication(selectedApplication.id);
+      }
+      if (pendingAction === 'restore') {
+        await restoreApplication(selectedApplication.id);
+      }
+      if (pendingAction === 'delete') {
+        await deleteApplication(selectedApplication.id);
+        closePanel();
+      }
 
-    await refreshList();
-    setPendingAction(null);
+      await refreshList();
+    } catch {
+      // Error is surfaced via the store's error state
+    } finally {
+      setPendingAction(null);
+    }
   };
 
   if (!panelOpen) {

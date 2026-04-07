@@ -67,7 +67,9 @@ export function CsvImportModal({ open, onClose, onImported }: CsvImportModalProp
               type="button"
               data-testid="sample-csv-btn"
               className="inline-flex h-8 items-center rounded-md border border-[var(--border-subtle)] px-3 text-sm text-[var(--text-primary)]"
-              onClick={() => void downloadSampleCSV()}
+              onClick={() => {
+                downloadSampleCSV().catch((err: unknown) => setError(err instanceof Error ? err.message : 'Download failed'));
+              }}
             >
               Download template
             </button>
