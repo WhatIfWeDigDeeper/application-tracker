@@ -196,7 +196,7 @@ export default function ApplicationEditPage() {
             setShowDeleteDialog(false);
             try {
               await deleteApplication(id);
-              navigate('/');
+              navigateAfterSave('/');
             } catch (caught) {
               setSubmitError(caught instanceof Error ? caught.message : 'Failed to delete application');
             }

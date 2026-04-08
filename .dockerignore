@@ -5,5 +5,4 @@
 **/coverage
 **/*.log*
 **/.env*
-Dockerfile*
 .dockerignore
