@@ -75,7 +75,7 @@ ensure_dynamodb_local() {
     echo "[lambda-api] DynamoDB Local already running on :8000"
   else
     echo "[lambda-api] Starting DynamoDB Local..."
-    docker compose up -d dynamodb-local
+    docker compose --project-directory "$ROOT_DIR" up -d dynamodb-local
     wait_for_port 8000 "dynamodb-local"
   fi
   echo "[lambda-api] Running DynamoDB table migration..."
