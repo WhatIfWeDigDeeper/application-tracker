@@ -21,7 +21,6 @@ export default function ListPage() {
   const restoreApplication = useApplicationStore((state) => state.restoreApplication);
   const deleteApplication = useApplicationStore((state) => state.deleteApplication);
   const selectApplication = useApplicationStore((state) => state.selectApplication);
-  const loadSelectedApplication = useApplicationStore((state) => state.loadSelectedApplication);
 
   const status = useFilterStore((state) => state.status);
   const companyCategory = useFilterStore((state) => state.companyCategory);
@@ -60,7 +59,6 @@ export default function ListPage() {
   const handleSelect = (id: string) => {
     selectApplication(id);
     openPanel('details');
-    void loadSelectedApplication(id);
     navigate(`/applications/${id}`);
   };
 

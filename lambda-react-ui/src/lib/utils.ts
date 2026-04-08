@@ -42,8 +42,11 @@ export function formatSalaryRange(min: number | null, max: number | null): strin
 }
 
 export function getTodayDate(): string {
-  const [datePart] = new Date().toISOString().split('T');
-  return datePart ?? '';
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export function getDaysUntil(value: string | null | undefined): number | null {
