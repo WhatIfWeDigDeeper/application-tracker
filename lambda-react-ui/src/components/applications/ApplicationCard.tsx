@@ -21,6 +21,7 @@ export function ApplicationCard({
 }: ApplicationCardProps) {
   const initials = `${application.companyName.charAt(0)}${application.positionTitle.charAt(0)}`.toUpperCase();
   const daysUntilOffer = getDaysUntil(application.offerDueDate);
+  const days = daysUntilOffer ?? 0;
   const showOfferBanner = application.status === 'given offer' && daysUntilOffer != null && daysUntilOffer <= 7;
 
   return (
@@ -89,8 +90,8 @@ export function ApplicationCard({
           }}
         >
           {isOverdue(application.offerDueDate)
-            ? `Offer overdue by ${Math.abs(daysUntilOffer)} day(s)`
-            : `Offer expires in ${daysUntilOffer} day(s)`}
+            ? `Offer overdue by ${Math.abs(days)} day(s)`
+            : `Offer expires in ${days} day(s)`}
         </div>
       ) : null}
     </article>

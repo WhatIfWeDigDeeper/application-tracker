@@ -17,6 +17,7 @@ interface InterviewStageItemProps {
 export function InterviewStageItem({ stage, index, isCurrent, onUpdate, onRemove }: InterviewStageItemProps) {
   const [editing, setEditing] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [itemError, setItemError] = useState<string | null>(null);
 
   const dotClass = stage.isCompleted
     ? 'bg-emerald-500'
@@ -53,9 +54,11 @@ export function InterviewStageItem({ stage, index, isCurrent, onUpdate, onRemove
               type="checkbox"
               checked={stage.isCompleted}
               onChange={(event) =>
-                void onUpdate(stage.id, {
+                onUpdate(stage.id, {
                   isCompleted: event.target.checked,
                   completedDate: event.target.checked ? stage.completedDate || getTodayDate() : null,
+                }).catch((caught: unknown) => {
+                  setItemError(caught instanceof Error ? caught.message : 'Failed to update stage.');
                 })
               }
             />
@@ -87,6 +90,8 @@ export function InterviewStageItem({ stage, index, isCurrent, onUpdate, onRemove
         />
       ) : null}
 
+      {itemError ? <div className="mt-1 text-xs text-[var(--status-rejected)]">{itemError}</div> : null}
+
       <ConfirmDialog
         open={confirmOpen}
         title="Delete interview stage?"
@@ -95,8 +100,12 @@ export function InterviewStageItem({ stage, index, isCurrent, onUpdate, onRemove
         variant="danger"
         onCancel={() => setConfirmOpen(false)}
         onConfirm={() => {
-          void onRemove(stage.id);
-          setConfirmOpen(false);
+          onRemove(stage.id)
+            .then(() => setConfirmOpen(false))
+            .catch((caught: unknown) => {
+              setItemError(caught instanceof Error ? caught.message : 'Failed to delete stage.');
+              setConfirmOpen(false);
+            });
         }}
       />
     </div>

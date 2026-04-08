@@ -50,25 +50,29 @@ export function InterviewStageForm({
 
     setError(null);
 
-    if (mode === 'create') {
+    try {
+      if (mode === 'create') {
+        await onSave({
+          name: name.trim(),
+          order: defaultOrder,
+          isCompleted,
+          completedDate: isCompleted && completedDate ? completedDate : undefined,
+          notes: notes.trim() || undefined,
+          performanceRating,
+        });
+        return;
+      }
+
       await onSave({
         name: name.trim(),
-        order: defaultOrder,
         isCompleted,
-        completedDate: isCompleted && completedDate ? completedDate : undefined,
-        notes: notes.trim() || undefined,
+        completedDate: isCompleted ? completedDate || null : null,
+        notes: notes.trim() || null,
         performanceRating,
       });
-      return;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Failed to save stage.');
     }
-
-    await onSave({
-      name: name.trim(),
-      isCompleted,
-      completedDate: isCompleted ? completedDate || null : null,
-      notes: notes.trim() || null,
-      performanceRating,
-    });
   };
 
   return (
@@ -124,7 +128,9 @@ export function InterviewStageForm({
             variant="danger"
             onClick={() => {
               if (onDelete) {
-                void onDelete();
+                onDelete().catch((caught: unknown) => {
+                  setError(caught instanceof Error ? caught.message : 'Failed to delete stage.');
+                });
               }
             }}
           >
