@@ -194,3 +194,89 @@ describe('computeFieldDiffs', () => {
     expect(diffs).toHaveLength(0);
   });
 });
+
+// Cursor pagination encode/decode tests
+// These mirror the inline logic in listApplications (application.service.ts)
+// and validate the base64-JSON contract used by the cursor pagination mode.
+describe('cursor pagination encode/decode', () => {
+  // Mirrors the decode branch in listApplications
+  const decodeCursor = (cursor: string): number => {
+    if (cursor === 'start') return 1;
+    try {
+      const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8')) as {
+        page?: number;
+      };
+      return Number.isInteger(decoded.page) && (decoded.page as number) > 0
+        ? (decoded.page as number)
+        : 1;
+    } catch {
+      return 1;
+    }
+  };
+
+  // Mirrors the encode branch in listApplications
+  const encodeCursor = (page: number): string =>
+    Buffer.from(JSON.stringify({ page }), 'utf8').toString('base64');
+
+  it('cursor="start" resolves to page 1', () => {
+    expect(decodeCursor('start')).toBe(1);
+  });
+
+  it('valid cursor token advances to the encoded page', () => {
+    const token = encodeCursor(2);
+    expect(decodeCursor(token)).toBe(2);
+  });
+
+  it('valid cursor token for page 5 resolves correctly', () => {
+    const token = encodeCursor(5);
+    expect(decodeCursor(token)).toBe(5);
+  });
+
+  it('malformed base64 (non-JSON) falls back to page 1', () => {
+    expect(decodeCursor('!!!not-base64!!!')).toBe(1);
+  });
+
+  it('valid base64 but missing page field falls back to page 1', () => {
+    const token = Buffer.from(JSON.stringify({ other: 'field' }), 'utf8').toString('base64');
+    expect(decodeCursor(token)).toBe(1);
+  });
+
+  it('valid base64 but page=0 falls back to page 1', () => {
+    const token = Buffer.from(JSON.stringify({ page: 0 }), 'utf8').toString('base64');
+    expect(decodeCursor(token)).toBe(1);
+  });
+
+  it('valid base64 but page=-1 falls back to page 1', () => {
+    const token = Buffer.from(JSON.stringify({ page: -1 }), 'utf8').toString('base64');
+    expect(decodeCursor(token)).toBe(1);
+  });
+
+  it('last-page: hasMore=false yields nextCursor=null', () => {
+    const page = 3;
+    const limit = 20;
+    const total = 50; // exactly 3 pages: 20+20+10
+    const offset = (page - 1) * limit; // 40
+    const hasMore = offset + limit < total; // 40+20=60 < 50 → false
+    const nextCursor = hasMore ? encodeCursor(page + 1) : null;
+    expect(hasMore).toBe(false);
+    expect(nextCursor).toBeNull();
+  });
+
+  it('has-more: hasMore=true yields nextCursor encoding next page', () => {
+    const page = 1;
+    const limit = 20;
+    const total = 50;
+    const offset = (page - 1) * limit; // 0
+    const hasMore = offset + limit < total; // 0+20=20 < 50 → true
+    const nextCursor = hasMore ? encodeCursor(page + 1) : null;
+    expect(hasMore).toBe(true);
+    expect(nextCursor).not.toBeNull();
+    expect(decodeCursor(nextCursor!)).toBe(2);
+  });
+
+  it('round-trips: encode then decode returns original page', () => {
+    for (const p of [1, 2, 10, 100]) {
+      expect(decodeCursor(encodeCursor(p))).toBe(p);
+    }
+  });
+});
