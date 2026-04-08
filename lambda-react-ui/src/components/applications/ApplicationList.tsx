@@ -52,6 +52,15 @@ export function ApplicationList({
     return () => window.removeEventListener('click', onWindowClick);
   }, []);
 
+  useEffect(() => {
+    if (!loading && total > 0 && applications.length === 0 && page > 1) {
+      const lastPage = Math.max(1, Math.ceil(total / limit));
+      if (page > lastPage) {
+        onPage(lastPage);
+      }
+    }
+  }, [loading, total, applications.length, page, limit, onPage]);
+
   const pendingApplication = useMemo(
     () => applications.find((application) => application.id === pendingAction?.id) ?? null,
     [applications, pendingAction]
@@ -72,6 +81,8 @@ export function ApplicationList({
       if (pendingAction.type === 'delete') {
         await onDelete(pendingAction.id);
       }
+    } catch {
+      // store already surfaces errors via error state
     } finally {
       setPendingAction(null);
       setOpenMenuForId(null);
