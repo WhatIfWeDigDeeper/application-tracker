@@ -78,7 +78,7 @@ export function ContextPanel() {
       if (field === 'salaryMin' || field === 'salaryMax') {
         const rawValue = detailDraft[field].trim();
         const parsed = rawValue ? Number(rawValue) : null;
-        if (parsed !== null && !Number.isFinite(parsed)) {
+        if (parsed !== null && (!Number.isFinite(parsed) || parsed < 0)) {
           return;
         }
         const nextValue = parsed !== null ? Math.round(parsed) : null;
@@ -139,7 +139,7 @@ export function ContextPanel() {
           <div style={{ fontWeight: 600 }}>{selectedApplication?.companyName ?? 'No Selection'}</div>
           <div className="text-sm text-[var(--text-secondary)]">{selectedApplication?.positionTitle ?? 'Select an application'}</div>
         </div>
-        <Button variant="ghost" size="sm" onClick={closePanel} type="button">
+        <Button variant="ghost" size="sm" onClick={closePanel} type="button" aria-label="Close context panel">
           X
         </Button>
       </div>

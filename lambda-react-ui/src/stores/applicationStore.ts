@@ -90,23 +90,38 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
   },
 
   deleteApplication: async (id) => {
-    await api.deleteApplication(id);
-    set((state) => ({
-      applications: state.applications.filter((app) => app.id !== id),
-      total: Math.max(0, state.total - 1),
-      selectedApplication: state.selectedApplication?.id === id ? null : state.selectedApplication,
-      selectedId: state.selectedId === id ? null : state.selectedId,
-    }));
+    try {
+      await api.deleteApplication(id);
+      set((state) => ({
+        applications: state.applications.filter((app) => app.id !== id),
+        total: Math.max(0, state.total - 1),
+        selectedApplication: state.selectedApplication?.id === id ? null : state.selectedApplication,
+        selectedId: state.selectedId === id ? null : state.selectedId,
+      }));
+    } catch (caught) {
+      set({ error: caught instanceof Error ? caught.message : 'Failed to delete application' });
+      throw caught;
+    }
   },
 
   archiveApplication: async (id) => {
-    await api.archiveApplication(id);
-    await get().refreshSelected();
+    try {
+      await api.archiveApplication(id);
+      await get().refreshSelected();
+    } catch (caught) {
+      set({ error: caught instanceof Error ? caught.message : 'Failed to archive application' });
+      throw caught;
+    }
   },
 
   restoreApplication: async (id) => {
-    await api.restoreApplication(id);
-    await get().refreshSelected();
+    try {
+      await api.restoreApplication(id);
+      await get().refreshSelected();
+    } catch (caught) {
+      set({ error: caught instanceof Error ? caught.message : 'Failed to restore application' });
+      throw caught;
+    }
   },
 
   selectApplication: (id) => set({ selectedId: id }),
