@@ -4,6 +4,17 @@ set -euo pipefail
 STACK="${1:-all}"
 STACKS=(react-next-ui react-ui vue-ui svelte-ui tanstack-start-ui tanstack-ui angular-ui angular-spring-ui react-apollo-ui lambda-react-ui)
 STARTED_PORTS=()
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+load_env_file() {
+  local env_file=$1
+  if [ -f "$env_file" ]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "$env_file"
+    set +a
+  fi
+}
 
 api_port() {
   case "$1" in
@@ -68,6 +79,10 @@ ensure_dynamodb_local() {
     wait_for_port 8000 "dynamodb-local"
   fi
   echo "[lambda-api] Running DynamoDB table migration..."
+  load_env_file "$ROOT_DIR/lambda-api/.env"
+  DYNAMODB_ENDPOINT="${DYNAMODB_ENDPOINT:-http://localhost:${DYNAMODB_PORT:-8000}}" \
+  AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-local}" \
+  AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-local}" \
   npm run migrate:lambda-api
 }
 
