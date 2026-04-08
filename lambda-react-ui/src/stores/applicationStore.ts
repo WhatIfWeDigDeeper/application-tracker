@@ -61,9 +61,14 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
           loading: false,
         });
       } else {
+        // Cursor pagination response: compute a synthetic total so pagination UI
+        // reflects whether more pages exist (hasMore) without under-reporting.
+        const syntheticTotal = response.hasMore
+          ? page * response.limit + 1
+          : (page - 1) * response.limit + response.items.length;
         set({
           applications: response.items,
-          total: response.items.length,
+          total: syntheticTotal,
           page,
           limit: response.limit,
           loading: false,
