@@ -14,7 +14,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@hono/node-server": "1.19.11",
+    "@hono/node-server": "1.19.13",
     "@hono/zod-validator": "^0.7.6",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
