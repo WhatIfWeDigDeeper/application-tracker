@@ -83,7 +83,7 @@ ensure_dynamodb_local() {
   DYNAMODB_ENDPOINT="${DYNAMODB_ENDPOINT:-http://localhost:${DYNAMODB_PORT:-8000}}" \
   AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-local}" \
   AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-local}" \
-  npm run migrate:lambda-api
+  npm --prefix "$ROOT_DIR" run migrate:lambda-api
 }
 
 ensure_api() {

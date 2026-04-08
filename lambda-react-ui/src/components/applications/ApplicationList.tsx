@@ -123,7 +123,15 @@ export function ApplicationList({
 
   return (
     <div data-testid="application-list">
-      <div className="grid gap-3" style={{ gridTemplateColumns: '1fr' }}>
+      <div
+        className="grid gap-3"
+        style={{
+          gridTemplateColumns:
+            viewMode === 'grid'
+              ? 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))'
+              : '1fr',
+        }}
+      >
         {applications.map((application) => (
           <div key={application.id} className="relative">
             <ApplicationCard
