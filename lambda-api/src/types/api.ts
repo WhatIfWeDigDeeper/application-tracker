@@ -155,6 +155,7 @@ export const ListApplicationsQuerySchema = z.object({
   includeArchived: z.preprocess((val) => val === 'true' || val === true, z.boolean()).default(false),
   sortBy: z.enum(['dateApplied', 'companyName', 'updatedAt']).default('updatedAt'),
   sortDir: z.enum(['asc', 'desc']).default('desc'),
+  cursor: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
@@ -168,6 +169,22 @@ export const PaginatedApplicationsSchema = z.object({
   total: z.number().int(),
 });
 export type PaginatedApplicationsResponse = z.infer<typeof PaginatedApplicationsSchema>;
+
+export const CursorPaginatedApplicationsSchema = z.object({
+  items: z.array(ApplicationSchema),
+  limit: z.number().int(),
+  nextCursor: z.string().nullable(),
+  hasMore: z.boolean(),
+});
+export type CursorPaginatedApplicationsResponse = z.infer<typeof CursorPaginatedApplicationsSchema>;
+
+export const ImportResultSchema = z.object({
+  imported: z.number().int(),
+  skipped: z.number().int(),
+  failed: z.number().int(),
+  errors: z.array(z.string()),
+});
+export type ImportResult = z.infer<typeof ImportResultSchema>;
 
 // History types
 export const FieldChangeSchema = z.object({

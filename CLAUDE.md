@@ -8,7 +8,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 
 - **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`. Always specify `origin/main` as the base when creating: `git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME" origin/main` — omitting the start-point defaults to the current HEAD, which causes the PR to include unintended commits. After a worktree agent completes, always verify the commit landed on a feature branch — not on `main` — by checking `git log --oneline --decorate -3`. If the commit is on `main`, first create a feature branch from it and push it (`git checkout -b <branch> && git push -u origin <branch>`), then reset local main (`git checkout main && git reset --hard origin/main`).
 - **Validation Chain**: `build:*` → `lint:*` → `test:*` → `test:e2e:*`
-- **Script Naming**: Scripts follow `verb:package-name` (e.g., `build:react-next-ui`, `lint:angular-ui`). Use `:all` suffix for scripts that run across all packages. `test:e2e:*` uses the UI package name (e.g., `test:e2e:react-next-ui`, `test:e2e:tanstack-ui`). When adding a new implementation, add per-package scripts for every verb (`dev`, `build`, `lint`, `test`) and add each to its `*:all` script and to `scripts/stop-all.sh`. When adding a new script group (new verb pattern like `validate:*`), also update `README.md` — add a TOC entry and a usage section so the pattern is discoverable. Do not wait to be asked.
+- **Script Naming**: Scripts follow `verb:package-name` (e.g., `build:react-next-ui`, `lint:angular-ui`). Use `:all` suffix for scripts that run across all packages. `test:e2e:*` uses the UI package name (e.g., `test:e2e:react-next-ui`, `test:e2e:tanstack-ui`). When adding a new implementation, add per-package scripts for every verb (`dev`, `build`, `lint`, `test`, `ci`, `audit:ci`) and add each to its `*:all` script and to `scripts/stop-all.sh`. When adding a new script group (new verb pattern like `validate:*`), also update `README.md` — add a TOC entry and a usage section so the pattern is discoverable. Do not wait to be asked.
 - **Parallel Execution**: 3+ items use Task tool subagents
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
@@ -18,10 +18,12 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Agent Skills Policy**: When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (including `pr-comments`, `ship-it`, `learn`, `playwright-cli`, etc.) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
 
 ## Active Technologies
-
-- TypeScript 5.x (strict mode enabled) + React 19, Next.js 16, Tailwind CSS 4.x, Vite
+- TypeScript 5.x (strict mode) + React 19, Vite 7.x, Next.js 16, Tailwind CSS 4.x
+- Zustand 5, React Router 7, TanStack Query v5, TanStack Router, Apollo Client
+- Vitest, @testing-library/react, Playwright
 - Python 3.12+ (fastapi package uses 3.14) with FastAPI, asyncpg, Pydantic v2, uv
 - PostgreSQL 18 (single database with multiple schemas)
+- DynamoDB (via lambda-api — no direct DB access from frontend)
 
 ## Documentation Guidelines
 
@@ -85,6 +87,10 @@ When **updating**: use the `update-deps` skill (npm only), then run the full val
 
 **`audit-ci` vs `npm audit` divergence** — The advisory database can update between runs. Local `npm audit` may show 0 vulnerabilities while CI `npm run audit:ci:<stack>` / `npm run audit:ci:all` can find new advisories. Always verify security status using the repo's canonical audit-ci invocation (`npm run audit:ci:<stack>`, `npm run audit:ci:all`, or explicitly `npx -y audit-ci --config .auditconfig.json`) — not just `npm audit` — before declaring a package clean.
 
+**`audit:ci:all` stops at first failure** — To find "Consider not allowlisting advisories" messages across all packages, run audit-ci per-package individually (`for dir in ...; do (cd "$dir" && npx -y audit-ci --config .auditconfig.json); done`) rather than `npm run audit:ci:all`, which halts at the first failing package and hides stale-allowlist warnings in later packages.
+
+**vitest 3.x is incompatible with vite 7.x** — Forcing vite 7.x via `"overrides": { "vite": "7.x.x" }` while a package still uses vitest 3.x causes `ReferenceError: __vite_ssr_exportName__ is not defined` at test time. vitest 4.x supports `vite ^6.0.0 || ^7.0.0 || ^8.0.0`. When adding a vite override, also upgrade vitest from 3.x to 4.x in the same package. If `vitest-mock-extended` is present, upgrade it to 4.0.0 as well (peer dep requires `vitest >=4.0.0`).
+
 **Prisma client regeneration** — After bumping `prisma` + `@prisma/client` (or `@prisma/adapter-pg`), run `npx prisma generate` in the package directory before building — otherwise TypeScript compilation fails with "Module '@prisma/client' has no exported member 'Prisma'".
 
 ## API Design Patterns
@@ -99,7 +105,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **React Router useBlocker**: Only works with `createBrowserRouter` + `RouterProvider`, not `<BrowserRouter>`
 - **Avoid absolute positioning for sibling elements**: When multiple elements share the same corner (e.g., badge + action menu), use flexbox flow instead of `absolute` — prevents overlap
 - **Validation limit changes**: When updating max lengths in constants/schemas, rg (ripgrep) for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
-- **Zod boolean coercion**: `z.coerce.boolean()` treats any non-empty string (including `"false"`) as `true` — use `z.preprocess((val) => val === 'true' || val === true, z.boolean())` for query params
+- **Zod boolean coercion**: `z.coerce.boolean()` treats any non-empty string (including `"false"`) as `true` — use `z.preprocess((val) => val === 'true' || val === true, z.boolean())` for query params. **`.default()` gotcha**: if the preprocess runs on `undefined` (absent param), it returns `false`, which is a valid boolean — so `.default(true)` never fires. Fix: return `undefined` from preprocess when `val === undefined` so `.default()` can apply.
 - **Null vs undefined in validation**: API fields that are "not set" often return `null`, not `undefined`. Strict `!== undefined` checks let `null` slip into range/format validators where JS coercion causes false failures (e.g. `null < 1` → `true`) — use `!= null` (loose equality) to treat both as absent.
 - **Drizzle `date()` columns** (hono-api, nest-api, nuxt-api): expect YYYY-MM-DD strings, not `Date` objects — use `new Date().toISOString().split('T')[0]` for today, not `new Date()` directly
 - **Default sort order**: All stacks sort applications by `updatedAt` descending, not `dateApplied` — do not assume date-applied ordering in queries or E2E tests
@@ -136,13 +142,10 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`@Converter` without `autoApply`**: `@Converter` without `autoApply = true` is silently inert if no entity field references it directly — verify usage before writing a new Converter when entities already use `@Type(XxxUserType.class)`
 - **UserType.fromDbValue delegation**: `fromDbValue()` in each `PostgreSQLEnumType` subclass should delegate to the enum's own `fromValue()` — don't re-implement the same lookup loop
 - **TypeReference for diff maps**: In diff/compare methods that deserialize JSON to a map, use `objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {})` instead of raw `Map.class` — avoids `key.toString()` casts and compiler warnings
-- **Immutable constants**: Use `Set.of()` for excluded-field constant sets in diff logic; use `List.of()` (not `Arrays.asList()`) when the list is truly immutable by intent
 - **GlobalExceptionHandler catch-all**: Always include `@ExceptionHandler(RuntimeException.class)` in `@RestControllerAdvice` — without it, `RuntimeException` wrappers around `JsonProcessingException` surface as empty 500 responses to clients
 - **JSONB snapshots**: Use `@JdbcTypeCode(SqlTypes.JSON)` from `org.hibernate.annotations` with Hibernate 6 for JSONB columns
 - **Spring Data JPA filtering**: `Specification<T>` + `JpaSpecificationExecutor<T>` for multi-criteria filters; compose with `Specification.where().and()`
 - **`isXxx` field naming**: JPA boolean fields named `isXxx` conflict with getter naming; name the field `archived` (not `isArchived`) — getter `isArchived()`, setter `setArchived()`
-- **Flyway auto-migration**: Flyway runs on startup — `./gradlew flywayMigrate` is only needed for manual runs; migrations live in `classpath:db/migration/`
-- **Gradle Kotlin DSL**: Uses `build.gradle.kts` — Kotlin syntax for plugin/dependency blocks
 - **OWASP dependency-check heap**: `dependencyCheckAnalyze` can OOM with default Gradle heap on this repo; run it with `-Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1024m'` (wired in `audit:ci:spring-api`)
 - **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
 - **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
@@ -203,7 +206,9 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **`hono/aws-lambda` import**: Built into the main `hono` package (not a separate npm package); use `import { handle } from 'hono/aws-lambda'`
 - **`.env` blocked by sandbox**: Use `.env.example` as template; create `.env` manually or rely on command-line env vars for CI
 - **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
-- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency). The `docs:types:lambda-api` script was removed; update the mermaid file manually when `api.ts` types change. Also note: Mermaid erDiagram reserves exactly `PK`/`FK`/`UK` as attribute key constraint tokens — use `PartitionKey`/`SortKey` for DynamoDB PK/SK (lowercase `pk`/`sk` also fail); multi-letter names like `GSI1PK` are NOT reserved and render fine. `map` is also a valid erDiagram type (not reserved). Avoid `|` inside quoted annotations; write `0or1` instead. For classDiagram enumeration members: values with spaces need quotes (e.g. `"given offer"`), hyphenated values work unquoted (e.g. `enterprise-software`). When documenting optional+nullable fields: `nullable().optional()` → `type|null?`; `.optional()` only → `type?`.
+- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency) — the `docs:types:lambda-api` script was removed. Update the mermaid file manually when `api.ts` types change.
+- **Mermaid erDiagram syntax gotchas**: `PK`/`FK`/`UK` are reserved attribute key constraint tokens — use `PartitionKey`/`SortKey` for DynamoDB keys (lowercase `pk`/`sk` also fail; multi-letter names like `GSI1PK` are fine). Avoid `|` inside quoted annotations (write `0or1`). `nullable().optional()` → `type|null?`; `.optional()` only → `type?`. classDiagram enum values with spaces need quotes (`"given offer"`); hyphenated values work unquoted.
+- **`void asyncFn()` in React event handlers**: `void` discards the promise, so rejections become unhandled. In `onClick`/`onConfirm` handlers, use `.catch()` to surface errors (e.g., `asyncFn().catch(err => setError(...))`) or wrap in an async IIFE with try/catch. This applies to all lambda-react-ui async actions: API calls, store dispatches, CSV export/import.
 
 ## AWS CDK Patterns (lambda-api/cdk/)
 
@@ -216,11 +221,12 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **CDK subpackage needs its own `vitest.config.ts`**: the parent `lambda-api/vitest.config.ts` has `include: ['src/**/*.test.ts']` which misses `cdk/test/`. Add a `vitest.config.ts` in `lambda-api/cdk/` with `include: ['test/**/*.test.ts']`
 - **`cdk.out/` must be gitignored**: CDK writes synthesized CloudFormation templates to `cdk.out/` at synth/test time — add it to `.gitignore`
 - **`aws-cdk` CLI version vs `aws-cdk-lib` version**: these are on separate version tracks within the 2.x major; a mismatch in minor/patch is normal and not a problem
-- **`HttpApi` is stable in `aws-cdk-lib` since ~v2.130**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed for current CDK versions
+- **`HttpApi`**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed
 
 ## Terminal Management
 
 - **PostgreSQL prerequisite**: Before starting any API server or running E2E tests, verify the PostgreSQL Docker container is running: `docker compose ps db`. If it's not running, `docker compose up -d db` first. A server started without the DB will hang or crash and may be unkillable without a reboot.
+- **UI port conflicts can invalidate E2E runs**: If a stack's UI port is already occupied by an unrelated app (for example, port `3000` serving a different project), Playwright may pass health checks but run tests against the wrong site (symptoms: missing expected selectors, API calls returning HTML `<!DOCTYPE ...>`). Before `bash scripts/run-e2e.sh all`, clear known UI/API ports with `bash scripts/kill-ports.sh <ports...>` to ensure each stack starts its intended server.
 - **Repeated test runs**: Run iterative/debugging test commands as foreground tasks in one shared terminal rather than spawning a new background terminal each iteration — background terminals accumulate and are never auto-cleaned.
 - **Kill background processes promptly**: Stop background Bash tasks via `TaskStop` (by task ID) or `kill <pid>` as soon as they're no longer needed — task IDs are only available in the current session.
 - **DynamoDB Local (port 8000) must be stopped via Docker, not `lsof`**: `kill $(lsof -ti :8000)` terminates the Java process inside the container, which stops the container and can bring down Docker entirely. Use `docker compose stop dynamodb-local` to stop it cleanly, or `docker compose restart dynamodb-local` to restart. If Docker becomes unavailable, restart via `colima restart`. Killing port 5090 (lambda-api Hono server) via `lsof` is fine — it's a plain Node.js process.
@@ -259,8 +265,7 @@ Additional notes:
 - **After every push to a PR branch** *(required, no exceptions)*: Immediately update the PR body via `gh pr edit <number> --body` to reflect all commits now on the branch. Do not wait to be asked. Do not skip because the change "seems minor" — always re-read the current description and update it.
 - **Spec status**: When a feature has a spec file in `specs/`, update its `Status` to `Complete` before merging the PR
 - **Wait for CI before merging**: Always check `gh pr checks <number>` and wait for all checks to pass before squash merging. Do not use `--admin` to bypass branch protection unless explicitly asked.
-- **Post-merge cleanup**: After squash merging a PR, immediately switch to main, pull, and delete the local branch (`git checkout main && git pull && git branch -d <branch>`). Never commit cleanup work (e.g. spec status updates) directly to local main — branch protection will reject the push, and the resulting squash PR will diverge from the local commit, causing a merge commit on the next pull instead of a fast-forward.
-- **After post-merge cleanup**: Ask the user — "Would you like me to review if there are any learnings from this session that I should persist going forward?" Wait for their response before ending the session.
+- **Post-merge cleanup**: After squash merging a PR, immediately switch to main, pull, and delete the local branch (`git checkout main && git pull && git branch -d <branch>`). Never commit cleanup work (e.g. spec status updates) directly to local main — branch protection will reject the push, and the resulting squash PR will diverge from the local commit, causing a merge commit on the next pull instead of a fast-forward. Then ask the user: "Would you like me to review if there are any learnings from this session that I should persist going forward?"
 - **Resolving PR review threads**: `gh` CLI has no resolve command. Use `gh api graphql` — fetch thread IDs via `pullRequest.reviewThreads`, resolve with `resolveReviewThread` mutation. Reply to each thread before resolving.
 - **CI toolchain parity**: When adding a new language/toolchain to the monorepo (e.g., Python/uv), update `.github/workflows/verify-pr.yaml` in the same PR to install the required tools
 - **`claude-review` action fails on PRs that modify the workflow file**: The action requires the workflow file to match `main` before it can authenticate — PRs that change `.github/workflows/claude-code-review.yml` will always get a "Workflow validation failed" error on the `claude-review` check. This is expected and resolves automatically once the PR is merged
@@ -290,7 +295,7 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 
 **Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 9 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
 
-**E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create (fixed in PR #229) — status can be set at create time directly.
+**E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create — status can be set at create time directly.
 
 **`test.describe.serial` for `beforeAll`-dependent tests**: With `fullyParallel: true`, `test.describe` (non-serial) runs each worker with an independent module load — module-scope variables like `const company = uniqueCompanyName(...)` produce different values per worker, so `beforeAll`-created data is invisible to `beforeEach` in other workers. Use `test.describe.serial` for any describe block whose tests share `beforeAll` setup data.
 
@@ -303,5 +308,5 @@ Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](do
 - **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
 - **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
 - **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
-- **Shared E2E history tests**: `history.spec.ts` runs against all 9 stacks — all implementations support the History Panel feature
+
 

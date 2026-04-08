@@ -2,3 +2,7 @@
 **/.next
 **/dist
 .git
+**/coverage
+**/*.log*
+**/.env*
+.dockerignore

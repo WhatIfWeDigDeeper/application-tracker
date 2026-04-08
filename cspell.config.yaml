@@ -26,6 +26,7 @@ words:
   - govulncheck
   - gradlew
   - Hono
+  - jsdom
   - Jdbc
   - jvmargs
   - keyboxd
@@ -51,6 +52,7 @@ words:
   - sslmode
   - Supabase
   - tanstack
+  - vitest
   - tbls
   - temurin
   - testname
@@ -67,5 +69,6 @@ words:
   - wireframes
   - worktree
   - worktrees
+  - zustand
 ignoreWords: []
 import: []

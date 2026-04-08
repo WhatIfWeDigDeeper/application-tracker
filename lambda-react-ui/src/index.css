@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --bg-page: #f8fafb;
+  --bg-sidebar: #0f172a;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-elevated: #ffffff;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-tertiary: #94a3b8;
+  --text-on-dark: #e2e8f0;
+  --text-on-dark-dim: #8b9bb4;
+
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-light: #eef2ff;
+
+  --status-unsubmitted: #94a3b8;
+  --status-unsubmitted-bg: #f1f5f9;
+  --status-applied: #3b82f6;
+  --status-applied-bg: #dbeafe;
+  --status-interviewing: #f59e0b;
+  --status-interviewing-bg: #fef3c7;
+  --status-given-offer: #10b981;
+  --status-given-offer-bg: #d1fae5;
+  --status-accepted-offer: #22c55e;
+  --status-accepted-offer-bg: #bbf7d0;
+  --status-rejected: #f43f5e;
+  --status-rejected-bg: #ffe4e6;
+  --status-declined-offer: #71717a;
+  --status-declined-offer-bg: #f4f4f5;
+  --status-no-offer: #f97316;
+  --status-no-offer-bg: #ffedd5;
+
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+}
+
+.dark {
+  --bg-page: #0b1121;
+  --bg-sidebar: #040815;
+  --bg-card: #162032;
+  --bg-card-hover: #1f2c44;
+  --bg-elevated: #19283e;
+  --border-subtle: #243352;
+  --border-strong: #31456d;
+  --text-primary: #e2e8f0;
+  --text-secondary: #a6b6ce;
+  --text-tertiary: #7c8ba2;
+  --text-on-dark: #e2e8f0;
+  --text-on-dark-dim: #a6b6ce;
+  --accent: #818cf8;
+  --accent-hover: #6366f1;
+  --accent-light: #312e81;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+#root {
+  min-height: 100vh;
+}

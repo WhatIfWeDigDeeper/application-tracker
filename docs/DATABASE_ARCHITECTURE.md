@@ -75,6 +75,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 
 **Lambda-DynamoDB:**
 - Table: `lambda_api_applications` (single-table design — no PostgreSQL schema)
+- Frontend pairing: `lambda-react-ui` uses this same table indirectly through `lambda-api`; there is no separate relational schema for the UI
 - Single table stores applications, interview stages, and history snapshots as separate item types, distinguished by `SK` prefix:
   - Application: `PK=APP#<uuid>`, `SK=APP#<uuid>`
   - Stage: `PK=APP#<uuid>`, `SK=STAGE#<uuid>`
@@ -86,3 +87,4 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - Local development: `amazon/dynamodb-local` Docker container on port 8000 (configured via `DYNAMODB_ENDPOINT` env var)
 - AWS SDK: `@aws-sdk/lib-dynamodb` (DynamoDB DocumentClient) with `removeUndefinedValues: true`
 - Connection config: `DYNAMODB_ENDPOINT=http://localhost:8000`, `AWS_REGION=us-east-1`, credentials `local/local` for DynamoDB Local
+- Isolation model: schema-per-implementation applies to PostgreSQL stacks only; DynamoDB stacks share one table and partition by key design instead of SQL schema boundaries

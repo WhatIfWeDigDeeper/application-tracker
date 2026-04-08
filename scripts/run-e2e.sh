@@ -2,8 +2,19 @@
 set -euo pipefail
 
 STACK="${1:-all}"
-STACKS=(react-next-ui react-ui vue-ui svelte-ui tanstack-start-ui tanstack-ui angular-ui angular-spring-ui react-apollo-ui)
+STACKS=(react-next-ui react-ui vue-ui svelte-ui tanstack-start-ui tanstack-ui angular-ui angular-spring-ui react-apollo-ui lambda-react-ui)
 STARTED_PORTS=()
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+load_env_file() {
+  local env_file=$1
+  if [ -f "$env_file" ]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "$env_file"
+    set +a
+  fi
+}
 
 api_port() {
   case "$1" in
@@ -16,6 +27,7 @@ api_port() {
     angular-ui)          echo 5070 ;;
     angular-spring-ui)   echo 8080 ;;
     react-apollo-ui)     echo 5080 ;;
+    lambda-react-ui)     echo 5090 ;;
   esac
 }
 
@@ -30,6 +42,7 @@ api_script() {
     angular-ui)          echo "dev:go-api" ;;
     angular-spring-ui)   echo "dev:spring-api" ;;
     react-apollo-ui)     echo "dev:yoga-api" ;;
+    lambda-react-ui)     echo "dev:lambda-api" ;;
   esac
 }
 
@@ -57,8 +70,27 @@ wait_for_port() {
   echo " ready (${elapsed}s)"
 }
 
+ensure_dynamodb_local() {
+  if port_in_use 8000; then
+    echo "[lambda-api] DynamoDB Local already running on :8000"
+  else
+    echo "[lambda-api] Starting DynamoDB Local..."
+    docker compose --project-directory "$ROOT_DIR" up -d dynamodb-local
+    wait_for_port 8000 "dynamodb-local"
+  fi
+  echo "[lambda-api] Running DynamoDB table migration..."
+  load_env_file "$ROOT_DIR/lambda-api/.env"
+  DYNAMODB_ENDPOINT="${DYNAMODB_ENDPOINT:-http://localhost:${DYNAMODB_PORT:-8000}}" \
+  AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-local}" \
+  AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-local}" \
+  npm --prefix "$ROOT_DIR" run migrate:lambda-api
+}
+
 ensure_api() {
   local stack=$1 port; port=$(api_port "$stack")
+  if [ "$stack" = "lambda-react-ui" ]; then
+    ensure_dynamodb_local
+  fi
   if port_in_use "$port"; then
     echo "[$stack] API already running on :$port"
   else

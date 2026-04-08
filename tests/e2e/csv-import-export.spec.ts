@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// CSV import/export tests only run for tanstack-ui (port 3050), tanstack-start-ui (port 3040), angular-ui (port 3060), angular-spring-ui (port 3070), and react-apollo-ui (port 3080)
+// CSV import/export tests only run for tanstack-ui (port 3050), tanstack-start-ui (port 3040), angular-ui (port 3060), angular-spring-ui (port 3070), react-apollo-ui (port 3080), and lambda-react-ui (port 3090)
 const port = Number(process.env.TEST_UI_PORT || 3000);
-const isTargetUI = port === 3050 || port === 3040 || port === 3060 || port === 3070 || port === 3080;
+const isTargetUI = port === 3050 || port === 3040 || port === 3060 || port === 3070 || port === 3080 || port === 3090;
 
 test.describe('CSV Import/Export', () => {
-  test.skip(!isTargetUI, 'CSV import/export only available on tanstack-ui (3050), tanstack-start-ui (3040), angular-ui (3060), angular-spring-ui (3070), and react-apollo-ui (3080)');
+  test.skip(!isTargetUI, 'CSV import/export only available on tanstack-ui (3050), tanstack-start-ui (3040), angular-ui (3060), angular-spring-ui (3070), react-apollo-ui (3080), and lambda-react-ui (3090)');
 
   const tmpDir = '/tmp/claude/e2e-csv-tests';
 
@@ -25,14 +25,14 @@ test.describe('CSV Import/Export', () => {
 
   test('should show Import CSV, Export CSV, and Template buttons', async ({ page }) => {
     await expect(page.locator('button:has-text("Import CSV")')).toBeVisible();
-    await expect(page.locator('a:has-text("Export CSV")')).toBeVisible();
-    await expect(page.locator('a:has-text("Template")')).toBeVisible();
+    await expect(page.locator(':is(a, button):has-text("Export CSV")')).toBeVisible();
+    await expect(page.locator(':is(a, button):has-text("Template")')).toBeVisible();
   });
 
   test('should download sample template CSV', async ({ page }) => {
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.locator('a:has-text("Template")').click(),
+      page.locator(':is(a, button):has-text("Template")').click(),
     ]);
 
     expect(download.suggestedFilename()).toBe('applications-template.csv');
@@ -53,7 +53,7 @@ test.describe('CSV Import/Export', () => {
     await page.click('button:has-text("Import CSV")');
     await expect(page.getByRole('heading', { name: 'Import Applications' })).toBeVisible();
     await expect(page.locator('input[type="file"]')).toBeVisible();
-    await expect(page.locator('a:has-text("Download template")')).toBeVisible();
+    await expect(page.locator(':is(a, button):has-text("Download template")')).toBeVisible();
   });
 
   test('should import a valid CSV file and show results', async ({ page }) => {
@@ -90,7 +90,7 @@ test.describe('CSV Import/Export', () => {
   test('should export CSV with current applications', async ({ page }) => {
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.locator('a:has-text("Export CSV")').click(),
+      page.locator(':is(a, button):has-text("Export CSV")').click(),
     ]);
 
     expect(download.suggestedFilename()).toMatch(/^applications-\d{4}-\d{2}-\d{2}\.csv$/);

@@ -21,6 +21,7 @@ import type {
   UpdateApplicationInput,
   ListApplicationsQuery,
   ApplicationResponse,
+  CursorPaginatedApplicationsResponse,
   PaginatedApplicationsResponse,
   InterviewStageResponse,
 } from '../types/api.js';
@@ -166,7 +167,7 @@ export async function touchApplication(id: string): Promise<ApplicationResponse 
 
 export async function listApplications(
   query: ListApplicationsQuery
-): Promise<PaginatedApplicationsResponse> {
+): Promise<PaginatedApplicationsResponse | CursorPaginatedApplicationsResponse> {
   const {
     status,
     companyCategory,
@@ -175,8 +176,9 @@ export async function listApplications(
     includeArchived,
     sortBy,
     sortDir,
-    page,
+    page: offsetPage,
     limit,
+    cursor,
   } = query;
 
   // Scan with FilterExpression (appropriate at job-tracker scale)
@@ -261,6 +263,22 @@ export async function listApplications(
 
   const total = items.length;
 
+  let page = offsetPage;
+  if (cursor !== undefined) {
+    if (cursor === 'start') {
+      page = 1;
+    } else {
+      try {
+        const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8')) as {
+          page?: number;
+        };
+        page = Number.isInteger(decoded.page) && (decoded.page as number) > 0 ? (decoded.page as number) : 1;
+      } catch {
+        page = 1;
+      }
+    }
+  }
+
   // Paginate in-memory
   const offset = (page - 1) * limit;
   const pageItems = items.slice(offset, offset + limit);
@@ -272,6 +290,19 @@ export async function listApplications(
       return toApplicationResponse(item, stages);
     })
   );
+
+  if (cursor !== undefined) {
+    const hasMore = offset + limit < total;
+    const nextCursor = hasMore
+      ? Buffer.from(JSON.stringify({ page: page + 1 }), 'utf8').toString('base64')
+      : null;
+    return {
+      items: responses,
+      limit,
+      nextCursor,
+      hasMore,
+    };
+  }
 
   return { items: responses, page, limit, total };
 }

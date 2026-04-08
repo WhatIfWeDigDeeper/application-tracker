@@ -10,6 +10,16 @@ Before running e2e tests, ensure the required backend services are running:
 | React + Koa | 3010 | 5010 | `cd koa-api && npm run dev` |
 | Vue + Nuxt | 3020 | 5040 | `cd nuxt-api && npm run dev` |
 | Svelte + Hono | 3030 | 5030 | `cd hono-api && npm run dev` |
+| Lambda React UI + Lambda API | 3090 | 5090 | `cd lambda-api && npm run dev` |
+
+For Lambda React UI e2e runs, also ensure DynamoDB Local is available on port 8000 and initialize the table before starting servers:
+
+```bash
+docker compose up -d dynamodb-local
+npm run migrate:lambda-api
+npm run dev:lambda-api
+npm run dev:lambda-react-ui
+```
 
 ## Shared Selector Contract
 
