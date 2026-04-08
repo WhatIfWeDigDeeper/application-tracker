@@ -84,6 +84,7 @@ export function FilterBar({ total, visibleCount, onImported }: FilterBarProps) {
 
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <select
+          aria-label="Company category"
           value={companyCategory ?? ''}
           onChange={(event) =>
             setCategoryFilter((event.target.value || undefined) as keyof typeof CATEGORY_LABELS | undefined)
@@ -99,6 +100,7 @@ export function FilterBar({ total, visibleCount, onImported }: FilterBarProps) {
         </select>
 
         <select
+          aria-label="Job source"
           value={jobSource ?? ''}
           onChange={(event) => setSourceFilter((event.target.value || undefined) as keyof typeof SOURCE_LABELS | undefined)}
           className="h-9 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-card)] px-2 text-sm"
@@ -112,6 +114,7 @@ export function FilterBar({ total, visibleCount, onImported }: FilterBarProps) {
         </select>
 
         <select
+          aria-label="Minimum skills match"
           value={skillsMatchMin != null ? String(skillsMatchMin) : ''}
           onChange={(event) => setSkillsMatchMin(event.target.value ? Number(event.target.value) : undefined)}
           className="h-9 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-card)] px-2 text-sm"
@@ -133,6 +136,7 @@ export function FilterBar({ total, visibleCount, onImported }: FilterBarProps) {
         </label>
 
         <select
+          aria-label="Sort by"
           value={sortBy}
           onChange={(event) => setSortBy(event.target.value as typeof sortBy)}
           className="h-9 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-card)] px-2 text-sm"

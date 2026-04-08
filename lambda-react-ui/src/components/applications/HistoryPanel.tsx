@@ -76,7 +76,7 @@ export function HistoryPanel({ applicationId }: HistoryPanelProps) {
     <div data-testid="history-panel" className="space-y-2">
       <div className="flex items-center justify-between">
         <h2 className="m-0 text-base font-semibold text-[var(--text-primary)]">History</h2>
-        <Button type="button" size="sm" variant="ghost" onClick={closePanel}>
+        <Button type="button" size="sm" variant="ghost" onClick={closePanel} aria-label="Close history panel">
           X
         </Button>
       </div>
