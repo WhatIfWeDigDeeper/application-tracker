@@ -14,7 +14,7 @@ compatibility: Requires git, jq, and GitHub CLI (gh) with authentication
 metadata:
   author: Gregory Murray
   repository: github.com/whatifwedigdeeper/agent-skills
-  version: "1.22"
+  version: "1.27"
 ---
 
 # PR Review: Implement and Respond to Review Comments
@@ -118,7 +118,7 @@ Also fetch top-level review bodies submitted with the review itself (e.g. the su
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews --paginate \
-  --jq '.[] | select((.state == "CHANGES_REQUESTED" or .state == "COMMENTED") and .body != "" and .body != null) | {id, body, state, submitted_at, author: .user.login}' \
+  --jq '.[] | select((.state == "CHANGES_REQUESTED" or .state == "COMMENTED") and .body and (.body | length > 0)) | {id, body, state, submitted_at, author: .user.login}' \
   | jq -s '.'
 ```
 
@@ -257,16 +257,17 @@ Before touching anything, show the user a clear summary as a table:
 Proceed? [y/N/auto]
 ```
 
-**Responses (when the confirmation prompt is shown):**
+**Confirmation prompt template.** When this prompt is required, emit `Proceed? [y/N/auto]` as your final message and **stop generating**. Do not supply an answer, do not assume `y`, do not continue to Step 8. Resume only after the user replies with `y`, `n`, or `auto`.
+
+Responses:
 - `y` — proceed normally
 - `n` — abort
 - `auto` — proceed AND switch to auto mode for all remaining bot-review iterations; subsequent iterations skip this confirmation gate (plan table still shown for observability)
 
-If `--manual` was passed, show the `Proceed? [y/N/auto]` prompt above and **stop generating**. Do not supply an answer, do not assume `y`, do not continue to Step 8. Output the prompt as your final message and wait. Resume only after the user replies with `y`, `n`, or `auto`.
-
-Otherwise (auto mode, the default), skip this confirmation prompt entirely — show the plan table above but proceed without waiting.
-
-If any condition requires manual confirmation in this iteration (for example, security screening flags from Step 5, oversized comments, diff-validation declines from Step 6, or `consistency` items from Step 6b), always drop to manual confirmation regardless of auto-mode — show the `Proceed? [y/N/auto]` prompt above and **stop generating**. Do not supply an answer, do not assume `y`, do not continue to Step 8. Output the prompt as your final message and wait. Resume only after the user replies with `y`, `n`, or `auto`. Here, `consistency` rows are inferred cross-file follow-ups from Step 6b and always require explicit confirmation, even in auto-mode.
+**When to show the prompt:**
+- **Manual mode (`--manual` was passed)** — always; emit the Confirmation prompt template above.
+- **Auto mode (default)** — skip; show the plan table for observability and proceed without waiting.
+- **Auto mode escalation** — if any condition requires manual confirmation in this iteration (security screening flags from Step 5, oversized comments, diff-validation declines from Step 6, or `consistency` items from Step 6b), drop to manual confirmation regardless of mode and emit the Confirmation prompt template above. `consistency` rows always require explicit confirmation, even in auto mode.
 
 ### 8. Apply Changes
 
@@ -364,7 +365,7 @@ Collect all commenters whose feedback was processed (implemented, accepted, decl
 
 **Also include bots that have previously reviewed this PR but haven't yet seen the current HEAD**. Run the canonical query once from `references/bot-polling.md` → **Stale-HEAD Bot Detection** while building this reviewer list, then merge those bot logins with the commenter list and deduplicate before the empty-check below.
 
-If the deduplicated reviewer list is empty, skip this step and proceed to the report.
+If the deduplicated reviewer list is empty, skip this step and proceed to Step 14.
 
 **Display names for bot accounts**: The REST comments API exposes each commenter's login as `user.login` (e.g. `copilot-pull-request-reviewer[bot]`), which you should store or reference as the `author` value from Step 2. When building the prompt or status line, use the short handle for display — see `references/bot-polling.md` — Bot Display Names for the algorithm. Use the full login (including any `[bot]` suffix) for the actual API calls.
 
@@ -415,6 +416,8 @@ Auto mode — re-requesting review from @user1, @user2 (no new commits to push).
 
 ### 13b. Bot Re-request and Polling
 
+After the POST below, follow the shared polling flow in `references/bot-polling.md`. See the Step 14 Entry gate for valid exits from Step 13b.
+
 **Bot reviewers** (e.g. `copilot-pull-request-reviewer[bot]`): `gh pr edit` uses the GraphQL `requestReviewsByLogin` endpoint which rejects bot accounts — and a bot in the list will cause the entire `gh pr edit` call to fail, blocking human re-requests too.
 
 **Exception — `claude[bot]`**: This is a GitHub App, not a bot user account. The `/requested_reviewers` REST endpoint returns 422 for `claude[bot]`. Skip re-request for it — it auto-triggers a review on push and cannot be re-requested via API. Because it was not explicitly re-requested, do not include it in the polling offer; re-invoke the skill when its review arrives.
@@ -430,9 +433,15 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/requested_reviewers \
 ```
 Note: POST alone is sufficient to re-trigger the review — no prior DELETE is needed.
 
-**If bot reviewers were re-requested**, **you must now continue with the shared polling loop in `references/bot-polling.md`** — do not skip to the report. Because this step already required the pre-POST snapshot and the POST re-request, **do not restart at that file's Step 13b entry/setup section, do not take another snapshot there, and do not send another POST there**. Follow only that file's instructions for manual mode vs. auto-mode, signal checking, and loop exit conditions.
+After the POST:
+
+1. Confirm the pre-POST snapshot was recorded (timestamp + unresolved thread IDs)
+2. Confirm the POST re-request was sent for each bot reviewer
+3. **Resume the shared bot-polling flow in `references/bot-polling.md` after its setup section** — do not restart the setup section (snapshot and POST are already done), but still follow any manual-mode poll-offer / stop-and-wait behavior before the signal-checking and loop-exit logic
 
 ### 14. Report
+
+> **Entry gate:** Reach Step 14 via one of: Step 13 found no reviewers (empty list); the user declined the Step 13 push/re-request prompt (manual mode); the shared polling loop in `references/bot-polling.md` reached one of its documented exit conditions; or the user declined the manual-mode poll offer in `references/bot-polling.md`. If you just completed Step 13b with bot reviewers re-requested and the user has **not** declined polling, you are **not here yet** — return to Step 13b item 3 and resume the shared polling flow's signal-checking/exit logic first.
 
 **You must now execute `references/report-templates.md`** — use the templates in that file to structure your final report. Omit lines that don't apply. In auto-loop mode, use the auto-loop summary table instead of the standard report; include the deferred follow-up-issue offer if there were out-of-scope declines.
 
