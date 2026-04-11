@@ -14,7 +14,7 @@
     "learn": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "f3c748fd50ad6d57ce0f015c384c0c62b4a830ce9f4063f6c424eb76057b7aed"
+      "computedHash": "4ce684f348b0adb48e6e7d2d6dd15b34cf41026d7ff037db94dc08385b348cfa"
     },
     "mermaid-diagrams": {
       "source": "softaworks/agent-toolkit",
@@ -24,7 +24,7 @@
     "peer-review": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "2f85139a040a6c4db106e378ce6105f9113e7d6f1cad7c262085c40f24e1d5f8"
+      "computedHash": "6f4b8540aeb4c9b0868965fe3c7eaf60114c03627564b973b5972fcd2a385c92"
     },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
@@ -34,7 +34,7 @@
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "cdbe6a6f3dbf46ce84d8f49d3fc13475179c088ae15453f7afa3b0a1a8d7ba5a"
+      "computedHash": "33e4ab83b92cdb0084db27711a6c750b617205fc677566ba847621509624ebc9"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
