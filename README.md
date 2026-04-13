@@ -464,8 +464,8 @@ Run the full validation chain (audit → build → lint → test) for a single s
 ```bash
 npm run validate:tanstack-ui      # audit:ci → build → lint → test
 npm run validate:express-api
-npm run validate:spring-api
-# ... validate:<stack> available for all 14 stacks
+npm run validate:nest-history-api
+# ... validate:<stack> available for all stacks
 ```
 
 Run everything across all stacks:
