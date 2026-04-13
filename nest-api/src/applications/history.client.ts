@@ -12,7 +12,7 @@
  *   gRPC service; only nest-api knows the schema)
  */
 
-import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, OnModuleInit, InternalServerErrorException } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { eq } from 'drizzle-orm';
@@ -77,9 +77,16 @@ export class HistoryClient implements OnModuleInit {
     if (!snapshot) return;
 
     const snapshotBytes = Buffer.from(JSON.stringify(snapshot), 'utf-8');
-    await firstValueFrom(
-      this.grpc.recordHistory({ applicationId, description, snapshot: snapshotBytes })
-    );
+    try {
+      await firstValueFrom(
+        this.grpc.recordHistory({ applicationId, description, snapshot: snapshotBytes })
+      );
+    } catch (err) {
+      console.error(`[recordHistory] gRPC call failed for ${applicationId}:`, err);
+      throw new InternalServerErrorException(
+        'History service unavailable — your changes were saved but history could not be recorded'
+      );
+    }
   }
 
   async listHistory(

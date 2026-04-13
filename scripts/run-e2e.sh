@@ -70,6 +70,18 @@ wait_for_port() {
   echo " ready (${elapsed}s)"
 }
 
+ensure_nest_history_api() {
+  if port_in_use 50051; then
+    echo "[nest-history-api] gRPC service already running on :50051"
+  else
+    echo "[nest-history-api] Starting gRPC service on :50051..."
+    npm run dev:nest-history-api &>/tmp/e2e-api-nest-history-api.log &
+    STARTED_PORTS+=("50051")
+    wait_for_port 50051 "nest-history-api"
+    sleep 2
+  fi
+}
+
 ensure_dynamodb_local() {
   if port_in_use 8000; then
     echo "[lambda-api] DynamoDB Local already running on :8000"
@@ -90,6 +102,9 @@ ensure_api() {
   local stack=$1 port; port=$(api_port "$stack")
   if [ "$stack" = "lambda-react-ui" ]; then
     ensure_dynamodb_local
+  fi
+  if [ "$stack" = "tanstack-ui" ]; then
+    ensure_nest_history_api
   fi
   if port_in_use "$port"; then
     echo "[$stack] API already running on :$port"
