@@ -44,7 +44,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - Owns one table: `application_history` (stores snapshots from `react_nestjs` stack)
 - DB access via Knex (intentionally different from `nest-api`'s Drizzle — adds toolchain diversity)
 - gRPC port: `50051` (configurable via `HISTORY_GRPC_PORT` env var)
-- Proto contract: `proto/history/v1/history.proto` (govened by `buf`; TS types generated via `ts-proto`)
+- Proto contract: `proto/history/v1/history.proto` (governed by `buf`; TS types generated via `ts-proto`)
 
 **Python-FastAPI-asyncpg:**
 - Schema defined in: `fastapi/migrations/001_initial.sql`

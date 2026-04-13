@@ -1,4 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { type Knex } from 'knex';
 import { KNEX } from '../database/database.module';
 
@@ -20,18 +21,27 @@ export class HistoryService {
     description: string,
     snapshotBytes: Buffer
   ): Promise<number> {
-    const sequence = await this.getNextSequence(applicationId);
+    let snapshot: unknown;
+    try {
+      snapshot = JSON.parse(snapshotBytes.toString('utf-8'));
+    } catch {
+      throw new RpcException({ code: 3, message: 'Invalid snapshot: must be valid JSON' });
+    }
 
-    await this.db('application_history')
-      .withSchema('react_nestjs_history')
-      .insert({
-        application_id: applicationId,
-        sequence,
-        description,
-        snapshot: JSON.parse(snapshotBytes.toString('utf-8')),
-      });
+    return await this.db.transaction(async (trx) => {
+      const sequence = await this.getNextSequence(applicationId, trx);
 
-    return sequence;
+      await trx('application_history')
+        .withSchema('react_nestjs_history')
+        .insert({
+          application_id: applicationId,
+          sequence,
+          description,
+          snapshot,
+        });
+
+      return sequence;
+    });
   }
 
   async listHistory(
@@ -88,8 +98,9 @@ export class HistoryService {
     return deleted;
   }
 
-  private async getNextSequence(applicationId: string): Promise<number> {
-    const result = await this.db('application_history')
+  private async getNextSequence(applicationId: string, trx?: Knex.Transaction): Promise<number> {
+    const db = trx ?? this.db;
+    const result = await db('application_history')
       .withSchema('react_nestjs_history')
       .where({ application_id: applicationId })
       .max<{ max: string | null }>('sequence as max')

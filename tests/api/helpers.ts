@@ -32,5 +32,5 @@ export function getTargetStacks(stacks: typeof ALL_STACKS): typeof ALL_STACKS {
   const stackName = process.env.STACK_NAME;
   const match = stackName ? ALL_STACKS.find(s => s.name === stackName) : undefined;
   if (stackName && !stacks.some(s => s.name === stackName)) return [];
-  return [{ ...(match ?? { name: stackName ?? 'target', validatesDates: true, hasInterviewStageDates: true, hasStageHistory: true }), baseUrl: url }];
+  return [{ ...(match ?? { name: stackName ?? 'target', validatesDates: true, hasInterviewStageDates: true, hasStageHistory: false }), baseUrl: url }];
 }

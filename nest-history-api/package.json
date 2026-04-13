@@ -9,7 +9,7 @@
     "start": "node dist/main.js",
     "lint": "eslint src",
     "test": "vitest run --passWithNoTests",
-    "migrate": "npx knex migrate:latest --knexfile knexfile.ts"
+    "migrate": "tsx node_modules/.bin/knex migrate:latest --knexfile knexfile.ts"
   },
   "dependencies": {
     "@nestjs/common": "11.1.18",
@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@nestjs/testing": "11.1.17",
+    "@nestjs/testing": "11.1.18",
     "@types/node": "25.3.5",
     "@types/pg": "8.11.15",
     "eslint": "10.0.3",

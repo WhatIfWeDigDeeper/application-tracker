@@ -1,9 +1,8 @@
 import { Module, Global } from '@nestjs/common';
 import knex, { type Knex } from 'knex';
 import dotenv from 'dotenv';
-import { join } from 'path';
 
-dotenv.config({ path: join(__dirname, '../../.env') });
+dotenv.config();
 
 export const KNEX = Symbol('KNEX');
 

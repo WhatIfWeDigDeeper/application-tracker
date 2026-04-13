@@ -118,6 +118,10 @@ jobs:
         if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run lint:all
 
+      - name: Check proto breaking changes
+        if: steps.docs-check.outputs.only_changed == 'false'
+        run: npm run proto:breaking
+
       - name: Build
         if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run build:all

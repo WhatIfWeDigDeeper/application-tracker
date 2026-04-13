@@ -28,8 +28,8 @@ export class HistoryController {
 
   @GrpcMethod('HistoryService', 'ListHistory')
   async listHistory(request: ListHistoryRequest): Promise<ListHistoryResponse> {
-    const page = request.page || 1;
-    const limit = request.limit || 50;
+    const page = Math.max(1, request.page || 1);
+    const limit = Math.max(1, request.limit || 50);
     const { rows, total } = await this.historyService.listHistory(request.applicationId, page, limit);
 
     return {

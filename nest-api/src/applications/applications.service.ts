@@ -193,7 +193,6 @@ export class ApplicationsService {
   }
 
   async deleteApplication(id: string): Promise<boolean> {
-    await this.historyService.recordHistory(id, buildDescription('delete'));
     // Clean up history in the separate schema (no cross-schema FK cascade).
     await this.historyService.deleteHistory(id);
 
