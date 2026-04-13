@@ -10,6 +10,11 @@
 
 import { HISTORY_STACKS, getTargetStacks } from './helpers';
 
+const _historyTargets = getTargetStacks(HISTORY_STACKS);
+const describeHistory = _historyTargets.length > 0
+  ? describe.each(_historyTargets)
+  : describe.skip.each([{ name: 'no-history-stacks', baseUrl: '', validatesDates: false, hasInterviewStageDates: false, hasStageHistory: false }]);
+
 interface AppResponse {
   id: string;
   companyName: string;
@@ -38,7 +43,7 @@ interface StageResponse {
   order: number;
 }
 
-describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl, hasInterviewStageDates, hasStageHistory }) => {
+describeHistory('History API ($name)', ({ baseUrl, hasInterviewStageDates, hasStageHistory }) => {
   const createdIds: string[] = [];
 
   async function createApp(): Promise<AppResponse> {
@@ -187,7 +192,6 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
 
       const stageBody: Record<string, unknown> = { name: 'Phone Screen', order: 1 };
       if (hasInterviewStageDates) {
-        stageBody.scheduledDate = null;
         stageBody.completedDate = null;
       }
 
@@ -213,7 +217,6 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
 
       const stageBody: Record<string, unknown> = { name: 'Technical', order: 1 };
       if (hasInterviewStageDates) {
-        stageBody.scheduledDate = null;
         stageBody.completedDate = null;
       }
 
@@ -230,7 +233,6 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
 
       const updateBody: Record<string, unknown> = { name: 'Technical Interview', order: 1 };
       if (hasInterviewStageDates) {
-        updateBody.scheduledDate = null;
         updateBody.completedDate = null;
       }
 
@@ -254,7 +256,6 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
 
       const stageBody: Record<string, unknown> = { name: 'Final Round', order: 1 };
       if (hasInterviewStageDates) {
-        stageBody.scheduledDate = null;
         stageBody.completedDate = null;
       }
 
