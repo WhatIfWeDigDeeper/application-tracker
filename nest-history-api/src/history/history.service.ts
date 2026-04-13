@@ -70,7 +70,10 @@ export class HistoryService {
     ]);
 
     return {
-      rows: rows as HistoryRow[],
+      rows: (rows as HistoryRow[]).map((row) => ({
+        ...row,
+        created_at: row.created_at instanceof Date ? row.created_at : new Date(String(row.created_at)),
+      })),
       total: Number(countResult?.count ?? 0),
     };
   }
