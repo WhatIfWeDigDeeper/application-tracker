@@ -4,7 +4,7 @@ import { DRIZZLE, type DrizzleDB } from '../database/database.provider.js';
 import { applications, interviewStages, type InterviewStage } from '../database/schema.js';
 import type { CreateInterviewStageInput, UpdateInterviewStageInput, InterviewStageResponse } from '../types/api.js';
 import { formatDate } from './shared.js';
-import { HistoryService, buildDescription } from './history.service.js';
+import { HistoryClient, buildDescription } from './history.client.js';
 
 function toStageResponse(stage: InterviewStage): InterviewStageResponse {
   return {
@@ -22,7 +22,7 @@ function toStageResponse(stage: InterviewStage): InterviewStageResponse {
 export class InterviewStagesService {
   constructor(
     @Inject(DRIZZLE) private db: DrizzleDB,
-    @Inject(HistoryService) private historyService: HistoryService,
+    @Inject(HistoryClient) private historyService: HistoryClient,
   ) {}
 
   async createInterviewStage(

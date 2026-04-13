@@ -18,6 +18,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [11. Lambda React UI + Lambda API + DynamoDB](#11-lambda-react-ui--lambda-api--dynamodb)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
+- [Service Communication](#service-communication)
 - [Type Diagrams](#type-diagrams)
 - [Repository Structure](#repository-structure)
 - [Getting Started](#getting-started)
@@ -91,12 +92,13 @@ This repository contains a complete job application tracker built with multiple 
 - Database: Drizzle ORM + PostgreSQL
 
 ### 5. React + TanStack + NestJS + Drizzle
-**Directories**: `tanstack-ui/` + `nest-api/`
+**Directories**: `tanstack-ui/` + `nest-api/` + `nest-history-api/`
 **Stack**:
 - Frontend: React 19 + TanStack Query v5 + TanStack Router + TypeScript + Vite + Tailwind CSS
-- Backend: NestJS with Fastify adapter
-- Database: Drizzle ORM + PostgreSQL
+- Backend: NestJS with Fastify adapter; history delegated to `nest-history-api` over gRPC
+- Database: Drizzle ORM + PostgreSQL (`react_nestjs`); history in `react_nestjs_history` (Knex)
 - Snapshot-based history with field diffs and restore
+- Service communication via Protocol Buffers + gRPC ([`proto/history/v1/history.proto`](proto/history/v1/history.proto)); types generated with `buf` + `ts-proto`
 
 ### 6. React SSR + TanStack Start + FastAPI
 **Directories**: `tanstack-start-ui/` + `fastapi/`
@@ -177,6 +179,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `react_koa` | React + Koa + PostgreSQL | [schema docs](docs/schema/react-koa/README.md) |
 | `svelte_hono` | Svelte + Hono + Drizzle | [schema docs](docs/schema/svelte-hono/README.md) |
 | `react_nestjs` | React + TanStack + NestJS + Drizzle | [schema docs](docs/schema/react-nestjs/README.md) |
+| `react_nestjs_history` | NestJS gRPC History Service | [schema docs](docs/schema/react-nestjs-history/README.md) |
 | `python_fastapi` | React SSR + TanStack Start + FastAPI | [schema docs](docs/schema/python-fastapi/README.md) |
 | `go_gin` | Angular + Go Gin API | [schema docs](docs/schema/go-gin/README.md) |
 | `java_spring` | Angular + Spring Boot + JPA | [schema docs](docs/schema/java-spring/README.md) |
@@ -189,6 +192,23 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `lambda_api_applications` | Lambda + DynamoDB API + Lambda React UI | Single-table design with GSIs; no PostgreSQL — [schema docs](docs/schema/lambda-api/README.md) |
 
 See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for ORM setup and connection string patterns.
+
+## Service Communication
+
+The React + TanStack + NestJS stack demonstrates microservice communication using **gRPC and Protocol Buffers**:
+
+- **`nest-api`** — public REST edge (port 5050); handles all HTTP requests from the browser
+- **`nest-history-api`** — internal gRPC microservice (port 50051); owns the `react_nestjs_history` schema and all history persistence
+
+History writes (create, restore) and reads flow from `nest-api` → gRPC → `nest-history-api`. The browser-facing REST contract is unchanged — the gRPC transport is entirely internal.
+
+**Proto contract**: [`proto/history/v1/history.proto`](proto/history/v1/history.proto) — governed by [`buf`](https://buf.build); TypeScript types generated via [`ts-proto`](https://github.com/stephenh/ts-proto).
+
+```bash
+npm run proto:lint      # lint .proto files with buf
+npm run proto:breaking  # check for breaking changes against main
+npm run proto:generate  # regenerate TypeScript types from .proto
+```
 
 ## Type Diagrams
 
@@ -226,10 +246,12 @@ Regenerate with `npm run docs:types` (all stacks except lambda-api, which is han
 ├── angular-spring-ui/            # Angular 21 UI (Spring Boot backend)
 ├── spring-api/                   # Spring Boot 3.4 API
 ├── nest-api/                     # NestJS + Fastify API
+├── nest-history-api/             # NestJS gRPC History Microservice (port 50051)
 ├── nuxt-api/                     # Nuxt server API
 ├── fastapi/                      # Python FastAPI API
 ├── go-api/                       # Go Gin API
 ├── lambda-api/                   # AWS Lambda + DynamoDB API
+├── proto/                        # Protocol Buffer definitions (buf + ts-proto)
 ├── specs/                        # Feature specifications
 ├── docs/                         # Documentation
 ├── .claude/                      # Claude Code skills and commands
@@ -272,7 +294,8 @@ Regenerate with `npm run docs:types` (all stacks except lambda-api, which is han
    npm run migrate:koa-api        # Koa (raw SQL)
    npm run migrate:hono-api       # Hono + Drizzle
    npm run migrate:nuxt-api       # Nuxt + Drizzle
-   npm run migrate:nest-api       # NestJS + Drizzle
+   npm run migrate:nest-api          # NestJS + Drizzle
+   npm run migrate:nest-history-api  # NestJS gRPC History Service (Knex)
    npm run migrate:fastapi        # FastAPI (asyncpg)
    npm run migrate:go             # Go Gin API (raw SQL)
    npm run migrate:spring-api     # Spring Boot API (Flyway — auto-run on startup too)
@@ -302,9 +325,10 @@ npm run dev:nuxt-api
 npm run dev:svelte-ui
 npm run dev:hono-api
 
-# React + TanStack + NestJS (UI 3050 + API 5050)
-npm run dev:tanstack-ui
+# React + TanStack + NestJS (UI 3050 + API 5050 + gRPC History 50051)
+npm run dev:nest-history-api  # start gRPC history microservice first
 npm run dev:nest-api
+npm run dev:tanstack-ui
 
 # React SSR + TanStack Start + FastAPI (UI 3040 + API 5160)
 npm run dev:tanstack-start-ui

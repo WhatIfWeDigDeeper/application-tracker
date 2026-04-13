@@ -76,6 +76,20 @@
       "console": "integratedTerminal"
     },
     {
+      "name": "NestJS History API gRPC (port 50051)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/nest-history-api/node_modules/.bin/tsx",
+      "args": [
+        "src/main.ts"
+      ],
+      "cwd": "${workspaceFolder}/nest-history-api",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
       "name": "FastAPI (port 5160)",
       "type": "debugpy",
       "request": "launch",

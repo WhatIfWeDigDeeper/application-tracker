@@ -1,9 +1,32 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { eq, and, desc, sql } from 'drizzle-orm';
+/**
+ * HistoryClient — drop-in replacement for the old local HistoryService.
+ *
+ * Public interface is identical so existing call sites in ApplicationsService,
+ * CsvService, InterviewStagesService, and ApplicationsController are unchanged.
+ *
+ * Internally:
+ * - Reads application snapshots from the local Drizzle DB (nest-api still owns
+ *   the applications + interview_stages tables)
+ * - Delegates storage/retrieval to nest-history-api over gRPC
+ * - Computes field-level diffs locally (snapshot contents are opaque to the
+ *   gRPC service; only nest-api knows the schema)
+ */
+
+import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
+import { ClientGrpc } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { eq } from 'drizzle-orm';
 import { DRIZZLE, type DrizzleDB } from '../database/database.provider.js';
-import { applicationHistory, applications, interviewStages } from '../database/schema.js';
+import { applications, interviewStages } from '../database/schema.js';
 import { toApplicationResponse } from './shared.js';
-import type { ApplicationResponse, HistoryEntryResponse, PaginatedHistoryResponse } from '../types/api.js';
+import type {
+  ApplicationResponse,
+  HistoryEntryResponse,
+  PaginatedHistoryResponse,
+} from '../types/api.js';
+import type { HistoryServiceClient } from '../generated/history/v1/history.js';
+
+export const HISTORY_CLIENT = 'HISTORY_PACKAGE';
 
 interface FieldChange {
   field: string;
@@ -33,40 +56,30 @@ const FIELD_LABELS: Record<string, string> = {
 };
 
 @Injectable()
-export class HistoryService {
-  constructor(@Inject(DRIZZLE) private db: DrizzleDB) {}
+export class HistoryClient implements OnModuleInit {
+  private grpc!: HistoryServiceClient;
 
-  async captureSnapshot(applicationId: string): Promise<ApplicationResponse | null> {
-    const app = await this.db.query.applications.findFirst({
-      where: eq(applications.id, applicationId),
-      with: { interviewStages: true },
-    });
+  constructor(
+    @Inject(DRIZZLE) private db: DrizzleDB,
+    @Inject(HISTORY_CLIENT) private readonly client: ClientGrpc,
+  ) {}
 
-    if (!app) return null;
-    return toApplicationResponse(app, app.interviewStages);
+  onModuleInit(): void {
+    this.grpc = this.client.getService<HistoryServiceClient>('HistoryService');
   }
 
-  async getNextSequence(applicationId: string): Promise<number> {
-    const result = await this.db
-      .select({ maxSeq: sql<number>`coalesce(max(${applicationHistory.sequence}), 0)` })
-      .from(applicationHistory)
-      .where(eq(applicationHistory.applicationId, applicationId));
-
-    return Number(result[0]?.maxSeq ?? 0) + 1;
-  }
+  // ---------------------------------------------------------------------------
+  // Public API — same signatures as the old HistoryService
+  // ---------------------------------------------------------------------------
 
   async recordHistory(applicationId: string, description: string): Promise<void> {
     const snapshot = await this.captureSnapshot(applicationId);
     if (!snapshot) return;
 
-    const sequence = await this.getNextSequence(applicationId);
-
-    await this.db.insert(applicationHistory).values({
-      applicationId,
-      sequence,
-      description,
-      snapshot,
-    });
+    const snapshotBytes = Buffer.from(JSON.stringify(snapshot), 'utf-8');
+    await firstValueFrom(
+      this.grpc.recordHistory({ applicationId, description, snapshot: snapshotBytes })
+    );
   }
 
   async listHistory(
@@ -74,58 +87,49 @@ export class HistoryService {
     page: number = 1,
     limit: number = 50
   ): Promise<PaginatedHistoryResponse> {
-    const countResult = await this.db
-      .select({ count: sql<number>`count(*)` })
-      .from(applicationHistory)
-      .where(eq(applicationHistory.applicationId, applicationId));
+    const response = await firstValueFrom(
+      this.grpc.listHistory({ applicationId, page, limit })
+    );
 
-    const total = Number(countResult[0]?.count || 0);
+    const entries: HistoryEntryResponse[] = response.entries.map((entry, index) => {
+      const thisSnapshot = JSON.parse(
+        Buffer.from(entry.snapshot).toString('utf-8')
+      ) as ApplicationResponse;
 
-    const offset = (page - 1) * limit;
-    const rows = await this.db
-      .select()
-      .from(applicationHistory)
-      .where(eq(applicationHistory.applicationId, applicationId))
-      .orderBy(desc(applicationHistory.sequence))
-      .limit(limit)
-      .offset(offset);
-
-    const entries: HistoryEntryResponse[] = rows.map((row, index) => {
-      const thisSnapshot = row.snapshot as ApplicationResponse;
       let changes: FieldChange[] = [];
-
-      const olderRow = rows[index + 1];
-      if (olderRow) {
-        const olderSnapshot = olderRow.snapshot as ApplicationResponse;
+      const olderEntry = response.entries[index + 1];
+      if (olderEntry) {
+        const olderSnapshot = JSON.parse(
+          Buffer.from(olderEntry.snapshot).toString('utf-8')
+        ) as ApplicationResponse;
         changes = computeFieldDiffs(olderSnapshot, thisSnapshot);
       }
 
       return {
-        id: row.id,
-        sequence: row.sequence,
-        description: row.description,
+        id: entry.id,
+        sequence: entry.sequence,
+        description: entry.description,
         changes,
-        createdAt: row.createdAt.toISOString(),
+        createdAt: entry.createdAt,
       };
     });
 
-    return { entries, total, page, limit };
+    return { entries, total: response.total, page: response.page, limit: response.limit };
   }
 
   async restoreToVersion(
     applicationId: string,
     targetSequence: number
   ): Promise<ApplicationResponse | null> {
-    const entry = await this.db.query.applicationHistory.findFirst({
-      where: and(
-        eq(applicationHistory.applicationId, applicationId),
-        eq(applicationHistory.sequence, targetSequence)
-      ),
-    });
+    const snapshotResp = await firstValueFrom(
+      this.grpc.getSnapshotAtVersion({ applicationId, sequence: targetSequence })
+    );
 
-    if (!entry) return null;
+    if (!snapshotResp.found) return null;
 
-    const snapshot = entry.snapshot as ApplicationResponse;
+    const snapshot = JSON.parse(
+      Buffer.from(snapshotResp.snapshot).toString('utf-8')
+    ) as ApplicationResponse;
 
     await this.db
       .update(applications)
@@ -171,9 +175,34 @@ export class HistoryService {
 
     return this.captureSnapshot(applicationId);
   }
+
+  async deleteHistory(applicationId: string): Promise<void> {
+    await firstValueFrom(this.grpc.deleteHistory({ applicationId }));
+  }
+
+  // ---------------------------------------------------------------------------
+  // Private helpers
+  // ---------------------------------------------------------------------------
+
+  private async captureSnapshot(applicationId: string): Promise<ApplicationResponse | null> {
+    const app = await this.db.query.applications.findFirst({
+      where: eq(applications.id, applicationId),
+      with: { interviewStages: true },
+    });
+
+    if (!app) return null;
+    return toApplicationResponse(app, app.interviewStages);
+  }
 }
 
-export function computeFieldDiffs(before: ApplicationResponse, after: ApplicationResponse): FieldChange[] {
+// ---------------------------------------------------------------------------
+// Pure helpers — kept here so existing imports still resolve
+// ---------------------------------------------------------------------------
+
+export function computeFieldDiffs(
+  before: ApplicationResponse,
+  after: ApplicationResponse
+): FieldChange[] {
   const changes: FieldChange[] = [];
 
   for (const [field, label] of Object.entries(FIELD_LABELS)) {

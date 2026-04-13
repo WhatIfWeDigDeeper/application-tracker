@@ -35,7 +35,16 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - Schema defined in: `nest-api/src/database/schema.ts`
 - Uses Drizzle's `pgSchema('react_nestjs')`
 - Config in: `nest-api/drizzle.config.ts` with `schemaFilter: ['react_nestjs']`
-- Snapshot-based history (like Express, Koa, Hono)
+- Snapshot-based history delegated to `nest-history-api` over gRPC (see below)
+
+**NestJS gRPC History Service:**
+- Package: `nest-history-api/` (pure NestJS gRPC microservice, no HTTP listener)
+- Schema defined in: `nest-history-api/migrations/` (Knex migrations)
+- Schema name: `react_nestjs_history`
+- Owns one table: `application_history` (stores snapshots from `react_nestjs` stack)
+- DB access via Knex (intentionally different from `nest-api`'s Drizzle — adds toolchain diversity)
+- gRPC port: `50051` (configurable via `HISTORY_GRPC_PORT` env var)
+- Proto contract: `proto/history/v1/history.proto` (govened by `buf`; TS types generated via `ts-proto`)
 
 **Python-FastAPI-asyncpg:**
 - Schema defined in: `fastapi/migrations/001_initial.sql`

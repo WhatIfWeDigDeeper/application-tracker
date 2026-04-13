@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import Papa from 'papaparse';
 import { DRIZZLE, type DrizzleDB } from '../database/database.provider.js';
 import { applications } from '../database/schema.js';
-import { HistoryService, buildDescription } from './history.service.js';
+import { HistoryClient, buildDescription } from './history.client.js';
 import { CsvRowSchema, type ImportResult } from '../types/api.js';
 import { isNotNull, sql } from 'drizzle-orm';
 
@@ -17,7 +17,7 @@ const CSV_COLUMNS = [
 export class CsvService {
   constructor(
     @Inject(DRIZZLE) private db: DrizzleDB,
-    @Inject(HistoryService) private historyService: HistoryService,
+    @Inject(HistoryClient) private historyService: HistoryClient,
   ) {}
 
   async getExistingJobPostingUrls(): Promise<Set<string>> {

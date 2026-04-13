@@ -10,7 +10,7 @@ import type {
   PaginatedApplicationsResponse,
 } from '../types/api.js';
 import { toApplicationResponse } from './shared.js';
-import { HistoryService, buildDescription } from './history.service.js';
+import { HistoryClient, buildDescription } from './history.client.js';
 
 const FIELD_LABELS_MAP: Record<string, string> = {
   companyName: 'Company Name',
@@ -35,7 +35,7 @@ const FIELD_LABELS_MAP: Record<string, string> = {
 export class ApplicationsService {
   constructor(
     @Inject(DRIZZLE) private db: DrizzleDB,
-    @Inject(HistoryService) private historyService: HistoryService,
+    @Inject(HistoryClient) private historyService: HistoryClient,
   ) {}
 
   async listApplications(query: ListApplicationsQuery): Promise<PaginatedApplicationsResponse> {
@@ -194,6 +194,8 @@ export class ApplicationsService {
 
   async deleteApplication(id: string): Promise<boolean> {
     await this.historyService.recordHistory(id, buildDescription('delete'));
+    // Clean up history in the separate schema (no cross-schema FK cascade).
+    await this.historyService.deleteHistory(id);
 
     const result = await this.db.delete(applications).where(eq(applications.id, id)).returning({ id: applications.id });
     return result.length > 0;

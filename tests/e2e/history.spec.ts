@@ -3,9 +3,9 @@ import { deleteApplicationViaApi, uniqueCompanyName } from './helpers';
 
 // Shared history tests for all stacks with history support:
 // Next.js+Express (port 3000), React+Koa (port 3010), Vue+Nuxt (port 3020),
-// Svelte+Hono (port 3030), Lambda+React (port 3090).
+// Svelte+Hono (port 3030), TanStack+Nest (port 3050), Lambda+React (port 3090).
 const port = Number(process.env.TEST_UI_PORT || 3000);
-const isTargetUI = port === 3000 || port === 3010 || port === 3020 || port === 3030 || port === 3090;
+const isTargetUI = port === 3000 || port === 3010 || port === 3020 || port === 3030 || port === 3050 || port === 3090;
 
 test.describe.serial('History Panel', () => {
   test.skip(!isTargetUI, 'History panel E2E is scoped to history-enabled UIs including lambda-react-ui (3090).');

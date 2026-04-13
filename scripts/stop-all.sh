@@ -17,6 +17,7 @@ PORTS=(
   5030  # Hono API
   5040  # Nuxt API
   5050  # Nest API
+  50051 # Nest History API (gRPC)
   5070  # Go API
   5160  # FastAPI
   5080  # Yoga API (GraphQL)
