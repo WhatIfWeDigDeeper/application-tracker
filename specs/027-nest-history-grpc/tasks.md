@@ -1,6 +1,6 @@
 # Tasks 027: nest-api history → gRPC microservice
 
-**Status:** Draft
+**Status:** Complete
 **Related:** `plan.md`, `spec.md`
 
 Tasks are ordered to minimize broken intermediate states. Each phase should leave the repo building and testing cleanly. Finish one phase before starting the next.
@@ -10,7 +10,7 @@ Tasks are ordered to minimize broken intermediate states. Each phase should leav
 ## Phase 1 — Proto contract & toolchain
 
 1. [ ] Add `buf` CLI to developer toolchain (document install in `nest-history-api/README.md`; no global package added).
-2. [ ] Create `proto/buf.yaml` (lint rules: `DEFAULT`, breaking: `FILE`) and `proto/buf.gen.yaml` (ts-proto plugin, `nestJs=true`, `outputServices=grpc-js`, `esModuleInterop=true`).
+2. [ ] Create `proto/buf.yaml` (lint rules: `STANDARD`, breaking: `FILE`) and `buf.gen.yaml` at repo root (ts-proto plugin, `nestJs=true`, `outputServices=grpc-js`, `esModuleInterop=true`).
 3. [ ] Author `proto/history/v1/history.proto` with `RecordHistory`, `ListHistory`, `GetSnapshotAtVersion`, `DeleteHistory` messages and `HistoryService` rpc.
 4. [ ] Add root-level scripts: `proto:generate`, `proto:lint`, `proto:breaking`. Point `proto:generate` outputs to `nest-api/src/generated/history/v1/` and `nest-history-api/src/generated/history/v1/`.
 5. [ ] Run `npm run proto:generate` and commit generated TS.

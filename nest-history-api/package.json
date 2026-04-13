@@ -12,6 +12,7 @@
     "migrate": "tsx node_modules/.bin/knex migrate:latest --knexfile knexfile.ts"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "2.11.0",
     "@nestjs/common": "11.1.18",
     "@nestjs/core": "11.1.18",
     "@nestjs/microservices": "11.1.18",

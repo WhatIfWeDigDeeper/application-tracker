@@ -1,6 +1,6 @@
 # Plan 027: Extract `nest-api` history into a NestJS gRPC microservice
 
-**Status:** Draft
+**Status:** Complete
 **Related:** `spec.md` (this folder), `tasks.md` (this folder)
 
 ## Context
@@ -14,7 +14,7 @@ React Native is explicitly out of scope; per discussion it will live in a separa
 ## Outcome
 
 - A new package `nest-history-api/` (NestJS, Fastify/HTTP disabled; runs as pure gRPC service on port `50051`) that owns PostgreSQL schema `react_nestjs_history` and its `application_history` table, including Knex migrations.
-- A `proto/` directory at the repo root containing `history/v1/history.proto`, governed by `buf` (`buf.yaml`, `buf.gen.yaml`) with `ts-proto` codegen and `buf lint` / `buf breaking` wired into the validation chain.
+- A `proto/` directory at the repo root containing `history/v1/history.proto`, governed by `buf` (`proto/buf.yaml` for lint/breaking rules; `buf.gen.yaml` at repo root for codegen) with `ts-proto` codegen and `buf lint` / `buf breaking` wired into the validation chain.
 - `nest-api` no longer touches `application_history`; its `HistoryService` provider is replaced by a thin gRPC client (`@nestjs/microservices` + `ClientGrpc`) that speaks to `nest-history-api`. Existing REST endpoints (`/applications/:id/history`, revert) continue to work unchanged for the browser.
 - `restoreToVersion` is refactored so the gRPC service is write-isolated: it returns the target snapshot; `nest-api` applies the revert to `applications` + `interview_stages` inside its own transaction.
 - Monorepo scripts, docs (`README.md`, `docs/DATABASE_ARCHITECTURE.md`, `CLAUDE.md`), `scripts/stop-all.sh`, and `.vscode/launch.json` updated per the "adding a new implementation" checklist in `CLAUDE.md`.
