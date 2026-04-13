@@ -15,7 +15,7 @@ import { InterviewStagesService } from './interview-stages.service.js';
         transport: Transport.GRPC,
         options: {
           package: 'history.v1',
-          protoPath: join(process.cwd(), 'proto', 'history', 'v1', 'history.proto'),
+          protoPath: join(process.cwd(), '..', 'proto', 'history', 'v1', 'history.proto'),
           url: `${process.env.HISTORY_GRPC_HOST ?? 'localhost'}:${process.env.HISTORY_GRPC_PORT ?? 50051}`,
         },
       },

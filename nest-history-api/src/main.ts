@@ -11,7 +11,7 @@ async function bootstrap(): Promise<void> {
     transport: Transport.GRPC,
     options: {
       package: 'history.v1',
-      protoPath: join(process.cwd(), 'proto', 'history', 'v1', 'history.proto'),
+      protoPath: join(process.cwd(), '..', 'proto', 'history', 'v1', 'history.proto'),
       url: `0.0.0.0:${port}`,
     },
   });
