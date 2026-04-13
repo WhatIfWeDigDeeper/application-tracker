@@ -4,7 +4,6 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
-| [react_nestjs.application_history](react_nestjs.application_history.md) | 6 |  | BASE TABLE |
 | [react_nestjs.applications](react_nestjs.applications.md) | 20 |  | BASE TABLE |
 | [react_nestjs.interview_stages](react_nestjs.interview_stages.md) | 8 |  | BASE TABLE |
 
@@ -36,17 +35,8 @@
 ```mermaid
 erDiagram
 
-"react_nestjs.application_history" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
 "react_nestjs.interview_stages" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
 
-"react_nestjs.application_history" {
-  id uuid
-  application_id uuid FK
-  sequence integer
-  description varchar_500_
-  snapshot jsonb
-  created_at timestamp_with_time_zone
-}
 "react_nestjs.applications" {
   id uuid
   company_name varchar_200_
