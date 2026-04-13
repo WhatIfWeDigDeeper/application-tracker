@@ -193,11 +193,19 @@ export class ApplicationsService {
   }
 
   async deleteApplication(id: string): Promise<boolean> {
-    // Clean up history in the separate schema (no cross-schema FK cascade).
-    await this.historyService.deleteHistory(id);
-
     const result = await this.db.delete(applications).where(eq(applications.id, id)).returning({ id: applications.id });
-    return result.length > 0;
+    if (result.length === 0) return false;
+
+    // Best-effort: clean up history in the separate schema. If nest-history-api is
+    // unreachable the application row is already deleted; log and continue rather than
+    // failing the request.
+    try {
+      await this.historyService.deleteHistory(id);
+    } catch (err) {
+      console.warn(`[deleteApplication] Failed to clean up history for ${id}:`, err);
+    }
+
+    return true;
   }
 
   async archiveApplication(id: string): Promise<ApplicationResponse | null> {
