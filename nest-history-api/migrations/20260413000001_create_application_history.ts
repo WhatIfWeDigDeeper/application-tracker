@@ -11,7 +11,6 @@ export async function up(knex: Knex): Promise<void> {
     table.jsonb('snapshot').notNullable();
     table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(knex.fn.now());
 
-    table.index(['application_id', 'sequence'], 'idx_history_app_sequence');
     table.unique(['application_id', 'sequence'], { indexName: 'uq_history_app_sequence' });
   });
 }
