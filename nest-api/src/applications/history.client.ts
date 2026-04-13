@@ -180,7 +180,11 @@ export class HistoryClient implements OnModuleInit {
       }
     });
 
-    await this.recordHistory(applicationId, buildDescription('restore_version', String(targetSequence)));
+    try {
+      await this.recordHistory(applicationId, buildDescription('restore_version', String(targetSequence)));
+    } catch (err) {
+      console.warn(`[restoreToVersion] Failed to record history for ${applicationId}:`, err);
+    }
 
     return this.captureSnapshot(applicationId);
   }
