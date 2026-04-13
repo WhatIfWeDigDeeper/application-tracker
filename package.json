@@ -208,7 +208,7 @@
     "cdk:destroy": "npm run --prefix lambda-api/cdk destroy",
     "cdk:destroy:local": "npm run --prefix lambda-api/cdk destroy:local",
     "migrate:all": "npm run migrate:express && npm run migrate:koa-api && npm run migrate:hono-api && npm run migrate:nuxt-api && npm run migrate:nest-api && npm run migrate:fastapi && npm run migrate:go && npm run migrate:spring-api && npm run migrate:yoga-api && npm run migrate:lambda-api && npm run migrate:nest-history-api",
-    "proto:generate": "buf generate proto",
+    "proto:generate": "buf generate",
     "proto:lint": "buf lint proto",
     "proto:breaking": "bash -c 'if git ls-tree origin/main proto 2>/dev/null | grep -q .; then buf breaking proto --against .git#branch=origin/main; else echo \"Skipping buf breaking: no proto baseline on origin/main yet\"; fi'",
     "test:e2e:react-next-ui": "TEST_UI_PORT=3000 PLAYWRIGHT_HTML_OPEN=never npx -y playwright test",
