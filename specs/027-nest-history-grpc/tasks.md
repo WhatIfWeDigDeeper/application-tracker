@@ -41,10 +41,10 @@ Tasks are ordered to minimize broken intermediate states. Each phase should leav
 4. [x] Update `applications.service.ts` to depend on `HistoryClient` instead of `HistoryService` (mechanical rename at the injection site and call sites).
 5. [x] Update `csv.service.ts` to depend on `HistoryClient` (same).
 6. [x] Update `interview-stages.service.ts` to depend on `HistoryClient` (same). Verify all three mutation paths — create, update, delete stage — still call `recordHistory` with equivalent payloads.
-7. [x] Add `ApplicationsService.restoreToVersion(id, sequence)` — calls `historyClient.getSnapshotAtVersion`, then applies the snapshot to `applications` + `interview_stages` inside a single Drizzle transaction.
+7. [x] Add `HistoryClient.restoreToVersion(id, sequence)` — calls `this.grpc.getSnapshotAtVersion`, then applies the snapshot to `applications` + `interview_stages` inside a single Drizzle transaction. (Note: implemented on `HistoryClient` directly rather than a separate `ApplicationsService` method, keeping all history-related logic in one place.)
 8. [x] Update `applications.controller.ts`:
    - Inject `HistoryClient` in place of `HistoryService` for `GET /applications/:id/history`.
-   - Change `POST /applications/:id/history/restore` to delegate to the new `ApplicationsService.restoreToVersion` method.
+   - Change `POST /applications/:id/history/restore` to delegate to `historyClient.restoreToVersion` directly.
 9. [x] Add an explicit `historyClient.deleteHistory(applicationId)` call in `ApplicationsService.remove` (replacing the cross-schema FK cascade).
 10. [x] Delete `nest-api/src/applications/history.service.ts` and its test file. Grep for any remaining `HistoryService` references — must be zero.
 11. [x] Run the chain for `nest-api`: `build → lint → test → audit:ci`. All pass.

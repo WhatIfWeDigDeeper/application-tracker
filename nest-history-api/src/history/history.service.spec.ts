@@ -2,10 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { HistoryService } from './history.service';
 
 // Unit tests for HistoryService that can run without a database.
-// DB-dependent methods (recordHistory, listHistory, etc.) are covered by integration tests.
+// DB-dependent methods (recordHistory, listHistory, etc.) are not yet covered —
+// integration test coverage is tracked in https://github.com/WhatIfWeDigDeeper/application-tracker/issues/280.
 
 describe('HistoryService — pure helpers', () => {
-  // getNextSequence is private; test it indirectly via recordHistory in integration tests.
+  // getNextSequence is private; behavioural tests (sequence ordering, pagination, restore)
+  // are deferred to the integration test suite tracked in #280.
   // Here we verify that the service can be constructed and its interface matches expectations.
 
   it('exports HistoryService', () => {
