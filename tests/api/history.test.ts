@@ -46,7 +46,7 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyName: 'History Test Corp',
+        companyName: 'API: History Test Corp',
         positionTitle: 'Engineer',
       }),
     });
@@ -58,7 +58,7 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
     const res = await fetch(`${baseUrl}/applications/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ companyName: 'History Test Corp', positionTitle: 'Engineer', ...patch }),
+      body: JSON.stringify({ companyName: 'API: History Test Corp', positionTitle: 'Engineer', ...patch }),
     });
     expect(res.ok).toBe(true);
     return res.json();
@@ -110,7 +110,7 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
       const app = await createApp();
       createdIds.push(app.id);
 
-      await updateApp(app.id, { companyName: 'Updated Corp' });
+      await updateApp(app.id, { companyName: 'API: Updated Corp' });
 
       const history = await getHistory(app.id);
       expect(history.entries.length).toBeGreaterThanOrEqual(2);
@@ -141,7 +141,7 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
       createdIds.push(app.id);
 
       // Make an update so there are 2 history entries
-      await updateApp(app.id, { companyName: 'Changed Corp' });
+      await updateApp(app.id, { companyName: 'API: Changed Corp' });
 
       // Restore to sequence 1 (original)
       const res = await fetch(`${baseUrl}/applications/${app.id}/history/restore`, {
@@ -153,14 +153,14 @@ describe.each(getTargetStacks(HISTORY_STACKS))('History API ($name)', ({ baseUrl
 
       const restored: AppResponse = await res.json();
       expect(restored.id).toBe(app.id);
-      expect(restored.companyName).toBe('History Test Corp'); // original value
+      expect(restored.companyName).toBe('API: History Test Corp'); // original value
     });
 
     it('adds a new history entry after restore', async () => {
       const app = await createApp();
       createdIds.push(app.id);
 
-      await updateApp(app.id, { companyName: 'Modified Corp' });
+      await updateApp(app.id, { companyName: 'API: Modified Corp' });
 
       await fetch(`${baseUrl}/applications/${app.id}/history/restore`, {
         method: 'POST',

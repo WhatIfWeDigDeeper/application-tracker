@@ -2,6 +2,9 @@
 
 /**
  * Deletes applications matching keywords via the API.
+ * All e2e tests now create applications with "E2E" in the company name,
+ * so that is the default keyword.
+ * You can specify additional keywords or override them entirely via command-line arguments.
  *
  * Usage:
  *   node scripts/cleanup-test-data.mjs [--port <port>] [--dry-run] [keyword ...]
@@ -12,28 +15,14 @@
  *   node scripts/cleanup-test-data.mjs --dry-run                # preview what would be deleted
  *
  * Default keywords (case-insensitive, matched against companyName and positionTitle):
- *   "History Co", "Delete Co", "Test Co", "Stage Co", "Unsaved Co"
+ *   "E2E"
  */
 
 const DEFAULT_PORT = 5040;
 // Express (3001) serves at /applications; all others use /api/applications
-const PORTS_WITHOUT_API_PREFIX = [3001];
+const PORTS_WITHOUT_API_PREFIX = [3001, 5050];
 
-const DEFAULT_KEYWORDS = [
-  'Delete Co',
-  'Discard Test',
-  'E2E',
-  'Edit Test',
-  'Final Test',
-  'History Co',
-  'No Date Company',
-  'Stage Co',
-  'Test Co',
-  'Test Company',
-  'Test Proxy',
-  'Unsaved Co',
-  'Updated Company',
-];
+const DEFAULT_KEYWORDS = ['E2E', 'API'];
 
 function parseArgs(argv) {
   const args = argv.slice(2);

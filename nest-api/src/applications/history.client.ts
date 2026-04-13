@@ -87,11 +87,17 @@ export class HistoryClient implements OnModuleInit {
     page: number = 1,
     limit: number = 50
   ): Promise<PaginatedHistoryResponse> {
-    const response = await firstValueFrom(
-      this.grpc.listHistory({ applicationId, page, limit })
-    );
+    let response;
+    try {
+      response = await firstValueFrom(
+        this.grpc.listHistory({ applicationId, page, limit })
+      );
+    } catch (err) {
+      console.warn(`[listHistory] gRPC call failed for ${applicationId}:`, err);
+      return { entries: [], total: 0, page, limit };
+    }
 
-    const entries: HistoryEntryResponse[] = response.entries.map((entry, index) => {
+    const entries: HistoryEntryResponse[] = (response.entries ?? []).map((entry, index) => {
       const thisSnapshot = JSON.parse(
         Buffer.from(entry.snapshot).toString('utf-8')
       ) as ApplicationResponse;

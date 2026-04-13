@@ -13,5 +13,5 @@ export async function deleteApplicationViaApi(page: Page, id: string): Promise<v
  * UUID-based unique company name to avoid parallel-test collisions.
  */
 export function uniqueCompanyName(prefix: string): string {
-  return `${prefix} ${crypto.randomUUID()}`;
+  return `E2E: ${prefix} ${crypto.randomUUID()}`;
 }

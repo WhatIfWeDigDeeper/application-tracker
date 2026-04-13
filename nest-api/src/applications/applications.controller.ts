@@ -155,6 +155,7 @@ export class ApplicationsController {
   }
 
   @Post(':id/history/restore')
+  @HttpCode(200)
   async restoreVersion(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(RestoreRequestSchema)) body: { sequence: number }

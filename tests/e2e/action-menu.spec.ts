@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const TEST_COMPANY = 'Action Menu Test Co';
+const TEST_COMPANY = 'E2E: Action Menu Test Co';
 
 test.describe('Action Menu - Card interactions', () => {
   let createdAppId: string;

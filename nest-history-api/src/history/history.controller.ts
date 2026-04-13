@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { HistoryService } from './history.service';
 import type {
@@ -14,7 +14,7 @@ import type {
 
 @Controller()
 export class HistoryController {
-  constructor(private readonly historyService: HistoryService) {}
+  constructor(@Inject(HistoryService) private readonly historyService: HistoryService) {}
 
   @GrpcMethod('HistoryService', 'RecordHistory')
   async recordHistory(request: RecordHistoryRequest): Promise<RecordHistoryResponse> {

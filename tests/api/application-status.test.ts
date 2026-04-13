@@ -53,7 +53,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Application Status + Date Constraint
   describe('create', () => {
     it('should default to unsubmitted status with null dateApplied', async () => {
       const app = await createApp({
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Software Engineer',
       });
       createdIds.push(app.id);
@@ -66,13 +66,13 @@ describe.each(getTargetStacks(ALL_STACKS))('Application Status + Date Constraint
   describe('update', () => {
     it('should force dateApplied to null when status is set to unsubmitted', async () => {
       const app = await createApp({
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Software Engineer',
       });
       createdIds.push(app.id);
 
       await updateApp(app.id, { companyName: app.id, positionTitle: 'Software Engineer', status: 'applied', dateApplied: '2026-01-15' });
-      const updated = await updateApp(app.id, { companyName: 'Test Company', positionTitle: 'Software Engineer', status: 'unsubmitted' });
+      const updated = await updateApp(app.id, { companyName: 'API: Test Company', positionTitle: 'Software Engineer', status: 'unsubmitted' });
 
       expect(updated.status).toBe('unsubmitted');
       expect(updated.dateApplied).toBeNull();
@@ -80,13 +80,13 @@ describe.each(getTargetStacks(ALL_STACKS))('Application Status + Date Constraint
 
     it('should force dateApplied to null even if dateApplied is also provided', async () => {
       const app = await createApp({
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Software Engineer',
       });
       createdIds.push(app.id);
 
       const updated = await updateApp(app.id, {
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Software Engineer',
         status: 'unsubmitted',
         dateApplied: '2026-02-01',
@@ -98,13 +98,13 @@ describe.each(getTargetStacks(ALL_STACKS))('Application Status + Date Constraint
 
     it('should allow dateApplied when status is not unsubmitted', async () => {
       const app = await createApp({
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Software Engineer',
       });
       createdIds.push(app.id);
 
       const updated = await updateApp(app.id, {
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Software Engineer',
         status: 'applied',
         dateApplied: '2026-01-20',

@@ -31,7 +31,7 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
 
-    await page.fill('input[placeholder="Company Name *"]', 'E2E Test Company');
+    await page.fill('input[placeholder="Company Name *"]', 'E2E: Test Company');
     await page.fill('input[placeholder="Position Title *"]', 'Senior Engineer');
 
     await page.click('button:has-text("Create Application")');
@@ -39,14 +39,14 @@ test.describe('Application CRUD - Inline Edit', () => {
     const id1 = page.url().split('/').pop()!;
     createdApps.push({ id: id1, url: page.url() });
 
-    await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('E2E Test Company');
+    await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('E2E: Test Company');
     await expect(page.locator('input[placeholder="Position Title *"]')).toHaveValue('Senior Engineer');
   });
 
   test('should edit an existing application', async ({ page }) => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
-    await page.fill('input[placeholder="Company Name *"]', 'Edit Test Company');
+    await page.fill('input[placeholder="Company Name *"]', 'E2E: Edit Test Company');
     await page.fill('input[placeholder="Position Title *"]', 'Developer');
     // Set status to applied so dateApplied is auto-filled (ensures item sorts to top of paginated lists)
     await page.selectOption('#status', 'applied');
@@ -57,7 +57,7 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     const companyInput = page.locator('input[placeholder="Company Name *"]');
     await companyInput.clear();
-    await companyInput.fill('Updated Company Name');
+    await companyInput.fill('E2E: Updated Company Name');
 
     await page.click('button:has-text("Save Changes")');
     // Wait for save to complete (button becomes disabled when form is clean)
@@ -66,16 +66,16 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.click('text=Back to List');
     await page.waitForURL('/');
 
-    await page.click('text=Updated Company Name');
+    await page.click('text=E2E: Updated Company Name');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
 
-    await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('Updated Company Name');
+    await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('E2E: Updated Company Name');
   });
 
   test('should discard changes in edit mode', async ({ page }) => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
-    await page.fill('input[placeholder="Company Name *"]', 'Discard Test Company');
+    await page.fill('input[placeholder="Company Name *"]', 'E2E: Discard Test Company');
     await page.fill('input[placeholder="Position Title *"]', 'Tester');
     await page.click('button:has-text("Create Application")');
     await page.waitForURL(/\/applications\/[a-f0-9-]+$/);
@@ -84,21 +84,21 @@ test.describe('Application CRUD - Inline Edit', () => {
 
     const companyInput = page.locator('input[placeholder="Company Name *"]');
     await companyInput.clear();
-    await companyInput.fill('This Should Be Discarded');
+    await companyInput.fill('E2E: This Should Be Discarded');
 
     await page.click('button:has-text("Discard")');
 
     // Confirm discard in the dialog
     await page.locator('[role="dialog"] button:has-text("Discard")').click();
 
-    await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('Discard Test Company');
+    await expect(page.locator('input[placeholder="Company Name *"]')).toHaveValue('E2E: Discard Test Company');
   });
 
   test('should create application with interview stages', async ({ page }) => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
 
-    await page.fill('input[placeholder="Company Name *"]', 'Stages Test Company');
+    await page.fill('input[placeholder="Company Name *"]', 'E2E: Stages Test Company');
     await page.fill('input[placeholder="Position Title *"]', 'Engineer');
 
     // Open the stage form
@@ -175,7 +175,7 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
 
-    await page.fill('input[placeholder="Company Name *"]', 'Status Persist Co');
+    await page.fill('input[placeholder="Company Name *"]', 'E2E: Status Persist Co');
     await page.fill('input[placeholder="Position Title *"]', 'Engineer');
     await page.selectOption('#status', 'applied');
 
@@ -203,7 +203,7 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
 
-    await page.fill('input[placeholder="Company Name *"]', 'No Date Company');
+    await page.fill('input[placeholder="Company Name *"]', 'E2E: No Date Company');
     await page.fill('input[placeholder="Position Title *"]', 'Engineer');
 
     await page.click('button:has-text("Create Application")');
@@ -297,7 +297,7 @@ test.describe('Application CRUD - Inline Edit', () => {
     await page.goto('/applications/new');
     await page.waitForLoadState('domcontentloaded');
 
-    await page.fill('input[placeholder="Company Name *"]', 'Salary Test Company');
+    await page.fill('input[placeholder="Company Name *"]', 'E2E: Salary Test Company');
     await page.fill('input[placeholder="Position Title *"]', 'Engineer');
     await page.fill('#salaryMin', '200000');
     await page.fill('#salaryMax', '100000');
@@ -325,7 +325,7 @@ test.describe('Status label - Not a match', () => {
     const context = await browser.newContext();
     const page = await context.newPage();
     const createRes = await page.request.post('/api/applications', {
-      data: { companyName: 'Not A Match Co', positionTitle: 'Engineer', status: 'applied' },
+      data: { companyName: 'E2E: Not A Match Co', positionTitle: 'Engineer', status: 'applied' },
     });
     const app = await createRes.json();
     createdAppId = app.id;
@@ -398,7 +398,7 @@ test.describe('Date display in list - angular-spring-ui', () => {
     const today = new Date().toISOString().split('T')[0];
     const res = await page.request.post('/api/applications', {
       data: {
-        companyName: 'Date Format Test Co',
+        companyName: 'E2E: Date Format Test Co',
         positionTitle: 'Engineer',
         status: 'applied',
         dateApplied: today,

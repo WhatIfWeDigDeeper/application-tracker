@@ -65,7 +65,7 @@ export const CreateInterviewStageSchema = z.object({
   name: z.string().min(1).max(100),
   order: z.number().int().min(0),
   isCompleted: z.boolean().default(false),
-  completedDate: z.string().optional(),
+  completedDate: z.string().nullable().optional(),
   notes: z.string().max(2000).optional(),
   performanceRating: z.number().int().min(1).max(5).optional(),
 });
