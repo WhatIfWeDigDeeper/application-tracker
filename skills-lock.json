@@ -14,7 +14,7 @@
     "learn": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "4ce684f348b0adb48e6e7d2d6dd15b34cf41026d7ff037db94dc08385b348cfa"
+      "computedHash": "31f93c373d257b2f95b1a47671ca5c458bb759fcb6d31ae4a8ecd9c5c621e9a0"
     },
     "mermaid-diagrams": {
       "source": "softaworks/agent-toolkit",
@@ -34,12 +34,12 @@
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "33e4ab83b92cdb0084db27711a6c750b617205fc677566ba847621509624ebc9"
+      "computedHash": "009233c0b97295d74e5846ce2ee5a33e82b0a84dd4e44cb765ca8c8be598e89f"
     },
     "pr-human-guide": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "02d021be6391a54d3d6388c797fa8a15b2cb0bb7c4655d0935ccef311cb95eb6"
+      "computedHash": "755756ef48b5c2c4ce6d8302e08d70556506950bcaf6594aa32f90cd508774fd"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
