@@ -37,8 +37,8 @@ Contract boundary (`proto/history/v1/history.proto`, rpcs):
 
 - `RecordHistory(RecordHistoryRequest) → RecordHistoryResponse` — writes one history row. Payload: `application_id`, `description`, `snapshot` (bytes — JSON-encoded to keep the proto stable against app-schema churn).
 - `ListHistory(ListHistoryRequest) → ListHistoryResponse` — returns ordered entries with `sequence`, `description`, `created_at`, `snapshot`.
-- `GetSnapshotAtVersion(GetSnapshotRequest) → GetSnapshotResponse` — returns the snapshot for a given `application_id` + `sequence`. Replaces the write-side of `restoreToVersion`; the caller applies it.
-- `DeleteHistory(DeleteHistoryRequest) → google.protobuf.Empty` — called when an application is deleted (cascade replacement, since we no longer share a DB FK across schemas).
+- `GetSnapshotAtVersion(GetSnapshotAtVersionRequest) → GetSnapshotAtVersionResponse` — returns the snapshot for a given `application_id` + `sequence`. Replaces the write-side of `restoreToVersion`; the caller applies it.
+- `DeleteHistory(DeleteHistoryRequest) → DeleteHistoryResponse` — returns `deleted_count`; called when an application is deleted (cascade replacement, since we no longer share a DB FK across schemas).
 
 Design notes:
 

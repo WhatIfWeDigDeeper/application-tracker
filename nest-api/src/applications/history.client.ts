@@ -131,45 +131,47 @@ export class HistoryClient implements OnModuleInit {
       Buffer.from(snapshotResp.snapshot).toString('utf-8')
     ) as ApplicationResponse;
 
-    await this.db
-      .update(applications)
-      .set({
-        companyName: snapshot.companyName,
-        positionTitle: snapshot.positionTitle,
-        dateApplied: snapshot.dateApplied,
-        status: snapshot.status,
-        companyUrl: snapshot.companyUrl,
-        jobPostingUrl: snapshot.jobPostingUrl,
-        companyCareerUrl: snapshot.companyCareerUrl,
-        companyCategory: snapshot.companyCategory,
-        skillsMatch: snapshot.skillsMatch,
-        jobSource: snapshot.jobSource,
-        coverLetterRequired: snapshot.coverLetterRequired,
-        specialRequirements: snapshot.specialRequirements,
-        salaryMin: snapshot.salaryMin,
-        salaryMax: snapshot.salaryMax,
-        notes: snapshot.notes,
-        offerDueDate: snapshot.offerDueDate,
-        isArchived: snapshot.isArchived,
-        updatedAt: new Date(),
-      })
-      .where(eq(applications.id, applicationId));
+    await this.db.transaction(async (trx) => {
+      await trx
+        .update(applications)
+        .set({
+          companyName: snapshot.companyName,
+          positionTitle: snapshot.positionTitle,
+          dateApplied: snapshot.dateApplied,
+          status: snapshot.status,
+          companyUrl: snapshot.companyUrl,
+          jobPostingUrl: snapshot.jobPostingUrl,
+          companyCareerUrl: snapshot.companyCareerUrl,
+          companyCategory: snapshot.companyCategory,
+          skillsMatch: snapshot.skillsMatch,
+          jobSource: snapshot.jobSource,
+          coverLetterRequired: snapshot.coverLetterRequired,
+          specialRequirements: snapshot.specialRequirements,
+          salaryMin: snapshot.salaryMin,
+          salaryMax: snapshot.salaryMax,
+          notes: snapshot.notes,
+          offerDueDate: snapshot.offerDueDate,
+          isArchived: snapshot.isArchived,
+          updatedAt: new Date(),
+        })
+        .where(eq(applications.id, applicationId));
 
-    await this.db.delete(interviewStages).where(eq(interviewStages.applicationId, applicationId));
+      await trx.delete(interviewStages).where(eq(interviewStages.applicationId, applicationId));
 
-    if (snapshot.interviewStages && snapshot.interviewStages.length > 0) {
-      await this.db.insert(interviewStages).values(
-        snapshot.interviewStages.map((s) => ({
-          applicationId,
-          name: s.name,
-          order: s.order,
-          isCompleted: s.isCompleted,
-          completedDate: s.completedDate || null,
-          notes: s.notes,
-          performanceRating: s.performanceRating,
-        }))
-      );
-    }
+      if (snapshot.interviewStages && snapshot.interviewStages.length > 0) {
+        await trx.insert(interviewStages).values(
+          snapshot.interviewStages.map((s) => ({
+            applicationId,
+            name: s.name,
+            order: s.order,
+            isCompleted: s.isCompleted,
+            completedDate: s.completedDate || null,
+            notes: s.notes,
+            performanceRating: s.performanceRating,
+          }))
+        );
+      }
+    });
 
     await this.recordHistory(applicationId, buildDescription('restore_version', String(targetSequence)));
 

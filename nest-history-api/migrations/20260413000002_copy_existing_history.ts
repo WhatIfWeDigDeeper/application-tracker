@@ -7,11 +7,20 @@ import type { Knex } from 'knex';
  */
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(`
-    INSERT INTO react_nestjs_history.application_history
-      (id, application_id, sequence, description, snapshot, created_at)
-    SELECT id, application_id, sequence, description, snapshot, created_at
-    FROM react_nestjs.application_history
-    ON CONFLICT (application_id, sequence) DO NOTHING
+    DO $$
+    BEGIN
+      IF EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'react_nestjs'
+        AND table_name = 'application_history'
+      ) THEN
+        INSERT INTO react_nestjs_history.application_history
+          (id, application_id, sequence, description, snapshot, created_at)
+        SELECT id, application_id, sequence, description, snapshot, created_at
+        FROM react_nestjs.application_history
+        ON CONFLICT (application_id, sequence) DO NOTHING;
+      END IF;
+    END $$;
   `);
 }
 
