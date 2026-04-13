@@ -97,13 +97,14 @@ export class HistoryClient implements OnModuleInit {
       return { entries: [], total: 0, page, limit };
     }
 
-    const entries: HistoryEntryResponse[] = (response.entries ?? []).map((entry, index) => {
+    const responseEntries = response.entries ?? [];
+    const entries: HistoryEntryResponse[] = responseEntries.map((entry, index) => {
       const thisSnapshot = JSON.parse(
         Buffer.from(entry.snapshot).toString('utf-8')
       ) as ApplicationResponse;
 
       let changes: FieldChange[] = [];
-      const olderEntry = response.entries[index + 1];
+      const olderEntry = responseEntries[index + 1];
       if (olderEntry) {
         const olderSnapshot = JSON.parse(
           Buffer.from(olderEntry.snapshot).toString('utf-8')
