@@ -6,13 +6,13 @@
   "permissions": {
     "allow": [
       "Bash",
-      "Fetch(*)",
-      "Write(*)",
-      "Edit(*)",
-      "Read(*)",
-      "Glob(*)",
-      "Grep(*)",
-      "WebFetch(*)",
+      "Fetch",
+      "Write",
+      "Edit",
+      "Read",
+      "Glob",
+      "Grep",
+      "WebFetch",
       "Skill(playwright-cli:*)"
     ],
     "deny": [
@@ -42,15 +42,6 @@
           {
             "type": "command",
             "command": "terminal-notifier -title 'application-tracker' -message 'Claude has a question for you' -sound Glass -activate com.microsoft.VSCode"
-          }
-        ]
-      },
-      {
-        "matcher": "idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "terminal-notifier -title 'application-tracker' -message 'Claude is waiting for your input' -sound Glass -activate com.microsoft.VSCode"
           }
         ]
       }

@@ -36,6 +36,11 @@
       "sourceType": "github",
       "computedHash": "33e4ab83b92cdb0084db27711a6c750b617205fc677566ba847621509624ebc9"
     },
+    "pr-human-guide": {
+      "source": "whatifwedigdeeper/agent-skills",
+      "sourceType": "github",
+      "computedHash": "02d021be6391a54d3d6388c797fa8a15b2cb0bb7c4655d0935ccef311cb95eb6"
+    },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
