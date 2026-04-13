@@ -43,7 +43,7 @@ interface StageResponse {
   order: number;
 }
 
-describeHistory('History API ($name)', ({ baseUrl, hasInterviewStageDates, hasStageHistory }) => {
+describeHistory('History API ($name)', ({ baseUrl, hasStageHistory }) => {
   const createdIds: string[] = [];
 
   async function createApp(): Promise<AppResponse> {
@@ -190,15 +190,10 @@ describeHistory('History API ($name)', ({ baseUrl, hasInterviewStageDates, hasSt
       const historyBefore = await getHistory(app.id);
       const countBefore = historyBefore.total;
 
-      const stageBody: Record<string, unknown> = { name: 'Phone Screen', order: 1 };
-      if (hasInterviewStageDates) {
-        stageBody.completedDate = null;
-      }
-
       const stageRes = await fetch(`${baseUrl}/applications/${app.id}/interview-stages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(stageBody),
+        body: JSON.stringify({ name: 'Phone Screen', order: 1 }),
       });
       expect(stageRes.status).toBe(201);
       const stage: StageResponse = await stageRes.json();
@@ -215,15 +210,10 @@ describeHistory('History API ($name)', ({ baseUrl, hasInterviewStageDates, hasSt
       const app = await createApp();
       createdIds.push(app.id);
 
-      const stageBody: Record<string, unknown> = { name: 'Technical', order: 1 };
-      if (hasInterviewStageDates) {
-        stageBody.completedDate = null;
-      }
-
       const stageRes = await fetch(`${baseUrl}/applications/${app.id}/interview-stages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(stageBody),
+        body: JSON.stringify({ name: 'Technical', order: 1 }),
       });
       expect(stageRes.status).toBe(201);
       const stage: StageResponse = await stageRes.json();
@@ -231,15 +221,10 @@ describeHistory('History API ($name)', ({ baseUrl, hasInterviewStageDates, hasSt
       const historyBefore = await getHistory(app.id);
       const countBefore = historyBefore.total;
 
-      const updateBody: Record<string, unknown> = { name: 'Technical Interview', order: 1 };
-      if (hasInterviewStageDates) {
-        updateBody.completedDate = null;
-      }
-
       await fetch(`${baseUrl}/applications/${app.id}/interview-stages/${stage.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateBody),
+        body: JSON.stringify({ name: 'Technical Interview', order: 1 }),
       });
 
       const historyAfter = await getHistory(app.id);
@@ -254,15 +239,10 @@ describeHistory('History API ($name)', ({ baseUrl, hasInterviewStageDates, hasSt
       const app = await createApp();
       createdIds.push(app.id);
 
-      const stageBody: Record<string, unknown> = { name: 'Final Round', order: 1 };
-      if (hasInterviewStageDates) {
-        stageBody.completedDate = null;
-      }
-
       const stageRes = await fetch(`${baseUrl}/applications/${app.id}/interview-stages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(stageBody),
+        body: JSON.stringify({ name: 'Final Round', order: 1 }),
       });
       expect(stageRes.status).toBe(201);
       const stage: StageResponse = await stageRes.json();
