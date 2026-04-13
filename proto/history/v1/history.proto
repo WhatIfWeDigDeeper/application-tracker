@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package history.v1;
+
+option java_multiple_files = true;
+option java_outer_classname = "HistoryProto";
+option java_package = "history.v1";
+
+// HistoryService manages application history snapshots for the application tracker.
+// Snapshots are transported as opaque JSON bytes; only the caller interprets their contents.
+service HistoryService {
+  // RecordHistory writes one history entry for an application.
+  rpc RecordHistory(RecordHistoryRequest) returns (RecordHistoryResponse);
+
+  // ListHistory returns paginated history entries for an application, ordered by sequence descending.
+  rpc ListHistory(ListHistoryRequest) returns (ListHistoryResponse);
+
+  // GetSnapshotAtVersion returns the snapshot at a specific sequence number.
+  // Used by the caller to retrieve a target state for restore operations.
+  rpc GetSnapshotAtVersion(GetSnapshotAtVersionRequest) returns (GetSnapshotAtVersionResponse);
+
+  // DeleteHistory removes all history entries for an application.
+  // Called when an application is deleted (cross-schema cascade replacement).
+  rpc DeleteHistory(DeleteHistoryRequest) returns (DeleteHistoryResponse);
+}
+
+message RecordHistoryRequest {
+  // UUID of the application this history entry belongs to.
+  string application_id = 1;
+  // Human-readable description of the change (e.g. "Updated Status, Notes").
+  string description = 2;
+  // JSON-encoded snapshot of the application state at the time of the change.
+  bytes snapshot = 3;
+}
+
+message RecordHistoryResponse {
+  // The sequence number assigned to this history entry.
+  int32 sequence = 1;
+}
+
+message ListHistoryRequest {
+  string application_id = 1;
+  // 1-based page number. Defaults to 1 if omitted.
+  int32 page = 2;
+  // Number of entries per page. Defaults to 50 if omitted.
+  int32 limit = 3;
+}
+
+message HistoryEntry {
+  // UUID of this history entry row.
+  string id = 1;
+  // Monotonically increasing per-application sequence number.
+  int32 sequence = 2;
+  // Human-readable change description.
+  string description = 3;
+  // ISO 8601 timestamp of when this entry was recorded.
+  string created_at = 4;
+  // JSON-encoded snapshot; the caller computes field-level diffs.
+  bytes snapshot = 5;
+}
+
+message ListHistoryResponse {
+  repeated HistoryEntry entries = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message GetSnapshotAtVersionRequest {
+  string application_id = 1;
+  int32 sequence = 2;
+}
+
+message GetSnapshotAtVersionResponse {
+  // JSON-encoded snapshot at the requested version. Empty if not found.
+  bytes snapshot = 1;
+  // Whether the requested sequence was found.
+  bool found = 2;
+}
+
+message DeleteHistoryRequest {
+  string application_id = 1;
+}
+
+message DeleteHistoryResponse {
+  // Number of history entries deleted.
+  int32 deleted_count = 1;
+}

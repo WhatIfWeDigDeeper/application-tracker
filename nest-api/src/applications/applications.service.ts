@@ -10,7 +10,7 @@ import type {
   PaginatedApplicationsResponse,
 } from '../types/api.js';
 import { toApplicationResponse } from './shared.js';
-import { HistoryService, buildDescription } from './history.service.js';
+import { HistoryClient, buildDescription } from './history.client.js';
 
 const FIELD_LABELS_MAP: Record<string, string> = {
   companyName: 'Company Name',
@@ -35,7 +35,7 @@ const FIELD_LABELS_MAP: Record<string, string> = {
 export class ApplicationsService {
   constructor(
     @Inject(DRIZZLE) private db: DrizzleDB,
-    @Inject(HistoryService) private historyService: HistoryService,
+    @Inject(HistoryClient) private historyService: HistoryClient,
   ) {}
 
   async listApplications(query: ListApplicationsQuery): Promise<PaginatedApplicationsResponse> {
@@ -193,10 +193,19 @@ export class ApplicationsService {
   }
 
   async deleteApplication(id: string): Promise<boolean> {
-    await this.historyService.recordHistory(id, buildDescription('delete'));
-
     const result = await this.db.delete(applications).where(eq(applications.id, id)).returning({ id: applications.id });
-    return result.length > 0;
+    if (result.length === 0) return false;
+
+    // Best-effort: clean up history in the separate schema. If nest-history-api is
+    // unreachable the application row is already deleted; log and continue rather than
+    // failing the request.
+    try {
+      await this.historyService.deleteHistory(id);
+    } catch (err) {
+      console.warn(`[deleteApplication] Failed to clean up history for ${id}:`, err);
+    }
+
+    return true;
   }
 
   async archiveApplication(id: string): Promise<ApplicationResponse | null> {

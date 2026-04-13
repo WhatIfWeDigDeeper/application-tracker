@@ -8,7 +8,7 @@ const VIEWPORTS = [
   { name: 'Desktop', width: 1440, height: 900 },
 ];
 
-const TEST_COMPANY = 'Responsive Layout Test Co';
+const TEST_COMPANY = 'E2E: Responsive Layout Test Co';
 
 test.describe('Responsive layout', () => {
   let createdAppId: string;

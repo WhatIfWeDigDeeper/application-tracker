@@ -17,7 +17,7 @@ import {
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ApplicationsService } from './applications.service.js';
 import { CsvService } from './csv.service.js';
-import { HistoryService } from './history.service.js';
+import { HistoryClient } from './history.client.js';
 import { InterviewStagesService } from './interview-stages.service.js';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe.js';
 import {
@@ -49,7 +49,7 @@ export class ApplicationsController {
   constructor(
     @Inject(ApplicationsService) private applicationsService: ApplicationsService,
     @Inject(CsvService) private csvService: CsvService,
-    @Inject(HistoryService) private historyService: HistoryService,
+    @Inject(HistoryClient) private historyService: HistoryClient,
     @Inject(InterviewStagesService) private interviewStagesService: InterviewStagesService,
   ) {}
 
@@ -155,6 +155,7 @@ export class ApplicationsController {
   }
 
   @Post(':id/history/restore')
+  @HttpCode(200)
   async restoreVersion(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(RestoreRequestSchema)) body: { sequence: number }

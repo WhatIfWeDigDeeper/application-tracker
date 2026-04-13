@@ -55,7 +55,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
     it('should import valid CSV with all fields', async () => {
       const csv = [
         'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
-        'CSV Test Corp,Frontend Dev,2026-01-10,applied,https://csvtest.com,https://csvtest.com/jobs/1,https://csvtest.com/careers,ai,4,linkedin,false,React experience required,90000,130000,Great opportunity,2026-03-15,false',
+        'API: CSV Test Corp,Frontend Dev,2026-01-10,applied,https://csvtest.com,https://csvtest.com/jobs/1,https://csvtest.com/careers,ai,4,linkedin,false,React experience required,90000,130000,Great opportunity,2026-03-15,false',
       ].join('\n');
 
       const formData = new FormData();
@@ -75,7 +75,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
       const listResponse = await fetch(`${baseUrl}/applications?limit=100`);
       const listData = await listResponse.json();
       const created = listData.items.find(
-        (a: Record<string, unknown>) => a.companyName === 'CSV Test Corp'
+        (a: Record<string, unknown>) => a.companyName === 'API: CSV Test Corp'
       );
       expect(created).toBeDefined();
       if (created) createdApplicationIds.push(created.id as string);
@@ -91,7 +91,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
     });
 
     it('should import isArchived=true and create an archived application', async () => {
-      const uniqueCompany = `Archived Import Corp ${Date.now()}`;
+      const uniqueCompany = `API: Archived Import Corp ${Date.now()}`;
       const csv = [
         'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
         `${uniqueCompany},Archived Role,,,,,,,,,,,,,,,true`,
@@ -123,7 +123,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
     it('should import CSV with only required fields and apply defaults', async () => {
       const csv = [
         'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
-        'Minimal Corp,Junior Dev,,,,,,,,,,,,,,,',
+        'API: Minimal Corp,Junior Dev,,,,,,,,,,,,,,,',
       ].join('\n');
 
       const formData = new FormData();
@@ -142,7 +142,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
       const listResponse = await fetch(`${baseUrl}/applications?limit=100`);
       const listData = await listResponse.json();
       const created = listData.items.find(
-        (a: Record<string, unknown>) => a.companyName === 'Minimal Corp'
+        (a: Record<string, unknown>) => a.companyName === 'API: Minimal Corp'
       );
       expect(created).toBeDefined();
       if (created) createdApplicationIds.push(created.id as string);
@@ -155,7 +155,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
         'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
         ',Missing Title,,,,,,,,,,,,,,,',
         'Missing Position,,,,,,,,,,,,,,,,',
-        'Valid Row,Valid Title,,,,,,,,,,,,,,,',
+        'API: Valid Row,Valid Title,,,,,,,,,,,,,,,',
       ].join('\n');
 
       const formData = new FormData();
@@ -176,7 +176,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
       const listResponse = await fetch(`${baseUrl}/applications?limit=100`);
       const listData = await listResponse.json();
       const created = listData.items.find(
-        (a: Record<string, unknown>) => a.companyName === 'Valid Row'
+        (a: Record<string, unknown>) => a.companyName === 'API: Valid Row'
       );
       if (created) createdApplicationIds.push(created.id as string);
     });
@@ -186,7 +186,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyName: 'Existing Corp',
+          companyName: 'API: Existing Corp',
           positionTitle: 'Existing Role',
           jobPostingUrl: 'https://existing.com/jobs/dedup-test',
         }),
@@ -197,7 +197,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
 
       const csv = [
         'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
-        'Duplicate Corp,Duplicate Role,,,,https://existing.com/jobs/dedup-test,,,,,,,,,,,',
+        'API: Duplicate Corp,Duplicate Role,,,,https://existing.com/jobs/dedup-test,,,,,,,,,,,',
       ].join('\n');
 
       const formData = new FormData();
@@ -218,8 +218,8 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
       const uniqueUrl = `https://intra-dedup-${Date.now()}.com/jobs/1`;
       const csv = [
         'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
-        `First Corp,First Role,,,,${uniqueUrl},,,,,,,,,,,`,
-        `Second Corp,Second Role,,,,${uniqueUrl},,,,,,,,,,,`,
+        `API: First Corp,First Role,,,,${uniqueUrl},,,,,,,,,,,`,
+        `API: Second Corp,Second Role,,,,${uniqueUrl},,,,,,,,,,,`,
       ].join('\n');
 
       const formData = new FormData();
@@ -238,7 +238,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
       const listResponse = await fetch(`${baseUrl}/applications?limit=100`);
       const listData = await listResponse.json();
       const created = listData.items.find(
-        (a: Record<string, unknown>) => a.companyName === 'First Corp'
+        (a: Record<string, unknown>) => a.companyName === 'API: First Corp'
       );
       if (created) createdApplicationIds.push(created.id as string);
     });
@@ -246,8 +246,8 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
     it('should never skip rows with empty jobPostingUrl', async () => {
       const csv = [
         'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
-        'No URL Corp A,Role A,,,,,,,,,,,,,,,',
-        'No URL Corp B,Role B,,,,,,,,,,,,,,,',
+        'API: No URL Corp A,Role A,,,,,,,,,,,,,,,',
+        'API: No URL Corp B,Role B,,,,,,,,,,,,,,,',
       ].join('\n');
 
       const formData = new FormData();
@@ -265,7 +265,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
 
       const listResponse = await fetch(`${baseUrl}/applications?limit=100`);
       const listData = await listResponse.json();
-      for (const name of ['No URL Corp A', 'No URL Corp B']) {
+      for (const name of ['API: No URL Corp A', 'API: No URL Corp B']) {
         const created = listData.items.find(
           (a: Record<string, unknown>) => a.companyName === name
         );
@@ -311,7 +311,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyName: 'Export Test Corp',
+          companyName: 'API: Export Test Corp',
           positionTitle: 'Export Role',
           salaryMin: 80000,
           salaryMax: 120000,
@@ -325,7 +325,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyName: 'Export Test Corp',
+          companyName: 'API: Export Test Corp',
           positionTitle: 'Export Role',
           status: 'interviewing',
           dateApplied: '2026-02-10',
@@ -347,7 +347,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
       expect(headers.length).toBe(17);
       expect(headers[0]).toBe('companyName');
 
-      const found = lines.some((line) => line.includes('Export Test Corp'));
+      const found = lines.some((line) => line.includes('API: Export Test Corp'));
       expect(found).toBe(true);
     });
 
@@ -356,7 +356,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyName: 'Format Test Corp',
+          companyName: 'API: Format Test Corp',
           positionTitle: 'Format Role',
           coverLetterRequired: true,
         }),
@@ -369,7 +369,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyName: 'Format Test Corp',
+          companyName: 'API: Format Test Corp',
           positionTitle: 'Format Role',
           status: 'applied',
           dateApplied: '2026-01-20',
@@ -381,7 +381,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
       const response = await fetch(`${baseUrl}/applications/export`);
       const csv = await response.text();
 
-      const line = csv.split('\n').find((l: string) => l.includes('Format Test Corp'));
+      const line = csv.split('\n').find((l: string) => l.includes('API: Format Test Corp'));
       expect(line).toBeDefined();
       expect(line).toContain('2026-01-20');
       expect(line).toContain('true');
@@ -393,7 +393,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyName: 'Archived Export Corp',
+          companyName: 'API: Archived Export Corp',
           positionTitle: 'Archived Role',
         }),
       });
@@ -406,12 +406,12 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
 
       const response = await fetch(`${baseUrl}/applications/export`);
       const csv = await response.text();
-      expect(csv).toContain('Archived Export Corp');
+      expect(csv).toContain('API: Archived Export Corp');
       const lines = csv.split('\n');
       const headers = lines[0].trim().split(',');
       const isArchivedIdx = headers.indexOf('isArchived');
       expect(isArchivedIdx).toBeGreaterThan(-1);
-      const archivedRow = lines.find((l: string) => l.includes('Archived Export Corp'));
+      const archivedRow = lines.find((l: string) => l.includes('API: Archived Export Corp'));
       expect(archivedRow).toBeDefined();
       if (archivedRow) {
         const cols = archivedRow.trim().split(',');
@@ -425,7 +425,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyName: 'Roundtrip Corp',
+          companyName: 'API: Roundtrip Corp',
           positionTitle: 'Roundtrip Role',
           jobPostingUrl: uniqueUrl,
           skillsMatch: 3,
@@ -442,7 +442,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
 
       const lines = csv.split('\n');
       const roundtripLine = lines.find((l: string) =>
-        l.includes('Roundtrip Corp') && l.includes(uniqueUrl)
+        l.includes('API: Roundtrip Corp') && l.includes(uniqueUrl)
       );
       expect(roundtripLine).toBeDefined();
 
@@ -464,7 +464,7 @@ describeEach('CSV Import/Export ($name)', ({ baseUrl }) => {
       const listResponse = await fetch(`${baseUrl}/applications?limit=100`);
       const listData = await listResponse.json();
       const reimported = listData.items.find(
-        (a: Record<string, unknown>) => a.companyName === 'Roundtrip Corp' && a.jobPostingUrl === uniqueUrl
+        (a: Record<string, unknown>) => a.companyName === 'API: Roundtrip Corp' && a.jobPostingUrl === uniqueUrl
       );
       expect(reimported).toBeDefined();
       if (reimported) createdApplicationIds.push(reimported.id as string);

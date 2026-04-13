@@ -23,7 +23,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Date Format ($name)', ({ baseUrl, va
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Test Position',
         companyCategory: 'education',
         skillsMatch: 5,
@@ -35,7 +35,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Date Format ($name)', ({ baseUrl, va
     const data = await response.json();
     createdApplicationId = data.id;
 
-    expect(data.companyName).toBe('Test Company');
+    expect(data.companyName).toBe('API: Test Company');
     expect(data.positionTitle).toBe('Test Position');
     expect(data.status).toBe('unsubmitted');
     expect(data.dateApplied).toBeNull();
@@ -48,7 +48,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Date Format ($name)', ({ baseUrl, va
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Test Position',
         dateApplied: '2026-01-05',
         status: 'applied',
@@ -69,7 +69,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Date Format ($name)', ({ baseUrl, va
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Test Position',
         dateApplied: '2026-02-15',
         status: 'applied',
@@ -90,7 +90,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Date Format ($name)', ({ baseUrl, va
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyName: 'Test Company',
+        companyName: 'API: Test Company',
         positionTitle: 'Test Position',
         offerDueDate: '2026-03-01',
       }),
@@ -107,7 +107,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Date Format ($name)', ({ baseUrl, va
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyName: 'Invalid Date Company',
+        companyName: 'API: Invalid Date Company',
         positionTitle: 'Test Position',
         dateApplied: '01/05/2026', // Invalid format
       }),

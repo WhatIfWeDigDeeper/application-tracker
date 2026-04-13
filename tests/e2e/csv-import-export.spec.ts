@@ -59,7 +59,7 @@ test.describe('CSV Import/Export', () => {
   test('should import a valid CSV file and show results', async ({ page }) => {
     const csv = [
       'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
-      'E2E Import Corp,E2E Developer,2026-02-10,applied,,,,,,,,,,,,,'
+      'E2E: Import Corp,E2E Developer,2026-02-10,applied,,,,,,,,,,,,,'
     ].join('\n');
 
     const csvPath = path.join(tmpDir, 'import-test.csv');
@@ -84,7 +84,7 @@ test.describe('CSV Import/Export', () => {
     await page.click('button:has-text("Close")');
 
     // Verify the imported application appears in the list
-    await expect(page.locator('text=E2E Import Corp').first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=E2E: Import Corp').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('should export CSV with current applications', async ({ page }) => {
@@ -109,7 +109,7 @@ test.describe('CSV Import/Export', () => {
     const csv = [
       'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
       ',Missing Company,,,,,,,,,,,,,,,',
-      'Valid E2E Corp,Valid Role,,,,,,,,,,,,,,,'
+      'E2E: Valid Corp,Valid Role,,,,,,,,,,,,,,,'
     ].join('\n');
 
     const csvPath = path.join(tmpDir, 'errors-test.csv');
@@ -140,7 +140,7 @@ test.describe('CSV Import/Export', () => {
     const uniqueUrl = `https://e2e-dedup-test-unique.com/jobs/${uniqueId}`;
     const csv1 = [
       'companyName,positionTitle,dateApplied,status,companyUrl,jobPostingUrl,companyCareerUrl,companyCategory,skillsMatch,jobSource,coverLetterRequired,specialRequirements,salaryMin,salaryMax,notes,offerDueDate,isArchived',
-      `Dedup E2E Corp,Dedup Role,,,,${uniqueUrl},,,,,,,,,,,`
+      `E2E: Dedup Corp,Dedup Role,,,,${uniqueUrl},,,,,,,,,,,`
     ].join('\n');
 
     const csvPath1 = path.join(tmpDir, `dedup-test-${uniqueId}.csv`);
@@ -174,7 +174,7 @@ test.describe('CSV Import/Export', () => {
   });
 
   // Clean up all E2E-created applications via the API
-  const e2eCompanyNames = ['E2E Import Corp', 'Valid E2E Corp', 'Dedup E2E Corp'];
+  const e2eCompanyNames = ['E2E: Import Corp', 'E2E: Valid Corp', 'E2E: Dedup Corp'];
 
   test.afterAll(async ({ browser }) => {
     const context = await browser.newContext();

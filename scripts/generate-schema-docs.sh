@@ -53,6 +53,7 @@ SCHEMAS=(
   "svelte_hono:svelte-hono"
   "vue_nuxt:vue-nuxt"
   "react_nestjs:react-nestjs"
+  "react_nestjs_history:react-nestjs-history"
   "python_fastapi:python-fastapi"
   "go_gin:go-gin"
   "java_spring:java-spring"

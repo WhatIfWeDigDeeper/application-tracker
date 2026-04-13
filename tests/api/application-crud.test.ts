@@ -46,13 +46,13 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
 
   it('POST /applications → 201 with correct fields', async () => {
     const app = await createApp({
-      companyName: 'CRUD Test Corp',
+      companyName: 'API: CRUD Test Corp',
       positionTitle: 'Software Engineer',
     });
     createdIds.push(app.id);
 
     expect(app.id).toBeTruthy();
-    expect(app.companyName).toBe('CRUD Test Corp');
+    expect(app.companyName).toBe('API: CRUD Test Corp');
     expect(app.positionTitle).toBe('Software Engineer');
     expect(app.status).toBe('unsubmitted');
     expect(app.dateApplied).toBeNull();
@@ -67,7 +67,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
 
   it('GET /applications/:id → 200 with correct data', async () => {
     const created = await createApp({
-      companyName: 'Get By ID Corp',
+      companyName: 'API: Get By ID Corp',
       positionTitle: 'Developer',
     });
     createdIds.push(created.id);
@@ -76,12 +76,12 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
     expect(res.status).toBe(200);
     const app: AppResponse = await res.json();
     expect(app.id).toBe(created.id);
-    expect(app.companyName).toBe('Get By ID Corp');
+    expect(app.companyName).toBe('API: Get By ID Corp');
   });
 
   it('PATCH /applications/:id → 200 with updated data', async () => {
     const created = await createApp({
-      companyName: 'Patch Corp',
+      companyName: 'API: Patch Corp',
       positionTitle: 'Engineer',
     });
     createdIds.push(created.id);
@@ -90,7 +90,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyName: 'Patch Corp Updated',
+        companyName: 'API: Patch Corp Updated',
         positionTitle: 'Senior Engineer',
         status: 'applied',
         dateApplied: '2026-02-01',
@@ -98,7 +98,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
     });
     expect(res.status).toBe(200);
     const app: AppResponse = await res.json();
-    expect(app.companyName).toBe('Patch Corp Updated');
+    expect(app.companyName).toBe('API: Patch Corp Updated');
     expect(app.positionTitle).toBe('Senior Engineer');
     expect(app.status).toBe('applied');
     expect(app.dateApplied).toContain('2026-02-01');
@@ -106,7 +106,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
 
   it('DELETE /applications/:id → 204', async () => {
     const created = await createApp({
-      companyName: 'Delete Corp',
+      companyName: 'API: Delete Corp',
       positionTitle: 'Temp Role',
     });
 
@@ -118,7 +118,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
 
   it('GET /applications?status=applied → filters by status', async () => {
     const app = await createApp({
-      companyName: 'Status Filter Corp',
+      companyName: 'API: Status Filter Corp',
       positionTitle: 'Filter Role',
     });
     createdIds.push(app.id);
@@ -127,7 +127,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyName: 'Status Filter Corp',
+        companyName: 'API: Status Filter Corp',
         positionTitle: 'Filter Role',
         status: 'applied',
         dateApplied: '2026-01-01',
@@ -146,7 +146,7 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
     const ids: string[] = [];
     for (let i = 0; i < 3; i++) {
       const app = await createApp({
-        companyName: `Pagination Corp ${i}`,
+        companyName: `API: Pagination Corp ${i}`,
         positionTitle: 'Paginate Role',
       });
       ids.push(app.id);

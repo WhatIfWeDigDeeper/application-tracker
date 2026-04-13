@@ -583,6 +583,8 @@ export function ApplicationEdit({ applicationId }: ApplicationEditProps) {
         <div className="flex items-center space-x-2">
           {/* Save */}
           <Button
+            type="button"
+            data-testid="application-form-save"
             onClick={handleSave}
             disabled={saving || (isEditMode && !isDirty)}
           >

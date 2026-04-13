@@ -1,0 +1,37 @@
+{
+  "name": "nest-history-api",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "migrate": "tsx node_modules/.bin/knex migrate:latest --knexfile knexfile.ts"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "2.11.0",
+    "@nestjs/common": "11.1.18",
+    "@nestjs/core": "11.1.18",
+    "@nestjs/microservices": "11.1.18",
+    "@grpc/grpc-js": "1.13.4",
+    "dotenv": "17.3.1",
+    "knex": "3.1.0",
+    "pg": "8.13.3",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@nestjs/testing": "11.1.18",
+    "@types/node": "25.3.5",
+    "@types/pg": "8.11.15",
+    "eslint": "10.0.3",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.56.1",
+    "vitest": "4.0.18"
+  }
+}
