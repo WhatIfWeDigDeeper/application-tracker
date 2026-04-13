@@ -15,14 +15,15 @@
  *   node scripts/cleanup-test-data.mjs --dry-run                # preview what would be deleted
  *
  * Default keywords (case-insensitive, matched against companyName and positionTitle):
- *   "E2E"
+ *   "E2E:" (prefix used by E2E tests)
+ *   "API:" (prefix used by API integration tests)
  */
 
 const DEFAULT_PORT = 5040;
-// Express (3001) serves at /applications; all others use /api/applications
+// Express (3001) and nest-api (5050) serve at /applications; all others use /api/applications
 const PORTS_WITHOUT_API_PREFIX = [3001, 5050];
 
-const DEFAULT_KEYWORDS = ['E2E', 'API'];
+const DEFAULT_KEYWORDS = ['E2E:', 'API:'];
 
 function parseArgs(argv) {
   const args = argv.slice(2);
