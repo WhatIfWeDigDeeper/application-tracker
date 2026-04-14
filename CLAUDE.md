@@ -13,9 +13,16 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
 - **Plan Execution**: Plans must end with a statement of how the work will be run — e.g., single session (sequential), parallel subagents, agent team, or isolated worktree — so the approach is visible before implementation begins.
-- **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant section of `CLAUDE.md` before ending the session — so teammates and future agents benefit. For repeatable multi-step processes, create a skill in `.claude/skills/`. **NEVER write to `~/.claude/projects/.../memory/` for this project** — those files are invisible to other contributors, may be reset, and are not the persistence mechanism for this repo. `CLAUDE.md` is the only approved place for project learnings. If any files exist in the memory directory, delete them. **After applying learnings, stop — do not commit, branch, or open a PR.** The user will review the changes and run `/ship-it` manually when ready.
+- **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant `CLAUDE.md` before ending the session — so teammates and future agents benefit. Cross-cutting patterns go in the root `CLAUDE.md`; stack-specific patterns go in `<stack>/CLAUDE.md` (see Per-Stack Guidance below). For repeatable multi-step processes, create a skill in `.claude/skills/`. **NEVER write to `~/.claude/projects/.../memory/` for this project** — those files are invisible to other contributors, may be reset, and are not the persistence mechanism for this repo. `CLAUDE.md` files are the only approved place for project learnings. If any files exist in the memory directory, delete them. **After applying learnings, stop — do not commit, branch, or open a PR.** The user will review the changes and run `/ship-it` manually when ready.
 - **Searching files**: Use `rg` (ripgrep) instead of `grep` or `find` for better performance and features.
 - **Agent Skills Policy**: When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (including `pr-comments`, `ship-it`, `learn`, `playwright-cli`, etc.) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Sync: `npx skills add -y whatifwedigdeeper/agent-skills` — repo-wide, diff before committing. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
+
+## Per-Stack Guidance
+
+Stack-specific patterns live in `<stack>/CLAUDE.md` and load on-demand when working in that directory:
+`angular-ui`, `vue-ui`, `svelte-ui`, `spring-api`, `tanstack-ui`, `fastapi`, `go-api`, `lambda-api` (incl. CDK), `nest-history-api`.
+Paired dirs (`angular-spring-ui`, `nuxt-api`, `hono-api`, `nest-api`) have pointer files to their primary stack.
+When adding a new implementation, create `<new-stack>/CLAUDE.md` for any stack-specific gotchas that emerge.
 
 ## Active Technologies
 - TypeScript 5.x (strict mode) + React 19, Vite 7.x, Next.js 16, Tailwind CSS 4.x
@@ -119,114 +126,6 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Multi-line fields**: Never pre-split CSV content by newlines before parsing — quoted fields can contain embedded newlines. Process the entire file character-by-character, tracking `inQuotes` state, and only treat `\n` as a row separator when `inQuotes` is false.
 - **Prisma enum `@map` values**: CSVs store `@map` display values (e.g. `"company-website"`, `"media-entertainment"`) but Prisma `create()`/`update()` requires the enum identifier name (`company_website`, `media_entertainment`). Add a lookup table (like `STATUS_DISPLAY_TO_PRISMA`) for each enum with hyphenated/spaced `@map` values and apply it during import.
 
-## Angular Patterns
-
-- **Confirm dialog `role="dialog"`**: Locators using `[role="dialog"] button:has-text(...)` require the inner dialog container div to have `role="dialog"` — Angular components don't add it automatically. Always include `role="dialog"` on the modal content div in `ConfirmDialogComponent`.
-
-## Vue.js Patterns
-
-- **Router component reuse**: `onMounted` won't re-fire on param change — use `watch(() => props.id)` to reload data
-- **Nav guard bypass**: `onBeforeRouteLeave` fires on `router.push()` — use a `skipNavGuard` ref, set `true` before push
-- **Pinia setup stores**: vue-ui uses setup stores (not options API) with Immer `produceWithPatches` for event sourcing — do not convert to composable style
-- **Event sourcing schema**: `vue_nuxt` has `application_events` + `application_snapshots` tables; history is event-sourced
-- **Validation limit sync**: Frontend and backend validation limits (e.g. max events list) must stay in sync
-- **`@shared` alias**: Shared types live in `nuxt-api/shared/`; both `tsconfig.json` and `vite.config.ts` need the alias configured
-
-## Svelte Patterns
-
-- **SvelteKit SSR**: Add `export const ssr = false` in `src/routes/+layout.ts` for SPA mode with Playwright
-- **Svelte 5 bind:value**: Doesn't propagate with callback `onchange` — use local `$state` + `$effect`, call callback in `oninput`
-- **Svelte 5 event delegation**: `stopPropagation()` doesn't prevent parent `<a>` navigation — avoid wrapping interactive cards in `<a>` tags; use `onclick` with `goto()` instead
-
-## Java/Spring Patterns
-
-- **Spring Boot port**: 8080 (`spring-api/`), Angular Spring UI port: 3070 (`angular-spring-ui/`)
-- **JPA enum with PostgreSQL custom types**: PostgreSQL enum values with spaces/hyphens (e.g. "given offer", "enterprise-software") require `AttributeConverter<MyEnum, String>` — `@Enumerated(EnumType.STRING)` alone won't work correctly
-- **`@Converter` without `autoApply`**: `@Converter` without `autoApply = true` is silently inert if no entity field references it directly — verify usage before writing a new Converter when entities already use `@Type(XxxUserType.class)`
-- **UserType.fromDbValue delegation**: `fromDbValue()` in each `PostgreSQLEnumType` subclass should delegate to the enum's own `fromValue()` — don't re-implement the same lookup loop
-- **TypeReference for diff maps**: In diff/compare methods that deserialize JSON to a map, use `objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {})` instead of raw `Map.class` — avoids `key.toString()` casts and compiler warnings
-- **GlobalExceptionHandler catch-all**: Always include `@ExceptionHandler(RuntimeException.class)` in `@RestControllerAdvice` — without it, `RuntimeException` wrappers around `JsonProcessingException` surface as empty 500 responses to clients
-- **JSONB snapshots**: Use `@JdbcTypeCode(SqlTypes.JSON)` from `org.hibernate.annotations` with Hibernate 6 for JSONB columns
-- **Spring Data JPA filtering**: `Specification<T>` + `JpaSpecificationExecutor<T>` for multi-criteria filters; compose with `Specification.where().and()`
-- **`isXxx` field naming**: JPA boolean fields named `isXxx` conflict with getter naming; name the field `archived` (not `isArchived`) — getter `isArchived()`, setter `setArchived()`
-- **OWASP dependency-check heap**: `dependencyCheckAnalyze` can OOM with default Gradle heap on this repo; run it with `-Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1024m'` (wired in `audit:ci:spring-api`)
-- **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
-- **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
-- **Jackson date serialization**: `LocalDate`/`LocalDateTime` serialize as arrays (e.g. `[2026,3,5]`) by default — add `.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)` to `ObjectMapper` config to get ISO strings (`"2026-03-05"`, `"2026-03-05T13:00:00Z"`)
-- **Managed version overrides**: Use `extra["tomcat.version"]`, `extra["postgresql.version"]`, `extra["log4j2.version"]` in `build.gradle.kts` to pin patch versions ahead of Spring Boot's BOM — preferred for CVE fixes
-- **InterviewStageResponse DTO**: Uses `name`/`order` (not `stageName`/`stageOrder`) to match Angular frontend model
-- **HistoryEntry DTO**: Uses `sequence`/`changes` (not `sequenceNumber`/`diffs`) to match frontend model
-- **`POST /interview-stages` returns 201 + `InterviewStageResponse`**: The `addStage` and `updateStage` service methods must use `stageRepository.saveAndFlush(stage)` (not cascade via `applicationRepository.saveAndFlush(app)`) to get the stage entity with its assigned UUID — `GenerationType.UUID` does not populate the ID on cascade-saved children in the caller's scope
-- **`HttpMessageNotReadableException` handler**: Invalid JSON (malformed date strings, wrong type coercions) throws `HttpMessageNotReadableException` which extends `RuntimeException`. Add an explicit `@ExceptionHandler(HttpMessageNotReadableException.class)` returning 400 with `{"code": "validation_error"}` before the generic `RuntimeException` catch-all handler to distinguish client errors from server errors
-- **Angular Spring UI endpoint mismatch**: `angular-spring-ui` calls `/api/applications/:id/interview-n` (not `/interview-stages`) — the interview-stage feature in the Angular Spring UI is broken by design; do not route-match or rename `/interview-stages` to `/interview-n`
-
-## TanStack UI + NestJS Patterns
-
-- Stack: React 19 + TanStack Query v5 + TanStack Router + NestJS (Fastify adapter) + Drizzle; tanstack-ui port 3050, nest-api port 5050, DB schema `react_nestjs`; snapshot-based history
-- **TanStack Router file-based routing**: `src/routes/__root.tsx`, `index.tsx`, `applications/new.tsx`, `applications/$id.tsx`
-- **TanStack Query**: Query key factory pattern in `src/queries/queryKeys.ts`
-- **NestJS DI with tsx**: Must use explicit `@Inject(ServiceClass)` on constructor params — tsx/esbuild doesn't emit decorator metadata, so parameter-based injection fails silently
-- **Zod validation pipe**: Custom Zod validation pipe used, not class-validator — do not add class-validator decorators
-- **Vite proxy**: `/api` → `http://localhost:5050` with path rewrite
-
-## FastAPI Patterns
-
-- Stack: Python 3.14 + FastAPI + asyncpg (raw SQL) + Pydantic v2, managed by `uv`; port 5160 (5060 reserved by macOS SIP), DB schema `python_fastapi`
-- **Functional style**: Service functions take `asyncpg.Pool` as first arg — no service classes, only Pydantic model classes
-- **Pydantic CamelModel**: Base class uses `alias_generator=to_camel`; use `model_dump(by_alias=True)` for API responses
-- **Partial PATCH via `model_fields_set`**: Distinguishes explicitly-set fields from absent ones — required for correct partial update behavior
-- **asyncpg DATE columns**: Require `datetime.date` objects, not strings — use the `parse_date()` helper in `src/services/shared.py`
-- **asyncpg SSL**: Pass `ssl=False` for local Docker PostgreSQL — asyncpg defaults to SSL which fails locally
-- **python-dotenv scope**: `load_dotenv()` walks up the directory tree — restrict it to `fastapi/.env` explicitly to avoid picking up a root `.env`
-- **PostgreSQL enum casts**: Need explicit schema-qualified casts, e.g. `$1::python_fastapi.application_status`
-- **Dev deps**: `uv sync --extra dev`; run server via `uv run python -m src`
-
-## Go API Patterns
-
-- Stack: Go + Gin + pgx/sqlc; go-api port 5070, angular-ui port 3060, DB schema `go_gin`
-- **StageInput JSON keys**: Uses `name`/`order` (not `stageName`/`stageOrder`) — must match what Angular frontend sends
-- **ApplicationInput validation**: No `binding:"required"` struct tags — validation done in service layer; `UpdateApplication` falls back to existing `companyName`/`positionTitle` when omitted
-- **angular-ui proxy**: `/api` → `http://localhost:5070` with `pathRewrite: {'^/api': ''}` in Angular dev proxy config
-- **Server startup**: `go run ./cmd/server` compiles and starts; `run-e2e.sh` manages lifecycle via `dev:go-api` npm script
-- **Manual restart after kill**: If go-api is killed manually, use `bash scripts/run-e2e.sh angular-ui` (not `npm run test:e2e:angular-ui`) — the npm script does not start the API backend
-
-## Lambda + DynamoDB API Patterns
-
-- Stack: TypeScript + Hono + AWS Lambda + DynamoDB; lambda-api port 5090, DB `lambda_api_applications` (DynamoDB, NOT PostgreSQL)
-- **Local dev approach**: Same Hono app runs as local server (`server.ts` via `@hono/node-server`) and as Lambda handler (`handler.ts` via `hono/aws-lambda`) — no LocalStack needed
-- **DynamoDB Local**: `amazon/dynamodb-local` Docker container on port 8000 (configurable via `DYNAMODB_PORT` env var in docker-compose.yml); start with `docker compose up -d dynamodb-local`. Uses a bind mount (`./data/dynamodb:/data`) with `user: root` to avoid SQLite permission issues that occur with named Docker volumes. The `data/` directory is gitignored.
-- **Table setup**: `npm run migrate:lambda-api` runs `lambda-api/scripts/setup-dynamodb.ts` (idempotent — skips if table exists). Data persists across container restarts via the bind mount.
-- **`dotenv` + ESM module init order**: `tsx` injects `.env` AFTER module-level code runs. `dynamodb.client.ts` creates the `DynamoDBClient` at module load time, so it must `import 'dotenv/config'` as its first line — otherwise `DYNAMODB_ENDPOINT` is unset and the client silently targets real AWS. Do not rely on `dotenv.config()` in `server.ts` to cover this.
-- **`GlobalSecondaryIndex` has no `BillingMode` field**: `BillingMode` is a top-level `CreateTableCommand` property only — do not set it on individual GSI definitions or TypeScript will reject the call.
-- **Removing a stopped Docker container before deleting its volume**: `docker volume rm` fails with "volume is in use" even for stopped containers — run `docker rm <container>` first, then `docker volume rm`.
-- **Single-table design**: All items share the `lambda_api_applications` table; item types distinguished by SK prefix (`APP#`, `STAGE#`, `HIST#`)
-- **GSI1**: `GSI1PK=STATUS#<status>#ARCHIVED#<0|1>` / `GSI1SK=UPDATED#<timestamp>#<id>` — filter by status + archived, sort by updatedAt
-- **GSI2**: `GSI2PK=ACTIVE` / `GSI2SK=UPDATED#<timestamp>#<id>` — all non-archived apps, sorted by updatedAt
-- **Pagination**: API contract uses offset-based pagination (`page`/`limit`); DynamoDB scan + in-memory slice (appropriate at job-tracker scale). Cursor mode is opt-in: pass `cursor` query param (`'start'` or a base64-encoded `{"page":N}` token); response shape changes to `{ items, limit, nextCursor, hasMore }` (no `total`). In the Zustand store, compute a synthetic total so pagination UI stays consistent: `hasMore ? page * limit + 1 : (page - 1) * limit + items.length` — never use `items.length` alone or the total will reflect only the current page.
-- **Cascade delete**: Querying `PK=APP#<id>` returns all related items (stages + history); `DeleteCommand` each one
-- **History sequence**: Stored as atomic counter on the application item (`historySequence`); incremented via `UpdateCommand ADD historySequence :inc` before writing HIST# items
-- **Unit tests**: Vitest; pure function tests (no Docker needed): `npm test` in lambda-api/. API integration tests require DynamoDB Local running: `npm run test:api:lambda-api`
-- **`hono/aws-lambda` import**: Built into the main `hono` package (not a separate npm package); use `import { handle } from 'hono/aws-lambda'`
-- **`.env` blocked by sandbox**: Use `.env.example` as template; create `.env` manually or rely on command-line env vars for CI
-- **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
-- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency) — the `docs:types:lambda-api` script was removed. Update the mermaid file manually when `api.ts` types change.
-- **Mermaid erDiagram syntax gotchas**: `PK`/`FK`/`UK` are reserved attribute key constraint tokens — use `PartitionKey`/`SortKey` for DynamoDB keys (lowercase `pk`/`sk` also fail; multi-letter names like `GSI1PK` are fine). Avoid `|` inside quoted annotations (write `0or1`). `nullable().optional()` → `type|null?`; `.optional()` only → `type?`. classDiagram enum values with spaces need quotes (`"given offer"`); hyphenated values work unquoted.
-- **`void asyncFn()` in React event handlers**: `void` discards the promise, so rejections become unhandled. In `onClick`/`onConfirm` handlers, use `.catch()` to surface errors (e.g., `asyncFn().catch(err => setError(...))`) or wrap in an async IIFE with try/catch. When the handler has cleanup that must run regardless of outcome (e.g., closing a dialog), use `try/finally` so cleanup always executes. This applies to all lambda-react-ui async actions: API calls, store dispatches, CSV export/import.
-- **Zustand load-by-ID stale state**: When a store action loads a resource by ID (e.g., `loadSelectedApplication`), clear the previous value in the same `set()` call that sets `loading: true` — otherwise the stale resource stays visible if the new fetch fails or if navigation happens faster than the previous load.
-
-## AWS CDK Patterns (lambda-api/cdk/)
-
-- Stack: AWS CDK v2 (`aws-cdk-lib`) + `NodejsFunction` (esbuild) + `TableV2` (DynamoDB) + `HttpApi` (API Gateway v2); CDK package lives at `lambda-api/cdk/` with its own isolated `package.json`
-- **CDK tsconfig must use `module: CommonJS`**: ts-node (used to run CDK apps) requires CJS — intentionally different from the parent `lambda-api/tsconfig.json` which uses ESM. Use `moduleResolution: "node"` (not `"bundler"`)
-- **`esbuild` must be an explicit devDependency** in `lambda-api/cdk/package.json`: `NodejsFunction` requires it at synth time. In a monorepo, don't rely on it being resolved from the parent's `node_modules` — that's fragile if the parent ever removes it
-- **`aws-cdk-local` v3 strips `AWS_*` env vars**: v3 (unlike v2) strips all `AWS_*` env vars before invoking `cdk`, then sets its own endpoint. Scripts like `bootstrap:local` should just be `cdklocal bootstrap` — don't set `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` inline, they'll be silently dropped
-- **`TableV2` → `AWS::DynamoDB::GlobalTable`**: CDK's `TableV2` synthesizes to `AWS::DynamoDB::GlobalTable`, not `AWS::DynamoDB::Table`. Use the correct type name in CDK assertions tests
-- **`tableName` is a CloudFormation token, not a literal**: `this.table.tableName` resolves to `{ Ref: "ApplicationsTableXXXXXXXX" }` at synth time. Assertions that expect a literal string (e.g. `'lambda_api_applications'`) will fail — use `Match.anyValue()` plus a `findResources` check that the Ref contains `'ApplicationsTable'`
-- **CDK subpackage needs its own `vitest.config.ts`**: the parent `lambda-api/vitest.config.ts` has `include: ['src/**/*.test.ts']` which misses `cdk/test/`. Add a `vitest.config.ts` in `lambda-api/cdk/` with `include: ['test/**/*.test.ts']`
-- **`cdk.out/` must be gitignored**: CDK writes synthesized CloudFormation templates to `cdk.out/` at synth/test time — add it to `.gitignore`
-- **`aws-cdk` CLI version vs `aws-cdk-lib` version**: these are on separate version tracks within the 2.x major; a mismatch in minor/patch is normal and not a problem
-- **`HttpApi`**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed
-
 ## Terminal Management
 
 - **PostgreSQL prerequisite**: Before starting any API server or running E2E tests, verify the PostgreSQL Docker container is running: `docker compose ps db`. If it's not running, `docker compose up -d db` first. A server started without the DB will hang or crash and may be unkillable without a reboot.
@@ -234,24 +133,6 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Repeated test runs**: Run iterative/debugging test commands as foreground tasks in one shared terminal rather than spawning a new background terminal each iteration — background terminals accumulate and are never auto-cleaned.
 - **Kill background processes promptly**: Stop background Bash tasks via `TaskStop` (by task ID) or `kill <pid>` as soon as they're no longer needed — task IDs are only available in the current session.
 - **DynamoDB Local (port 8000) must be stopped via Docker, not `lsof`**: `kill $(lsof -ti :8000)` terminates the Java process inside the container, which stops the container and can bring down Docker entirely. Use `docker compose stop dynamodb-local` to stop it cleanly, or `docker compose restart dynamodb-local` to restart. If Docker becomes unavailable, restart via `colima restart`. Killing port 5090 (lambda-api Hono server) via `lsof` is fine — it's a plain Node.js process.
-
-## gRPC / Protocol Buffers Patterns
-
-Stack: `nest-history-api/` — NestJS pure gRPC microservice (no HTTP listener) on port `50051`, backed by Knex + PostgreSQL schema `react_nestjs_history`. Paired with `nest-api` which consumes it as a gRPC client.
-
-- **Proto toolchain**: `buf` (install via `brew install bufbuild/buf/buf`) + `ts-proto`. `buf.yaml` lives in `proto/`, `buf.gen.yaml` at repo root. Generated TS is committed (`src/generated/`); run `npm run proto:generate` after editing any `.proto` file. CI runs `npm run proto:lint` and `npm run proto:breaking` to enforce contract quality.
-- **buf.gen.yaml v2 syntax**: Use `local: ./node_modules/.bin/protoc-gen-ts_proto` (not `name:` or `path:`). Run `buf generate` (no args) from repo root — `buf.gen.yaml` picks up `inputs: [{directory: proto}]` automatically.
-- **buf lint category**: Use `STANDARD` not `DEFAULT` (deprecated in buf 1.x). Run `buf lint proto` to verify.
-- **buf naming convention**: RPC request/response messages must follow `{RpcName}Request` / `{RpcName}Response` naming — e.g., `GetSnapshotAtVersionRequest`, not `GetSnapshotRequest`. Violating this fails `buf lint`.
-- **Opaque snapshot bytes**: Application snapshots are transported as `bytes` (JSON-encoded) in the proto, not as typed proto messages. This decouples the history service proto schema from application field churn. The gRPC service is write-isolated: it never reads or writes `applications` or `interview_stages` tables.
-- **Pure microservice bootstrap**: `NestFactory.createMicroservice<MicroserviceOptions>(AppModule, { transport: Transport.GRPC, options: { ... } })` — no `app.listen(port)` style. The service listens on gRPC, not HTTP.
-- **protoPath at runtime**: Use `join(process.cwd(), '..', 'proto', 'history', 'v1', 'history.proto')` — dev scripts `cd` into the package directory first (`cd nest-history-api && npm run dev`), so `process.cwd()` is the package dir, not the repo root. The `..` steps back up to the repo root where `proto/` lives. Do not use `__dirname`-relative paths that assume the compiled dist directory structure.
-- **gRPC client in NestJS (consumer side)**: Register via `ClientsModule.register([{ name: TOKEN, transport: Transport.GRPC, options: { package, protoPath, url } }])`. Inject `ClientGrpc` with `@Inject(TOKEN)`. Get the service in `onModuleInit`: `this.grpc = this.client.getService<HistoryServiceClient>('HistoryService')`.
-- **Observable → Promise**: ts-proto generates `Observable<T>` for unary RPCs. Wrap with `await firstValueFrom(this.grpc.method(request))` in the consumer.
-- **`@bufbuild/protobuf` must be an explicit dep**: ts-proto-generated code imports from `@bufbuild/protobuf/wire`. Add it to the package.json of every service that imports generated files — do not rely on it being hoisted from the root (it will be missing in CI `npm ci` installs).
-- **Cross-schema cascade delete**: When an application is deleted, `nest-api` deletes the application row first, then calls `historyClient.deleteHistory(applicationId)` as best-effort cleanup (wrapped in try/catch). If `nest-history-api` is unreachable the application row is still removed; the error is logged as a warning. There is no cross-schema FK cascade since history lives in a separate schema (`react_nestjs_history`) owned by `nest-history-api`.
-- **CJS vs ESM for gRPC service**: `nest-history-api` uses CJS (`"type": "commonjs"` in package.json, `"module": "CommonJS"` in tsconfig). ESLint config must be `.mjs` (not `.js`) when the package is CJS. This is intentional — most NestJS gRPC tutorials and ts-proto examples use CJS, and it avoids ESM/CJS interop issues.
-- **buf CLI requires sandbox bypass**: `buf lint` and `buf generate` write to `~/.cache/buf` — they fail in sandbox with "operation not permitted". Run with `dangerouslyDisableSandbox: true`.
 
 ## Sandbox Notes
 
@@ -292,7 +173,7 @@ Additional notes:
 - **Resolving PR review threads**: `gh` CLI has no resolve command. Use `gh api graphql` — fetch thread IDs via `pullRequest.reviewThreads`, resolve with `resolveReviewThread` mutation. Reply to each thread before resolving.
 - **CI toolchain parity**: When adding a new language/toolchain to the monorepo (e.g., Python/uv), update `.github/workflows/verify-pr.yaml` in the same PR to install the required tools
 - **`claude-review` action fails on PRs that modify the workflow file**: The action requires the workflow file to match `main` before it can authenticate — PRs that change `.github/workflows/claude-code-review.yml` will always get a "Workflow validation failed" error on the `claude-review` check. This is expected and resolves automatically once the PR is merged
-- **Documentation**: When adding a new implementation, update: `README.md` (TOC, implementations table, running instructions, test commands, **schema docs table link**, and **Type Diagrams list**), and as needed `CLAUDE.md`. Every new implementation adds a new DB schema — always update `docs/DATABASE_ARCHITECTURE.md` and `scripts/generate-schema-docs.sh` (add the new `schema_name:dir-name` entry to the SCHEMAS array), then run `npm run docs:schema`. **When a table moves between schemas**: manually delete the old table `.md`, remove it from the old schema's `README.md` and `schema.json`, and create the new schema dir with `README.md`, table `.md`, and `schema.json` — `npm run docs:schema` only works if the DB is live with the migrated schema. **`docs:types` after microservice extraction**: HTTP API response types stay in the consuming service — `docs:types:<stack>` doesn't need updating when only the implementation moves. When adding a TypeScript implementation, add a `docs:types:<stack>` script to `package.json` pointing to the main types/service file, add it to the `docs:types` all-script, **run it** (`npm run docs:types:<stack>`), and **add the generated file link to the Type Diagrams list in `README.md`**. Also add a debug configuration to `.vscode/launch.json` for the new API backend (use the appropriate debug type: `node` for TS/Node APIs, `debugpy` for Python, `go` for Go). For Java/Spring, use `type: java, request: attach` on port 5005 and add a `dev:<stack>:debug` npm script that runs `./gradlew bootRun --debug-jvm` — do not use `request: launch` as it requires full Java extension project resolution which is fragile. Do not wait to be asked — include docs in the implementation plan.
+- **Documentation**: When adding a new implementation, update: `README.md` (TOC, implementations table, running instructions, test commands, **schema docs table link**, and **Type Diagrams list**), root `CLAUDE.md` as needed, and create `<new-stack>/CLAUDE.md` for any stack-specific gotchas. Every new implementation adds a new DB schema — always update `docs/DATABASE_ARCHITECTURE.md` and `scripts/generate-schema-docs.sh` (add the new `schema_name:dir-name` entry to the SCHEMAS array), then run `npm run docs:schema`. **When a table moves between schemas**: manually delete the old table `.md`, remove it from the old schema's `README.md` and `schema.json`, and create the new schema dir with `README.md`, table `.md`, and `schema.json` — `npm run docs:schema` only works if the DB is live with the migrated schema. **`docs:types` after microservice extraction**: HTTP API response types stay in the consuming service — `docs:types:<stack>` doesn't need updating when only the implementation moves. When adding a TypeScript implementation, add a `docs:types:<stack>` script to `package.json` pointing to the main types/service file, add it to the `docs:types` all-script, **run it** (`npm run docs:types:<stack>`), and **add the generated file link to the Type Diagrams list in `README.md`**. Also add a debug configuration to `.vscode/launch.json` for the new API backend (use the appropriate debug type: `node` for TS/Node APIs, `debugpy` for Python, `go` for Go). For Java/Spring, use `type: java, request: attach` on port 5005 and add a `dev:<stack>:debug` npm script that runs `./gradlew bootRun --debug-jvm` — do not use `request: launch` as it requires full Java extension project resolution which is fragile. Do not wait to be asked — include docs in the implementation plan.
 
 ## Running API Integration Tests
 

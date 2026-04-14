@@ -1,0 +1,21 @@
+# Java/Spring Patterns
+
+- **Spring Boot port**: 8080 (`spring-api/`), Angular Spring UI port: 3070 (`angular-spring-ui/`)
+- **JPA enum with PostgreSQL custom types**: PostgreSQL enum values with spaces/hyphens (e.g. "given offer", "enterprise-software") require `AttributeConverter<MyEnum, String>` — `@Enumerated(EnumType.STRING)` alone won't work correctly
+- **`@Converter` without `autoApply`**: `@Converter` without `autoApply = true` is silently inert if no entity field references it directly — verify usage before writing a new Converter when entities already use `@Type(XxxUserType.class)`
+- **UserType.fromDbValue delegation**: `fromDbValue()` in each `PostgreSQLEnumType` subclass should delegate to the enum's own `fromValue()` — don't re-implement the same lookup loop
+- **TypeReference for diff maps**: In diff/compare methods that deserialize JSON to a map, use `objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {})` instead of raw `Map.class` — avoids `key.toString()` casts and compiler warnings
+- **GlobalExceptionHandler catch-all**: Always include `@ExceptionHandler(RuntimeException.class)` in `@RestControllerAdvice` — without it, `RuntimeException` wrappers around `JsonProcessingException` surface as empty 500 responses to clients
+- **JSONB snapshots**: Use `@JdbcTypeCode(SqlTypes.JSON)` from `org.hibernate.annotations` with Hibernate 6 for JSONB columns
+- **Spring Data JPA filtering**: `Specification<T>` + `JpaSpecificationExecutor<T>` for multi-criteria filters; compose with `Specification.where().and()`
+- **`isXxx` field naming**: JPA boolean fields named `isXxx` conflict with getter naming; name the field `archived` (not `isArchived`) — getter `isArchived()`, setter `setArchived()`
+- **OWASP dependency-check heap**: `dependencyCheckAnalyze` can OOM with default Gradle heap on this repo; run it with `-Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1024m'` (wired in `audit:ci:spring-api`)
+- **Batch import + class-level `@Transactional`**: `@Transactional` at class level makes a failed `saveAndFlush` mark the transaction rollback-only — catch blocks can't recover. Fix: `@Transactional(propagation = NOT_SUPPORTED)` + `TransactionTemplate` per row.
+- **LinkedIn URLs exceed VARCHAR(500)**: URL columns for job posting/company URLs should use `TEXT` — LinkedIn tracking URLs commonly exceed 500 chars
+- **Jackson date serialization**: `LocalDate`/`LocalDateTime` serialize as arrays (e.g. `[2026,3,5]`) by default — add `.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)` to `ObjectMapper` config to get ISO strings (`"2026-03-05"`, `"2026-03-05T13:00:00Z"`)
+- **Managed version overrides**: Use `extra["tomcat.version"]`, `extra["postgresql.version"]`, `extra["log4j2.version"]` in `build.gradle.kts` to pin patch versions ahead of Spring Boot's BOM — preferred for CVE fixes
+- **InterviewStageResponse DTO**: Uses `name`/`order` (not `stageName`/`stageOrder`) to match Angular frontend model
+- **HistoryEntry DTO**: Uses `sequence`/`changes` (not `sequenceNumber`/`diffs`) to match frontend model
+- **`POST /interview-stages` returns 201 + `InterviewStageResponse`**: The `addStage` and `updateStage` service methods must use `stageRepository.saveAndFlush(stage)` (not cascade via `applicationRepository.saveAndFlush(app)`) to get the stage entity with its assigned UUID — `GenerationType.UUID` does not populate the ID on cascade-saved children in the caller's scope
+- **`HttpMessageNotReadableException` handler**: Invalid JSON (malformed date strings, wrong type coercions) throws `HttpMessageNotReadableException` which extends `RuntimeException`. Add an explicit `@ExceptionHandler(HttpMessageNotReadableException.class)` returning 400 with `{"code": "validation_error"}` before the generic `RuntimeException` catch-all handler to distinguish client errors from server errors
+- **Angular Spring UI endpoint mismatch**: `angular-spring-ui` calls `/api/applications/:id/interview-n` (not `/interview-stages`) — the interview-stage feature in the Angular Spring UI is broken by design; do not route-match or rename `/interview-stages` to `/interview-n`
