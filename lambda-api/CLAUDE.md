@@ -1,0 +1,36 @@
+# Lambda + DynamoDB API Patterns
+
+- Stack: TypeScript + Hono + AWS Lambda + DynamoDB; lambda-api port 5090, DB `lambda_api_applications` (DynamoDB, NOT PostgreSQL)
+- **Local dev approach**: Same Hono app runs as local server (`server.ts` via `@hono/node-server`) and as Lambda handler (`handler.ts` via `hono/aws-lambda`) — no LocalStack needed
+- **DynamoDB Local**: `amazon/dynamodb-local` Docker container on port 8000 (configurable via `DYNAMODB_PORT` env var in docker-compose.yml); start with `docker compose up -d dynamodb-local`. Uses a bind mount (`./data/dynamodb:/data`) with `user: root` to avoid SQLite permission issues that occur with named Docker volumes. The `data/` directory is gitignored.
+- **Table setup**: `npm run migrate:lambda-api` runs `lambda-api/scripts/setup-dynamodb.ts` (idempotent — skips if table exists). Data persists across container restarts via the bind mount.
+- **`dotenv` + ESM module init order**: `tsx` injects `.env` AFTER module-level code runs. `dynamodb.client.ts` creates the `DynamoDBClient` at module load time, so it must `import 'dotenv/config'` as its first line — otherwise `DYNAMODB_ENDPOINT` is unset and the client silently targets real AWS. Do not rely on `dotenv.config()` in `server.ts` to cover this.
+- **`GlobalSecondaryIndex` has no `BillingMode` field**: `BillingMode` is a top-level `CreateTableCommand` property only — do not set it on individual GSI definitions or TypeScript will reject the call.
+- **Removing a stopped Docker container before deleting its volume**: `docker volume rm` fails with "volume is in use" even for stopped containers — run `docker rm <container>` first, then `docker volume rm`.
+- **Single-table design**: All items share the `lambda_api_applications` table; item types distinguished by SK prefix (`APP#`, `STAGE#`, `HIST#`)
+- **GSI1**: `GSI1PK=STATUS#<status>#ARCHIVED#<0|1>` / `GSI1SK=UPDATED#<timestamp>#<id>` — filter by status + archived, sort by updatedAt
+- **GSI2**: `GSI2PK=ACTIVE` / `GSI2SK=UPDATED#<timestamp>#<id>` — all non-archived apps, sorted by updatedAt
+- **Pagination**: API contract uses offset-based pagination (`page`/`limit`); DynamoDB scan + in-memory slice (appropriate at job-tracker scale). Cursor mode is opt-in: pass `cursor` query param (`'start'` or a base64-encoded `{"page":N}` token); response shape changes to `{ items, limit, nextCursor, hasMore }` (no `total`). In the Zustand store, compute a synthetic total so pagination UI stays consistent: `hasMore ? page * limit + 1 : (page - 1) * limit + items.length` — never use `items.length` alone or the total will reflect only the current page.
+- **Cascade delete**: Querying `PK=APP#<id>` returns all related items (stages + history); `DeleteCommand` each one
+- **History sequence**: Stored as atomic counter on the application item (`historySequence`); incremented via `UpdateCommand ADD historySequence :inc` before writing HIST# items
+- **Unit tests**: Vitest; pure function tests (no Docker needed): `npm test` in lambda-api/. API integration tests require DynamoDB Local running: `npm run test:api:lambda-api`
+- **`hono/aws-lambda` import**: Built into the main `hono` package (not a separate npm package); use `import { handle } from 'hono/aws-lambda'`
+- **`.env` blocked by sandbox**: Use `.env.example` as template; create `.env` manually or rely on command-line env vars for CI
+- **`tsx` IPC in sandbox**: `npx tsx` requires a Unix socket for hot-reload IPC which is blocked in sandbox; use `dangerouslyDisableSandbox: true` or `node --import tsx/esm` as alternative
+- **`docs/types/lambda-api/api.mermaid` is hand-maintained**: `ts-to-mermaid` cannot resolve `zod` (runtime import, not a type-level dependency) — the `docs:types:lambda-api` script was removed. Update the mermaid file manually when `api.ts` types change.
+- **Mermaid erDiagram syntax gotchas**: `PK`/`FK`/`UK` are reserved attribute key constraint tokens — use `PartitionKey`/`SortKey` for DynamoDB keys (lowercase `pk`/`sk` also fail; multi-letter names like `GSI1PK` are fine). Avoid `|` inside quoted annotations (write `0or1`). `nullable().optional()` → `type|null?`; `.optional()` only → `type?`. classDiagram enum values with spaces need quotes (`"given offer"`); hyphenated values work unquoted.
+- **`void asyncFn()` in React event handlers**: `void` discards the promise, so rejections become unhandled. In `onClick`/`onConfirm` handlers, use `.catch()` to surface errors (e.g., `asyncFn().catch(err => setError(...))`) or wrap in an async IIFE with try/catch. When the handler has cleanup that must run regardless of outcome (e.g., closing a dialog), use `try/finally` so cleanup always executes. This applies to all lambda-react-ui async actions: API calls, store dispatches, CSV export/import.
+- **Zustand load-by-ID stale state**: When a store action loads a resource by ID (e.g., `loadSelectedApplication`), clear the previous value in the same `set()` call that sets `loading: true` — otherwise the stale resource stays visible if the new fetch fails or if navigation happens faster than the previous load.
+
+## AWS CDK Patterns (cdk/)
+
+- Stack: AWS CDK v2 (`aws-cdk-lib`) + `NodejsFunction` (esbuild) + `TableV2` (DynamoDB) + `HttpApi` (API Gateway v2); CDK package lives at `lambda-api/cdk/` with its own isolated `package.json`
+- **CDK tsconfig must use `module: CommonJS`**: ts-node (used to run CDK apps) requires CJS — intentionally different from the parent `lambda-api/tsconfig.json` which uses ESM. Use `moduleResolution: "node"` (not `"bundler"`)
+- **`esbuild` must be an explicit devDependency** in `lambda-api/cdk/package.json`: `NodejsFunction` requires it at synth time. In a monorepo, don't rely on it being resolved from the parent's `node_modules` — that's fragile if the parent ever removes it
+- **`aws-cdk-local` v3 strips `AWS_*` env vars**: v3 (unlike v2) strips all `AWS_*` env vars before invoking `cdk`, then sets its own endpoint. Scripts like `bootstrap:local` should just be `cdklocal bootstrap` — don't set `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` inline, they'll be silently dropped
+- **`TableV2` → `AWS::DynamoDB::GlobalTable`**: CDK's `TableV2` synthesizes to `AWS::DynamoDB::GlobalTable`, not `AWS::DynamoDB::Table`. Use the correct type name in CDK assertions tests
+- **`tableName` is a CloudFormation token, not a literal**: `this.table.tableName` resolves to `{ Ref: "ApplicationsTableXXXXXXXX" }` at synth time. Assertions that expect a literal string (e.g. `'lambda_api_applications'`) will fail — use `Match.anyValue()` plus a `findResources` check that the Ref contains `'ApplicationsTable'`
+- **CDK subpackage needs its own `vitest.config.ts`**: the parent `lambda-api/vitest.config.ts` has `include: ['src/**/*.test.ts']` which misses `cdk/test/`. Add a `vitest.config.ts` in `lambda-api/cdk/` with `include: ['test/**/*.test.ts']`
+- **`cdk.out/` must be gitignored**: CDK writes synthesized CloudFormation templates to `cdk.out/` at synth/test time — add it to `.gitignore`
+- **`aws-cdk` CLI version vs `aws-cdk-lib` version**: these are on separate version tracks within the 2.x major; a mismatch in minor/patch is normal and not a problem
+- **`HttpApi`**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed
