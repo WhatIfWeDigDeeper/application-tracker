@@ -66,6 +66,10 @@ dependencyCheck {
     skipConfigurations = listOf("checkstyle")
     nvd {
         apiKey = System.getenv("NVD_API_KEY") ?: ""
+        validForHours = 48  // CI caches NVD data daily; 48 h accepts yesterday's restore without
+                             // attempting a live NVD update — avoiding a Jackson parse error where
+                             // the NVD API returns nanosecond-precision timestamps that
+                             // dependency-check-gradle 12.x cannot deserialize.
     }
     analyzers {
         ossIndex {
