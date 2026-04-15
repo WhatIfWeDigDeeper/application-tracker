@@ -59,6 +59,9 @@ checkstyle {
 
 dependencyCheck {
     failBuildOnCVSS = 7.0f
+    failOnError = false   // NVD API returns variable-precision timestamps (up to nanoseconds) that
+                          // dependency-check-gradle 12.x cannot deserialize; fall back to cached data
+                          // rather than failing the build on an upstream API format issue.
     suppressionFile = "config/dependency-check-suppressions.xml"
     skipConfigurations = listOf("checkstyle")
     nvd {
