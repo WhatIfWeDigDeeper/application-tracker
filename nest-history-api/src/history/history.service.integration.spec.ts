@@ -25,6 +25,7 @@ describeIntegration('HistoryService (integration)', () => {
     // Mirror the production migration inline so tests don't depend on the Knex TS
     // migration loader (which can't resolve ts-node under vitest's CJS runtime).
     await db.raw('CREATE SCHEMA IF NOT EXISTS react_nestjs_history');
+    await db.raw('CREATE EXTENSION IF NOT EXISTS pgcrypto');
     await db.raw(`
       CREATE TABLE IF NOT EXISTS react_nestjs_history.application_history (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -147,6 +148,7 @@ describeIntegration('HistoryService (integration)', () => {
     // What we *must* guarantee: no two successful writes share a sequence, and persisted rows
     // reflect exactly the successful sequences. If rejections occur, document them — the test
     // still validates the unique constraint did its job.
+    expect(fulfilled.length).toBeGreaterThan(0);
     const sequences = fulfilled.map((r) => r.value).sort((a, b) => a - b);
     expect(new Set(sequences).size).toBe(sequences.length);
 

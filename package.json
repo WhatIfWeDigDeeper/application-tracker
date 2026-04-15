@@ -42,7 +42,7 @@
     "audit:fix:angular-spring-ui": "cd angular-spring-ui && npm audit fix",
     "audit:fix:yoga-api": "cd yoga-api && npm audit fix",
     "audit:fix:react-apollo-ui": "cd react-apollo-ui && npm audit fix",
-    "audit:fix:all": "npm run audit:fix:express-api; npm run audit:fix:react-next-ui;npm run audit:fix:koa-api;npm run audit:fix:react-ui;npm run audit:fix:hono-api;npm run audit:fix:svelte-ui;npm run audit:fix:vue-ui;npm run audit:fix:nuxt-api;npm run audit:fix:nest-api;npm run audit:fix:tanstack-ui;npm run audit:fix:tanstack-start-ui;npm run audit:fix:angular-ui;npm run audit:fix:angular-spring-ui;npm run audit:fix:yoga-api;npm run audit:fix:react-apollo-ui",
+    "audit:fix:all": "npm run audit:fix:express-api && npm run audit:fix:react-next-ui && npm run audit:fix:koa-api && npm run audit:fix:react-ui && npm run audit:fix:hono-api && npm run audit:fix:svelte-ui && npm run audit:fix:vue-ui && npm run audit:fix:nuxt-api && npm run audit:fix:nest-api && npm run audit:fix:tanstack-ui && npm run audit:fix:tanstack-start-ui && npm run audit:fix:angular-ui && npm run audit:fix:angular-spring-ui && npm run audit:fix:yoga-api && npm run audit:fix:react-apollo-ui",
     "dev:express-api": "cd api && npm run dev",
     "dev:react-next-ui": "cd ui && npm run dev",
     "dev:koa-api": "cd koa-api && npm run dev",
