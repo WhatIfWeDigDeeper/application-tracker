@@ -9,13 +9,14 @@
     "start": "node dist/main.js",
     "lint": "eslint src",
     "test": "vitest run --passWithNoTests",
+    "test:integration": "vitest run --config vitest.integration.config.ts --passWithNoTests",
     "migrate": "tsx node_modules/.bin/knex migrate:latest --knexfile knexfile.ts"
   },
   "dependencies": {
     "@bufbuild/protobuf": "2.11.0",
-    "@nestjs/common": "11.1.18",
-    "@nestjs/core": "11.1.18",
-    "@nestjs/microservices": "11.1.18",
+    "@nestjs/common": "11.1.19",
+    "@nestjs/core": "11.1.19",
+    "@nestjs/microservices": "11.1.19",
     "@grpc/grpc-js": "1.13.4",
     "dotenv": "17.3.1",
     "knex": "3.1.0",
@@ -25,7 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@nestjs/testing": "11.1.18",
+    "@nestjs/testing": "11.1.19",
     "@types/node": "25.3.5",
     "@types/pg": "8.11.15",
     "eslint": "10.0.3",
