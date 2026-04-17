@@ -19,7 +19,7 @@
     "@grpc/grpc-js": "1.13.4",
     "@nestjs/common": "11.1.18",
     "@nestjs/core": "11.1.18",
-    "@nestjs/microservices": "11.1.18",
+    "@nestjs/microservices": "11.1.19",
     "@nestjs/platform-fastify": "11.1.18",
     "dotenv": "17.3.1",
     "drizzle-orm": "0.45.2",
