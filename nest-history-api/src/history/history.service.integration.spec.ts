@@ -49,6 +49,7 @@ describeIntegration('HistoryService (integration)', () => {
           'Unable to create the pgcrypto extension for integration tests. ' +
             'The configured TEST_DATABASE_URL does not have permission to create extensions. ' +
             'Please pre-install pgcrypto in the target database or use a database user with the required privileges.',
+          { cause: error },
         );
       }
       throw error;
