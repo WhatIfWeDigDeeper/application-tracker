@@ -5,14 +5,14 @@
   },
   "permissions": {
     "allow": [
-      "Bash",
-      "Fetch",
-      "Write",
-      "Edit",
-      "Read",
-      "Glob",
-      "Grep",
-      "WebFetch",
+      "Bash(*)",
+      "Fetch(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(*)",
       "Skill(playwright-cli:*)"
     ],
     "deny": [
