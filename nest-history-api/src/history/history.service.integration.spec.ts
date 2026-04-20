@@ -22,10 +22,37 @@ describeIntegration('HistoryService (integration)', () => {
       searchPath: ['react_nestjs_history', 'public'],
       pool: { min: 1, max: 5 },
     });
+    // Safety: beforeEach TRUNCATEs react_nestjs_history.application_history, so pointing
+    // this suite at the shared dev database would wipe real history rows. Require the
+    // target DB name to end with "_test" so a misconfigured TEST_DATABASE_URL can't clobber
+    // dev data.
+    const dbNameRow = await db.raw<{ rows: Array<{ current_database: string }> }>(
+      'SELECT current_database()',
+    );
+    const currentDb = dbNameRow.rows[0].current_database;
+    if (!/_test$/.test(currentDb)) {
+      throw new Error(
+        `Refusing to run integration tests against database "${currentDb}" — ` +
+          `TEST_DATABASE_URL must point at a database whose name ends with "_test" ` +
+          `(e.g. app_tracker_test) to prevent truncating dev data.`,
+      );
+    }
     // Mirror the production migration inline so tests don't depend on the Knex TS
     // migration loader (which can't resolve ts-node under vitest's CJS runtime).
     await db.raw('CREATE SCHEMA IF NOT EXISTS react_nestjs_history');
-    await db.raw('CREATE EXTENSION IF NOT EXISTS pgcrypto');
+    try {
+      await db.raw('CREATE EXTENSION IF NOT EXISTS pgcrypto');
+    } catch (error) {
+      const pgError = error as { code?: string; message?: string };
+      if (pgError.code === '42501') {
+        throw new Error(
+          'Unable to create the pgcrypto extension for integration tests. ' +
+            'The configured TEST_DATABASE_URL does not have permission to create extensions. ' +
+            'Please pre-install pgcrypto in the target database or use a database user with the required privileges.',
+        );
+      }
+      throw error;
+    }
     await db.raw(`
       CREATE TABLE IF NOT EXISTS react_nestjs_history.application_history (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
