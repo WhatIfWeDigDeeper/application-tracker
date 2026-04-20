@@ -144,7 +144,6 @@ Commands that require `dangerouslyDisableSandbox: true`:
 - `drizzle-kit` commands — filesystem access outside project
 - `nuxt dev/build/prepare` — filesystem access
 - `git commit` with GPG signing — `~/.gnupg/` access
-- `gh` CLI — network access
 - Playwright tests (WebKit/Chromium) on macOS — `bootstrap_check_in` permissions
 
 Additional notes:

@@ -66,9 +66,14 @@
       "allowedHosts": [
         "api.github.com",
         "github.com",
+        "results-receiver.actions.githubusercontent.com",
+        "telemetry.individual.githubcopilot.com",
+        "api.individual.githubcopilot.com",
+        "api.githubcopilot.com",
         "registry.npmjs.org"
       ]
     },
+    "enableWeakerNetworkIsolation": true,
     "excludedCommands": [
       "docker",
       "gh",
