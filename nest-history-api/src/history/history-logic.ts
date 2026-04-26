@@ -24,10 +24,6 @@ export function clampPagination(
   };
 }
 
-export function nextSequence(currentMax: string | number | null | undefined): number {
-  return Number(currentMax ?? 0) + 1;
-}
-
 export function toDate(value: Date | string): Date {
   return value instanceof Date ? value : new Date(String(value));
 }

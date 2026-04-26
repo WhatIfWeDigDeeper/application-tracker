@@ -3,7 +3,6 @@ import { RpcException } from '@nestjs/microservices';
 import {
   parseSnapshot,
   clampPagination,
-  nextSequence,
   toDate,
   encodeSnapshot,
   countFromQuery,
@@ -61,21 +60,6 @@ describe('clampPagination', () => {
 
   it('computes offset = (page - 1) * limit', () => {
     expect(clampPagination(5, 20).offset).toBe(80);
-  });
-});
-
-describe('nextSequence', () => {
-  it('returns 1 when no prior rows exist (null/undefined)', () => {
-    expect(nextSequence(null)).toBe(1);
-    expect(nextSequence(undefined)).toBe(1);
-  });
-
-  it('returns MAX + 1 for numeric input', () => {
-    expect(nextSequence(7)).toBe(8);
-  });
-
-  it('coerces string values from pg count-like results', () => {
-    expect(nextSequence('41')).toBe(42);
   });
 });
 

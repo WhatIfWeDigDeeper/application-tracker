@@ -4,7 +4,6 @@ import { KNEX } from '../database/database.module';
 import {
   parseSnapshot,
   clampPagination,
-  nextSequence,
   toDate,
   encodeSnapshot,
   countFromQuery,
@@ -31,13 +30,7 @@ export class HistoryService {
     const snapshot = parseSnapshot(snapshotBytes);
 
     return await this.db.transaction(async (trx) => {
-      const maxRow = await trx('application_history')
-        .withSchema('react_nestjs_history')
-        .where({ application_id: applicationId })
-        .max<{ max: string | null }>('sequence as max')
-        .first();
-
-      const sequence = nextSequence(maxRow?.max);
+      const sequence = await this.getNextSequence(applicationId, trx);
 
       await trx('application_history')
         .withSchema('react_nestjs_history')
@@ -96,6 +89,15 @@ export class HistoryService {
 
     if (!row) return null;
     return encodeSnapshot(row.snapshot);
+  }
+
+  private async getNextSequence(applicationId: string, trx: Knex.Transaction): Promise<number> {
+    const maxRow = await trx('application_history')
+      .withSchema('react_nestjs_history')
+      .where({ application_id: applicationId })
+      .max<{ max: string | null }>('sequence as max')
+      .first();
+    return Number(maxRow?.max ?? 0) + 1;
   }
 
   async deleteHistory(applicationId: string): Promise<number> {
