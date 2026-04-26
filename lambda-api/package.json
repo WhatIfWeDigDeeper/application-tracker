@@ -14,11 +14,11 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.1024.0",
     "@aws-sdk/lib-dynamodb": "3.1024.0",
-    "@hono/node-server": "1.19.13",
+    "@hono/node-server": "2.0.0",
     "@hono/zod-validator": "0.7.6",
     "dotenv": "17.4.0",
-    "hono": "4.12.12",
-    "uuid": "13.0.0",
+    "hono": "4.12.15",
+    "uuid": "14.0.0",
     "zod": "4.3.6"
   },
   "devDependencies": {
