@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.4.13"
+    id("org.springframework.boot") version "3.5.14"
     id("io.spring.dependency-management") version "1.1.7"
     id("checkstyle")
     id("org.owasp.dependencycheck") version "12.2.1"
@@ -10,9 +10,8 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 
 // Override managed versions to address CVEs
-extra["tomcat.version"] = "10.1.54"       // CVE-2025-66614, CVE-2026-24734, CVE-2025-61795, CVE-2026-24733, CVE-2026-29145, CVE-2026-24880, CVE-2026-29129, CVE-2026-29146, CVE-2026-34483, CVE-2026-34487
-extra["postgresql.version"] = "42.7.7"   // CVE-2025-49146
-extra["log4j2.version"] = "2.25.3"       // CVE-2025-68161
+// tomcat 10.1.54 and postgresql 42.7.10 are now included in the Spring Boot 3.5.14 BOM
+extra["log4j2.version"] = "2.25.4"       // CVE-2025-68161, CVE-2026-34478, CVE-2026-34480, CVE-2026-34481
 
 java {
     toolchain {
