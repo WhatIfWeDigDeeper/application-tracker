@@ -2,9 +2,9 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <!-- CVE-2026-22731: Spring Boot Actuator health group exposure — spring-api does not use
          spring-boot-starter-actuator, so this vulnerability does not apply. Upgraded to latest
-         3.4.x (3.4.13); no patched version is yet listed in NVD. Revisit when one is confirmed. -->
+         3.5.x (3.5.14); no patched version is yet listed in NVD. Revisit when one is confirmed. -->
     <suppress until="2026-07-20Z">
-        <notes>spring-api has no Actuator dependency; CVE-2026-22731 does not apply. Running on latest 3.4.x.</notes>
+        <notes>spring-api has no Actuator dependency; CVE-2026-22731 does not apply. Running on latest 3.5.x (3.5.14).</notes>
         <gav regex="true">^org\.springframework\.boot:spring-boot.*$</gav>
         <cve>CVE-2026-22731</cve>
     </suppress>
