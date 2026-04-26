@@ -61,6 +61,8 @@ See [docs/DATABASE_ARCHITECTURE.md](docs/DATABASE_ARCHITECTURE.md) for per-imple
 
 **When fixing a bug or test failure, automatically run the relevant tests after applying the fix** — do not wait for the user to ask. Use the most targeted test command available (e.g., `test:e2e:react-ui` for a react-ui failure). Report pass/fail results immediately.
 
+**Test design — prefer pure functions and integration, not mocks** — When code has non-trivial logic, extract it into exported pure functions and unit-test those directly. Reserve mocks for *simulating failures* (e.g., a dependency throwing) — do not use them to stand in for real components when the goal is verifying logic, because asserting on mock call arguments couples tests to internal implementation. If a behavior can't be exercised without mocks (e.g. DB interaction, HTTP I/O), test it through the real API surface / integration tests instead.
+
 **When fixing a shared E2E test failure** — shared tests in `tests/e2e/` run against all stacks. After applying a fix, run `bash scripts/run-e2e.sh all` (or `npm run test:e2e:all`) to confirm no other stack regressed. Do not stop after the originally failing stack passes.
 
 1. **Add tests** — Create or update tests for new functionality. Include E2E tests when the change affects user-visible behavior (labels, UI interactions, API contracts). **When fixing a bug, write a failing test first that reproduces the issue, then fix it** — this ensures the bug is understood and won't regress.
@@ -142,14 +144,13 @@ Commands that require `dangerouslyDisableSandbox: true`:
 - `drizzle-kit` commands — filesystem access outside project
 - `nuxt dev/build/prepare` — filesystem access
 - `git commit` with GPG signing — `~/.gnupg/` access
-- `gh` CLI — network access
 - Playwright tests (WebKit/Chromium) on macOS — `bootstrap_check_in` permissions
 
 Additional notes:
 - **Heredoc in sandbox**: `$(cat <<'EOF'...EOF)` in commit messages fails in sandbox — use plain quoted strings or write to `$TMPDIR/commit-msg.txt` and use `git commit -F`
 - **`uv sync`**: Requires sandbox override for network; `uv run python -m src` works in sandbox after initial sync
 - **`permissions.allow` vs `sandbox.network.allowedHosts`**: `WebFetch(*)` in permissions controls whether the tool can be called without prompting — it does NOT bypass sandbox network restrictions. External hosts also need `sandbox.network.allowedHosts` in `.claude/settings.json`; `github.com` and `registry.npmjs.org` are already added
-- **`permissions.allow` bare names**: `"Read"` ≡ `"Read(*)"` — use parameterized form only for specific restrictions (e.g. `"Read(.env)"`).
+- **`permissions.allow` bare names**: Always use explicit `"Read(*)"` form — bare `"Read"` no longer implies `"Read(*)"` in current Claude Code versions and will prompt for every call.
 - **npm cache permission error (EPERM)**: If `npm` fails with `Your cache folder contains root-owned files` (can recur after `sudo npm install -g`), pass `--cache /tmp/npm-cache-$$` to redirect to a writable temp dir (e.g. `npm outdated --cache /tmp/npm-cache-$$`). Permanent fix: `sudo chown -R 501:20 ~/.npm`
 - **Subagent `cd` does not persist across Bash calls**: Shell working directory resets between Bash tool calls. Never instruct a subagent to `cd <dir>` in one call and `npm install` in the next — npm will run in the wrong directory (typically the main repo root), silently modifying the wrong `package.json`. Always use `npm install --prefix <absolute-path>` so no `cd` is needed. **`npm run` `--prefix` syntax**: the flag must come before the script name — `npm --prefix /path run <script>`, NOT `npm run <script> --prefix /path` (the latter is silently ignored).
 - **Edit and Write tools both blocked on GitHub Actions workflow files**: A security hook blocks both the Edit and Write tools on `.github/workflows/*.yml` and `.github/workflows/*.yaml` files. The only reliable workaround is `cat > "$TMPDIR/workflow.yml" << 'EOF' ... EOF && mv "$TMPDIR/workflow.yml" .github/workflows/...` — do not use `sed` for multi-block YAML rewrites, it silently duplicates content into the wrong sections.

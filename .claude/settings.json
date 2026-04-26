@@ -5,14 +5,14 @@
   },
   "permissions": {
     "allow": [
-      "Bash",
-      "Fetch",
-      "Write",
-      "Edit",
-      "Read",
-      "Glob",
-      "Grep",
-      "WebFetch",
+      "Bash(*)",
+      "Fetch(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(*)",
       "Skill(playwright-cli:*)"
     ],
     "deny": [
@@ -23,7 +23,7 @@
       "Bash(sudo *)",
       "Bash(chmod 777 *)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   },
   "hooks": {
     "Notification": [
@@ -66,9 +66,14 @@
       "allowedHosts": [
         "api.github.com",
         "github.com",
+        "results-receiver.actions.githubusercontent.com",
+        "telemetry.individual.githubcopilot.com",
+        "api.individual.githubcopilot.com",
+        "api.githubcopilot.com",
         "registry.npmjs.org"
       ]
     },
+    "enableWeakerNetworkIsolation": true,
     "excludedCommands": [
       "docker",
       "gh",

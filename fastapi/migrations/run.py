@@ -43,7 +43,7 @@ async def run_migrations() -> None:
                 "INSERT INTO python_fastapi.schema_migrations (migration_name) VALUES ($1)",
                 name,
             )
-            print(f"  Done.")
+            print("  Done.")
     finally:
         await conn.close()
 

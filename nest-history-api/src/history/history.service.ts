@@ -1,7 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
 import { type Knex } from 'knex';
 import { KNEX } from '../database/database.module';
+import {
+  parseSnapshot,
+  clampPagination,
+  toDate,
+  encodeSnapshot,
+  countFromQuery,
+} from './history-logic';
 
 export interface HistoryRow {
   id: string;
@@ -19,14 +25,9 @@ export class HistoryService {
   async recordHistory(
     applicationId: string,
     description: string,
-    snapshotBytes: Buffer
+    snapshotBytes: Buffer,
   ): Promise<number> {
-    let snapshot: unknown;
-    try {
-      snapshot = JSON.parse(snapshotBytes.toString('utf-8'));
-    } catch {
-      throw new RpcException({ code: 3, message: 'Invalid snapshot: must be valid JSON' });
-    }
+    const snapshot = parseSnapshot(snapshotBytes);
 
     return await this.db.transaction(async (trx) => {
       const sequence = await this.getNextSequence(applicationId, trx);
@@ -47,11 +48,9 @@ export class HistoryService {
   async listHistory(
     applicationId: string,
     page: number,
-    limit: number
+    limit: number,
   ): Promise<{ rows: HistoryRow[]; total: number }> {
-    const effectivePage = page > 0 ? page : 1;
-    const effectiveLimit = limit > 0 ? limit : 50;
-    const offset = (effectivePage - 1) * effectiveLimit;
+    const { limit: effectiveLimit, offset } = clampPagination(page, limit);
 
     const [countResult, rows] = await Promise.all([
       this.db('application_history')
@@ -72,15 +71,15 @@ export class HistoryService {
     return {
       rows: (rows as HistoryRow[]).map((row) => ({
         ...row,
-        created_at: row.created_at instanceof Date ? row.created_at : new Date(String(row.created_at)),
+        created_at: toDate(row.created_at),
       })),
-      total: Number(countResult?.count ?? 0),
+      total: countFromQuery(countResult),
     };
   }
 
   async getSnapshotAtVersion(
     applicationId: string,
-    sequence: number
+    sequence: number,
   ): Promise<Buffer | null> {
     const row = await this.db('application_history')
       .withSchema('react_nestjs_history')
@@ -89,26 +88,22 @@ export class HistoryService {
       .first();
 
     if (!row) return null;
-    return Buffer.from(JSON.stringify(row.snapshot), 'utf-8');
+    return encodeSnapshot(row.snapshot);
   }
 
-  async deleteHistory(applicationId: string): Promise<number> {
-    const deleted = await this.db('application_history')
-      .withSchema('react_nestjs_history')
-      .where({ application_id: applicationId })
-      .delete();
-
-    return deleted;
-  }
-
-  private async getNextSequence(applicationId: string, trx?: Knex.Transaction): Promise<number> {
-    const db = trx ?? this.db;
-    const result = await db('application_history')
+  private async getNextSequence(applicationId: string, trx: Knex.Transaction): Promise<number> {
+    const maxRow = await trx('application_history')
       .withSchema('react_nestjs_history')
       .where({ application_id: applicationId })
       .max<{ max: string | null }>('sequence as max')
       .first();
+    return Number(maxRow?.max ?? 0) + 1;
+  }
 
-    return Number(result?.max ?? 0) + 1;
+  async deleteHistory(applicationId: string): Promise<number> {
+    return await this.db('application_history')
+      .withSchema('react_nestjs_history')
+      .where({ application_id: applicationId })
+      .delete();
   }
 }
