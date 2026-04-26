@@ -4,17 +4,17 @@
     "dev": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",
-      "computedHash": "2895341c0061c04328444399ca4e375625dc87615bf110d0cf77231232d20f27"
+      "computedHash": "da14d3749ab3f65b479db8b056ab64cd262ce15d07dd642f7d3263ad10708c1b"
     },
     "js-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "a12b89d2b71746cea8211d1fd8c5e3392f83c2b271b79b8ced9244729136f50a"
+      "computedHash": "2274cd9b24d26eba6f6510f04f68edae91aacc143a1bb17ef6bdae5356465b80"
     },
     "learn": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "31f93c373d257b2f95b1a47671ca5c458bb759fcb6d31ae4a8ecd9c5c621e9a0"
+      "computedHash": "9e9ee3231ed08080eb8647489ad35bc76309f5541f7c25bb470e3b65617d2a96"
     },
     "mermaid-diagrams": {
       "source": "softaworks/agent-toolkit",
@@ -24,37 +24,37 @@
     "peer-review": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "6f4b8540aeb4c9b0868965fe3c7eaf60114c03627564b973b5972fcd2a385c92"
+      "computedHash": "0dc6379a464c692521ac4b5adfba330ab443ae278deafeb6134c9ed4abd8455d"
     },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",
-      "computedHash": "45b90b409fb80cf08ee4e8b72377bddacfac3d1c1fac69bff5fd5342fad26adf"
+      "computedHash": "17b68556620db6799a69ce72946b42eea69547856486847d42d004237f07256d"
     },
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "009233c0b97295d74e5846ce2ee5a33e82b0a84dd4e44cb765ca8c8be598e89f"
+      "computedHash": "ad4c65a8eeebbbc5a69d3864650534196ad0e3c34c86bcd55553928f9cf61834"
     },
     "pr-human-guide": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "755756ef48b5c2c4ce6d8302e08d70556506950bcaf6594aa32f90cd508774fd"
+      "computedHash": "507433dd7f301766a8843607e64bd26f3c9bc9ec0083230ad77525db10c72653"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "f8fc2b7ef2eb0f8548a73a40f3db7e7e02b4b4fbef81892a4517a0f47327ec1b"
+      "computedHash": "4ce0fb985ff02f4f8b93e5b441c0eb49f48477c3b3f111fb59bede6ab34a876e"
     },
     "uv-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "fd4eed7de050f3e3411dcd985072b8ea6c5fc6d508e13aec28e108a1de0dcbbf"
+      "computedHash": "991a9c57a5c429d82aa301429dcbffea2aac38c5241803d9db2b2805297e2fe0"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
-      "computedHash": "afeca00ac2f492d88fdd010e73d91719a5b57c564bb4a73325b0bd77e11323ab"
+      "computedHash": "ca7b0c0c6e5f2750043f7f0cd72d16ac4e2abc48f9b5500d047a4b77a2506212"
     }
   }
 }
