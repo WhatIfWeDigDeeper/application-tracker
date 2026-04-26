@@ -176,7 +176,6 @@
     "test:lambda-api": "cd lambda-api && npm test",
     "test:lambda-api-cdk": "cd lambda-api/cdk && npm test",
     "test:nest-history-api": "cd nest-history-api && npm test",
-    "test:integration:nest-history-api": "cd nest-history-api && npm run test:integration",
     "test:all": "npm run test:express-api && npm run test:react-next-ui && npm run test:koa-api && npm run test:react-ui && npm run test:svelte-ui && npm run test:vue-ui && npm run test:nest-api && npm run test:tanstack-ui && npm run test:tanstack-start-ui && npm run test:fastapi && npm run test:go-api && npm run test:angular-ui && npm run test:spring-api && npm run test:angular-spring-ui && npm run test:yoga-api && npm run test:react-apollo-ui && npm run test:lambda-react-ui && npm run test:lambda-api && npm run test:lambda-api-cdk && npm run test:nest-history-api",
     "test:coverage": "npm run test:express-api -- --coverage && npm run test:react-next-ui -- --coverage",
     "test:api:express-api": "API_URL=http://localhost:3001 STACK_NAME=express-api npx jest --config tests/jest.config.js --testPathPatterns=tests/api",

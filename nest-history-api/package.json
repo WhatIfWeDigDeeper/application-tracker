@@ -9,7 +9,6 @@
     "start": "node dist/main.js",
     "lint": "eslint src",
     "test": "vitest run --passWithNoTests",
-    "test:integration": "vitest run --config vitest.integration.config.ts --passWithNoTests",
     "migrate": "tsx node_modules/.bin/knex migrate:latest --knexfile knexfile.ts"
   },
   "dependencies": {

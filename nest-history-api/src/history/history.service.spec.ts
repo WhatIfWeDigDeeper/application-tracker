@@ -9,9 +9,8 @@ import {
   countFromQuery,
 } from './history-logic';
 
-// Pure-function tests for HistoryService's extracted helpers. End-to-end behavior
-// (sequence allocation under concurrency, pagination against Postgres, delete semantics)
-// is covered by history.service.integration.spec.ts against a real database.
+// Pure-function tests for HistoryService's extracted helpers. Proto contract regression
+// protection lives in the repo-level proto lint/breaking checks.
 
 describe('parseSnapshot', () => {
   it('returns the parsed JSON value for valid bytes', () => {
