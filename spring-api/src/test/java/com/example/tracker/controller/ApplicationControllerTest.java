@@ -7,12 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -31,7 +32,7 @@ class ApplicationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private ApplicationService service;
 
     private ApplicationResponse sampleApp() {
@@ -56,7 +57,7 @@ class ApplicationControllerTest {
     @Test
     void createReturnsBadRequestOnMissingFields() throws Exception {
         mockMvc.perform(post("/api/applications")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
                 .content("{}"))
             .andExpect(status().isBadRequest());
     }
@@ -66,8 +67,8 @@ class ApplicationControllerTest {
         when(service.create(any())).thenReturn(sampleApp());
         Map<String, String> req = Map.of("companyName", "Acme", "positionTitle", "Engineer");
         mockMvc.perform(post("/api/applications")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .content(Objects.requireNonNull(objectMapper.writeValueAsString(req))))
             .andExpect(status().isCreated());
     }
 }

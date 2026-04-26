@@ -39,6 +39,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
@@ -74,7 +75,7 @@ public class ApplicationService {
         InterviewStageRepository stageRepository,
         ApplicationSnapshotRepository snapshotRepository,
         ObjectMapper objectMapper,
-        PlatformTransactionManager transactionManager
+        @NonNull PlatformTransactionManager transactionManager
     ) {
         this.applicationRepository = applicationRepository;
         this.stageRepository = stageRepository;
@@ -94,12 +95,13 @@ public class ApplicationService {
         );
         Pageable pageable = PageRequest.of(page - 1, limit, sort);
 
-        Specification<Application> spec = Specification
-            .where(includeArchived ? null : ApplicationSpecifications.isArchived(false))
-            .and(ApplicationSpecifications.hasStatus(status))
-            .and(ApplicationSpecifications.hasCategory(companyCategory))
-            .and(ApplicationSpecifications.hasJobSource(jobSource))
-            .and(ApplicationSpecifications.hasMinSkillsMatch(skillsMatchMin));
+        Specification<Application> spec = Specification.allOf(
+            includeArchived ? null : ApplicationSpecifications.isArchived(false),
+            ApplicationSpecifications.hasStatus(status),
+            ApplicationSpecifications.hasCategory(companyCategory),
+            ApplicationSpecifications.hasJobSource(jobSource),
+            ApplicationSpecifications.hasMinSkillsMatch(skillsMatchMin)
+        );
 
         Page<Application> result = applicationRepository.findAll(spec, pageable);
         List<ApplicationResponse> items = result.getContent().stream()
@@ -108,7 +110,7 @@ public class ApplicationService {
         return new PaginatedResponse<>(items, page, limit, result.getTotalElements());
     }
 
-    public ApplicationResponse get(UUID id) {
+    public ApplicationResponse get(@NonNull UUID id) {
         return toResponse(findById(id));
     }
 
@@ -120,7 +122,7 @@ public class ApplicationService {
         return toResponse(app);
     }
 
-    public ApplicationResponse update(UUID id, ApplicationRequest req) {
+    public ApplicationResponse update(@NonNull UUID id, ApplicationRequest req) {
         Application app = findById(id);
         ApplicationStatus prevStatus = app.getStatus();
         applyRequest(app, req);
@@ -135,12 +137,12 @@ public class ApplicationService {
         return toResponse(app);
     }
 
-    public void delete(UUID id) {
+    public void delete(@NonNull UUID id) {
         Application app = findById(id);
         applicationRepository.delete(app);
     }
 
-    public ApplicationResponse archive(UUID id) {
+    public ApplicationResponse archive(@NonNull UUID id) {
         Application app = findById(id);
         app.setArchived(true);
         applicationRepository.saveAndFlush(app);
@@ -148,7 +150,7 @@ public class ApplicationService {
         return toResponse(app);
     }
 
-    public ApplicationResponse restore(UUID id) {
+    public ApplicationResponse restore(@NonNull UUID id) {
         Application app = findById(id);
         app.setArchived(false);
         applicationRepository.saveAndFlush(app);
@@ -156,7 +158,7 @@ public class ApplicationService {
         return toResponse(app);
     }
 
-    public InterviewStageResponse addStage(UUID appId, InterviewStageRequest req) {
+    public InterviewStageResponse addStage(@NonNull UUID appId, InterviewStageRequest req) {
         Application app = findById(appId);
         InterviewStage stage = new InterviewStage();
         stage.setApplication(app);
@@ -172,12 +174,12 @@ public class ApplicationService {
         );
     }
 
-    public InterviewStageResponse updateStage(UUID appId, UUID stageId, InterviewStageRequest req) {
+    public InterviewStageResponse updateStage(@NonNull UUID appId, UUID stageId, InterviewStageRequest req) {
         Application app = findById(appId);
-        InterviewStage stage = app.getInterviewStages().stream()
+        InterviewStage stage = Objects.requireNonNull(app.getInterviewStages().stream()
             .filter(s -> s.getId().equals(stageId))
             .findFirst()
-            .orElseThrow(() -> new EntityNotFoundException("Stage not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Stage not found")));
         applyStageRequest(stage, req);
         InterviewStage savedStage = stageRepository.saveAndFlush(stage);
         captureSnapshot(app, "Stage updated");
@@ -189,7 +191,7 @@ public class ApplicationService {
         );
     }
 
-    public ApplicationResponse deleteStage(UUID appId, UUID stageId) {
+    public ApplicationResponse deleteStage(@NonNull UUID appId, UUID stageId) {
         Application app = findById(appId);
         app.getInterviewStages().removeIf(s -> s.getId().equals(stageId));
         applicationRepository.saveAndFlush(app);
@@ -208,7 +210,7 @@ public class ApplicationService {
             .toList();
     }
 
-    public ApplicationResponse restoreHistory(UUID appId, UUID snapshotId) {
+    public ApplicationResponse restoreHistory(@NonNull UUID appId, @NonNull UUID snapshotId) {
         ApplicationSnapshot snapshot = snapshotRepository.findById(snapshotId)
             .orElseThrow(() -> new EntityNotFoundException("Snapshot not found"));
         Application app = findById(appId);
@@ -354,9 +356,9 @@ public class ApplicationService {
         return rows;
     }
 
-    private Application findById(UUID id) {
-        return applicationRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Application not found: " + id));
+    private @NonNull Application findById(@NonNull UUID id) {
+        return Objects.requireNonNull(applicationRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Application not found: " + id)));
     }
 
     private void applyRequest(Application app, ApplicationRequest req) {
@@ -527,7 +529,7 @@ public class ApplicationService {
             + app.isArchived() + "\n";
     }
 
-    private Application buildApplicationFromRow(Map<String, Integer> headerMap, String[] cols,
+    private @NonNull Application buildApplicationFromRow(Map<String, Integer> headerMap, String[] cols,
                                                 String companyName, String positionTitle, String jobPostingUrl) {
         Application app = new Application();
         app.setCompanyName(companyName);

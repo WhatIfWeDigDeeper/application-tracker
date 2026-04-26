@@ -73,7 +73,6 @@ public abstract class PostgreSQLEnumType<E extends Enum<E>> implements UserType<
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E assemble(Serializable cached, Object owner) {
         return cached == null ? null : fromDbValue((String) cached);
     }
