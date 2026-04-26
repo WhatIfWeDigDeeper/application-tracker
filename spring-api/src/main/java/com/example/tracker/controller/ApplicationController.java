@@ -93,13 +93,13 @@ public class ApplicationController {
 
     @PatchMapping("/{id}/interview-stages/{stageId}")
     public InterviewStageResponse updateStage(@PathVariable @NonNull UUID id,
-                                           @PathVariable UUID stageId,
+                                           @PathVariable @NonNull UUID stageId,
                                            @Valid @RequestBody InterviewStageRequest req) {
         return service.updateStage(id, stageId, req);
     }
 
     @DeleteMapping("/{id}/interview-stages/{stageId}")
-    public ApplicationResponse deleteStage(@PathVariable @NonNull UUID id, @PathVariable UUID stageId) {
+    public ApplicationResponse deleteStage(@PathVariable @NonNull UUID id, @PathVariable @NonNull UUID stageId) {
         return service.deleteStage(id, stageId);
     }
 

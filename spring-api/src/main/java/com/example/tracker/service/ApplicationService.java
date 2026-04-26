@@ -174,7 +174,7 @@ public class ApplicationService {
         );
     }
 
-    public InterviewStageResponse updateStage(@NonNull UUID appId, UUID stageId, InterviewStageRequest req) {
+    public InterviewStageResponse updateStage(@NonNull UUID appId, @NonNull UUID stageId, InterviewStageRequest req) {
         Application app = findById(appId);
         InterviewStage stage = Objects.requireNonNull(app.getInterviewStages().stream()
             .filter(s -> s.getId().equals(stageId))
@@ -191,7 +191,7 @@ public class ApplicationService {
         );
     }
 
-    public ApplicationResponse deleteStage(@NonNull UUID appId, UUID stageId) {
+    public ApplicationResponse deleteStage(@NonNull UUID appId, @NonNull UUID stageId) {
         Application app = findById(appId);
         app.getInterviewStages().removeIf(s -> s.getId().equals(stageId));
         applicationRepository.saveAndFlush(app);
@@ -199,7 +199,7 @@ public class ApplicationService {
         return toResponse(app);
     }
 
-    public List<HistoryEntry> getHistory(UUID appId) {
+    public List<HistoryEntry> getHistory(@NonNull UUID appId) {
         return snapshotRepository.findByApplicationIdOrderBySequenceNumberDesc(appId)
             .stream()
             .map(snap -> {

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("null")
 class ApplicationServiceTest {
 
     @Mock
@@ -45,6 +44,7 @@ class ApplicationServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void createSavesApplicationAndCreatesSnapshot() {
         Application saved = new Application();
         saved.setId(UUID.randomUUID());
@@ -66,6 +66,7 @@ class ApplicationServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void updateTransitionToInterviewingCreatesDefaultStages() {
         Application app = new Application();
         app.setId(UUID.randomUUID());

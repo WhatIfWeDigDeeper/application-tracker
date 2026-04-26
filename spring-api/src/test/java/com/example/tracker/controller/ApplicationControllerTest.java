@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,18 +56,19 @@ class ApplicationControllerTest {
     @Test
     void createReturnsBadRequestOnMissingFields() throws Exception {
         mockMvc.perform(post("/api/applications")
-                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{}"))
             .andExpect(status().isBadRequest());
     }
 
     @Test
+    @SuppressWarnings("null")
     void createReturnsCreated() throws Exception {
         when(service.create(any())).thenReturn(sampleApp());
         Map<String, String> req = Map.of("companyName", "Acme", "positionTitle", "Engineer");
         mockMvc.perform(post("/api/applications")
-                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
-                .content(Objects.requireNonNull(objectMapper.writeValueAsString(req))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(req)))
             .andExpect(status().isCreated());
     }
 }
