@@ -44,6 +44,7 @@ class ApplicationServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void createSavesApplicationAndCreatesSnapshot() {
         Application saved = new Application();
         saved.setId(UUID.randomUUID());
@@ -65,6 +66,7 @@ class ApplicationServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void updateTransitionToInterviewingCreatesDefaultStages() {
         Application app = new Application();
         app.setId(UUID.randomUUID());

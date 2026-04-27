@@ -11,8 +11,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -31,7 +31,7 @@ class ApplicationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private ApplicationService service;
 
     private ApplicationResponse sampleApp() {
@@ -56,17 +56,18 @@ class ApplicationControllerTest {
     @Test
     void createReturnsBadRequestOnMissingFields() throws Exception {
         mockMvc.perform(post("/api/applications")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{}"))
             .andExpect(status().isBadRequest());
     }
 
     @Test
+    @SuppressWarnings("null")
     void createReturnsCreated() throws Exception {
         when(service.create(any())).thenReturn(sampleApp());
         Map<String, String> req = Map.of("companyName", "Acme", "positionTitle", "Engineer");
         mockMvc.perform(post("/api/applications")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
             .andExpect(status().isCreated());
     }

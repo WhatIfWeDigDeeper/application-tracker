@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.lang.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +55,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/{id}")
-    public ApplicationResponse get(@PathVariable UUID id) {
+    public ApplicationResponse get(@PathVariable @NonNull UUID id) {
         return service.get(id);
     }
 
@@ -64,51 +65,51 @@ public class ApplicationController {
     }
 
     @PatchMapping("/{id}")
-    public ApplicationResponse update(@PathVariable UUID id, @Valid @RequestBody ApplicationRequest req) {
+    public ApplicationResponse update(@PathVariable @NonNull UUID id, @Valid @RequestBody ApplicationRequest req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable @NonNull UUID id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/archive")
-    public ApplicationResponse archive(@PathVariable UUID id) {
+    public ApplicationResponse archive(@PathVariable @NonNull UUID id) {
         return service.archive(id);
     }
 
     @PostMapping("/{id}/restore")
-    public ApplicationResponse restore(@PathVariable UUID id) {
+    public ApplicationResponse restore(@PathVariable @NonNull UUID id) {
         return service.restore(id);
     }
 
     @PostMapping("/{id}/interview-stages")
-    public ResponseEntity<InterviewStageResponse> addStage(@PathVariable UUID id,
+    public ResponseEntity<InterviewStageResponse> addStage(@PathVariable @NonNull UUID id,
                                         @Valid @RequestBody InterviewStageRequest req) {
         return ResponseEntity.status(201).body(service.addStage(id, req));
     }
 
     @PatchMapping("/{id}/interview-stages/{stageId}")
-    public InterviewStageResponse updateStage(@PathVariable UUID id,
-                                           @PathVariable UUID stageId,
+    public InterviewStageResponse updateStage(@PathVariable @NonNull UUID id,
+                                           @PathVariable @NonNull UUID stageId,
                                            @Valid @RequestBody InterviewStageRequest req) {
         return service.updateStage(id, stageId, req);
     }
 
     @DeleteMapping("/{id}/interview-stages/{stageId}")
-    public ApplicationResponse deleteStage(@PathVariable UUID id, @PathVariable UUID stageId) {
+    public ApplicationResponse deleteStage(@PathVariable @NonNull UUID id, @PathVariable @NonNull UUID stageId) {
         return service.deleteStage(id, stageId);
     }
 
     @GetMapping("/{id}/history")
-    public List<HistoryEntry> getHistory(@PathVariable UUID id) {
+    public List<HistoryEntry> getHistory(@PathVariable @NonNull UUID id) {
         return service.getHistory(id);
     }
 
     @PostMapping("/{id}/history/{historyId}/restore")
-    public ApplicationResponse restoreHistory(@PathVariable UUID id, @PathVariable UUID historyId) {
+    public ApplicationResponse restoreHistory(@PathVariable @NonNull UUID id, @PathVariable @NonNull UUID historyId) {
         return service.restoreHistory(id, historyId);
     }
 
