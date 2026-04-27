@@ -147,6 +147,7 @@ Commands that require `dangerouslyDisableSandbox: true`:
 - `nuxt dev/build/prepare` — filesystem access
 - `git commit` with GPG signing — `~/.gnupg/` access
 - Playwright tests (WebKit/Chromium) on macOS — `bootstrap_check_in` permissions
+- `./gradlew` commands — sandbox has no Java Runtime; prepend `export JAVA_HOME=$(/usr/libexec/java_home)`
 
 Additional notes:
 - **Heredoc in sandbox**: `$(cat <<'EOF'...EOF)` in commit messages fails in sandbox — use plain quoted strings or write to `$TMPDIR/commit-msg.txt` and use `git commit -F`
