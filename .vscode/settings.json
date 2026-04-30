@@ -19,13 +19,16 @@
         "**/*": true,
         "**/.claude/**": false,
         "**/.vscode/*.json": false,
+        "**/.github/workflows/**": false,
+        "**/.github/**/*.yml": false,
+        "**/.github/**/*.yaml": false,
         "**/.git/**": false,
+        "**/.env*": false,
         "**/{.env,.zshrc,server.xml,build.rs,web.config,.gitattributes}": false,
         "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props}": false,
         "**/*.lock": false
     },
     "chat.tools.terminal.enableAutoApprove": true,
-    "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
     "chat.tools.terminal.autoApprove": {
         "/(^|[\\s\"'=:/])\\.env(?:\\.|[\\s\"':/;|&><]|$)/": {
             "approve": false,
@@ -35,7 +38,7 @@
             "approve": false,
             "matchCommandLine": true
         },
-        "/^\\s*rm\\b(?=.*(?:\\s-(?:[^\\s]*r[^\\s]*)\\b|\\s--recursive(?:\\s|$)))(?=.*(?:\\s-(?:[^\\s]*f[^\\s]*)\\b|\\s--force(?:\\s|$))).*\\s\\/(?:\\s|$|[;&|*])/": {
+        "/^\\s*rm\\b(?=.*(?:\\s-[^\\s]*r[^\\s]*|\\s--recursive(?:[=\\s]|$)))(?=.*(?:\\s-[^\\s]*f[^\\s]*|\\s--force(?:[=\\s]|$))).*\\s\\/(?:$|[\\s;&|<>]|\\.(?:$|[\\s;&|<>])|\\*)/": {
             "approve": false,
             "matchCommandLine": true
         },
@@ -46,8 +49,7 @@
         "/^\\s*chmod\\s+(?:-[^\\s]+\\s+)*777\\b/": {
             "approve": false,
             "matchCommandLine": true
-        },
-        "/.*/": true
+        }
     },
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive"
