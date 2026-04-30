@@ -9,11 +9,13 @@
     "js-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
+      "skillPath": "skills/js-deps/SKILL.md",
       "computedHash": "2274cd9b24d26eba6f6510f04f68edae91aacc143a1bb17ef6bdae5356465b80"
     },
     "learn": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
+      "skillPath": "skills/learn/SKILL.md",
       "computedHash": "9e9ee3231ed08080eb8647489ad35bc76309f5541f7c25bb470e3b65617d2a96"
     },
     "mermaid-diagrams": {
@@ -24,7 +26,8 @@
     "peer-review": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "0dc6379a464c692521ac4b5adfba330ab443ae278deafeb6134c9ed4abd8455d"
+      "skillPath": "skills/peer-review/SKILL.md",
+      "computedHash": "593645f61fd1eb047e4f37b06162a97c77e968e3297db5f1030ebf79f7743b6c"
     },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
@@ -34,21 +37,25 @@
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
-      "computedHash": "ad4c65a8eeebbbc5a69d3864650534196ad0e3c34c86bcd55553928f9cf61834"
+      "skillPath": "skills/pr-comments/SKILL.md",
+      "computedHash": "7e7ba36e6ae45f8de42a5f1759ba56c4354bf4fa40a0ade431e8a1a13c22d5e5"
     },
     "pr-human-guide": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
+      "skillPath": "skills/pr-human-guide/SKILL.md",
       "computedHash": "507433dd7f301766a8843607e64bd26f3c9bc9ec0083230ad77525db10c72653"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
+      "skillPath": "skills/ship-it/SKILL.md",
       "computedHash": "4ce0fb985ff02f4f8b93e5b441c0eb49f48477c3b3f111fb59bede6ab34a876e"
     },
     "uv-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
+      "skillPath": "skills/uv-deps/SKILL.md",
       "computedHash": "991a9c57a5c429d82aa301429dcbffea2aac38c5241803d9db2b2805297e2fe0"
     },
     "vercel-react-best-practices": {
