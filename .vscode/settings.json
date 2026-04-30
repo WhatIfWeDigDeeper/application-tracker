@@ -14,54 +14,39 @@
         "editor.defaultFormatter": "vscode.json-language-features",
         "editor.formatOnSave": true
     },
+    "chat.permissions.default": "autoApprove",
+    "chat.tools.edits.autoApprove": {
+        "**/*": true,
+        "**/.vscode/*.json": false,
+        "**/.git/**": false,
+        "**/{.env,.zshrc,server.xml,build.rs,web.config,.gitattributes}": false,
+        "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props}": false,
+        "**/*.lock": false
+    },
+    "chat.tools.terminal.enableAutoApprove": true,
+    "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
     "chat.tools.terminal.autoApprove": {
-        ".specify/scripts/bash/": true,
-        ".specify/scripts/powershell/": true,
-        "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json 2>&1$/": {
-            "approve": true,
+        "/(^|[\\s\"'=:/])\\.env(?:\\.|[\\s\"':/]|$)/": {
+            "approve": false,
             "matchCommandLine": true
         },
-        "/^(git|gh|npm|npx|ls|pwd|cat|head|tail|grep|find|which|echo|wc|diff|tree|file|stat|du|df|env|printenv)(\\s+.*)?$/": {
-            "approve": true,
+        "/(^|[\\s\"'=:/])\\.zshrc(?:[\\s\"':/]|$)/": {
+            "approve": false,
             "matchCommandLine": true
         },
-        "cd": true,
-        "curl": true,
-        "go": true,
-        "gh": true,
-        "git": true,
-        "jar": true,
-        "java": true,
-        "npm": true,
-        "node": true,
-        "pkill": true,
-        "npx jest": true,
-        "npx tsc": true,
-        "npx ng": true,
-        "npx nx": true,
-        "npx playwright": true,
-        "./gradlew": true,
-        "find": true,
-        "ls": true,
-        "pwd": true,
-        "cat": true,
-        "head": true,
-        "tail": true,
-        "grep": true,
-        "which": true,
-        "echo": true,
-        "wc": true,
-        "diff": true,
-        "tree": true,
-        "file": true,
-        "stat": true,
-        "du": true,
-        "df": true,
-        "xargs": true,
-        "brew": true,
-        "gradle wrapper": true,
-        "docker": true,
-        "docker-compose": true
+        "/^\\s*rm\\s+-(?:[^\\s]*r[^\\s]*f|[^\\s]*f[^\\s]*r)[^\\s]*\\s+\\/(?:\\s|$|[;&|*])/": {
+            "approve": false,
+            "matchCommandLine": true
+        },
+        "/^\\s*sudo\\b/": {
+            "approve": false,
+            "matchCommandLine": true
+        },
+        "/^\\s*chmod\\s+(?:-[^\\s]+\\s+)*777\\b/": {
+            "approve": false,
+            "matchCommandLine": true
+        },
+        "/.*/": true
     },
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive"

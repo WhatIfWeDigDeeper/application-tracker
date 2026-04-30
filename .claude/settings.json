@@ -19,6 +19,9 @@
       "Read(.env)",
       "Write(.env)",
       "Edit(.env)",
+      "Read(~/.zshrc)",
+      "Write(~/.zshrc)",
+      "Edit(~/.zshrc)",
       "Bash(rm -rf /)",
       "Bash(sudo *)",
       "Bash(chmod 777 *)"
