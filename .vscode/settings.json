@@ -42,6 +42,10 @@
             "approve": false,
             "matchCommandLine": true
         },
+        "/^\\s*(?:bash|sh|zsh|dash|ksh|ash|csh|tcsh)(?:\\s+-[A-Za-z]+)*\\s+-[A-Za-z]*c\\b(?=.*\\brm\\b)(?=.*(?:[\\s'\"]-[^\\s'\"]*r[^\\s'\"]*|--recursive))(?=.*(?:[\\s'\"]-[^\\s'\"]*f[^\\s'\"]*|--force)).*\\brm\\b.*[\\s'\"]\\/(?:[./]*)?(?:['\"]|[\\s;&|<>]|\\*|$)/": {
+            "approve": false,
+            "matchCommandLine": true
+        },
         "/^\\s*sudo\\b/": {
             "approve": false,
             "matchCommandLine": true
