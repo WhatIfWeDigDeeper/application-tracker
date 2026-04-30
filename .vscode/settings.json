@@ -30,7 +30,7 @@
     },
     "chat.tools.terminal.enableAutoApprove": true,
     "chat.tools.terminal.autoApprove": {
-        "/(^|[\\s\"'=:/])\\.env(?:\\.|[\\s\"':/;|&><]|$)/": {
+        "/(^|[\\s\"'=:/])\\.env[^\\s\"':/;|&><]*(?:[\\s\"':/;|&><]|$)/": {
             "approve": false,
             "matchCommandLine": true
         },
@@ -38,7 +38,7 @@
             "approve": false,
             "matchCommandLine": true
         },
-        "/^\\s*rm\\b(?=.*(?:\\s-[^\\s]*r[^\\s]*|\\s--recursive(?:[=\\s]|$)))(?=.*(?:\\s-[^\\s]*f[^\\s]*|\\s--force(?:[=\\s]|$))).*\\s\\/(?:$|[\\s;&|<>]|\\.(?:$|[\\s;&|<>])|\\*)/": {
+        "/^\\s*rm\\b(?=.*(?:\\s-[^\\s]*r[^\\s]*|\\s--recursive(?:[=\\s]|$)))(?=.*(?:\\s-[^\\s]*f[^\\s]*|\\s--force(?:[=\\s]|$))).*\\s\\/(?:[./]*)?(?:$|[\\s;&|<>]|\\*)/": {
             "approve": false,
             "matchCommandLine": true
         },
