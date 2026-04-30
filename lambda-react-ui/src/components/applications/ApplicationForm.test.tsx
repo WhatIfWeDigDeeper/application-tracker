@@ -81,4 +81,17 @@ describe('ApplicationForm', () => {
 
     expect(screen.getByRole('button', { name: /discard/i })).toBeDisabled();
   });
+
+  it('disables save button while save is in progress', () => {
+    render(
+      <ApplicationForm
+        mode="edit"
+        saving={true}
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+        initialValues={{ companyName: 'Acme', positionTitle: 'Engineer' }}
+      />
+    );
+
+    expect(screen.getByTestId('application-form-save')).toBeDisabled();
+  });
 });

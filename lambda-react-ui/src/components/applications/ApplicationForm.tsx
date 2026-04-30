@@ -413,7 +413,7 @@ export function ApplicationForm({
         <Button
           data-testid="application-form-save"
           type="button"
-          disabled={mode === 'edit' && !dirty}
+          disabled={saving || (mode === 'edit' && !dirty)}
           loading={saving}
           onClick={() => {
             void handleSubmit();
