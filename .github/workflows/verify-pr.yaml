@@ -61,6 +61,13 @@ jobs:
         if: steps.docs-check.outputs.only_changed == 'false'
         run: cd fastapi && uv sync --extra dev
 
+      - name: Set up Java 21
+        if: steps.docs-check.outputs.only_changed == 'false'
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
       - name: Set up Go
         if: steps.docs-check.outputs.only_changed == 'false'
         uses: actions/setup-go@v6
