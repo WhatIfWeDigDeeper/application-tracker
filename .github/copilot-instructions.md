@@ -6,7 +6,7 @@
 - Start here, then jump to the focused partials in `.github/agents/` for on-demand detail.
 - For automation recipes, see `.github/agents/skills-index.md` to leverage existing `.claude/skills` instead of duplicating them.
 - Honor CLAUDE.md rules: no new docs at repo root; prefer exact version pins; use worktrees for complex work.
-- Keep CLAUDE.md in sync: mirror cross-cutting rule changes back to `CLAUDE.md`.
+- Keep `CLAUDE.md` and `.github/copilot-instructions.md` in sync for cross-cutting rule changes.
 
 ## Quick Rules
 - Run the validation chain after meaningful code changes: `build → lint → test → test:e2e`; skip only for trivial/docs-only edits.
