@@ -49,7 +49,7 @@
       "Bash(rm *--force*--recursive* /..)",
       "Bash(sudo *)",
       "Bash(chmod 777 *)",
-      "Bash(chmod * 777 *)"
+      "Bash(chmod -* 777 *)"
     ],
     "defaultMode": "auto"
   },
