@@ -34,7 +34,7 @@ When responding to PR review feedback, do not directly apply reviewer suggestion
 
 ## Cross-Cutting Patterns
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
-- **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it with `read_file` or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).
+- **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it in the editor or with CLI tools like `cat`, `sed`, or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).
 
 ## When in Doubt
 - Mirror existing implementations; prefer incremental changes with tests.

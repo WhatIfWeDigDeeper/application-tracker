@@ -17,6 +17,7 @@
     "chat.permissions.default": "autoApprove",
     "chat.tools.edits.autoApprove": {
         "**/*": true,
+        "**/.claude/**": false,
         "**/.vscode/*.json": false,
         "**/.git/**": false,
         "**/{.env,.zshrc,server.xml,build.rs,web.config,.gitattributes}": false,
