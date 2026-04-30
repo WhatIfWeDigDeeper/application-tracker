@@ -68,4 +68,17 @@ describe('ApplicationForm', () => {
 
     expect(saveButton).toBeEnabled();
   });
+
+  it('disables cancel/discard button while save is in progress', () => {
+    render(
+      <ApplicationForm
+        mode="edit"
+        saving={true}
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+        initialValues={{ companyName: 'Acme', positionTitle: 'Engineer' }}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /discard/i })).toBeDisabled();
+  });
 });

@@ -407,7 +407,7 @@ export function ApplicationForm({
       </section>
 
       <div className="flex items-center justify-end gap-2">
-        <Button variant="secondary" type="button" onClick={() => onCancel?.(dirty)}>
+        <Button variant="secondary" type="button" disabled={saving} onClick={() => onCancel?.(dirty)}>
           {mode === 'edit' ? 'Discard' : 'Cancel'}
         </Button>
         <Button
