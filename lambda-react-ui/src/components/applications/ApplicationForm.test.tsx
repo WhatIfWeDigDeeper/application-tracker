@@ -51,4 +51,47 @@ describe('ApplicationForm', () => {
 
     expect(screen.getByTestId('application-form-save')).toHaveAttribute('type', 'button');
   });
+
+  it('disables edit save while the form is clean and enables it after changes', () => {
+    render(
+      <ApplicationForm
+        mode="edit"
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+        initialValues={{ companyName: 'Acme', positionTitle: 'Engineer' }}
+      />
+    );
+
+    const saveButton = screen.getByTestId('application-form-save');
+    expect(saveButton).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText(/Company Name/i), { target: { value: 'Acme Updated' } });
+
+    expect(saveButton).toBeEnabled();
+  });
+
+  it('disables cancel/discard button while save is in progress', () => {
+    render(
+      <ApplicationForm
+        mode="edit"
+        saving={true}
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+        initialValues={{ companyName: 'Acme', positionTitle: 'Engineer' }}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /discard/i })).toBeDisabled();
+  });
+
+  it('disables save button while save is in progress', () => {
+    render(
+      <ApplicationForm
+        mode="edit"
+        saving={true}
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+        initialValues={{ companyName: 'Acme', positionTitle: 'Engineer' }}
+      />
+    );
+
+    expect(screen.getByTestId('application-form-save')).toBeDisabled();
+  });
 });

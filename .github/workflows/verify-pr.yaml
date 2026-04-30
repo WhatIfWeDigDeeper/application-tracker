@@ -68,23 +68,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Set up Gradle
-        if: steps.docs-check.outputs.only_changed == 'false'
-        uses: gradle/actions/setup-gradle@v6
-
-      - name: Get date for NVD cache key
-        if: steps.docs-check.outputs.only_changed == 'false'
-        id: date
-        run: echo "today=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-
-      - name: Cache NVD dependency-check database
-        if: steps.docs-check.outputs.only_changed == 'false'
-        uses: actions/cache@v5
-        with:
-          path: ~/.gradle/dependency-check-data
-          key: nvd-data-${{ runner.os }}-${{ steps.date.outputs.today }}
-          restore-keys: nvd-data-${{ runner.os }}-
-
       - name: Set up Go
         if: steps.docs-check.outputs.only_changed == 'false'
         uses: actions/setup-go@v6

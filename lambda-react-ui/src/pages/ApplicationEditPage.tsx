@@ -88,7 +88,7 @@ export default function ApplicationEditPage() {
   return (
     <section>
       <h1 style={{ margin: 0 }}>{id ? 'Edit Application' : 'New Application'}</h1>
-      <Button variant="ghost" size="sm" type="button" onClick={() => navigate('/')}>
+      <Button variant="ghost" size="sm" type="button" disabled={saving} onClick={() => navigate('/')}>
         Back to List
       </Button>
       <p style={{ color: 'var(--text-secondary)' }}>
@@ -140,6 +140,7 @@ export default function ApplicationEditPage() {
         onClick={() => openPanel('history')}
         type="button"
         variant="secondary"
+        disabled={saving}
       >
         History
       </Button>
@@ -150,6 +151,7 @@ export default function ApplicationEditPage() {
           onClick={() => setShowDeleteDialog(true)}
           type="button"
           variant="danger"
+          disabled={saving}
         >
           Delete
         </Button>
