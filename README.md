@@ -32,7 +32,9 @@ A full-stack job application tracking system with multiple technology stack impl
   - [End-to-End Tests](#end-to-end-tests)
   - [Build Verification](#build-verification)
   - [Per-Stack Validation](#per-stack-validation)
+  - [CI Workflows](#ci-workflows)
 - [Development Tools](#development-tools)
+  - [Skills](#skills)
   - [VS Code Debug Configurations](#vs-code-debug-configurations)
   - [Notifications (Optional)](#notifications-optional)
 - [License](#license)
@@ -486,6 +488,8 @@ This repository includes Claude Code commands and skills for common development 
 - `/pr` - Create pull requests
 - `/fix-build` - Fix build errors
 
+### Skills
+
 Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIfWeDigDeeper/agent-skills?tab=readme-ov-file#installation):
 
 | Skill | Description |
@@ -500,13 +504,17 @@ Skills installed from [WhatIfWeDigDeeper/agent-skills](https://github.com/WhatIf
 Since `npx skills check` and `npx skills update` apparently do not work with the above repo at this time, you may force update all skills:
 
 ```bash
-npx skills add -y whatifwedigdeeper/agent-skills
+npx skills add -y https://github.com/whatifwedigdeeper/agent-skills
 ```
 
 Other skills
 
 ```bash
 npx skills add -y https://github.com/microsoft/playwright-cli --skill playwright-cli
+```
+
+```bash
+npx skills add -y https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices
 ```
 
 
