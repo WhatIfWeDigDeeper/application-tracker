@@ -27,11 +27,11 @@
     "chat.tools.terminal.enableAutoApprove": true,
     "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
     "chat.tools.terminal.autoApprove": {
-        "/(^|[\\s\"'=:/])\\.env(?:\\.|[\\s\"':/]|$)/": {
+        "/(^|[\\s\"'=:/])\\.env(?:\\.|[\\s\"':/;|&><]|$)/": {
             "approve": false,
             "matchCommandLine": true
         },
-        "/(^|[\\s\"'=:/])\\.zshrc(?:[\\s\"':/]|$)/": {
+        "/(^|[\\s\"'=:/])\\.zshrc(?:[\\s\"':/;|&><]|$)/": {
             "approve": false,
             "matchCommandLine": true
         },
