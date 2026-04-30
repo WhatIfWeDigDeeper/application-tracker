@@ -51,4 +51,21 @@ describe('ApplicationForm', () => {
 
     expect(screen.getByTestId('application-form-save')).toHaveAttribute('type', 'button');
   });
+
+  it('disables edit save while the form is clean and enables it after changes', () => {
+    render(
+      <ApplicationForm
+        mode="edit"
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+        initialValues={{ companyName: 'Acme', positionTitle: 'Engineer' }}
+      />
+    );
+
+    const saveButton = screen.getByTestId('application-form-save');
+    expect(saveButton).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText(/Company Name/i), { target: { value: 'Acme Updated' } });
+
+    expect(saveButton).toBeEnabled();
+  });
 });

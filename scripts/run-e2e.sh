@@ -91,11 +91,13 @@ ensure_dynamodb_local() {
     wait_for_port 8000 "dynamodb-local"
   fi
   echo "[lambda-api] Running DynamoDB table migration..."
-  load_env_file "$ROOT_DIR/lambda-api/.env"
-  DYNAMODB_ENDPOINT="${DYNAMODB_ENDPOINT:-http://localhost:${DYNAMODB_PORT:-8000}}" \
-  AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-local}" \
-  AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-local}" \
-  npm --prefix "$ROOT_DIR" run migrate:lambda-api
+  (
+    load_env_file "$ROOT_DIR/lambda-api/.env"
+    DYNAMODB_ENDPOINT="${DYNAMODB_ENDPOINT:-http://localhost:${DYNAMODB_PORT:-8000}}" \
+    AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-local}" \
+    AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-local}" \
+    npm --prefix "$ROOT_DIR" run migrate:lambda-api
+  )
 }
 
 ensure_api() {
