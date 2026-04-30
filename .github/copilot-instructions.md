@@ -6,6 +6,7 @@
 - Start here, then jump to the focused partials in `.github/agents/` for on-demand detail.
 - For automation recipes, see `.github/agents/skills-index.md` to leverage existing `.claude/skills` instead of duplicating them.
 - Honor CLAUDE.md rules: no new docs at repo root; prefer exact version pins; use worktrees for complex work.
+- Keep `CLAUDE.md` and `.github/copilot-instructions.md` in sync for cross-cutting rule changes.
 
 ## Quick Rules
 - Run the validation chain after meaningful code changes: `build → lint → test → test:e2e`; skip only for trivial/docs-only edits.
@@ -33,6 +34,7 @@ When responding to PR review feedback, do not directly apply reviewer suggestion
 
 ## Cross-Cutting Patterns
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
+- **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it in the editor or with CLI tools like `cat`, `sed`, or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).
 
 ## When in Doubt
 - Mirror existing implementations; prefer incremental changes with tests.

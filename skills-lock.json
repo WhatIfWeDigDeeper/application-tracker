@@ -39,13 +39,13 @@
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/pr-comments/SKILL.md",
-      "computedHash": "7e7ba36e6ae45f8de42a5f1759ba56c4354bf4fa40a0ade431e8a1a13c22d5e5"
+      "computedHash": "69aaae9f1d6991b18c496eaa0d19f5e95dc84dfa73363d58d65242008f5e23fb"
     },
     "pr-human-guide": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/pr-human-guide/SKILL.md",
-      "computedHash": "507433dd7f301766a8843607e64bd26f3c9bc9ec0083230ad77525db10c72653"
+      "computedHash": "0b3bf8f379e1dbbf231ec75b7dee66152487e5290c01ae8c4d4ea6b81bb6cbce"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
