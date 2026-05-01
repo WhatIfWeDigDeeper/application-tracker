@@ -14,6 +14,21 @@ jobs:
     name: verify-pr
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app_tracker
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -117,6 +132,15 @@ jobs:
         if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run build:all
 
+      - name: Prepare Rails test database
+        if: steps.docs-check.outputs.only_changed == 'false'
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app_tracker
+          RAILS_ENV: test
+        run: cd rails-api && bin/with-ruby bundle exec rails db:migrate
+
       - name: Test
         if: steps.docs-check.outputs.only_changed == 'false'
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app_tracker
         run: npm run test:all
