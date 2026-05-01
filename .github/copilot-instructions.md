@@ -37,6 +37,9 @@ When responding to PR review feedback, do not directly apply reviewer suggestion
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
 - **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it in the editor or with CLI tools like `cat`, `sed`, or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).
 - **Shared tests**: See `tests/CLAUDE.md` for API/E2E lifecycle, `--runInBand`, cleanup, and Playwright/WebKit quirks.
+- **Migrations**: Prefer `IF NOT EXISTS` on `CREATE SCHEMA / TABLE / INDEX` — `app_tracker` is shared; prior state may pre-exist.
+- **Cross-stack cleanup discovered mid-PR**: If the PR exposes a problem it doesn't own (other stacks, shared tooling), file a cross-linked follow-up issue instead of expanding the diff. List filed issues with URLs in the session summary.
+- **Rule writing**: Every clause must be load-bearing (rule / non-obvious why / concrete example). Cut restatements, redundant adverbs, and self-evident "why" tails.
 
 ## When in Doubt
 - Mirror existing implementations; prefer incremental changes with tests.
