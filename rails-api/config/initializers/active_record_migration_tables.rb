@@ -5,8 +5,10 @@
 # sharing the app_tracker DB.
 begin
   ActiveRecord::Base.connection.execute("CREATE SCHEMA IF NOT EXISTS ruby_rails")
-rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad
+rescue ActiveRecord::NoDatabaseError
   # DB doesn't exist yet (db:create not run); skip — caller will set up DB.
+  # Connection failures (PG::ConnectionBad) are NOT rescued — let prod fail
+  # fast instead of booting against an unreachable database.
 end
 
 ActiveRecord::Base.schema_migrations_table_name = "ruby_rails.schema_migrations"
