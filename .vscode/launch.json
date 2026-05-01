@@ -118,16 +118,10 @@
       "port": 5005
     },
     {
-      "name": "Rails API (port 5180)",
+      "name": "Rails API (port 5180, attach)",
       "type": "rdbg",
-      "request": "launch",
-      "script": "${workspaceFolder}/rails-api/bin/rails",
-      "args": [
-        "server",
-        "-p",
-        "5180"
-      ],
-      "cwd": "${workspaceFolder}/rails-api"
+      "request": "attach",
+      "debugPort": "12345"
     },
     {
       "type": "node",

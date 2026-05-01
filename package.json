@@ -72,6 +72,7 @@
     "dev:lambda-api": "cd lambda-api && npm run dev",
     "dev:nest-history-api": "cd nest-history-api && npm run dev",
     "dev:rails-api": "cd rails-api && bin/with-ruby bundle exec rails server -p 5180",
+    "dev:rails-api:debug": "cd rails-api && bin/with-ruby bundle exec rdbg --open --port 12345 --nonstop -c -- bin/rails server -p 5180",
     "build:express-api": "cd api && npm run build",
     "build:react-next-ui": "cd ui && npm run build",
     "build:koa-api": "cd koa-api && npm run build",
