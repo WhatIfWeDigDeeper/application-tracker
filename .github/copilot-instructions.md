@@ -40,6 +40,7 @@ When responding to PR review feedback, do not directly apply reviewer suggestion
 - **Migrations**: Prefer `IF NOT EXISTS` on `CREATE SCHEMA / TABLE / INDEX` — `app_tracker` is shared; prior state may pre-exist.
 - **Cross-stack cleanup discovered mid-PR**: If the PR exposes a problem it doesn't own (other stacks, shared tooling), file a cross-linked follow-up issue instead of expanding the diff. List filed issues with URLs in the session summary.
 - **Rule writing**: Every clause must be load-bearing (rule / non-obvious why / concrete example). Cut restatements, redundant adverbs, and self-evident "why" tails.
+- **PR body updates after push**: Fetch the current body and modify in place via `gh pr edit <pr> --body-file` — never rewrite from scratch — so HTML-comment marker blocks (e.g. `<!-- pr-human-guide -->`) survive.
 
 ## When in Doubt
 - Mirror existing implementations; prefer incremental changes with tests.
