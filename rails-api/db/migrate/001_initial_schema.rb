@@ -5,7 +5,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
     execute <<~SQL
       CREATE SCHEMA IF NOT EXISTS ruby_rails;
 
-      CREATE TABLE IF NOT EXISTS ruby_rails.applications (
+      CREATE TABLE ruby_rails.applications (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         company_name VARCHAR(200) NOT NULL,
         position_title VARCHAR(200) NOT NULL,
@@ -28,14 +28,14 @@ class InitialSchema < ActiveRecord::Migration[8.0]
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
 
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_applications_on_status ON ruby_rails.applications(status);
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_applications_on_company_category ON ruby_rails.applications(company_category);
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_applications_on_job_source ON ruby_rails.applications(job_source);
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_applications_on_is_archived ON ruby_rails.applications(is_archived);
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_applications_on_updated_at ON ruby_rails.applications(updated_at);
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_applications_on_job_posting_url ON ruby_rails.applications(job_posting_url);
+      CREATE INDEX index_ruby_rails_applications_on_status ON ruby_rails.applications(status);
+      CREATE INDEX index_ruby_rails_applications_on_company_category ON ruby_rails.applications(company_category);
+      CREATE INDEX index_ruby_rails_applications_on_job_source ON ruby_rails.applications(job_source);
+      CREATE INDEX index_ruby_rails_applications_on_is_archived ON ruby_rails.applications(is_archived);
+      CREATE INDEX index_ruby_rails_applications_on_updated_at ON ruby_rails.applications(updated_at);
+      CREATE INDEX index_ruby_rails_applications_on_job_posting_url ON ruby_rails.applications(job_posting_url);
 
-      CREATE TABLE IF NOT EXISTS ruby_rails.interview_stages (
+      CREATE TABLE ruby_rails.interview_stages (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         application_id UUID NOT NULL REFERENCES ruby_rails.applications(id) ON DELETE CASCADE,
         name VARCHAR(100) NOT NULL,
@@ -46,12 +46,12 @@ class InitialSchema < ActiveRecord::Migration[8.0]
         performance_rating INTEGER
       );
 
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_interview_stages_on_application_id
+      CREATE INDEX index_ruby_rails_interview_stages_on_application_id
         ON ruby_rails.interview_stages(application_id);
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_interview_stages_on_application_id_order
+      CREATE INDEX index_ruby_rails_interview_stages_on_application_id_order
         ON ruby_rails.interview_stages(application_id, "order");
 
-      CREATE TABLE IF NOT EXISTS ruby_rails.application_snapshots (
+      CREATE TABLE ruby_rails.application_snapshots (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         application_id UUID NOT NULL REFERENCES ruby_rails.applications(id) ON DELETE CASCADE,
         sequence INTEGER NOT NULL,
@@ -60,9 +60,9 @@ class InitialSchema < ActiveRecord::Migration[8.0]
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
 
-      CREATE UNIQUE INDEX IF NOT EXISTS index_ruby_rails_application_snapshots_on_application_sequence
+      CREATE UNIQUE INDEX index_ruby_rails_application_snapshots_on_application_sequence
         ON ruby_rails.application_snapshots(application_id, sequence);
-      CREATE INDEX IF NOT EXISTS index_ruby_rails_application_snapshots_on_created_at
+      CREATE INDEX index_ruby_rails_application_snapshots_on_created_at
         ON ruby_rails.application_snapshots(created_at);
     SQL
   end

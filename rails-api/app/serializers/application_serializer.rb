@@ -1,23 +1,9 @@
 class ApplicationSerializer
-  FIELD_LABELS = {
-    "companyName" => "Company Name",
-    "positionTitle" => "Position Title",
-    "dateApplied" => "Date Applied",
-    "status" => "Status",
-    "companyUrl" => "Company URL",
-    "jobPostingUrl" => "Job Posting URL",
-    "companyCareerUrl" => "Career Page URL",
-    "companyCategory" => "Company Category",
-    "skillsMatch" => "Skills Match",
-    "jobSource" => "Job Source",
-    "coverLetterRequired" => "Cover Letter Required",
-    "specialRequirements" => "Special Requirements",
-    "salaryMin" => "Min Salary",
-    "salaryMax" => "Max Salary",
-    "notes" => "Notes",
-    "offerDueDate" => "Offer Due Date",
-    "isArchived" => "Archived"
-  }.freeze
+  # Snapshots are stored with camelCase keys; derive from the canonical
+  # snake_case map on ApplicationService so the two stay in sync.
+  FIELD_LABELS = ApplicationService::FIELD_LABELS
+                 .transform_keys { |key| key.to_s.camelize(:lower) }
+                 .freeze
 
   def self.application(application)
     {
