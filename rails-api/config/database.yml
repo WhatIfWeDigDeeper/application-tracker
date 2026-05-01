@@ -14,4 +14,8 @@ test:
 
 production:
   <<: *default
-  url: <%= ENV.fetch("DATABASE_URL") %>
+  # No localhost fallback in production — see config/environments/production.rb
+  # for the boot-time guard that raises if DATABASE_URL is missing. Using
+  # ENV[...] (not ENV.fetch) keeps YAML parse safe in dev/test/CI builds that
+  # touch every environment.
+  url: <%= ENV["DATABASE_URL"] %>
