@@ -480,10 +480,10 @@ npm run build:all         # Build all implementations
 
 ### Per-Stack Validation
 
-Run the full validation chain (audit → build → lint → test) for a single stack:
+Run the full validation chain (install → audit → lint → build → test) for a single stack:
 
 ```bash
-npm run validate:tanstack-ui      # audit:ci → build → lint → test
+npm run validate:tanstack-ui      # install → audit:ci → lint → build → test
 npm run validate:express-api
 npm run validate:nest-history-api
 # ... validate:<stack> available for all stacks
