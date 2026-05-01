@@ -2,11 +2,11 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
-  url: <%= ENV.fetch("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/app_tracker") %>
   schema_search_path: ruby_rails,public
 
 development:
   <<: *default
+  url: <%= ENV.fetch("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/app_tracker") %>
 
 test:
   <<: *default
@@ -14,3 +14,4 @@ test:
 
 production:
   <<: *default
+  url: <%= ENV.fetch("DATABASE_URL") %>
