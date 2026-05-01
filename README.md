@@ -16,6 +16,7 @@ A full-stack job application tracking system with multiple technology stack impl
   - [9. GraphQL Yoga + React Apollo](#9-graphql-yoga--react-apollo)
   - [10. Lambda + DynamoDB (API only)](#10-lambda--dynamodb-api-only)
   - [11. Lambda React UI + Lambda API + DynamoDB](#11-lambda-react-ui--lambda-api--dynamodb)
+  - [12. Ruby on Rails API](#12-ruby-on-rails-api)
 - [Core Features](#core-features)
 - [Database Architecture](#database-architecture)
 - [Service Communication](#service-communication)
@@ -63,6 +64,7 @@ This repository contains a complete job application tracker built with multiple 
 | GraphQL Yoga + React Apollo | `react-apollo-ui/` + `yoga-api/` | 3080 | 5080 | PostgreSQL (`graphql_yoga`) |
 | Lambda + DynamoDB (API only) | `lambda-api/` | - | 5090 | DynamoDB (`lambda_api_applications`) |
 | Lambda React UI + Lambda API + DynamoDB | `lambda-react-ui/` + `lambda-api/` | 3090 | 5090 | Zustand + React 19 + Vite, DynamoDB-backed |
+| Ruby on Rails API | `rails-api/` | - | 5180 | PostgreSQL (`ruby_rails`) |
 
 ### 1. Vue + Nuxt + Drizzle
 **Directories**: `vue-ui/` + `nuxt-api/`
@@ -158,6 +160,14 @@ This repository contains a complete job application tracker built with multiple 
 - Database: DynamoDB single-table design (`lambda_api_applications`) via `lambda-api` endpoints only
 - Includes responsive three-pane UI, context panel workflows, CSV import/export, history diff view, and shared E2E compatibility
 
+### 12. Ruby on Rails API
+**Directory**: `rails-api/`
+**Stack**:
+- Backend: Ruby 3.3+ + Rails API mode + ActiveRecord — port 5180
+- Database: PostgreSQL via `ruby_rails` schema (Rails migrations)
+- API-only first pass; UI parity and CSV import/export are deferred follow-ups
+- Snapshot-based history with field diffs and restore
+
 ## Core Features
 
 All implementations provide:
@@ -186,6 +196,7 @@ All implementations share a single PostgreSQL database (`app_tracker`) with sepa
 | `go_gin` | Angular + Go Gin API | [schema docs](docs/schema/go-gin/README.md) |
 | `java_spring` | Angular + Spring Boot + JPA | [schema docs](docs/schema/java-spring/README.md) |
 | `graphql_yoga` | GraphQL Yoga + React Apollo | [schema docs](docs/schema/graphql-yoga/README.md) |
+| `ruby_rails` | Ruby on Rails API | [schema docs](docs/schema/ruby-rails/README.md) |
 
 **DynamoDB (non-relational):**
 
@@ -253,6 +264,7 @@ Regenerate with `npm run docs:types` (all stacks except lambda-api, which is han
 ├── fastapi/                      # Python FastAPI API
 ├── go-api/                       # Go Gin API
 ├── lambda-api/                   # AWS Lambda + DynamoDB API
+├── rails-api/                    # Ruby on Rails API
 ├── proto/                        # Protocol Buffer definitions (buf + ts-proto)
 ├── specs/                        # Feature specifications
 ├── docs/                         # Documentation
@@ -269,6 +281,7 @@ Regenerate with `npm run docs:types` (all stacks except lambda-api, which is han
 - Python 3.12+ and [uv](https://docs.astral.sh/uv/) (for the FastAPI implementation)
 - Go 1.24+ (for the Go Gin API implementation) — ensure `$(go env GOPATH)/bin` (typically `~/go/bin`) appears in your `PATH` before system package manager paths so locally-installed Go tools (`govulncheck`, `gotestsum`) take precedence
 - Java 21 (for the Spring Boot implementation) — Eclipse Temurin is recommended: `brew install --cask temurin@21`
+- Ruby 3.3+ and Bundler (for the Rails API implementation)
 - Docker and Docker Compose (for PostgreSQL)
 - [tbls](https://github.com/k1LoW/tbls) (optional, for regenerating schema docs): `brew install tbls`
 
@@ -301,6 +314,7 @@ Regenerate with `npm run docs:types` (all stacks except lambda-api, which is han
    npm run migrate:fastapi        # FastAPI (asyncpg)
    npm run migrate:go             # Go Gin API (raw SQL)
    npm run migrate:spring-api     # Spring Boot API (Flyway — auto-run on startup too)
+   npm run migrate:rails-api      # Rails API (ActiveRecord migrations)
 
    # or all at once:
    npm run migrate:all
@@ -354,6 +368,9 @@ npm run dev:lambda-api                      # start Hono server on port 5090
 npm run dev:lambda-api
 npm run dev:lambda-react-ui
 
+# Ruby on Rails API (API only — port 5180)
+npm run dev:rails-api
+
 # CDK — synthesize / deploy (real AWS or LocalStack)
 npm run cdk:synth                           # synthesize CloudFormation template (no AWS needed)
 npm run cdk:deploy                          # deploy to real AWS
@@ -395,6 +412,7 @@ npm run test:angular-spring-ui  # Angular Spring UI tests (Jest + @testing-libra
 npm run test:lambda-api         # Lambda + DynamoDB unit tests (vitest, no Docker needed)
 npm run test:lambda-react-ui    # Lambda React UI tests (Vitest + Testing Library)
 npm run test:lambda-api-cdk     # CDK assertions tests (vitest, no Docker needed)
+npm run test:rails-api          # Rails API tests (RSpec)
 ```
 
 Run all unit tests:
@@ -405,7 +423,7 @@ npm run test:all          # Run all implementation tests
 
 ### API Integration Tests
 
-Cross-stack API tests run Jest integration tests against each REST API backend. All 9 implementations are tested with a shared test suite covering CRUD, date formats, CSV import/export, and application status.
+Cross-stack API tests run Jest integration tests against each REST API backend. Implementations are tested with a shared test suite covering CRUD, date formats, CSV import/export for CSV-capable stacks, history, and application status.
 
 Run tests for a single API (requires the API server to be running):
 
@@ -420,6 +438,7 @@ npm run test:api:go-api        # Go Gin API (port 5070)
 npm run test:api:spring-api    # Spring Boot API (port 8080)
 npm run test:api:yoga-api      # GraphQL Yoga REST API (port 5080)
 npm run test:api:lambda-api    # Lambda + DynamoDB API (port 5090)
+npm run test:api:rails-api     # Rails API (port 5180)
 ```
 
 Run all API tests with automatic server lifecycle management:

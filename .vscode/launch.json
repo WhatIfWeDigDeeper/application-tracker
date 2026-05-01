@@ -118,6 +118,18 @@
       "port": 5005
     },
     {
+      "name": "Rails API (port 5180)",
+      "type": "rdbg",
+      "request": "launch",
+      "script": "${workspaceFolder}/rails-api/bin/rails",
+      "args": [
+        "server",
+        "-p",
+        "5180"
+      ],
+      "cwd": "${workspaceFolder}/rails-api"
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "yoga-api",

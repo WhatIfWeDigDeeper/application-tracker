@@ -23,7 +23,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 ## Per-Stack Guidance
 
 Stack-specific patterns live in `<stack>/CLAUDE.md` and load on-demand when working in that directory:
-`angular-ui`, `vue-ui`, `svelte-ui`, `spring-api`, `tanstack-ui`, `fastapi`, `go-api`, `lambda-api` (incl. CDK), `nest-history-api`.
+`angular-ui`, `vue-ui`, `svelte-ui`, `spring-api`, `tanstack-ui`, `fastapi`, `go-api`, `lambda-api` (incl. CDK), `nest-history-api`, `rails-api`.
 Paired dirs (`angular-spring-ui`, `nuxt-api`, `hono-api`, `nest-api`) have pointer files to their primary stack.
 When adding a new implementation, create `<new-stack>/CLAUDE.md` for any stack-specific gotchas that emerge.
 
@@ -32,6 +32,7 @@ When adding a new implementation, create `<new-stack>/CLAUDE.md` for any stack-s
 - Zustand 5, React Router 7, TanStack Query v5, TanStack Router, Apollo Client
 - Vitest, @testing-library/react, Playwright
 - Python 3.12+ (fastapi package uses 3.14) with FastAPI, asyncpg, Pydantic v2, uv
+- Ruby 3.3+ with Rails API mode, ActiveRecord, RSpec, Bundler
 - PostgreSQL 18 (single database with multiple schemas)
 - DynamoDB (via lambda-api — no direct DB access from frontend)
 
@@ -51,6 +52,7 @@ Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolat
 - **java_spring** — `spring-api/src/main/resources/db/migration/V1__initial.sql` (Spring Data JPA + Hibernate 6, Flyway auto-migration)
 - **go_gin** — `go-api/migrations/001_initial.up.sql` (pgx/sqlc, raw SQL)
 - **graphql_yoga** — `yoga-api/prisma/schema.prisma` (Prisma); paired with `react-apollo-ui` (port 3080)
+- **ruby_rails** — `rails-api/db/migrate/001_initial_schema.rb` (Rails migrations, ActiveRecord); API-only on port 5180
 
 Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 
@@ -143,6 +145,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 Commands that require `dangerouslyDisableSandbox: true`:
 - `npm install` — network access for package downloads
+- `bundle install` — network access for RubyGems downloads
 - `docker compose` — `.env` file access
 - `drizzle-kit` commands — filesystem access outside project
 - `nuxt dev/build/prepare` — filesystem access
@@ -184,38 +187,8 @@ Additional notes:
 
 ## Running API Integration Tests
 
-**Server lifecycle**: For fully managed runs (API auto-start/stop for all 10 stacks), use `bash scripts/run-api-tests.sh [stack|all]` or `npm run test:api:all`. To run against a single already-running API, use `npm run test:api:<stack>` (e.g., `npm run test:api:nest-api`).
-
-**All stacks run sequentially with `--runInBand`** — tests share a DB schema per stack; parallel Jest workers cause state contamination (race conditions in export/import round-trip tests). The script passes `--runInBand` to ensure test files run sequentially within each stack run.
-
-**`run-api-tests.sh all` continues on failure** — unlike `run-e2e.sh`, it accumulates `FAILED_STACKS` and reports them all at the end, so all stacks are tested even when one fails.
-
-**Cross-stack PATCH compatibility**: Go API and Spring API require all non-optional fields in PATCH requests. Always include `companyName` + `positionTitle` for application PATCH, and `name` + `order` for interview stage PATCH.
-
-**Stack-specific flags in `tests/api/helpers.ts`**: `validatesDates` (true only for stacks that return 400 + `code: validation_error` for bad dates), `hasInterviewStageDates` (false for go-api which lacks `completedDate` on stages). Update these when adding a new stack.
+See `tests/CLAUDE.md` for shared API contract test lifecycle, `--runInBand`, cross-stack PATCH, and helper flag rules.
 
 ## Running E2E Tests
 
-**Server lifecycle**: For fully managed runs (API auto-start/stop), use `bash scripts/run-e2e.sh [stack|all]` — `npm run test:e2e:all` also uses this. To run manually when servers are already up, use `npm run test:e2e:<stack>` directly and leave pre-existing servers running afterward. **`npm run test:e2e:<stack>` only starts the UI dev server** (via playwright `webServer`), not the API backend — if you've killed the backend manually, use `bash scripts/run-e2e.sh <stack>` to restart it before running tests.
-
-Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
-
-**`run-e2e.sh all` stops at the first failing stack** — if a flaky test causes early exit, run the remaining stacks individually (`bash scripts/run-e2e.sh <stack>`) to get full coverage rather than re-running all from scratch.
-
-**E2E test data cleanup**: Tests that create data must clean up in `afterAll` using API calls (e.g., `page.request.delete('/api/applications/${id}')`) — not fragile UI interactions. Cleanup must run even if individual tests fail.
-
-**Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 9 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
-
-**E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create — status can be set at create time directly.
-
-**`test.describe.serial` for `beforeAll`-dependent tests**: With `fullyParallel: true`, `test.describe` (non-serial) runs each worker with an independent module load — module-scope variables like `const company = uniqueCompanyName(...)` produce different values per worker, so `beforeAll`-created data is invisible to `beforeEach` in other workers. Use `test.describe.serial` for any describe block whose tests share `beforeAll` setup data.
-
-### Playwright / webkit Quirks
-
-- **webkit + React 19 form submission**: Playwright's `requestSubmit()`, button `.click()`, and `press('Enter')` do not fire React's `onSubmit` in webkit for multi-input forms. Workaround: extract a `doSubmit()` function, add `type="button"` + `data-testid="<form>-save"` + `onClick={doSubmit}` to the submit button, and use `page.locator('[data-testid="<form>-save"]').click()` in tests.
-- **Submit button type changes**: When changing a button from `type="submit"` to `type="button"`, unit tests using `querySelector('button[type="submit"]')` will silently return `null`. Prefer `getByTestId()` or `getByRole('button', { name: /save/i })` instead.
-- **Angular `[hidden]` vs `@if` for Playwright gates**: `[hidden]="!expr"` keeps the element in the DOM (just invisible); in webkit, `expect(locator).toBeVisible()` can pass immediately while the element's content/state is still stale/default, so later assertions may read the wrong value. Use `@if (expr)` instead of `[hidden]="!expr"` whenever a Playwright assertion waits for an element to appear.
-- **Modal re-open timing in webkit**: After clicking Close on a modal/panel and immediately re-opening it, webkit can interact with stale DOM from the previous open cycle. Assert `await expect(page.locator('text=<panel heading>')).not.toBeVisible()` after Close before triggering the second open.
-- **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
-- **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
-- **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
+See `tests/CLAUDE.md` for shared E2E lifecycle, cleanup, cross-stack behavior, and Playwright/WebKit quirks. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.

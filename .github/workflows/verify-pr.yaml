@@ -89,6 +89,14 @@ jobs:
         with:
           setup_only: true
 
+      - name: Set up Ruby
+        if: steps.docs-check.outputs.only_changed == 'false'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: rails-api
+
       - name: Run Security Audit
         if: steps.docs-check.outputs.only_changed == 'false'
         run: npm run audit:ci:all

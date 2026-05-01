@@ -58,6 +58,7 @@ SCHEMAS=(
   "go_gin:go-gin"
   "java_spring:java-spring"
   "graphql_yoga:graphql-yoga"
+  "ruby_rails:ruby-rails"
 )
 
 for entry in "${SCHEMAS[@]}"; do

@@ -1,7 +1,5 @@
 # vue_nuxt.applications
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |

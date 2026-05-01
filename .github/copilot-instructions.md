@@ -13,6 +13,7 @@
 - Prefer individual CRUD operations over batch replace for nested resources; UI components expose `onAdd/onUpdate/onRemove` instead of `onChange` full-state diffs.
 - Use exact dependency versions (no ^ or ~); run audit checks before shipping.
 - Keep APIs/UI aligned with the shared schema and port mappings; see env/ports partial.
+- Rails API work lives in `rails-api/` and uses Ruby 3.3+ with ActiveRecord against PostgreSQL schema `ruby_rails` on port 5180.
 - Use worktrees or subagents for 3+ parallel items.
 
 ## Jump To Partials
@@ -35,6 +36,7 @@ When responding to PR review feedback, do not directly apply reviewer suggestion
 ## Cross-Cutting Patterns
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
 - **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it in the editor or with CLI tools like `cat`, `sed`, or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).
+- **Shared tests**: See `tests/CLAUDE.md` for API/E2E lifecycle, `--runInBand`, cleanup, and Playwright/WebKit quirks.
 
 ## When in Doubt
 - Mirror existing implementations; prefer incremental changes with tests.

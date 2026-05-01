@@ -35,7 +35,7 @@
           "name": "created_at",
           "type": "timestamp with time zone",
           "nullable": false,
-          "default": "now()"
+          "default": "CURRENT_TIMESTAMP"
         }
       ],
       "indexes": [
@@ -45,6 +45,15 @@
           "table": "react_nestjs_history.application_history",
           "columns": [
             "id"
+          ]
+        },
+        {
+          "name": "idx_history_app_sequence",
+          "def": "CREATE INDEX idx_history_app_sequence ON react_nestjs_history.application_history USING btree (application_id, sequence)",
+          "table": "react_nestjs_history.application_history",
+          "columns": [
+            "application_id",
+            "sequence"
           ]
         },
         {
@@ -59,16 +68,6 @@
       ],
       "constraints": [
         {
-          "name": "application_history_id_not_null",
-          "type": "n",
-          "def": "NOT NULL id",
-          "table": "react_nestjs_history.application_history",
-          "referenced_table": "",
-          "columns": [
-            "id"
-          ]
-        },
-        {
           "name": "application_history_application_id_not_null",
           "type": "n",
           "def": "NOT NULL application_id",
@@ -79,13 +78,13 @@
           ]
         },
         {
-          "name": "application_history_sequence_not_null",
+          "name": "application_history_created_at_not_null",
           "type": "n",
-          "def": "NOT NULL sequence",
+          "def": "NOT NULL created_at",
           "table": "react_nestjs_history.application_history",
           "referenced_table": "",
           "columns": [
-            "sequence"
+            "created_at"
           ]
         },
         {
@@ -99,6 +98,26 @@
           ]
         },
         {
+          "name": "application_history_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "react_nestjs_history.application_history",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_history_sequence_not_null",
+          "type": "n",
+          "def": "NOT NULL sequence",
+          "table": "react_nestjs_history.application_history",
+          "referenced_table": "",
+          "columns": [
+            "sequence"
+          ]
+        },
+        {
           "name": "application_history_snapshot_not_null",
           "type": "n",
           "def": "NOT NULL snapshot",
@@ -106,16 +125,6 @@
           "referenced_table": "",
           "columns": [
             "snapshot"
-          ]
-        },
-        {
-          "name": "application_history_created_at_not_null",
-          "type": "n",
-          "def": "NOT NULL created_at",
-          "table": "react_nestjs_history.application_history",
-          "referenced_table": "",
-          "columns": [
-            "created_at"
           ]
         },
         {
@@ -140,9 +149,492 @@
           ]
         }
       ]
+    },
+    {
+      "name": "react_nestjs_history.knex_migrations",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nullable": false,
+          "default": "nextval('react_nestjs_history.knex_migrations_id_seq'::regclass)"
+        },
+        {
+          "name": "name",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "batch",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "migration_time",
+          "type": "timestamp with time zone",
+          "nullable": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "knex_migrations_pkey",
+          "def": "CREATE UNIQUE INDEX knex_migrations_pkey ON react_nestjs_history.knex_migrations USING btree (id)",
+          "table": "react_nestjs_history.knex_migrations",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "knex_migrations_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "react_nestjs_history.knex_migrations",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "knex_migrations_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "react_nestjs_history.knex_migrations",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "react_nestjs_history.knex_migrations_lock",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "index",
+          "type": "integer",
+          "nullable": false,
+          "default": "nextval('react_nestjs_history.knex_migrations_lock_index_seq'::regclass)"
+        },
+        {
+          "name": "is_locked",
+          "type": "integer",
+          "nullable": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "knex_migrations_lock_pkey",
+          "def": "CREATE UNIQUE INDEX knex_migrations_lock_pkey ON react_nestjs_history.knex_migrations_lock USING btree (index)",
+          "table": "react_nestjs_history.knex_migrations_lock",
+          "columns": [
+            "index"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "knex_migrations_lock_index_not_null",
+          "type": "n",
+          "def": "NOT NULL index",
+          "table": "react_nestjs_history.knex_migrations_lock",
+          "referenced_table": "",
+          "columns": [
+            "index"
+          ]
+        },
+        {
+          "name": "knex_migrations_lock_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (index)",
+          "table": "react_nestjs_history.knex_migrations_lock",
+          "referenced_table": "",
+          "columns": [
+            "index"
+          ]
+        }
+      ]
     }
   ],
-  "relations": [],
+  "enums": [
+    {
+      "name": "express_prisma.ApplicationStatus",
+      "values": [
+        "accepted",
+        "applied",
+        "interviewing",
+        "offered",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "express_prisma.CompanyCategory",
+      "values": [
+        "enterprise",
+        "mid_market",
+        "other",
+        "scale_up",
+        "startup"
+      ]
+    },
+    {
+      "name": "express_prisma.JobSource",
+      "values": [
+        "company_website",
+        "job_board",
+        "other",
+        "recruiter",
+        "referral"
+      ]
+    },
+    {
+      "name": "graphql_yoga.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "graphql_yoga.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "graphql_yoga.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "java_spring.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "java_spring.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "java_spring.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "python_fastapi.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "python_fastapi.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "python_fastapi.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_koa.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "react_koa.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_nestjs.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "react_nestjs.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_nestjs.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "svelte_hono.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "svelte_hono.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "svelte_hono.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "vue_nuxt.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "vue_nuxt.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    }
+  ],
   "driver": {
     "name": "postgres",
     "database_version": "PostgreSQL 18.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",

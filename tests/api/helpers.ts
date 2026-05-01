@@ -9,6 +9,7 @@ export const ALL_STACKS = [
   { name: 'spring-api',  baseUrl: 'http://localhost:8080/api', validatesDates: true,  hasInterviewStageDates: true,  hasStageHistory: true  },
   { name: 'yoga-api',    baseUrl: 'http://localhost:5080/api', validatesDates: false, hasInterviewStageDates: true,  hasStageHistory: false },
   { name: 'lambda-api',  baseUrl: 'http://localhost:5090',     validatesDates: false, hasInterviewStageDates: true,  hasStageHistory: true  },
+  { name: 'rails-api',   baseUrl: 'http://localhost:5180',     validatesDates: true,  hasInterviewStageDates: true,  hasStageHistory: true  },
 ];
 
 export const CSV_STACKS = ALL_STACKS.filter(s =>

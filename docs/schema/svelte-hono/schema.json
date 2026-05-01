@@ -315,7 +315,7 @@
           "type": "FOREIGN KEY",
           "def": "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE",
           "table": "svelte_hono.interview_stages",
-          "referenced_table": "applications",
+          "referenced_table": "svelte_hono.applications",
           "columns": [
             "application_id"
           ],
@@ -447,7 +447,7 @@
           "type": "FOREIGN KEY",
           "def": "FOREIGN KEY (application_id) REFERENCES svelte_hono.applications(id) ON DELETE CASCADE",
           "table": "svelte_hono.application_history",
-          "referenced_table": "applications",
+          "referenced_table": "svelte_hono.applications",
           "columns": [
             "application_id"
           ],
@@ -526,6 +526,104 @@
         "other",
         "recruiter",
         "referral"
+      ]
+    },
+    {
+      "name": "graphql_yoga.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "graphql_yoga.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "graphql_yoga.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "java_spring.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "java_spring.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "java_spring.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
       ]
     },
     {

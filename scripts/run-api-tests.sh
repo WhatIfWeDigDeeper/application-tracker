@@ -3,7 +3,7 @@ set -euo pipefail
 
 STACK="${1:-all}"
 # Maps UI stack names to API names for npm scripts; also accepts API names directly
-STACKS=(express-api koa-api nuxt-api hono-api fastapi nest-api go-api spring-api yoga-api lambda-api)
+STACKS=(express-api koa-api nuxt-api hono-api fastapi nest-api go-api spring-api yoga-api lambda-api rails-api)
 STARTED_PORTS=()
 FAILED_STACKS=()
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,6 +31,7 @@ api_port() {
     spring-api)   echo 8080 ;;
     yoga-api)     echo 5080 ;;
     lambda-api)   echo 5090 ;;
+    rails-api)    echo 5180 ;;
   esac
 }
 
@@ -46,6 +47,7 @@ api_script() {
     spring-api)   echo "dev:spring-api" ;;
     yoga-api)     echo "dev:yoga-api" ;;
     lambda-api)   echo "dev:lambda-api" ;;
+    rails-api)    echo "dev:rails-api" ;;
   esac
 }
 
