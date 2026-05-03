@@ -281,7 +281,7 @@
     "validate:lambda-react-ui": "bash scripts/validate.sh lambda-react-ui",
     "validate:lambda-api": "bash scripts/validate.sh lambda-api",
     "validate:rails-api": "bash scripts/validate.sh rails-api",
-    "validate:all": "npm run install:all && npm run audit:ci:all && npm run lint:all && npm run build:all && npm run test:all && npm run test:e2e:all"
+    "validate:all": "npm run install:all && npm run audit:ci:all && npm run lint:all && npm run build:all && npm run migrate:all && npm run test:all && npm run test:e2e:all"
   },
   "keywords": [],
   "author": "",
