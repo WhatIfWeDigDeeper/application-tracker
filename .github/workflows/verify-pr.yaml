@@ -108,7 +108,7 @@ jobs:
         if: steps.docs-check.outputs.only_changed == 'false'
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version-file: rails-api/.ruby-version
           bundler-cache: true
           working-directory: rails-api
 

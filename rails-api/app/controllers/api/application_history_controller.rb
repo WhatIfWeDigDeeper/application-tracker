@@ -22,7 +22,17 @@ module Api
     end
 
     def restore
-      restored = ApplicationRestoreService.restore(application, json_payload["sequence"].to_i)
+      sequence_value = json_payload["sequence"]
+      unless sequence_value.is_a?(Integer) && sequence_value >= 1
+        render json: {
+          code: "validation_error",
+          message: "Validation failed",
+          details: [{ field: "sequence", message: "must be an integer greater than or equal to 1" }]
+        }, status: :bad_request
+        return
+      end
+
+      restored = ApplicationRestoreService.restore(application, sequence_value)
       if restored
         render json: ApplicationSerializer.application(restored)
       else

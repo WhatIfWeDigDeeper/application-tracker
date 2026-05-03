@@ -26,6 +26,34 @@ RSpec.describe "Application History API" do
     expect(response.parsed_body["entries"].first["description"]).to match(/Restored/i)
   end
 
+  it "returns validation_error when restore body omits sequence" do
+    application = ApplicationService.create({
+      "companyName" => "Validation Corp",
+      "positionTitle" => "Engineer"
+    })
+
+    post "/applications/#{application.id}/history/restore", params: {}, as: :json
+
+    expect(response).to have_http_status(:bad_request)
+    body = response.parsed_body
+    expect(body["code"]).to eq("validation_error")
+    expect(body["details"]).to include(
+      hash_including("field" => "sequence")
+    )
+  end
+
+  it "returns validation_error when restore sequence is less than 1" do
+    application = ApplicationService.create({
+      "companyName" => "Validation Corp",
+      "positionTitle" => "Engineer"
+    })
+
+    post "/applications/#{application.id}/history/restore", params: { sequence: 0 }, as: :json
+
+    expect(response).to have_http_status(:bad_request)
+    expect(response.parsed_body["code"]).to eq("validation_error")
+  end
+
   it "preserves interview stage ids when restoring a snapshot" do
     application = ApplicationService.create({
       "companyName" => "Stage History Corp",
