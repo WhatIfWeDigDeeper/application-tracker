@@ -7,8 +7,11 @@ begin
   ActiveRecord::Base.connection.execute("CREATE SCHEMA IF NOT EXISTS ruby_rails")
 rescue ActiveRecord::NoDatabaseError
   # DB doesn't exist yet (db:create not run); skip — caller will set up DB.
-  # Connection failures (PG::ConnectionBad) are NOT rescued — let prod fail
-  # fast instead of booting against an unreachable database.
+rescue ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
+  # DB unreachable. In production we want to fail fast; in dev/test we want
+  # non-DB tasks (zeitwerk:check via build:rails-api, console eval) to still
+  # work without Postgres running.
+  raise if Rails.env.production?
 end
 
 ActiveRecord::Base.schema_migrations_table_name = "ruby_rails.schema_migrations"
