@@ -16,6 +16,9 @@
 - Rails API work lives in `rails-api/` and uses Ruby 3.3+ with ActiveRecord against PostgreSQL schema `ruby_rails` on port 5180.
 - Use worktrees or subagents for 3+ parallel items.
 
+## Code Review
+- Before raising PR feedback, read existing review threads and replies on the touched code. Do not restate issues that were already answered, intentionally accepted, or deferred to a linked follow-up issue unless later commits materially changed the code or invalidated the earlier resolution.
+
 ## Jump To Partials
 - Overview and tone: `.github/agents/overview.md`
 - Validation chain details: `.github/agents/validation.md`
