@@ -141,6 +141,4 @@ jobs:
 
       - name: Test
         if: steps.docs-check.outputs.only_changed == 'false'
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app_tracker
         run: npm run test:all
