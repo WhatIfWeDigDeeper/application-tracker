@@ -41,6 +41,29 @@ RSpec.describe "Applications API" do
   end
 
   describe "PATCH /applications/:id" do
+    it "preserves dateApplied on status-bearing PATCH that omits the date" do
+      application = ApplicationService.create({
+        "companyName" => "Preserve Corp",
+        "positionTitle" => "Engineer",
+        "status" => "applied",
+        "dateApplied" => "2025-12-01"
+      })
+
+      patch "/applications/#{application.id}", params: {
+        companyName: "Preserve Corp Renamed",
+        positionTitle: "Engineer",
+        status: "applied"
+      }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = response.parsed_body
+      expect(body["dateApplied"]).to eq("2025-12-01")
+      expect(application.reload.date_applied.iso8601).to eq("2025-12-01")
+
+      latest_snapshot = application.application_snapshots.order(:sequence).last
+      expect(latest_snapshot.description).not_to include("Date Applied")
+    end
+
     it "forces dateApplied to null when status returns to unsubmitted" do
       application = ApplicationService.create({
         "companyName" => "Status Corp",

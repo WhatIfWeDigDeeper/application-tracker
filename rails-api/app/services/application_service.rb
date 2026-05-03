@@ -64,7 +64,7 @@ class ApplicationService
   def self.create(payload)
     attributes = ApiParams.application_attributes(payload)
     attributes[:status] = attributes[:status].presence || "unsubmitted"
-    apply_date_side_effects(attributes)
+    apply_date_side_effects(attributes, on_create: true)
 
     application = nil
     ApplicationRecord.transaction do
@@ -81,7 +81,7 @@ class ApplicationService
 
     previous_status = application.status
     prevent_terminal_transition!(application, attributes[:status])
-    apply_date_side_effects(attributes)
+    apply_date_side_effects(attributes, on_create: false)
 
     ApplicationRecord.transaction do
       application.update!(attributes)
@@ -118,13 +118,13 @@ class ApplicationService
     value == true || value.to_s.downcase == "true"
   end
 
-  def self.apply_date_side_effects(attributes)
+  def self.apply_date_side_effects(attributes, on_create:)
     status = attributes[:status]
     return if status.blank?
 
     if status == "unsubmitted"
       attributes[:date_applied] = nil
-    elsif !attributes.key?(:date_applied) || attributes[:date_applied].nil?
+    elsif on_create && (!attributes.key?(:date_applied) || attributes[:date_applied].nil?)
       attributes[:date_applied] = Date.current
     end
   end
