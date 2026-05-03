@@ -1,7 +1,5 @@
 # go_gin.schema_migrations
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |

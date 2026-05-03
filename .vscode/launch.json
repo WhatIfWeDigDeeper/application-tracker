@@ -118,6 +118,12 @@
       "port": 5005
     },
     {
+      "name": "Rails API (port 5180, attach)",
+      "type": "rdbg",
+      "request": "attach",
+      "debugPort": "12345"
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "yoga-api",

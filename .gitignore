@@ -199,6 +199,9 @@ __pycache__/
 *.egg-info/
 .venv/
 
+# Rails
+rails-api/tmp/
+
 # DynamoDB Local persistent data
 data/
 

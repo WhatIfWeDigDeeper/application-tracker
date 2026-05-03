@@ -1,7 +1,5 @@
 # vue_nuxt.application_events
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |

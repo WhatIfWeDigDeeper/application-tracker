@@ -78,6 +78,14 @@ All implementations share a single PostgreSQL database (`app_tracker`) but use s
 - Snapshot-based history (like Hono, NestJS, FastAPI, Go)
 - Spring Data JPA `Specification<T>` + `JpaSpecificationExecutor` for multi-criteria filters
 
+**Ruby-Rails-ActiveRecord:**
+- Schema defined in: `rails-api/db/migrate/001_initial_schema.rb`
+- Rails migrations create the `ruby_rails` schema and ActiveRecord tables
+- ActiveRecord uses `schema_search_path: ruby_rails,public` in `rails-api/config/database.yml`
+- Enum-like fields are stored as strings with model inclusion validations so values with spaces and hyphens match the API contract exactly
+- JSONB snapshots in `application_snapshots.snapshot` store full application state including interview stages
+- Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker` with schema search path configured by Rails
+
 ---
 
 ## DynamoDB (Non-Relational)

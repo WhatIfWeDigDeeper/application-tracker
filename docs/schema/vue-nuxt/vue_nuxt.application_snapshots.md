@@ -1,7 +1,5 @@
 # vue_nuxt.application_snapshots
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |

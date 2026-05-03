@@ -1,0 +1,21 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  schema_search_path: ruby_rails,public
+
+development:
+  <<: *default
+  url: <%= ENV.fetch("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/app_tracker") %>
+
+test:
+  <<: *default
+  url: <%= ENV.fetch("TEST_DATABASE_URL", ENV.fetch("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/app_tracker")) %>
+
+production:
+  <<: *default
+  # No localhost fallback in production — see config/environments/production.rb
+  # for the boot-time guard that raises if DATABASE_URL is missing. Using
+  # ENV[...] (not ENV.fetch) keeps YAML parse safe in dev/test/CI builds that
+  # touch every environment.
+  url: <%= ENV["DATABASE_URL"] %>

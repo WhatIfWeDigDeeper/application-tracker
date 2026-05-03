@@ -1,0 +1,52 @@
+#!/usr/bin/env sh
+set -eu
+
+ORIGINAL_PATH="$PATH"
+
+ruby_is_compatible() {
+  command -v ruby >/dev/null 2>&1 && ruby -e 'exit(Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3") ? 0 : 1)' >/dev/null 2>&1
+}
+
+try_ruby_prefix() {
+  prefix="$1"
+  if [ -n "$prefix" ] && [ -x "$prefix/bin/ruby" ]; then
+    PATH="$prefix/bin:$ORIGINAL_PATH" ruby_is_compatible
+  else
+    return 1
+  fi
+}
+
+use_ruby_prefix() {
+  PATH="$1/bin:$ORIGINAL_PATH"
+  export PATH
+}
+
+if ruby_is_compatible; then
+  exec "$@"
+fi
+
+if [ -n "${RUBY_33_PREFIX:-}" ] && try_ruby_prefix "$RUBY_33_PREFIX"; then
+  use_ruby_prefix "$RUBY_33_PREFIX"
+  exec "$@"
+fi
+
+if command -v brew >/dev/null 2>&1; then
+  ruby_prefix="$(brew --prefix ruby@3.3 2>/dev/null || true)"
+  if try_ruby_prefix "$ruby_prefix"; then
+    use_ruby_prefix "$ruby_prefix"
+    exec "$@"
+  fi
+fi
+
+if try_ruby_prefix /opt/homebrew/opt/ruby@3.3; then
+  use_ruby_prefix /opt/homebrew/opt/ruby@3.3
+  exec "$@"
+fi
+
+if try_ruby_prefix /usr/local/opt/ruby@3.3; then
+  use_ruby_prefix /usr/local/opt/ruby@3.3
+  exec "$@"
+fi
+
+echo "Ruby 3.3+ is required for rails-api. Install Ruby 3.3+, or set RUBY_33_PREFIX to its install prefix." >&2
+exit 1

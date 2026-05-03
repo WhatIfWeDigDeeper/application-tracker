@@ -1,7 +1,5 @@
 # vue_nuxt.interview_stages
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |

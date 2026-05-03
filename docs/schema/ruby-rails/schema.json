@@ -1,0 +1,974 @@
+{
+  "name": "app_tracker",
+  "tables": [
+    {
+      "name": "ruby_rails.applications",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "company_name",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "position_title",
+          "type": "varchar(200)",
+          "nullable": false
+        },
+        {
+          "name": "date_applied",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "type": "varchar(50)",
+          "nullable": false,
+          "default": "'unsubmitted'::character varying"
+        },
+        {
+          "name": "company_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "job_posting_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_career_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "company_category",
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        {
+          "name": "skills_match",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "job_source",
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        {
+          "name": "cover_letter_required",
+          "type": "boolean",
+          "nullable": true
+        },
+        {
+          "name": "special_requirements",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "salary_min",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "salary_max",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "offer_due_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "is_archived",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "applications_pkey",
+          "def": "CREATE UNIQUE INDEX applications_pkey ON ruby_rails.applications USING btree (id)",
+          "table": "ruby_rails.applications",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_applications_on_status",
+          "def": "CREATE INDEX index_ruby_rails_applications_on_status ON ruby_rails.applications USING btree (status)",
+          "table": "ruby_rails.applications",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_applications_on_company_category",
+          "def": "CREATE INDEX index_ruby_rails_applications_on_company_category ON ruby_rails.applications USING btree (company_category)",
+          "table": "ruby_rails.applications",
+          "columns": [
+            "company_category"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_applications_on_job_source",
+          "def": "CREATE INDEX index_ruby_rails_applications_on_job_source ON ruby_rails.applications USING btree (job_source)",
+          "table": "ruby_rails.applications",
+          "columns": [
+            "job_source"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_applications_on_is_archived",
+          "def": "CREATE INDEX index_ruby_rails_applications_on_is_archived ON ruby_rails.applications USING btree (is_archived)",
+          "table": "ruby_rails.applications",
+          "columns": [
+            "is_archived"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_applications_on_updated_at",
+          "def": "CREATE INDEX index_ruby_rails_applications_on_updated_at ON ruby_rails.applications USING btree (updated_at)",
+          "table": "ruby_rails.applications",
+          "columns": [
+            "updated_at"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_applications_on_job_posting_url",
+          "def": "CREATE INDEX index_ruby_rails_applications_on_job_posting_url ON ruby_rails.applications USING btree (job_posting_url)",
+          "table": "ruby_rails.applications",
+          "columns": [
+            "job_posting_url"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "applications_company_name_not_null",
+          "type": "n",
+          "def": "NOT NULL company_name",
+          "table": "ruby_rails.applications",
+          "referenced_table": "",
+          "columns": [
+            "company_name"
+          ]
+        },
+        {
+          "name": "applications_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "ruby_rails.applications",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "applications_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "ruby_rails.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "applications_is_archived_not_null",
+          "type": "n",
+          "def": "NOT NULL is_archived",
+          "table": "ruby_rails.applications",
+          "referenced_table": "",
+          "columns": [
+            "is_archived"
+          ]
+        },
+        {
+          "name": "applications_position_title_not_null",
+          "type": "n",
+          "def": "NOT NULL position_title",
+          "table": "ruby_rails.applications",
+          "referenced_table": "",
+          "columns": [
+            "position_title"
+          ]
+        },
+        {
+          "name": "applications_status_not_null",
+          "type": "n",
+          "def": "NOT NULL status",
+          "table": "ruby_rails.applications",
+          "referenced_table": "",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "applications_updated_at_not_null",
+          "type": "n",
+          "def": "NOT NULL updated_at",
+          "table": "ruby_rails.applications",
+          "referenced_table": "",
+          "columns": [
+            "updated_at"
+          ]
+        },
+        {
+          "name": "applications_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "ruby_rails.applications",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ruby_rails.interview_stages",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "is_completed",
+          "type": "boolean",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "completed_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "performance_rating",
+          "type": "integer",
+          "nullable": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "interview_stages_pkey",
+          "def": "CREATE UNIQUE INDEX interview_stages_pkey ON ruby_rails.interview_stages USING btree (id)",
+          "table": "ruby_rails.interview_stages",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_interview_stages_on_application_id",
+          "def": "CREATE INDEX index_ruby_rails_interview_stages_on_application_id ON ruby_rails.interview_stages USING btree (application_id)",
+          "table": "ruby_rails.interview_stages",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_interview_stages_on_application_id_order",
+          "def": "CREATE INDEX index_ruby_rails_interview_stages_on_application_id_order ON ruby_rails.interview_stages USING btree (application_id, \"order\")",
+          "table": "ruby_rails.interview_stages",
+          "columns": [
+            "application_id",
+            "order"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "interview_stages_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "ruby_rails.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "interview_stages_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "ruby_rails.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_is_completed_not_null",
+          "type": "n",
+          "def": "NOT NULL is_completed",
+          "table": "ruby_rails.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "is_completed"
+          ]
+        },
+        {
+          "name": "interview_stages_name_not_null",
+          "type": "n",
+          "def": "NOT NULL name",
+          "table": "ruby_rails.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "interview_stages_order_not_null",
+          "type": "n",
+          "def": "NOT NULL \"order\"",
+          "table": "ruby_rails.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "order"
+          ]
+        },
+        {
+          "name": "interview_stages_application_id_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES ruby_rails.applications(id) ON DELETE CASCADE",
+          "table": "ruby_rails.interview_stages",
+          "referenced_table": "ruby_rails.applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "interview_stages_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "ruby_rails.interview_stages",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ruby_rails.application_snapshots",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "sequence",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "varchar(500)",
+          "nullable": false
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "application_snapshots_pkey",
+          "def": "CREATE UNIQUE INDEX application_snapshots_pkey ON ruby_rails.application_snapshots USING btree (id)",
+          "table": "ruby_rails.application_snapshots",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_application_snapshots_on_application_sequence",
+          "def": "CREATE UNIQUE INDEX index_ruby_rails_application_snapshots_on_application_sequence ON ruby_rails.application_snapshots USING btree (application_id, sequence)",
+          "table": "ruby_rails.application_snapshots",
+          "columns": [
+            "application_id",
+            "sequence"
+          ]
+        },
+        {
+          "name": "index_ruby_rails_application_snapshots_on_created_at",
+          "def": "CREATE INDEX index_ruby_rails_application_snapshots_on_created_at ON ruby_rails.application_snapshots USING btree (created_at)",
+          "table": "ruby_rails.application_snapshots",
+          "columns": [
+            "created_at"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "application_snapshots_application_id_not_null",
+          "type": "n",
+          "def": "NOT NULL application_id",
+          "table": "ruby_rails.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "application_id"
+          ]
+        },
+        {
+          "name": "application_snapshots_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "ruby_rails.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "application_snapshots_description_not_null",
+          "type": "n",
+          "def": "NOT NULL description",
+          "table": "ruby_rails.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "description"
+          ]
+        },
+        {
+          "name": "application_snapshots_id_not_null",
+          "type": "n",
+          "def": "NOT NULL id",
+          "table": "ruby_rails.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_snapshots_sequence_not_null",
+          "type": "n",
+          "def": "NOT NULL sequence",
+          "table": "ruby_rails.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "sequence"
+          ]
+        },
+        {
+          "name": "application_snapshots_snapshot_not_null",
+          "type": "n",
+          "def": "NOT NULL snapshot",
+          "table": "ruby_rails.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "snapshot"
+          ]
+        },
+        {
+          "name": "application_snapshots_application_id_fkey",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (application_id) REFERENCES ruby_rails.applications(id) ON DELETE CASCADE",
+          "table": "ruby_rails.application_snapshots",
+          "referenced_table": "ruby_rails.applications",
+          "columns": [
+            "application_id"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "application_snapshots_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "ruby_rails.application_snapshots",
+          "referenced_table": "",
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "table": "ruby_rails.interview_stages",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "ruby_rails.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES ruby_rails.applications(id) ON DELETE CASCADE"
+    },
+    {
+      "table": "ruby_rails.application_snapshots",
+      "columns": [
+        "application_id"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "ruby_rails.applications",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "exactly_one",
+      "def": "FOREIGN KEY (application_id) REFERENCES ruby_rails.applications(id) ON DELETE CASCADE"
+    }
+  ],
+  "enums": [
+    {
+      "name": "express_prisma.ApplicationStatus",
+      "values": [
+        "accepted",
+        "applied",
+        "interviewing",
+        "offered",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "express_prisma.CompanyCategory",
+      "values": [
+        "enterprise",
+        "mid_market",
+        "other",
+        "scale_up",
+        "startup"
+      ]
+    },
+    {
+      "name": "express_prisma.JobSource",
+      "values": [
+        "company_website",
+        "job_board",
+        "other",
+        "recruiter",
+        "referral"
+      ]
+    },
+    {
+      "name": "graphql_yoga.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "graphql_yoga.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "graphql_yoga.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "java_spring.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "java_spring.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "java_spring.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "python_fastapi.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "python_fastapi.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "python_fastapi.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_koa.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "react_koa.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_koa.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "react_nestjs.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "react_nestjs.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "react_nestjs.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "svelte_hono.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "svelte_hono.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "svelte_hono.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    },
+    {
+      "name": "vue_nuxt.application_status",
+      "values": [
+        "accepted offer",
+        "applied",
+        "declined offer",
+        "given offer",
+        "interviewing",
+        "no offer",
+        "rejected",
+        "unsubmitted"
+      ]
+    },
+    {
+      "name": "vue_nuxt.company_category",
+      "values": [
+        "ai",
+        "climate",
+        "consulting",
+        "consumer-tech",
+        "cybersecurity",
+        "e-commerce",
+        "education",
+        "energy",
+        "enterprise-software",
+        "finance",
+        "gaming",
+        "government",
+        "health",
+        "hospitality",
+        "media-entertainment",
+        "nonprofit",
+        "other",
+        "restaurant",
+        "retail"
+      ]
+    },
+    {
+      "name": "vue_nuxt.job_source",
+      "values": [
+        "colleague",
+        "company-website",
+        "friend",
+        "indeed",
+        "linkedin",
+        "other",
+        "recruiter"
+      ]
+    }
+  ],
+  "driver": {
+    "name": "postgres",
+    "database_version": "PostgreSQL 18.1 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "meta": {
+      "current_schema": "public",
+      "search_paths": [
+        "postgres",
+        "public"
+      ],
+      "dict": {
+        "Functions": "Stored procedures and functions"
+      }
+    }
+  }
+}

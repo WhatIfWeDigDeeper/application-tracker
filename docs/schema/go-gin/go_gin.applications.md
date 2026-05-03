@@ -1,7 +1,5 @@
 # go_gin.applications
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |

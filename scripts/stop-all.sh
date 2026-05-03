@@ -19,9 +19,10 @@ PORTS=(
   5050  # Nest API
   50051 # Nest History API (gRPC)
   5070  # Go API
-  5160  # FastAPI
   5080  # Yoga API (GraphQL)
   5090  # Lambda API
+  5160  # FastAPI
+  5180  # Rails API
   8080  # Spring Boot API
 )
 

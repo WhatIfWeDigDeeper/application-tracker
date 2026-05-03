@@ -4,8 +4,12 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
+| [react_nestjs.application_history](react_nestjs.application_history.md) | 6 |  | BASE TABLE |
 | [react_nestjs.applications](react_nestjs.applications.md) | 20 |  | BASE TABLE |
 | [react_nestjs.interview_stages](react_nestjs.interview_stages.md) | 8 |  | BASE TABLE |
+| [react_nestjs_history.application_history](react_nestjs_history.application_history.md) | 6 |  | BASE TABLE |
+| [react_nestjs_history.knex_migrations](react_nestjs_history.knex_migrations.md) | 4 |  | BASE TABLE |
+| [react_nestjs_history.knex_migrations_lock](react_nestjs_history.knex_migrations_lock.md) | 2 |  | BASE TABLE |
 
 ## Enums
 
@@ -14,6 +18,12 @@
 | express_prisma.ApplicationStatus | accepted, applied, interviewing, offered, rejected, unsubmitted |
 | express_prisma.CompanyCategory | enterprise, mid_market, other, scale_up, startup |
 | express_prisma.JobSource | company_website, job_board, other, recruiter, referral |
+| graphql_yoga.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected, unsubmitted |
+| graphql_yoga.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
+| graphql_yoga.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
+| java_spring.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected, unsubmitted |
+| java_spring.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
+| java_spring.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
 | python_fastapi.application_status | accepted offer, applied, declined offer, given offer, interviewing, no offer, rejected, unsubmitted |
 | python_fastapi.company_category | ai, climate, consulting, consumer-tech, cybersecurity, e-commerce, education, energy, enterprise-software, finance, gaming, government, health, hospitality, media-entertainment, nonprofit, other, restaurant, retail |
 | python_fastapi.job_source | colleague, company-website, friend, indeed, linkedin, other, recruiter |
@@ -35,8 +45,17 @@
 ```mermaid
 erDiagram
 
+"react_nestjs.application_history" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
 "react_nestjs.interview_stages" }o--|| "react_nestjs.applications" : "FOREIGN KEY (application_id) REFERENCES react_nestjs.applications(id) ON DELETE CASCADE"
 
+"react_nestjs.application_history" {
+  id uuid
+  application_id uuid FK
+  sequence integer
+  description varchar_500_
+  snapshot jsonb
+  created_at timestamp_with_time_zone
+}
 "react_nestjs.applications" {
   id uuid
   company_name varchar_200_
@@ -68,6 +87,24 @@ erDiagram
   completed_date date
   notes text
   performance_rating integer
+}
+"react_nestjs_history.application_history" {
+  id uuid
+  application_id uuid
+  sequence integer
+  description text
+  snapshot jsonb
+  created_at timestamp_with_time_zone
+}
+"react_nestjs_history.knex_migrations" {
+  id integer
+  name varchar_255_
+  batch integer
+  migration_time timestamp_with_time_zone
+}
+"react_nestjs_history.knex_migrations_lock" {
+  index integer
+  is_locked integer
 }
 ```
 

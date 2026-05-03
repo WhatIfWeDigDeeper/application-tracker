@@ -1,7 +1,5 @@
 # express_prisma.Application
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |

@@ -1,7 +1,5 @@
 # go_gin.application_snapshots
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |

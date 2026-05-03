@@ -8,12 +8,14 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 
 - **Worktree Isolation**: Complex operations use isolated worktrees at `../<name>-[timestamp]`. Always specify `origin/main` as the base when creating: `git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME" origin/main` — omitting the start-point defaults to the current HEAD, which causes the PR to include unintended commits. After a worktree agent completes, always verify the commit landed on a feature branch — not on `main` — by checking `git log --oneline --decorate -3`. If the commit is on `main`, first create a feature branch from it and push it (`git checkout -b <branch> && git push -u origin <branch>`), then reset local main (`git checkout main && git reset --hard origin/main`).
 - **Validation Chain**: `build:*` → `lint:*` → `test:*` → `test:e2e:*`
-- **Script Naming**: Scripts follow `verb:package-name` (e.g., `build:react-next-ui`, `lint:angular-ui`). Use `:all` suffix for scripts that run across all packages. `test:e2e:*` uses the UI package name (e.g., `test:e2e:react-next-ui`, `test:e2e:tanstack-ui`). When adding a new implementation, add per-package scripts for every verb (`dev`, `build`, `lint`, `test`, `ci`, `audit:ci`, `validate`) and add each to its `*:all` script and to `scripts/stop-all.sh`. After adding, cross-check that sibling stacks also have `validate:*` and `ci:*` shorthands — these silently fall behind when new stacks are added. When adding a new script group (new verb pattern like `validate:*`), also update `README.md` — add a TOC entry and a usage section so the pattern is discoverable. Do not wait to be asked.
+- **Script Naming**: Scripts follow `verb:package-name` (e.g., `build:react-next-ui`, `lint:angular-ui`). Use `:all` suffix for scripts that run across all packages. `test:e2e:*` uses the UI package name (e.g., `test:e2e:react-next-ui`, `test:e2e:tanstack-ui`). When adding a new implementation, add per-package scripts for every verb (`dev`, `build`, `lint`, `test`, `ci`, `audit:ci`, `validate`) and add each to its `*:all` script and to `scripts/stop-all.sh`. After adding, cross-check that sibling stacks also have `validate:*` and `ci:*` shorthands — these silently fall behind when new stacks are added. Use the same stack name across all verbs (e.g. `migrate:express-api` aliasing `migrate:express`) so generic `npm run "verb:$STACK"` invocations from `validate.sh` work for every stack. When adding a new script group (new verb pattern like `validate:*`), also update `README.md` — add a TOC entry and a usage section so the pattern is discoverable. Do not wait to be asked.
 - **Parallel Execution**: 3+ items use Task tool subagents
 - **Spec First**: When planning a new feature, the first implementation step should be to write the spec to `specs/<number>-<name>/spec.md`
 - **Spell Checker**: When cspell flags a valid term (tool names, libraries, technical jargon), add it to `cspell.config.yaml` under `words`
 - **Plan Execution**: Plans must end with a statement of how the work will be run — e.g., single session (sequential), parallel subagents, agent team, or isolated worktree — so the approach is visible before implementation begins.
+- **Code Review**: Before raising PR feedback, read existing review threads and replies on the touched code. Do not restate issues that were already answered, intentionally accepted, or deferred to a linked follow-up issue unless later commits materially changed the code or invalidated the earlier resolution.
 - **Persisting Learnings**: When you discover a new gotcha, stack-specific pattern, or tool quirk during a session, add it directly to the relevant `CLAUDE.md` before ending the session — so teammates and future agents benefit. Cross-cutting patterns go in the root `CLAUDE.md`; stack-specific patterns go in `<stack>/CLAUDE.md` (see Per-Stack Guidance below). For repeatable multi-step processes, create a skill in `.claude/skills/`. **NEVER write to `~/.claude/projects/.../memory/` for this project** — those files are invisible to other contributors, may be reset, and are not the persistence mechanism for this repo. `CLAUDE.md` files are the only approved place for project learnings. If any files exist in the memory directory, delete them. **After applying learnings, stop — do not commit, branch, or open a PR.** The user will review the changes and run `/ship-it` manually when ready.
+- **Rule writing**: Every clause must be load-bearing (rule / non-obvious why / concrete example). Cut restatements, redundant adverbs, and self-evident "why" tails.
 - **Copilot sync**: When updating cross-cutting repo rules, mirror relevant changes to `.github/copilot-instructions.md`.
 - **Searching files**: Use `rg` (ripgrep) instead of `grep` or `find` for better performance and features.
 - **Agent Skills Policy**: When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (including `pr-comments`, `ship-it`, `learn`, `playwright-cli`, etc.) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Sync: `npx skills add -y whatifwedigdeeper/agent-skills` — repo-wide, diff before committing. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
@@ -23,7 +25,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 ## Per-Stack Guidance
 
 Stack-specific patterns live in `<stack>/CLAUDE.md` and load on-demand when working in that directory:
-`angular-ui`, `vue-ui`, `svelte-ui`, `spring-api`, `tanstack-ui`, `fastapi`, `go-api`, `lambda-api` (incl. CDK), `nest-history-api`.
+`angular-ui`, `vue-ui`, `svelte-ui`, `spring-api`, `tanstack-ui`, `fastapi`, `go-api`, `lambda-api` (incl. CDK), `nest-history-api`, `rails-api`.
 Paired dirs (`angular-spring-ui`, `nuxt-api`, `hono-api`, `nest-api`) have pointer files to their primary stack.
 When adding a new implementation, create `<new-stack>/CLAUDE.md` for any stack-specific gotchas that emerge.
 
@@ -32,6 +34,7 @@ When adding a new implementation, create `<new-stack>/CLAUDE.md` for any stack-s
 - Zustand 5, React Router 7, TanStack Query v5, TanStack Router, Apollo Client
 - Vitest, @testing-library/react, Playwright
 - Python 3.12+ (fastapi package uses 3.14) with FastAPI, asyncpg, Pydantic v2, uv
+- Ruby 3.3+ with Rails API mode, ActiveRecord, RSpec, Bundler
 - PostgreSQL 18 (single database with multiple schemas)
 - DynamoDB (via lambda-api — no direct DB access from frontend)
 
@@ -51,6 +54,7 @@ Single PostgreSQL database (`app_tracker`) with schema-per-implementation isolat
 - **java_spring** — `spring-api/src/main/resources/db/migration/V1__initial.sql` (Spring Data JPA + Hibernate 6, Flyway auto-migration)
 - **go_gin** — `go-api/migrations/001_initial.up.sql` (pgx/sqlc, raw SQL)
 - **graphql_yoga** — `yoga-api/prisma/schema.prisma` (Prisma); paired with `react-apollo-ui` (port 3080)
+- **ruby_rails** — `rails-api/db/migrate/001_initial_schema.rb` (Rails migrations, ActiveRecord); API-only on port 5180
 
 Connection string: `postgresql://<user>:<password>@localhost:5432/app_tracker?schema=<schema_name>`
 
@@ -124,6 +128,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 - **Drizzle `date()` columns** (hono-api, nest-api, nuxt-api): expect YYYY-MM-DD strings, not `Date` objects — use `new Date().toISOString().split('T')[0]` for today, not `new Date()` directly
 - **Default sort order**: All stacks sort applications by `updatedAt` descending, not `dateApplied` — do not assume date-applied ordering in queries or E2E tests
 - **Null-safe array access from external sources**: Use `(arr ?? []).map/filter/reduce(...)` whenever the array comes from an API response, proto decode, or DB query — external sources can omit array fields entirely, leaving them `undefined`.
+- **Migrations**: Prefer `IF NOT EXISTS` on `CREATE SCHEMA / TABLE / INDEX` — `app_tracker` is shared; prior state may pre-exist.
 
 ## CSV Import Patterns
 
@@ -143,6 +148,7 @@ Prefer individual CRUD operations (`addStage`, `updateStage`, `removeStage`) ove
 
 Commands that require `dangerouslyDisableSandbox: true`:
 - `npm install` — network access for package downloads
+- `bundle install` — network access for RubyGems downloads
 - `docker compose` — `.env` file access
 - `drizzle-kit` commands — filesystem access outside project
 - `nuxt dev/build/prepare` — filesystem access
@@ -159,6 +165,7 @@ Additional notes:
 - **Subagent `cd` does not persist across Bash calls**: Shell working directory resets between Bash tool calls. Never instruct a subagent to `cd <dir>` in one call and `npm install` in the next — npm will run in the wrong directory (typically the main repo root), silently modifying the wrong `package.json`. Always use `npm install --prefix <absolute-path>` so no `cd` is needed. **`npm run` `--prefix` syntax**: the flag must come before the script name — `npm --prefix /path run <script>`, NOT `npm run <script> --prefix /path` (the latter is silently ignored).
 - **Edit and Write tools both blocked on GitHub Actions workflow files**: A security hook blocks both the Edit and Write tools on `.github/workflows/*.yml` and `.github/workflows/*.yaml` files. The only reliable workaround is `cat > "$TMPDIR/workflow.yml" << 'EOF' ... EOF && mv "$TMPDIR/workflow.yml" .github/workflows/...` — do not use `sed` for multi-block YAML rewrites, it silently duplicates content into the wrong sections.
 - **`.claude/settings.json` edits need explicit per-edit auth**: Harness blocks Edit/Write to it even from an active skill. Auth must name the file AND the specific change (e.g., `Yes, edit .claude/settings.json to change X to Y`); `y`/`auto` is rejected. Surface the diff first; don't retry blindly.
+- **Hook deny on `@file` refs**: `gh api ... -F body=@<path>` / `-F query=@<path>` may be denied with "wasn't shown being created in the transcript" even right after Write. Fix: Read the file first (so its content appears) or `cat` it into a variable and pass `-f field="$VAR"`.
 - **`GH_TOKEN` env var overrides keyring for `gh` CLI**: If `GH_TOKEN` is set (e.g., a fine-grained PAT without PR write permissions), it takes precedence over the keyring token, causing `gh api` write calls to fail with 403. Run `unset GH_TOKEN` before any `gh pr create`, `gh pr edit`, or `gh api` calls that require write access.
 - **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it in the editor or with CLI tools like `cat`, `sed`, or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).
 
@@ -173,49 +180,20 @@ Additional notes:
 - **Never push directly to main**: `main` is branch-protected — always create a feature branch, push there, and open a PR. Direct pushes will be rejected.
 - **Interactive sessions**: Do not commit unless explicitly asked
 - **Worktree/subagent sessions**: Auto-commit before returning (worktree is ephemeral)
-- **After every push to a PR branch** *(required, no exceptions)*: Immediately update the PR body via `gh pr edit <number> --body` to reflect all commits now on the branch. Do not wait to be asked. Do not skip because the change "seems minor" — always re-read the current description and update it.
+- **After every push to a PR branch**: Update the PR body via `gh pr edit <pr> --body-file` to reflect all commits. Fetch the current body and modify in place — never rewrite from scratch — so HTML-comment marker blocks (e.g. `<!-- pr-human-guide -->`) survive.
 - **Spec status**: When a feature has a spec file in `specs/`, update its `Status` to `Complete` before merging the PR
 - **Wait for CI before merging**: Always check `gh pr checks <number>` and wait for all checks to pass before squash merging. Do not use `--admin` to bypass branch protection unless explicitly asked.
 - **Post-merge cleanup**: After squash merging a PR, immediately switch to main, pull, and delete the local branch (`git checkout main && git pull && git branch -d <branch>`). Never commit cleanup work (e.g. spec status updates) directly to local main — branch protection will reject the push, and the resulting squash PR will diverge from the local commit, causing a merge commit on the next pull instead of a fast-forward. Then ask the user: "Would you like me to review if there are any learnings from this session that I should persist going forward?"
 - **Resolving PR review threads**: `gh` CLI has no resolve command. Use `gh api graphql` — fetch thread IDs via `pullRequest.reviewThreads`, resolve with `resolveReviewThread` mutation. Reply to each thread before resolving.
 - **CI toolchain parity**: When adding a new language/toolchain to the monorepo (e.g., Python/uv), update `.github/workflows/verify-pr.yaml` in the same PR to install the required tools
+- **Cross-stack cleanup discovered mid-PR**: If the PR exposes a problem it doesn't own (other stacks, shared tooling), file a cross-linked follow-up issue instead of expanding the diff. List filed issues with URLs in the session summary.
 - **`claude-review` action fails on PRs that modify the workflow file**: The action requires the workflow file to match `main` before it can authenticate — PRs that change `.github/workflows/claude-code-review.yml` will always get a "Workflow validation failed" error on the `claude-review` check. This is expected and resolves automatically once the PR is merged
 - **Documentation**: When adding a new implementation, update: `README.md` (TOC, implementations table, running instructions, test commands, **schema docs table link**, and **Type Diagrams list**), root `CLAUDE.md` as needed, and create `<new-stack>/CLAUDE.md` for any stack-specific gotchas. Every new implementation adds a new DB schema — always update `docs/DATABASE_ARCHITECTURE.md` and `scripts/generate-schema-docs.sh` (add the new `schema_name:dir-name` entry to the SCHEMAS array), then run `npm run docs:schema`. **When a table moves between schemas**: manually delete the old table `.md`, remove it from the old schema's `README.md` and `schema.json`, and create the new schema dir with `README.md`, table `.md`, and `schema.json` — `npm run docs:schema` only works if the DB is live with the migrated schema. **`docs:types` after microservice extraction**: HTTP API response types stay in the consuming service — `docs:types:<stack>` doesn't need updating when only the implementation moves. When adding a TypeScript implementation, add a `docs:types:<stack>` script to `package.json` pointing to the main types/service file, add it to the `docs:types` all-script, **run it** (`npm run docs:types:<stack>`), and **add the generated file link to the Type Diagrams list in `README.md`**. Also add a debug configuration to `.vscode/launch.json` for the new API backend (use the appropriate debug type: `node` for TS/Node APIs, `debugpy` for Python, `go` for Go). For Java/Spring, use `type: java, request: attach` on port 5005 and add a `dev:<stack>:debug` npm script that runs `./gradlew bootRun --debug-jvm` — do not use `request: launch` as it requires full Java extension project resolution which is fragile. Do not wait to be asked — include docs in the implementation plan.
 
 ## Running API Integration Tests
 
-**Server lifecycle**: For fully managed runs (API auto-start/stop for all 10 stacks), use `bash scripts/run-api-tests.sh [stack|all]` or `npm run test:api:all`. To run against a single already-running API, use `npm run test:api:<stack>` (e.g., `npm run test:api:nest-api`).
-
-**All stacks run sequentially with `--runInBand`** — tests share a DB schema per stack; parallel Jest workers cause state contamination (race conditions in export/import round-trip tests). The script passes `--runInBand` to ensure test files run sequentially within each stack run.
-
-**`run-api-tests.sh all` continues on failure** — unlike `run-e2e.sh`, it accumulates `FAILED_STACKS` and reports them all at the end, so all stacks are tested even when one fails.
-
-**Cross-stack PATCH compatibility**: Go API and Spring API require all non-optional fields in PATCH requests. Always include `companyName` + `positionTitle` for application PATCH, and `name` + `order` for interview stage PATCH.
-
-**Stack-specific flags in `tests/api/helpers.ts`**: `validatesDates` (true only for stacks that return 400 + `code: validation_error` for bad dates), `hasInterviewStageDates` (false for go-api which lacks `completedDate` on stages). Update these when adding a new stack.
+See `tests/CLAUDE.md` for shared API contract test lifecycle, `--runInBand`, cross-stack PATCH, and helper flag rules.
 
 ## Running E2E Tests
 
-**Server lifecycle**: For fully managed runs (API auto-start/stop), use `bash scripts/run-e2e.sh [stack|all]` — `npm run test:e2e:all` also uses this. To run manually when servers are already up, use `npm run test:e2e:<stack>` directly and leave pre-existing servers running afterward. **`npm run test:e2e:<stack>` only starts the UI dev server** (via playwright `webServer`), not the API backend — if you've killed the backend manually, use `bash scripts/run-e2e.sh <stack>` to restart it before running tests.
-
-Each requires its backend running separately. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.
-
-**`run-e2e.sh all` stops at the first failing stack** — if a flaky test causes early exit, run the remaining stacks individually (`bash scripts/run-e2e.sh <stack>`) to get full coverage rather than re-running all from scratch.
-
-**E2E test data cleanup**: Tests that create data must clean up in `afterAll` using API calls (e.g., `page.request.delete('/api/applications/${id}')`) — not fragile UI interactions. Cleanup must run even if individual tests fail.
-
-**Shared E2E tests run against all implementations**: Files in `tests/e2e/` are not stack-specific — every test runs against all 9 stacks. A fix for a failure on one stack can silently break another. Selectors, timing assumptions, and interaction patterns must work across React (SSR and CSR), Vue, Svelte, Angular, and Next.js. When modifying a shared E2E test, reason through how each stack will behave — e.g., React SSR apps require `waitForLoadState('networkidle')` before interacting with controlled inputs (including `beforeAll` setup), while SPA frameworks handle `selectOption()` natively after `domcontentloaded`. After any change to a shared E2E file, run `npm run test:e2e:all` (or `bash scripts/run-e2e.sh`) to confirm nothing regressed across stacks.
-
-**E2E `beforeAll` PATCH must include all required fields**: Go and Spring backends reject partial PATCHes (e.g. `{ status: 'applied' }` alone) because `companyName` and `positionTitle` are required. Always send the full required body in `beforeAll` PATCHes: `{ companyName, positionTitle, status }`. All backends accept `status` and `dateApplied` on POST create — status can be set at create time directly.
-
-**`test.describe.serial` for `beforeAll`-dependent tests**: With `fullyParallel: true`, `test.describe` (non-serial) runs each worker with an independent module load — module-scope variables like `const company = uniqueCompanyName(...)` produce different values per worker, so `beforeAll`-created data is invisible to `beforeEach` in other workers. Use `test.describe.serial` for any describe block whose tests share `beforeAll` setup data.
-
-### Playwright / webkit Quirks
-
-- **webkit + React 19 form submission**: Playwright's `requestSubmit()`, button `.click()`, and `press('Enter')` do not fire React's `onSubmit` in webkit for multi-input forms. Workaround: extract a `doSubmit()` function, add `type="button"` + `data-testid="<form>-save"` + `onClick={doSubmit}` to the submit button, and use `page.locator('[data-testid="<form>-save"]').click()` in tests.
-- **Submit button type changes**: When changing a button from `type="submit"` to `type="button"`, unit tests using `querySelector('button[type="submit"]')` will silently return `null`. Prefer `getByTestId()` or `getByRole('button', { name: /save/i })` instead.
-- **Angular `[hidden]` vs `@if` for Playwright gates**: `[hidden]="!expr"` keeps the element in the DOM (just invisible); in webkit, `expect(locator).toBeVisible()` can pass immediately while the element's content/state is still stale/default, so later assertions may read the wrong value. Use `@if (expr)` instead of `[hidden]="!expr"` whenever a Playwright assertion waits for an element to appear.
-- **Modal re-open timing in webkit**: After clicking Close on a modal/panel and immediately re-opening it, webkit can interact with stale DOM from the previous open cycle. Assert `await expect(page.locator('text=<panel heading>')).not.toBeVisible()` after Close before triggering the second open.
-- **`selectOption('')` in webkit**: webkit does not fire a `change` event when `selectOption('')` returns a `<select>` to its blank default option. Framework event handlers that listen to `change` (e.g. Angular's `(ngModelChange)`) will not fire. Fix: follow `selectOption('')` with `await locator.dispatchEvent('change')` to ensure the event fires in all browsers.
-- **Playwright count assertions**: Use `/\b1(?!\d)/` not `/\b1\b/` for exact count checks — `\b` fails when the digit is immediately adjacent to a letter (e.g. Angular renders `"1Skipped"` without whitespace between count and label)
-- **Playwright `toHaveText` vs `toContainText`**: `toHaveText(regex)` requires a full match including surrounding whitespace from padding; use `toContainText(regex)` when the element has CSS padding that adds whitespace around the text content
+See `tests/CLAUDE.md` for shared E2E lifecycle, cleanup, cross-stack behavior, and Playwright/WebKit quirks. See [docs/TESTING_REFERENCE.md](docs/TESTING_REFERENCE.md) for prerequisites, selector contracts, doc generation commands, and unit test patterns.

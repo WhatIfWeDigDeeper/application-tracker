@@ -106,27 +106,27 @@ APPLICATION ||--o{ HISTORY : "has history"
 APPLICATION {
   string PartitionKey "APP#uuid"
   string SortKey "APP#uuid"
-  string id
-  string companyName
-  string positionTitle
-  string status
-  string dateApplied
-  string companyUrl
-  string jobPostingUrl
-  string companyCareerUrl
-  string companyCategory
-  int skillsMatch
-  string jobSource
-  boolean coverLetterRequired
-  string specialRequirements
-  int salaryMin
-  int salaryMax
-  string notes
-  string offerDueDate
-  boolean isArchived
-  int historySequence
-  string createdAt
-  string updatedAt
+  id string
+  companyName string
+  positionTitle string
+  status string
+  dateApplied string
+  companyUrl string
+  jobPostingUrl string
+  companyCareerUrl string
+  companyCategory string
+  skillsMatch int
+  jobSource string
+  coverLetterRequired boolean
+  specialRequirements string
+  salaryMin int
+  salaryMax int
+  notes string
+  offerDueDate string
+  isArchived boolean
+  historySequence int
+  createdAt string
+  updatedAt string
   string GSI1PK "STATUS#status#ARCHIVED#0or1"
   string GSI1SK "UPDATED#ts#id"
   string GSI2PK "ACTIVE"
@@ -136,25 +136,25 @@ APPLICATION {
 INTERVIEW_STAGE {
   string PartitionKey "APP#uuid"
   string SortKey "STAGE#uuid"
-  string id
-  string applicationId
-  string name
-  int order
-  boolean isCompleted
-  string completedDate
-  string notes
-  int performanceRating
+  id string
+  applicationId string
+  name string
+  order int
+  isCompleted boolean
+  completedDate string
+  notes string
+  performanceRating int
 }
 
 HISTORY {
   string PartitionKey "APP#uuid"
   string SortKey "HIST#00000001"
-  string id
-  string applicationId
-  int sequence
-  string description
+  id string
+  applicationId string
+  sequence int
+  description string
   map snapshot "full ApplicationResponse as DynamoDB Map"
-  string createdAt
+  createdAt string
 }
 ```
 
