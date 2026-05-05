@@ -1,12 +1,20 @@
 {
   "projectName": "fastapi-application-tracker",
-  "projectRoot": "/Users/greg/code/application-tracker/fastapi",
   "description": "Application Tracker REST API built with Python FastAPI, asyncpg for PostgreSQL, and Pydantic v2 models. Runs on port 5160, uses the python_fastapi PostgreSQL schema, and is consumed by tanstack-start-ui.",
   "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
   "generatedAt": "2026-05-04T00:00:00.000Z",
   "pluginVersion": "2.5.1",
-  "languages": ["Python", "SQL"],
-  "frameworks": ["FastAPI", "asyncpg", "Pydantic v2", "uvicorn", "pytest"],
+  "languages": [
+    "Python",
+    "SQL"
+  ],
+  "frameworks": [
+    "FastAPI",
+    "asyncpg",
+    "Pydantic v2",
+    "uvicorn",
+    "pytest"
+  ],
   "entryPoint": "src/main.py",
   "stats": {
     "filesAnalyzed": 24,

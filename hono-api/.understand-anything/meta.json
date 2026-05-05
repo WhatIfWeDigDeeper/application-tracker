@@ -1,13 +1,18 @@
 {
   "version": "2.5.1",
   "projectName": "job-tracker-hono-api",
-  "projectRoot": "/Users/greg/code/application-tracker/hono-api",
   "description": "Hono.js TypeScript REST API for the Job Application Tracker, using Drizzle ORM with PostgreSQL (svelte_hono schema). Serves as the backend for svelte-ui.",
   "generatedAt": "2026-05-04T00:00:00.000Z",
   "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
   "entryPoint": "src/index.ts",
-  "languages": ["TypeScript"],
-  "frameworks": ["Hono", "Drizzle ORM", "Zod"],
+  "languages": [
+    "TypeScript"
+  ],
+  "frameworks": [
+    "Hono",
+    "Drizzle ORM",
+    "Zod"
+  ],
   "filesAnalyzed": 14,
   "stats": {
     "totalNodes": 14,

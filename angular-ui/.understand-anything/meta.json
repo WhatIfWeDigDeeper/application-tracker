@@ -1,13 +1,20 @@
 {
   "version": "2.5.1",
   "projectName": "angular-ui",
-  "projectRoot": "/Users/greg/code/application-tracker/angular-ui",
   "description": "Angular 21 standalone-component UI for a job application tracker. Pairs with go-api (Go Gin + pgx/sqlc) on port 5070 via dev proxy and nginx in production. Runs on port 3060.",
   "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
   "analyzedAt": "2026-05-04T00:00:00.000Z",
   "entryPoint": "src/main.ts",
-  "languages": ["TypeScript", "HTML", "CSS"],
-  "frameworks": ["Angular 21", "RxJS 7", "Tailwind CSS 4"],
+  "languages": [
+    "TypeScript",
+    "HTML",
+    "CSS"
+  ],
+  "frameworks": [
+    "Angular 21",
+    "RxJS 7",
+    "Tailwind CSS 4"
+  ],
   "totalFiles": 25,
   "stats": {
     "totalNodes": 25,
@@ -25,6 +32,5 @@
       "uses": 6,
       "guards": 1
     }
-  },
-  "outputPath": "/Users/greg/code/application-tracker/angular-ui/.understand-anything/knowledge-graph.json"
+  }
 }

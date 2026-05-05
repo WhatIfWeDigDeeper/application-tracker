@@ -40,6 +40,7 @@ When responding to PR review feedback, do not directly apply reviewer suggestion
 
 ## Cross-Cutting Patterns
 - **Bash write loops silently fail in sandbox**: `for f in ...; do cp ...; done` loops writing to project subdirs silently no-op — use `python3 -c "import shutil; shutil.copy2(src, dst)"` instead.
+- **gitignore slash anchors pattern to root**: A pattern with an internal `/` (like `foo/bar/`) is anchored to the `.gitignore` root — use `**/foo/bar/` to match nested directories too.
 - **README TOC**: When adding a section or subsection to `README.md`, add a matching TOC entry. Anchor format: lowercase, spaces → `-`, drop special characters except hyphens. Subsections indent two spaces under their parent.
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
 - **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it in the editor or with CLI tools like `cat`, `sed`, or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).

@@ -1,12 +1,19 @@
 {
   "version": "2.5.1",
   "projectName": "nest-history-api",
-  "projectRoot": "/Users/greg/code/application-tracker/nest-history-api",
   "description": "NestJS gRPC microservice for application history tracking. Communicates via gRPC with nest-api. Uses Knex for PostgreSQL migrations and raw queries. Stores application snapshots as opaque JSON bytes in the react_nestjs_history schema.",
   "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
   "generatedAt": "2026-05-04T00:00:00.000Z",
-  "languages": ["TypeScript"],
-  "frameworks": ["NestJS", "gRPC", "Knex", "Protocol Buffers", "Vitest"],
+  "languages": [
+    "TypeScript"
+  ],
+  "frameworks": [
+    "NestJS",
+    "gRPC",
+    "Knex",
+    "Protocol Buffers",
+    "Vitest"
+  ],
   "entryPoint": "src/main.ts",
   "stats": {
     "totalFiles": 19,
@@ -23,6 +30,5 @@
       "imports": 10,
       "references": 5
     }
-  },
-  "outputPath": "/Users/greg/code/application-tracker/nest-history-api/.understand-anything/knowledge-graph.json"
+  }
 }

@@ -543,7 +543,7 @@ The server prints a tokenized URL — open the full URL including `?token=<TOKEN
 
 ### Domain Analysis (Business Flows)
 
-Each graph also has a domain view that maps business flows and their steps. Run `/understand-anything:understand-domain` in Claude Code to generate or refresh it.
+Run `/understand-anything:understand-domain` in Claude Code from any stack directory to generate a `domain-graph.json` that maps business flows and their steps. Domain graphs are generated on demand and are not committed alongside the knowledge graphs.
 
 For a single stack:
 

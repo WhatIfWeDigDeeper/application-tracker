@@ -5,7 +5,7 @@
 
 ## Goal
 
-Produce a navigable knowledge graph for every stack in this monorepo using the `understand-anything` plugin. Each stack gets its own `.understand-anything/knowledge-graph.json` (per-directory working unit). When all stacks are analyzed, a single unified subdomain merge is run at the monorepo root.
+Produce a navigable knowledge graph for every stack in this monorepo using the `understand-anything` plugin. Each stack gets its own `.understand-anything/knowledge-graph.json` (per-directory working unit).
 
 ## Strategy
 
@@ -29,8 +29,8 @@ Produce a navigable knowledge graph for every stack in this monorepo using the `
 | `tanstack-ui` | UI (TanStack Router/Query) | ✅ Done |
 | `tanstack-start-ui` | UI (TanStack Start SSR) | ✅ Done |
 | `fastapi` | API (Python/FastAPI/asyncpg) | ✅ Done |
-| `angular-ui` | UI (Angular 19) | ✅ Done |
-| `angular-spring-ui` | UI pointer → angular-ui | — (pointer dir, no source) |
+| `angular-ui` | UI (Angular 21) | ✅ Done |
+| `angular-spring-ui` | UI (Angular 21/Spring Boot) | ⬜ Not analyzed |
 | `go-api` | API (Go/Gin/sqlc) | ✅ Done |
 | `spring-api` | API (Java/Spring Boot/Flyway) | ✅ Done |
 | `yoga-api` | API (GraphQL Yoga/Prisma) | ✅ Done |
@@ -50,14 +50,14 @@ To view any stack's graph:
 
 ```bash
 cd <plugin-root>/packages/dashboard
-GRAPH_DIR=/Users/greg/code/application-tracker/<stack-dir> npx vite --host 127.0.0.1
+GRAPH_DIR=/path/to/application-tracker/<stack-dir> npx vite --host 127.0.0.1
 ```
 
 The Vite server prints a tokenized URL — use the full URL including `?token=<TOKEN>`.
 
 ## Notes
 
-- Plugin root: `/Users/greg/.claude/plugins/cache/understand-anything/understand-anything/2.5.1`
+- Plugin root: `~/.claude/plugins/cache/understand-anything/understand-anything/<version>`
 - `python` → use `python3` on this system
 - Dashboard requires `dangerouslyDisableSandbox: true` to kill with `kill <pid>`
 - After each stack, update the Status column in this spec to ✅ Done
