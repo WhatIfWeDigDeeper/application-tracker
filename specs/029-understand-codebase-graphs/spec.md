@@ -10,8 +10,7 @@ Produce a navigable knowledge graph for every stack in this monorepo using the `
 ## Strategy
 
 - **Per-directory graphs** are the primary working unit — each stack directory is self-contained and viewable independently via the dashboard.
-- **No paired merges** — the PoC showed UI↔API paired graphs add overhead without revealing meaningful cross-stack edges (shared types/API calls are not resolved at analysis time).
-- **One unified root merge** — deferred until all stacks are analyzed; produces a single `knowledge-graph.json` at the repo root for an all-stacks view.
+- **No paired or unified merges** — the PoC showed merged graphs are too overwhelming to navigate and don't clearly identify API vs UI stacks in the dashboard.
 
 ## Stacks
 
@@ -38,13 +37,12 @@ Produce a navigable knowledge graph for every stack in this monorepo using the `
 | `react-apollo-ui` | UI (React/Apollo Client) | ✅ Done |
 | `nest-history-api` | API (NestJS gRPC microservice) | ✅ Done |
 | `rails-api` | API (Ruby on Rails) | ✅ Done |
-| Monorepo root (unified merge) | All 20 stacks merged | ✅ Done — 533 nodes, 1032 edges |
+| Monorepo root (unified merge) | All 20 stacks merged | ❌ Removed — too overwhelming, dashboard doesn't distinguish API vs UI |
 
 ## Deliverables
 
 1. `.understand-anything/knowledge-graph.json` in each stack directory listed above.
 2. A `## Codebase Knowledge Graphs` section in the root `README.md` explaining what the graphs are, how to view them (dashboard command), and listing all stacks.
-3. Monorepo-root unified merge graph once all per-directory graphs exist.
 
 ## Dashboard Usage
 

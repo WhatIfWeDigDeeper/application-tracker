@@ -504,7 +504,7 @@ The **Claude Code Review** workflow (`claude-code-review`) is triggered manually
 
 ## Codebase Knowledge Graphs
 
-Each stack directory has a navigable knowledge graph produced by the [understand-anything](https://github.com/WhatIfWeDigDeeper/understand-anything) plugin. Graphs map files, functions, classes, and their relationships into architectural layers with a guided tour for onboarding. A unified merge graph at the repo root spans all 20 stacks (533 nodes, 1032 edges).
+Each stack directory has a navigable knowledge graph produced by the [understand-anything](https://github.com/WhatIfWeDigDeeper/understand-anything) plugin. Graphs map files, functions, classes, and their relationships into architectural layers with a guided tour for onboarding.
 
 | Stack | Directory |
 |-------|-----------|
@@ -544,12 +544,6 @@ The server prints a tokenized URL — open the full URL including `?token=<TOKEN
 ### Domain Analysis (Business Flows)
 
 Each graph also has a domain view that maps business flows and their steps. Run `/understand-anything:understand-domain` in Claude Code to generate or refresh it.
-
-For the unified cross-stack view (repo root):
-
-```
-/understand-anything:understand-domain
-```
 
 For a single stack:
 
