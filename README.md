@@ -34,6 +34,9 @@ A full-stack job application tracking system with multiple technology stack impl
   - [Build Verification](#build-verification)
   - [Per-Stack Validation](#per-stack-validation)
   - [CI Workflows](#ci-workflows)
+- [Codebase Knowledge Graphs](#codebase-knowledge-graphs)
+  - [Viewing a Graph](#viewing-a-graph)
+  - [Domain Analysis (Business Flows)](#domain-analysis-business-flows)
 - [Development Tools](#development-tools)
   - [Skills](#skills)
   - [VS Code Debug Configurations](#vs-code-debug-configurations)
@@ -498,6 +501,64 @@ npm run validate:all
 ### CI Workflows
 
 The **Claude Code Review** workflow (`claude-code-review`) is triggered manually — it does not run automatically on pull requests. To run it, go to **Actions → Claude Code Review → Run workflow** and enter the PR number.
+
+## Codebase Knowledge Graphs
+
+Each stack directory has a navigable knowledge graph produced by the [understand-anything](https://github.com/WhatIfWeDigDeeper/understand-anything) plugin. Graphs map files, functions, classes, and their relationships into architectural layers with a guided tour for onboarding. A unified merge graph at the repo root spans all 20 stacks (533 nodes, 1032 edges).
+
+| Stack | Directory |
+|-------|-----------|
+| Lambda API (Hono/DynamoDB) | `lambda-api/` |
+| Lambda React UI | `lambda-react-ui/` |
+| Express API (Prisma) | `api/` |
+| Koa API | `koa-api/` |
+| React UI | `react-ui/` |
+| Vue UI | `vue-ui/` |
+| Nuxt API (Drizzle) | `nuxt-api/` |
+| Hono API (Drizzle) | `hono-api/` |
+| SvelteKit UI | `svelte-ui/` |
+| NestJS API (Drizzle) | `nest-api/` |
+| TanStack Router UI | `tanstack-ui/` |
+| TanStack Start SSR UI | `tanstack-start-ui/` |
+| FastAPI (Python) | `fastapi/` |
+| Angular UI | `angular-ui/` |
+| Go Gin API | `go-api/` |
+| Spring Boot API | `spring-api/` |
+| GraphQL Yoga API | `yoga-api/` |
+| React Apollo UI | `react-apollo-ui/` |
+| NestJS gRPC History API | `nest-history-api/` |
+| Ruby on Rails API | `rails-api/` |
+
+### Viewing a Graph
+
+The dashboard requires the [understand-anything](https://github.com/WhatIfWeDigDeeper/understand-anything) plugin. Once installed, launch it for any analyzed stack:
+
+```bash
+PLUGIN=/Users/<you>/.claude/plugins/cache/understand-anything/understand-anything/<version>
+cd $PLUGIN/packages/dashboard
+GRAPH_DIR=/path/to/application-tracker/<stack-dir> npx vite --host 127.0.0.1
+```
+
+The server prints a tokenized URL — open the full URL including `?token=<TOKEN>` in your browser.
+
+### Domain Analysis (Business Flows)
+
+Each graph also has a domain view that maps business flows and their steps. Run `/understand-anything:understand-domain` in Claude Code to generate or refresh it.
+
+For the unified cross-stack view (repo root):
+
+```
+/understand-anything:understand-domain
+```
+
+For a single stack:
+
+```
+/understand-anything:understand-domain lambda-api
+/understand-anything:understand-domain react-ui
+```
+
+See [specs/029-understand-codebase-graphs/spec.md](specs/029-understand-codebase-graphs/spec.md) for full details.
 
 ## Development Tools
 

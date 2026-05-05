@@ -1,0 +1,1331 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "job-tracker-lambda-api",
+    "languages": [
+      "javascript",
+      "json",
+      "markdown",
+      "typescript"
+    ],
+    "frameworks": [
+      "AWS CDK",
+      "DynamoDB",
+      "Hono",
+      "Vitest"
+    ],
+    "description": "TypeScript REST API deployed as AWS Lambda with Hono, DynamoDB single-table design, and a CDK sub-project for infrastructure. Runs as a local Hono dev server on port 5090.",
+    "analyzedAt": "2026-05-04T14:36:15.870858+00:00",
+    "gitCommitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f"
+  },
+  "nodes": [
+    {
+      "id": "config:.auditconfig.json",
+      "type": "config",
+      "name": ".auditconfig.json",
+      "filePath": ".auditconfig.json",
+      "summary": "audit-ci configuration allowing high-severity advisories for the lambda-api package, using the npm package manager.",
+      "tags": [
+        "configuration",
+        "security",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.env.example",
+      "type": "config",
+      "name": ".env.example",
+      "filePath": ".env.example",
+      "summary": "Environment variable template defining DynamoDB endpoint, table name, AWS credentials, and server port required to run the lambda-api locally.",
+      "tags": [
+        "configuration",
+        "infrastructure",
+        "deployment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:CLAUDE.md",
+      "type": "document",
+      "name": "CLAUDE.md",
+      "filePath": "CLAUDE.md",
+      "summary": "Stack-specific guidance for the lambda-api covering DynamoDB single-table design, local development patterns, CDK deployment patterns, and common gotchas for the Hono+Lambda+DynamoDB stack.",
+      "tags": [
+        "documentation",
+        "configuration",
+        "infrastructure"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:cdk/.auditconfig.json",
+      "type": "config",
+      "name": ".auditconfig.json",
+      "filePath": "cdk/.auditconfig.json",
+      "summary": "audit-ci configuration for the CDK sub-package, allowing moderate-severity advisories.",
+      "tags": [
+        "configuration",
+        "security",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:cdk/bin/app.ts",
+      "type": "file",
+      "name": "app.ts",
+      "filePath": "cdk/bin/app.ts",
+      "summary": "CDK application entry point that instantiates the LambdaApiStack, configuring synthesizer and environment from CDK context.",
+      "tags": [
+        "entry-point",
+        "infrastructure",
+        "deployment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:cdk/cdk.json",
+      "type": "config",
+      "name": "cdk.json",
+      "filePath": "cdk/cdk.json",
+      "summary": "CDK toolkit configuration specifying the app entry point, watch include/exclude patterns, and feature flag context for the lambda-api stack.",
+      "tags": [
+        "configuration",
+        "infrastructure",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:cdk/lib/lambda-api-stack.ts",
+      "type": "file",
+      "name": "lambda-api-stack.ts",
+      "filePath": "cdk/lib/lambda-api-stack.ts",
+      "summary": "AWS CDK stack defining the DynamoDB TableV2 with GSI indexes, NodejsFunction Lambda, and HTTP API Gateway v2 integration for deploying the lambda-api to AWS.",
+      "tags": [
+        "infrastructure",
+        "deployment",
+        "service"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses TableV2 which synthesizes to AWS::DynamoDB::GlobalTable (not AWS::DynamoDB::Table), and NodejsFunction which bundles via esbuild at synth time."
+    },
+    {
+      "id": "class:cdk/lib/lambda-api-stack.ts:LambdaApiStack",
+      "type": "class",
+      "name": "LambdaApiStack",
+      "filePath": "cdk/lib/lambda-api-stack.ts",
+      "lineRange": [
+        10,
+        78
+      ],
+      "summary": "CDK Stack subclass that provisions the DynamoDB table, Lambda function, and HTTP API Gateway, wiring them together with IAM permissions.",
+      "tags": [
+        "infrastructure",
+        "deployment",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:cdk/package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "cdk/package.json",
+      "summary": "Package manifest for the CDK sub-project, defining scripts for synth, deploy, and diff, plus CDK v2, esbuild, and vitest dependencies.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "infrastructure"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:cdk/test/lambda-api-stack.test.ts",
+      "type": "file",
+      "name": "lambda-api-stack.test.ts",
+      "filePath": "cdk/test/lambda-api-stack.test.ts",
+      "summary": "Vitest test suite for the LambdaApiStack CDK construct, asserting that the synthesized CloudFormation template contains expected DynamoDB GlobalTable, Lambda, and HTTP API resources.",
+      "tags": [
+        "test",
+        "infrastructure",
+        "deployment"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:cdk/tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "cdk/tsconfig.json",
+      "summary": "TypeScript compiler configuration for the CDK sub-package using CommonJS modules and node module resolution, intentionally different from the parent lambda-api ESM config.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "typescript"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Must use module:CommonJS because ts-node (the CDK runner) requires CJS; cannot share the parent lambda-api tsconfig.json."
+    },
+    {
+      "id": "file:cdk/vitest.config.ts",
+      "type": "file",
+      "name": "vitest.config.ts",
+      "filePath": "cdk/vitest.config.ts",
+      "summary": "Vitest configuration for the CDK sub-package, scoped to include only the cdk/test/ directory test files.",
+      "tags": [
+        "configuration",
+        "test",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:eslint.config.js",
+      "type": "file",
+      "name": "eslint.config.js",
+      "filePath": "eslint.config.js",
+      "summary": "ESLint flat configuration for the lambda-api package, applying TypeScript ESLint rules to source files.",
+      "tags": [
+        "configuration",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "Root package manifest for the lambda-api package defining build, dev, test, and migration scripts alongside Hono, DynamoDB, and Zod runtime dependencies.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "entry-point"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/setup-dynamodb.ts",
+      "type": "file",
+      "name": "setup-dynamodb.ts",
+      "filePath": "scripts/setup-dynamodb.ts",
+      "summary": "Idempotent DynamoDB table setup script that creates the lambda_api_applications table with its GSI indexes if it does not already exist, used by the migrate:lambda-api npm script.",
+      "tags": [
+        "script",
+        "database",
+        "infrastructure"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/setup-dynamodb.ts:tableExists",
+      "type": "function",
+      "name": "tableExists",
+      "filePath": "scripts/setup-dynamodb.ts",
+      "lineRange": [
+        37,
+        48
+      ],
+      "summary": "Checks whether the DynamoDB table already exists by sending a DescribeTableCommand and catching the ResourceNotFoundException.",
+      "tags": [
+        "database",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/setup-dynamodb.ts:createTable",
+      "type": "function",
+      "name": "createTable",
+      "filePath": "scripts/setup-dynamodb.ts",
+      "lineRange": [
+        50,
+        87
+      ],
+      "summary": "Creates the DynamoDB table with partition key, sort key, GSI1, and GSI2 index definitions using CreateTableCommand.",
+      "tags": [
+        "database",
+        "infrastructure"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/__tests__/csv.test.ts",
+      "type": "file",
+      "name": "csv.test.ts",
+      "filePath": "src/__tests__/csv.test.ts",
+      "summary": "Unit tests for the CSV service, covering parsing, serialization, and import logic for job application data.",
+      "tags": [
+        "test",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/__tests__/unit.test.ts",
+      "type": "file",
+      "name": "unit.test.ts",
+      "filePath": "src/__tests__/unit.test.ts",
+      "summary": "Comprehensive unit tests for application service functions including CRUD operations, pagination cursor encoding/decoding, and field validation logic.",
+      "tags": [
+        "test",
+        "utility"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/app.ts",
+      "type": "file",
+      "name": "app.ts",
+      "filePath": "src/app.ts",
+      "summary": "Hono application factory that configures CORS, mounts the applications and health routes, and registers global error handlers; exported as the shared app instance for both server and Lambda handler.",
+      "tags": [
+        "entry-point",
+        "api-handler",
+        "middleware"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/handler.ts",
+      "type": "file",
+      "name": "handler.ts",
+      "filePath": "src/handler.ts",
+      "summary": "AWS Lambda handler entry point that wraps the shared Hono app using hono/aws-lambda's handle() adapter for Lambda invocations.",
+      "tags": [
+        "entry-point",
+        "api-handler",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/applications.ts",
+      "type": "file",
+      "name": "applications.ts",
+      "filePath": "src/routes/applications.ts",
+      "summary": "Hono router defining all application REST endpoints including CRUD, archive/restore, interview stage management, history, and CSV import/export, with Zod request validation.",
+      "tags": [
+        "api-handler",
+        "service",
+        "validation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/routes/health.ts",
+      "type": "file",
+      "name": "health.ts",
+      "filePath": "src/routes/health.ts",
+      "summary": "Hono router providing a simple GET /health endpoint that returns a 200 OK status response.",
+      "tags": [
+        "api-handler",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/server.ts",
+      "type": "file",
+      "name": "server.ts",
+      "filePath": "src/server.ts",
+      "summary": "Local development server entry point that starts the Hono app on a configurable port using @hono/node-server.",
+      "tags": [
+        "entry-point",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/services/application.service.ts",
+      "type": "file",
+      "name": "application.service.ts",
+      "filePath": "src/services/application.service.ts",
+      "summary": "Core application service implementing all DynamoDB CRUD operations for job applications, including list with filtering/pagination, archive/restore, and point-in-time version restore from history.",
+      "tags": [
+        "service",
+        "data-model",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/services/application.service.ts:listApplications",
+      "type": "function",
+      "name": "listApplications",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [
+        168,
+        308
+      ],
+      "summary": "Queries DynamoDB using GSI1 or GSI2 with dynamic FilterExpression, applies in-memory sorting and offset-based or cursor-based pagination, then fetches associated stages for each page.",
+      "tags": [
+        "service",
+        "data-model",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/services/application.service.ts:createApplication",
+      "type": "function",
+      "name": "createApplication",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [
+        310,
+        353
+      ],
+      "summary": "Creates a new job application item in DynamoDB with UUID, timestamps, and GSI key projections, then records a creation history entry.",
+      "tags": [
+        "service",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/application.service.ts:updateApplication",
+      "type": "function",
+      "name": "updateApplication",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [
+        355,
+        411
+      ],
+      "summary": "Applies partial field updates to a DynamoDB application item, rebuilds GSI keys for changed status/archived fields, and records a field-level change history entry.",
+      "tags": [
+        "service",
+        "data-model"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/services/application.service.ts:deleteApplication",
+      "type": "function",
+      "name": "deleteApplication",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [
+        413,
+        443
+      ],
+      "summary": "Cascade-deletes an application and all related stage and history items by querying on PK then batching individual DeleteCommands.",
+      "tags": [
+        "service",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/application.service.ts:restoreToVersion",
+      "type": "function",
+      "name": "restoreToVersion",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [
+        494,
+        593
+      ],
+      "summary": "Restores an application to a historical snapshot by reading the HIST# item, rebuilding the application and stage items, replacing all current stages via BatchWrite, and recording a restore history entry.",
+      "tags": [
+        "service",
+        "data-model"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/services/csv.service.ts",
+      "type": "file",
+      "name": "csv.service.ts",
+      "filePath": "src/services/csv.service.ts",
+      "summary": "CSV import and export service for job applications, implementing a character-by-character quoted-field parser, Zod enum validation, and deduplication by job posting URL.",
+      "tags": [
+        "service",
+        "serialization",
+        "data-model"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/services/csv.service.ts:parseCsvRows",
+      "type": "function",
+      "name": "parseCsvRows",
+      "filePath": "src/services/csv.service.ts",
+      "lineRange": [
+        45,
+        93
+      ],
+      "summary": "Character-by-character CSV parser that correctly handles quoted fields with embedded newlines, commas, and escaped double-quotes.",
+      "tags": [
+        "serialization",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/csv.service.ts:importApplications",
+      "type": "function",
+      "name": "importApplications",
+      "filePath": "src/services/csv.service.ts",
+      "lineRange": [
+        193,
+        297
+      ],
+      "summary": "Parses a CSV upload, validates each row against Zod schemas, deduplicates by job posting URL, and creates or updates application records via the application service.",
+      "tags": [
+        "service",
+        "validation",
+        "data-model"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/services/csv.service.ts:exportApplications",
+      "type": "function",
+      "name": "exportApplications",
+      "filePath": "src/services/csv.service.ts",
+      "lineRange": [
+        299,
+        325
+      ],
+      "summary": "Fetches all applications via listApplications with pagination loop and serializes them to CSV format.",
+      "tags": [
+        "service",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/services/dynamodb.client.ts",
+      "type": "file",
+      "name": "dynamodb.client.ts",
+      "filePath": "src/services/dynamodb.client.ts",
+      "summary": "Singleton DynamoDB DocumentClient and TABLE_NAME constant exported for use by all service modules; reads DYNAMODB_ENDPOINT and AWS_REGION from environment at module load time.",
+      "tags": [
+        "service",
+        "singleton",
+        "infrastructure"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Must import 'dotenv/config' as its first line so DYNAMODB_ENDPOINT is available at module load time when running via tsx."
+    },
+    {
+      "id": "file:src/services/history.service.ts",
+      "type": "file",
+      "name": "history.service.ts",
+      "filePath": "src/services/history.service.ts",
+      "summary": "History tracking service that records application change events as HIST# items in DynamoDB with atomic sequence counters, lists paginated history, and computes field-level diffs between snapshots.",
+      "tags": [
+        "service",
+        "data-model",
+        "event-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/services/history.service.ts:recordHistory",
+      "type": "function",
+      "name": "recordHistory",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [
+        52,
+        75
+      ],
+      "summary": "Atomically increments the application's historySequence counter then writes a HIST# item capturing the action description and full application snapshot.",
+      "tags": [
+        "service",
+        "data-model",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/history.service.ts:computeFieldDiffs",
+      "type": "function",
+      "name": "computeFieldDiffs",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [
+        137,
+        164
+      ],
+      "summary": "Computes field-level before/after diffs between two application snapshots by comparing serialized JSON values for each known field.",
+      "tags": [
+        "utility",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/services/interview-stage.service.ts",
+      "type": "file",
+      "name": "interview-stage.service.ts",
+      "filePath": "src/services/interview-stage.service.ts",
+      "summary": "Interview stage service providing CRUD operations for STAGE# DynamoDB items, calling touchApplication to update parent application timestamps and recording stage change history.",
+      "tags": [
+        "service",
+        "data-model",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/services/interview-stage.service.ts:createInterviewStage",
+      "type": "function",
+      "name": "createInterviewStage",
+      "filePath": "src/services/interview-stage.service.ts",
+      "lineRange": [
+        46,
+        77
+      ],
+      "summary": "Creates a new STAGE# item in DynamoDB, touches the parent application's updatedAt, and records a stage-creation history entry.",
+      "tags": [
+        "service",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/interview-stage.service.ts:deleteInterviewStage",
+      "type": "function",
+      "name": "deleteInterviewStage",
+      "filePath": "src/services/interview-stage.service.ts",
+      "lineRange": [
+        124,
+        156
+      ],
+      "summary": "Looks up and deletes a STAGE# item by application ID and stage ID, then touches the parent application and records a deletion history entry.",
+      "tags": [
+        "service",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/types/api.ts",
+      "type": "file",
+      "name": "api.ts",
+      "filePath": "src/types/api.ts",
+      "summary": "Zod schema definitions for all API request and response types including application CRUD, interview stages, pagination shapes, history entries, and import results.",
+      "tags": [
+        "type-definition",
+        "validation",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/types/dynamo.ts",
+      "type": "file",
+      "name": "dynamo.ts",
+      "filePath": "src/types/dynamo.ts",
+      "summary": "DynamoDB single-table type definitions and key builder functions for APP#, STAGE#, HIST# items, plus GSI key constructors and item type guards.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "Root TypeScript compiler configuration for the lambda-api package using ESM modules, bundler module resolution, and strict mode targeting Node 20.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "typescript"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:vitest.config.ts",
+      "type": "file",
+      "name": "vitest.config.ts",
+      "filePath": "vitest.config.ts",
+      "summary": "Vitest configuration for the lambda-api package, scoped to src/**/*.test.ts files.",
+      "tags": [
+        "configuration",
+        "test",
+        "build-system"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:cdk/bin/app.ts",
+      "target": "file:cdk/lib/lambda-api-stack.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:cdk/test/lambda-api-stack.test.ts",
+      "target": "file:cdk/lib/lambda-api-stack.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:cdk/lib/lambda-api-stack.ts",
+      "target": "class:cdk/lib/lambda-api-stack.ts:LambdaApiStack",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:cdk/lib/lambda-api-stack.ts",
+      "target": "class:cdk/lib/lambda-api-stack.ts:LambdaApiStack",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:cdk/bin/app.ts",
+      "target": "class:cdk/lib/lambda-api-stack.ts:LambdaApiStack",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:cdk/test/lambda-api-stack.test.ts",
+      "target": "class:cdk/lib/lambda-api-stack.ts:LambdaApiStack",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:scripts/setup-dynamodb.ts",
+      "target": "function:scripts/setup-dynamodb.ts:tableExists",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/setup-dynamodb.ts",
+      "target": "function:scripts/setup-dynamodb.ts:createTable",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:listApplications",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:createApplication",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:updateApplication",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:deleteApplication",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:restoreToVersion",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:listApplications",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:createApplication",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:updateApplication",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:deleteApplication",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "function:src/services/application.service.ts:restoreToVersion",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "function:src/services/csv.service.ts:parseCsvRows",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "function:src/services/csv.service.ts:importApplications",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "function:src/services/csv.service.ts:exportApplications",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "function:src/services/csv.service.ts:parseCsvRows",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "function:src/services/csv.service.ts:importApplications",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "function:src/services/csv.service.ts:exportApplications",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "function:src/services/history.service.ts:recordHistory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "function:src/services/history.service.ts:computeFieldDiffs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "function:src/services/history.service.ts:recordHistory",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "function:src/services/history.service.ts:computeFieldDiffs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/interview-stage.service.ts",
+      "target": "function:src/services/interview-stage.service.ts:createInterviewStage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/interview-stage.service.ts",
+      "target": "function:src/services/interview-stage.service.ts:deleteInterviewStage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/services/interview-stage.service.ts",
+      "target": "function:src/services/interview-stage.service.ts:createInterviewStage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/interview-stage.service.ts",
+      "target": "function:src/services/interview-stage.service.ts:deleteInterviewStage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "file:src/app.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "file:src/handler.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:cdk/tsconfig.json",
+      "target": "file:cdk/lib/lambda-api-stack.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.env.example",
+      "target": "file:src/services/dynamodb.client.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.env.example",
+      "target": "file:src/server.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:cdk/lib/lambda-api-stack.ts",
+      "target": "file:src/handler.ts",
+      "type": "deploys",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:src/services/dynamodb.client.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:src/handler.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:cdk/lib/lambda-api-stack.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/__tests__/csv.test.ts",
+      "target": "file:src/services/csv.service.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/__tests__/unit.test.ts",
+      "target": "file:src/services/application.service.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/app.ts",
+      "target": "file:src/routes/applications.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/app.ts",
+      "target": "file:src/routes/health.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/handler.ts",
+      "target": "file:src/app.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/app.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/application.service.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/csv.service.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/interview-stage.service.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/types/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "file:src/services/dynamodb.client.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "file:src/types/dynamo.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "file:src/types/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/application.service.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "file:src/services/application.service.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "file:src/services/dynamodb.client.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/csv.service.ts",
+      "target": "file:src/types/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "file:src/services/dynamodb.client.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "file:src/types/dynamo.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/interview-stage.service.ts",
+      "target": "file:src/services/dynamodb.client.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/interview-stage.service.ts",
+      "target": "file:src/types/dynamo.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/interview-stage.service.ts",
+      "target": "file:src/services/application.service.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/services/interview-stage.service.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:scripts/setup-dynamodb.ts",
+      "target": "file:src/services/dynamodb.client.ts",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:api",
+      "name": "API Layer",
+      "description": "Hono application factory, Lambda and local server entry points, and REST route handlers for job application CRUD and health check endpoints.",
+      "nodeIds": [
+        "file:src/app.ts",
+        "file:src/handler.ts",
+        "file:src/server.ts",
+        "file:src/routes/applications.ts",
+        "file:src/routes/health.ts"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Service Layer",
+      "description": "Core DynamoDB CRUD services for applications, interview stages, history tracking, CSV import/export, and the singleton DynamoDB DocumentClient.",
+      "nodeIds": [
+        "file:src/services/application.service.ts",
+        "file:src/services/csv.service.ts",
+        "file:src/services/dynamodb.client.ts",
+        "file:src/services/history.service.ts",
+        "file:src/services/interview-stage.service.ts"
+      ]
+    },
+    {
+      "id": "layer:types",
+      "name": "Types Layer",
+      "description": "Zod schema definitions for API request/response shapes and DynamoDB single-table type definitions with key builder functions for APP#, STAGE#, and HIST# items.",
+      "nodeIds": [
+        "file:src/types/api.ts",
+        "file:src/types/dynamo.ts"
+      ]
+    },
+    {
+      "id": "layer:test",
+      "name": "Test Layer",
+      "description": "Vitest unit tests for the CSV service parser and application service CRUD functions.",
+      "nodeIds": [
+        "file:src/__tests__/csv.test.ts",
+        "file:src/__tests__/unit.test.ts"
+      ]
+    },
+    {
+      "id": "layer:infrastructure",
+      "name": "Infrastructure Layer",
+      "description": "AWS CDK sub-project defining the DynamoDB table, Lambda function, and API Gateway v2 stack, plus the idempotent DynamoDB Local table setup script.",
+      "nodeIds": [
+        "file:cdk/bin/app.ts",
+        "file:cdk/lib/lambda-api-stack.ts",
+        "file:cdk/test/lambda-api-stack.test.ts",
+        "file:cdk/vitest.config.ts",
+        "config:cdk/.auditconfig.json",
+        "config:cdk/cdk.json",
+        "config:cdk/package.json",
+        "config:cdk/tsconfig.json",
+        "file:scripts/setup-dynamodb.ts"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "Configuration",
+      "description": "Root-level build, lint, and test configuration files for the lambda-api package including TypeScript, Vitest, ESLint, audit-ci, and environment variable templates.",
+      "nodeIds": [
+        "config:.auditconfig.json",
+        "config:.env.example",
+        "config:package.json",
+        "config:tsconfig.json",
+        "file:eslint.config.js",
+        "file:vitest.config.ts"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "Documentation",
+      "description": "Stack-specific developer guidance covering DynamoDB single-table design patterns, local development workflow, and CDK deployment conventions.",
+      "nodeIds": [
+        "document:CLAUDE.md"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Developer Guide",
+      "description": "CLAUDE.md is the first stop for any new contributor: it documents the DynamoDB single-table design (APP#/STAGE#/HIST# key prefixes, two GSIs, pagination contract), local dev patterns (DynamoDB Local on port 8000, dotenv init-order gotcha), and CDK deployment notes. Reading it before touching any code gives you the mental model that every other file assumes.",
+      "nodeIds": [
+        "document:CLAUDE.md"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Project Manifest",
+      "description": "The root package.json is the project's command centre, declaring the Hono, DynamoDB SDK, and Zod runtime dependencies alongside the build, dev, test, and migration scripts. It reveals the dual-runtime strategy at a glance: `dev` starts the local Node.js server while `migrate:lambda-api` initialises the DynamoDB Local table, with no mention of a PostgreSQL connection string anywhere.",
+      "nodeIds": [
+        "config:package.json"
+      ],
+      "languageLesson": "In an ESM-first project (\"type\": \"module\"), all .js files are treated as ES modules. CDK's ts-node runner requires CommonJS, which is why the cdk/ sub-package has its own tsconfig.json with \"module\": \"CommonJS\" \u2014 a deliberate exception to the parent configuration."
+    },
+    {
+      "order": 3,
+      "title": "Environment Configuration",
+      "description": "`.env.example` is the authoritative list of every runtime knob the application supports: the DynamoDB endpoint URL (pointing to localhost:8000 in development or absent in Lambda for real AWS), table name, AWS credentials, and server port. Two service files depend on it directly \u2014 `dynamodb.client.ts` reads the endpoint at module load time, and `server.ts` reads the port \u2014 which is why dotenv must be imported before any service module is required.",
+      "nodeIds": [
+        "config:.env.example"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Dual Runtime Entry Points",
+      "description": "The project has two entry points for the same Hono application. `server.ts` boots a plain Node.js HTTP server via `@hono/node-server` for local development on port 5090. `handler.ts` exports the AWS Lambda handler using `hono/aws-lambda`, which adapts the same Hono app to the Lambda event/context interface. The key insight is that neither file contains any business logic \u2014 they are thin wrappers around the shared `app.ts` factory.",
+      "nodeIds": [
+        "file:src/server.ts",
+        "file:src/handler.ts"
+      ],
+      "languageLesson": "Hono's `handle()` adapter from `hono/aws-lambda` is bundled inside the main `hono` package \u2014 there is no separate npm package to install. The adapter translates the AWS APIGatewayProxyEventV2 shape into a standard Fetch API Request object that the Hono router understands."
+    },
+    {
+      "order": 5,
+      "title": "Hono Application Factory",
+      "description": "With fanIn=3, `src/app.ts` is the shared core consumed by both `server.ts` and `handler.ts`. It is a factory function that wires CORS middleware, mounts the two routers (`/health` and the main applications routes), and registers the global error handler. Keeping it as a factory (rather than a singleton module) makes it straightforward to instantiate in tests without side effects.",
+      "nodeIds": [
+        "file:src/app.ts",
+        "file:src/routes/health.ts"
+      ],
+      "languageLesson": "Hono uses a chainable router API similar to Express. Middleware is registered with `app.use()`, sub-routers are mounted with `app.route()`, and the factory returns the `app` instance. Unlike Express, Hono routes are typed \u2014 the context `c` object carries the validated request body and inferred response type at the TypeScript level."
+    },
+    {
+      "order": 6,
+      "title": "Type Contract",
+      "description": "Before reading any service or route code it is worth understanding the type vocabulary they share. `src/types/api.ts` defines Zod schemas for every API request body and response shape \u2014 including the two pagination modes (offset-based and cursor-based) and the CSV import result envelope. `src/types/dynamo.ts` defines the DynamoDB item shapes, key builder functions (`appKey`, `stageKey`, `histKey`), and type guards that let services distinguish APP# from STAGE# from HIST# items at runtime. Both files are imported by three or more modules each (fanIn=3), making them the vocabulary of the entire codebase.",
+      "nodeIds": [
+        "file:src/types/api.ts",
+        "file:src/types/dynamo.ts"
+      ],
+      "languageLesson": "Zod schemas serve a dual purpose here: they are both the TypeScript type source (via `z.infer<typeof schema>`) and the runtime validator. This single-source-of-truth pattern means the shape of a request body is defined exactly once and is automatically enforced at the route layer before any service code runs."
+    },
+    {
+      "order": 7,
+      "title": "DynamoDB Singleton Client",
+      "description": "`dynamodb.client.ts` is the single most depended-upon file in the project (fanIn=7) \u2014 every service module imports the DocumentClient from here. It creates the client exactly once at module load time, reading `DYNAMODB_ENDPOINT` from the environment: when set it points to DynamoDB Local for development; when absent the AWS SDK defaults to real AWS, which is the correct behaviour inside a Lambda function. This module-level singleton pattern avoids creating a new TCP connection on every invocation inside Lambda.",
+      "nodeIds": [
+        "file:src/services/dynamodb.client.ts"
+      ],
+      "languageLesson": "Module-level singletons in Node.js ESM are safe because the module cache ensures the file is evaluated only once per process. In Lambda, the execution environment is reused across warm invocations, so a singleton client avoids connection overhead on every request \u2014 a meaningful latency optimisation for DynamoDB."
+    },
+    {
+      "order": 8,
+      "title": "Applications Route Handler",
+      "description": "`src/routes/applications.ts` is the broadest file in the codebase by fan-out (fanOut=5), connecting the HTTP layer to every service and both type modules. Each route handler parses and validates the request with a Zod schema from `api.ts`, then delegates to the appropriate service. This file is the best place to map the API surface \u2014 GET/POST/PUT/DELETE for applications, PATCH for status, and dedicated sub-routes for CSV import/export, history, and interview stages.",
+      "nodeIds": [
+        "file:src/routes/applications.ts"
+      ],
+      "languageLesson": "Hono's `zValidator` middleware integrates Zod schemas directly into the route definition. When validation fails, Hono returns a 400 response automatically before the handler runs, so service functions never receive malformed input. The validated data is available via `c.req.valid('json')` with full TypeScript inference."
+    },
+    {
+      "order": 9,
+      "title": "Core Application Service",
+      "description": "With fanIn=4, `application.service.ts` is the second most depended-upon module in the project. It implements all CRUD operations for job application items (APP# keys), including paginated list queries against both GSIs, soft-archive logic, version restore from HIST# snapshots, and the `touchApplication` helper that updates parent timestamps when child items change. The history service is called here on every write, wiring in audit tracking transparently from the consumer's perspective.",
+      "nodeIds": [
+        "file:src/services/application.service.ts"
+      ],
+      "languageLesson": "DynamoDB's `UpdateCommand` supports atomic counter increments using the `ADD` action (`ADD historySequence :inc`). The application service uses this to safely increment the history sequence number \u2014 even under concurrent Lambda invocations \u2014 without needing a read-then-write cycle that could produce duplicate sequence numbers."
+    },
+    {
+      "order": 10,
+      "title": "History & Stage Services",
+      "description": "Two specialised services handle the sub-items that live alongside each application in the single table. `history.service.ts` writes HIST# items by reading the atomic sequence counter, computing field-level diffs between the old and new application state, and persisting a snapshot. `interview-stage.service.ts` handles CRUD for STAGE# items and calls `touchApplication` after every write so the parent application's `updatedAt` timestamp reflects stage changes. Together these two services (fanIn=3 each) implement the audit trail and interview tracking features visible in the application UI.",
+      "nodeIds": [
+        "file:src/services/history.service.ts",
+        "file:src/services/interview-stage.service.ts"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "CSV Import/Export Service",
+      "description": "`csv.service.ts` implements bulk data portability with a character-by-character CSV parser (required to handle quoted fields containing embedded newlines), Zod-validated row mapping, and deduplication logic that prevents duplicate applications on re-import. It depends on `application.service.ts` for writing records, making CSV import a thin orchestration layer rather than a separate data path. The accompanying `csv.test.ts` exercises the parser extensively because the multi-line field edge cases are where bugs hide.",
+      "nodeIds": [
+        "file:src/services/csv.service.ts",
+        "file:src/__tests__/csv.test.ts"
+      ],
+      "languageLesson": "Multi-line CSV fields require character-by-character state machine parsing \u2014 you cannot split the file on newlines first because quoted fields can legitimately contain `\\n`. The parser tracks an `inQuotes` boolean and only treats `\\n` as a row boundary when that flag is false."
+    },
+    {
+      "order": 12,
+      "title": "Unit Test Suite",
+      "description": "`src/__tests__/unit.test.ts` tests the application service functions as pure units without a running DynamoDB instance. It covers CRUD operations, pagination boundary conditions, and input validation, giving contributors a fast feedback loop that does not require Docker. These tests deliberately do not mock the service internals \u2014 they call the exported functions directly and assert on return values, keeping the tests decoupled from implementation details.",
+      "nodeIds": [
+        "file:src/__tests__/unit.test.ts",
+        "file:vitest.config.ts"
+      ]
+    },
+    {
+      "order": 13,
+      "title": "DynamoDB Table Setup",
+      "description": "`scripts/setup-dynamodb.ts` is the migration script run by `npm run migrate:lambda-api`. It creates the `lambda_api_applications` table with the two GSIs (GSI1 for status+archived filtering, GSI2 for all active applications sorted by updatedAt) and exits without error if the table already exists. Reading this script alongside `dynamo.ts` gives you the complete picture of the single-table schema: the GSI key patterns defined here are the indexes that the application service queries.",
+      "nodeIds": [
+        "file:scripts/setup-dynamodb.ts"
+      ]
+    },
+    {
+      "order": 14,
+      "title": "CDK Infrastructure Stack",
+      "description": "The `cdk/` sub-project is a self-contained AWS CDK application that provisions everything the Lambda needs in AWS: a DynamoDB `TableV2` with the same two GSIs defined in `setup-dynamodb.ts`, a `NodejsFunction` that bundles `src/handler.ts` via esbuild, and an HTTP API Gateway v2 that routes all traffic to the Lambda. `cdk/bin/app.ts` is the CDK application entry point that instantiates `LambdaApiStack`, and `cdk/test/lambda-api-stack.test.ts` asserts the synthesized CloudFormation template matches the expected resource shapes.",
+      "nodeIds": [
+        "file:cdk/bin/app.ts",
+        "file:cdk/lib/lambda-api-stack.ts",
+        "file:cdk/test/lambda-api-stack.test.ts"
+      ],
+      "languageLesson": "CDK's `NodejsFunction` uses esbuild to bundle TypeScript at `cdk synth` time, producing a single-file Lambda deployment package. The bundle entry point is the `handler.ts` file from Step 4, which is how the CDK stack and the application code are connected \u2014 the CDK stack does not import the application code at TypeScript level, it references it as a file path string passed to `NodejsFunction`."
+    }
+  ]
+}

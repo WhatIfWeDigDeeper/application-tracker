@@ -27,7 +27,7 @@
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/peer-review/SKILL.md",
-      "computedHash": "593645f61fd1eb047e4f37b06162a97c77e968e3297db5f1030ebf79f7743b6c"
+      "computedHash": "6b299ec6aa4e3145f0484eb62ad314cdd848f2a40aff4ee4f28ea8bea92e6776"
     },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",

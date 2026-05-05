@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-05T01:27:02Z",
+  "gitCommitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
+  "projectRoot": "/Users/greg/code/application-tracker/go-api",
+  "pluginVersion": "2.5.1",
+  "stats": {
+    "totalNodes": 35,
+    "totalEdges": 35,
+    "totalLayers": 7,
+    "tourSteps": 8
+  }
+}

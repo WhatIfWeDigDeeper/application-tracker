@@ -1,0 +1,28 @@
+{
+  "version": "2.5.1",
+  "projectName": "react-apollo-ui",
+  "projectRoot": "/Users/greg/code/application-tracker/react-apollo-ui",
+  "description": "React 19 + TypeScript UI using Apollo Client for GraphQL communication with yoga-api backend. Features TanStack Router for file-based routing, Tailwind CSS v4 for styling, and Vite for bundling. Runs on port 3080, proxies /graphql and /api to localhost:5080.",
+  "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
+  "analyzedAt": "2026-05-04T00:00:00.000Z",
+  "languages": ["TypeScript", "TSX", "CSS"],
+  "frameworks": ["React 19", "Apollo Client 4", "TanStack Router", "Tailwind CSS 4", "Vite 7", "Vitest 4", "Playwright"],
+  "stats": {
+    "totalFiles": 36,
+    "totalNodes": 31,
+    "totalEdges": 47,
+    "totalLayers": 9,
+    "tourSteps": 12,
+    "nodeTypes": {
+      "file": 26,
+      "config": 5
+    },
+    "edgeTypes": {
+      "imports": 39,
+      "tests": 2,
+      "references": 6
+    }
+  },
+  "entryPoint": "src/main.tsx",
+  "warnings": []
+}

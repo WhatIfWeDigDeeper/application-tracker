@@ -1,0 +1,17 @@
+{
+  "projectName": "spring-api",
+  "projectRoot": "/Users/greg/code/application-tracker/spring-api",
+  "description": "Java Spring Boot 3 REST API for job application tracking. Uses Spring Data JPA with Hibernate 6, Flyway for DB migrations (java_spring PostgreSQL schema), and Bean Validation. Runs on port 8080, pairs with angular-ui on port 3070.",
+  "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
+  "analyzedAt": "2026-05-04T00:00:00Z",
+  "pluginVersion": "2.5.1",
+  "languages": ["Java", "SQL", "Kotlin"],
+  "frameworks": ["Spring Boot 3", "Spring Data JPA", "Hibernate 6", "Flyway", "JUnit 5", "Mockito"],
+  "stats": {
+    "totalFiles": 37,
+    "totalNodes": 37,
+    "totalEdges": 62,
+    "totalLayers": 8,
+    "tourSteps": 9
+  }
+}

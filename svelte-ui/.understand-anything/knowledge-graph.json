@@ -1,0 +1,489 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/app.html",
+      "type": "file",
+      "name": "app.html",
+      "filePath": "src/app.html",
+      "summary": "Root HTML shell for the SvelteKit SPA. Sets lang, viewport, preload strategy, and mounts %sveltekit.body%.",
+      "tags": ["html", "entrypoint", "sveltekit", "shell"]
+    },
+    {
+      "id": "file:src/app.css",
+      "type": "file",
+      "name": "app.css",
+      "filePath": "src/app.css",
+      "summary": "Global stylesheet importing Tailwind CSS 4 and @tailwindcss/forms plugin. Defines custom primary color palette and reusable component classes: .btn-primary, .btn-secondary, .btn-danger, .input, .label, .card.",
+      "tags": ["css", "tailwind", "design-system", "styles"]
+    },
+    {
+      "id": "file:src/routes/+layout.ts",
+      "type": "file",
+      "name": "+layout.ts",
+      "filePath": "src/routes/+layout.ts",
+      "summary": "Disables SSR with `export const ssr = false`, making the app a pure client-side SPA to avoid hydration timing issues.",
+      "tags": ["sveltekit", "config", "ssr", "routing"]
+    },
+    {
+      "id": "file:src/routes/+layout.svelte",
+      "type": "file",
+      "name": "+layout.svelte",
+      "filePath": "src/routes/+layout.svelte",
+      "summary": "Root layout wrapping all routes. Renders navigation bar with Svelte logo and app title, dark-mode toggle (persisted to localStorage using system preference default), and a max-width content container that renders child routes via {@render children()}.",
+      "tags": ["sveltekit", "layout", "navigation", "dark-mode", "svelte5"]
+    },
+    {
+      "id": "file:src/routes/+page.svelte",
+      "type": "file",
+      "name": "+page.svelte (home)",
+      "filePath": "src/routes/+page.svelte",
+      "summary": "Home/list page. Shows the FilterBar, paginated ApplicationCard grid, empty/loading/error states, and a ConfirmDialog for delete. Reacts to filter changes via $effect to reload from applicationStore. Handles archive/restore and delete via store methods.",
+      "tags": ["sveltekit", "page", "list-view", "svelte5"]
+    },
+    {
+      "id": "file:src/routes/applications/[id]/+page.svelte",
+      "type": "file",
+      "name": "+page.svelte ([id])",
+      "filePath": "src/routes/applications/[id]/+page.svelte",
+      "summary": "Detail/edit page for an existing application. Derives the id from $page.params and delegates all rendering to the ApplicationEdit component.",
+      "tags": ["sveltekit", "page", "dynamic-route", "detail-view"]
+    },
+    {
+      "id": "file:src/routes/applications/new/+page.svelte",
+      "type": "file",
+      "name": "+page.svelte (new)",
+      "filePath": "src/routes/applications/new/+page.svelte",
+      "summary": "Create page. Renders ApplicationEdit without an id prop, switching it into create mode.",
+      "tags": ["sveltekit", "page", "create-view"]
+    },
+    {
+      "id": "file:src/lib/types/index.ts",
+      "type": "file",
+      "name": "types/index.ts",
+      "filePath": "src/lib/types/index.ts",
+      "summary": "Central type module. Exports domain interfaces (Application, InterviewStage, FilterState, HistoryEntry, FieldChange, PaginatedResponse), enum union types (ApplicationStatus, CompanyCategory, JobSource), and display-helper constants (STATUS_LABELS, CATEGORY_LABELS, SOURCE_LABELS, STATUS_COLORS, ALL_STATUSES, ALL_CATEGORIES, ALL_SOURCES).",
+      "tags": ["types", "domain-model", "constants", "typescript"]
+    },
+    {
+      "id": "file:src/lib/types/index.test.ts",
+      "type": "file",
+      "name": "types/index.test.ts",
+      "filePath": "src/lib/types/index.test.ts",
+      "summary": "Unit tests verifying that STATUS_LABELS and STATUS_COLORS have entries for every ApplicationStatus in ALL_STATUSES, and that 'unsubmitted' is the first status.",
+      "tags": ["test", "vitest", "types"]
+    },
+    {
+      "id": "file:src/lib/stores/api.ts",
+      "type": "file",
+      "name": "stores/api.ts",
+      "filePath": "src/lib/stores/api.ts",
+      "summary": "HTTP API client singleton. Wraps all fetch calls to /api (proxied to hono-api). Provides typed methods for applications CRUD (list, get, create, update, delete, archive, restore), interview stages CRUD, and history (getHistory, restoreToVersion). Handles 204 No Content and surfaces error messages.",
+      "tags": ["api-client", "http", "fetch", "singleton", "typescript"]
+    },
+    {
+      "id": "file:src/lib/stores/applications.svelte.ts",
+      "type": "file",
+      "name": "applications.svelte.ts",
+      "filePath": "src/lib/stores/applications.svelte.ts",
+      "summary": "Svelte 5 runes-based application store using a factory function pattern. Manages reactive state (applications array, total, page, limit, loading, error, filters) with $state and $derived. Exposes load, create, update, remove, archive, restore, setFilters, setPage, resetFilters. Exports singleton `applicationStore`.",
+      "tags": ["store", "svelte5", "runes", "state-management", "reactive"]
+    },
+    {
+      "id": "file:src/lib/components/ApplicationCard.svelte",
+      "type": "file",
+      "name": "ApplicationCard.svelte",
+      "filePath": "src/lib/components/ApplicationCard.svelte",
+      "summary": "Card component showing a single application in the list. Displays company name with StatusBadge, position title, applied date, category tag, RatingDisplay for skills match, interview stage progress, and offer due-date urgency. Has an overflow menu (Archive/Delete) with click-outside isolation via stopPropagation.",
+      "tags": ["component", "svelte5", "list-item", "card"]
+    },
+    {
+      "id": "file:src/lib/components/ApplicationDetail.svelte",
+      "type": "file",
+      "name": "ApplicationDetail.svelte",
+      "filePath": "src/lib/components/ApplicationDetail.svelte",
+      "summary": "Slide-over detail panel (legacy). Shows full application details in read mode or embeds ApplicationForm for editing. Includes status quick-change select, salary formatting, links section, notes, and InterviewStageList. Used in an older panel-based layout (now superseded by ApplicationEdit route pattern).",
+      "tags": ["component", "svelte5", "detail-view", "panel"]
+    },
+    {
+      "id": "file:src/lib/components/ApplicationEdit.svelte",
+      "type": "file",
+      "name": "ApplicationEdit.svelte",
+      "filePath": "src/lib/components/ApplicationEdit.svelte",
+      "summary": "Primary create/edit form for applications. Handles both create mode (no id prop) and edit mode (id prop). Features: full form state with $state runes, snapshot-based dirty tracking (isDirty), navigation guard via beforeNavigate + window.beforeunload, status-to-date enforcement, inline interview stage management (add/edit/delete/toggle-complete), history panel toggle, and confirm dialogs for discard/delete/stage-delete.",
+      "tags": ["component", "svelte5", "form", "create", "edit", "validation", "navigation-guard"]
+    },
+    {
+      "id": "file:src/lib/components/ApplicationForm.svelte",
+      "type": "file",
+      "name": "ApplicationForm.svelte",
+      "filePath": "src/lib/components/ApplicationForm.svelte",
+      "summary": "Reusable form for application create/update fields. Accepts optional `application` prop for pre-population. Handles both CreateApplicationInput and UpdateApplicationInput shapes. Used inside ApplicationDetail for inline editing.",
+      "tags": ["component", "svelte5", "form", "reusable"]
+    },
+    {
+      "id": "file:src/lib/components/ConfirmDialog.svelte",
+      "type": "file",
+      "name": "ConfirmDialog.svelte",
+      "filePath": "src/lib/components/ConfirmDialog.svelte",
+      "summary": "Modal confirmation dialog. Props: title, message, confirmLabel, cancelLabel, confirmVariant (primary|danger), onconfirm, oncancel. Closes on Escape key or backdrop click. Uses Tailwind fixed overlay.",
+      "tags": ["component", "svelte5", "modal", "dialog", "accessibility"]
+    },
+    {
+      "id": "file:src/lib/components/EmptyState.svelte",
+      "type": "file",
+      "name": "EmptyState.svelte",
+      "filePath": "src/lib/components/EmptyState.svelte",
+      "summary": "Centered empty-state placeholder with clipboard icon, configurable title, description, and optional action button.",
+      "tags": ["component", "svelte5", "empty-state", "ui"]
+    },
+    {
+      "id": "file:src/lib/components/FieldDiff.svelte",
+      "type": "file",
+      "name": "FieldDiff.svelte",
+      "filePath": "src/lib/components/FieldDiff.svelte",
+      "summary": "Renders a list of FieldChange objects as before/after diffs with red strikethrough for old values and green for new values. Used inside HistoryPanel.",
+      "tags": ["component", "svelte5", "history", "diff"]
+    },
+    {
+      "id": "file:src/lib/components/FilterBar.svelte",
+      "type": "file",
+      "name": "FilterBar.svelte",
+      "filePath": "src/lib/components/FilterBar.svelte",
+      "summary": "Filter toolbar for the list view. Provides select dropdowns for Status, Category, Source, Min Skills Match, and Sort By with direction toggle. Includes 'Include archived' checkbox and result count display. Emits partial FilterState updates via onchange callback.",
+      "tags": ["component", "svelte5", "filter", "toolbar"]
+    },
+    {
+      "id": "file:src/lib/components/HistoryPanel.svelte",
+      "type": "file",
+      "name": "HistoryPanel.svelte",
+      "filePath": "src/lib/components/HistoryPanel.svelte",
+      "summary": "Slide-over panel (fixed right, w-96) showing paginated history entries for an application. Each entry is expandable to show FieldDiff changes. Non-current entries have a 'Restore to this point' button that calls api.restoreToVersion and triggers onrestored callback.",
+      "tags": ["component", "svelte5", "history", "panel", "slide-over"]
+    },
+    {
+      "id": "file:src/lib/components/InterviewStageForm.svelte",
+      "type": "file",
+      "name": "InterviewStageForm.svelte",
+      "filePath": "src/lib/components/InterviewStageForm.svelte",
+      "summary": "Inline form for adding or editing an interview stage. Fields: name (required), order, isCompleted checkbox, completedDate (conditional), performanceRating (via RatingInput), notes. Submits CreateInterviewStageInput or UpdateInterviewStageInput based on whether a stage prop is provided.",
+      "tags": ["component", "svelte5", "form", "interview-stage"]
+    },
+    {
+      "id": "file:src/lib/components/InterviewStageItem.svelte",
+      "type": "file",
+      "name": "InterviewStageItem.svelte",
+      "filePath": "src/lib/components/InterviewStageItem.svelte",
+      "summary": "Single interview stage row. Shows a toggle-complete checkbox, stage name (struck through when completed), completed date, performance rating (RatingDisplay), notes icon, and hover-revealed edit/delete buttons.",
+      "tags": ["component", "svelte5", "interview-stage", "list-item"]
+    },
+    {
+      "id": "file:src/lib/components/InterviewStageList.svelte",
+      "type": "file",
+      "name": "InterviewStageList.svelte",
+      "filePath": "src/lib/components/InterviewStageList.svelte",
+      "summary": "Container for interview stages within ApplicationDetail. Renders sorted InterviewStageItem list with completion count, an Add Stage button, and inline InterviewStageForm for add/edit. Delegates CRUD to onAdd/onUpdate/onRemove callback props.",
+      "tags": ["component", "svelte5", "interview-stage", "container"]
+    },
+    {
+      "id": "file:src/lib/components/Pagination.svelte",
+      "type": "file",
+      "name": "Pagination.svelte",
+      "filePath": "src/lib/components/Pagination.svelte",
+      "summary": "Smart pagination control. Renders Previous/Next buttons and up to 7 page numbers with ellipsis compression for large page counts. Highlights current page and sets aria-current.",
+      "tags": ["component", "svelte5", "pagination", "navigation", "accessibility"]
+    },
+    {
+      "id": "file:src/lib/components/RatingDisplay.svelte",
+      "type": "file",
+      "name": "RatingDisplay.svelte",
+      "filePath": "src/lib/components/RatingDisplay.svelte",
+      "summary": "Read-only star rating display. Accepts value (1-5), max (default 5), and optional showNumeric flag. Renders filled/empty SVG stars.",
+      "tags": ["component", "svelte5", "rating", "display"]
+    },
+    {
+      "id": "file:src/lib/components/RatingInput.svelte",
+      "type": "file",
+      "name": "RatingInput.svelte",
+      "filePath": "src/lib/components/RatingInput.svelte",
+      "summary": "Interactive 5-star rating input. Implements ARIA radiogroup pattern with roving tabindex. Supports hover preview, click to set, click again to clear (allowClear), Space/Enter keyboard activation.",
+      "tags": ["component", "svelte5", "rating", "input", "accessibility", "aria"]
+    },
+    {
+      "id": "file:src/lib/components/RatingInput.test.ts",
+      "type": "file",
+      "name": "RatingInput.test.ts",
+      "filePath": "src/lib/components/RatingInput.test.ts",
+      "summary": "Comprehensive unit tests for RatingInput covering ARIA roles, roving tabindex, keyboard interaction (Space, Enter), mouse click/clear, and visual focus-ring classes. Uses @testing-library/svelte and userEvent.",
+      "tags": ["test", "vitest", "component-test", "accessibility", "rating"]
+    },
+    {
+      "id": "file:src/lib/components/StatusBadge.svelte",
+      "type": "file",
+      "name": "StatusBadge.svelte",
+      "filePath": "src/lib/components/StatusBadge.svelte",
+      "summary": "Inline pill badge for ApplicationStatus. Maps status to Tailwind color classes via STATUS_COLORS and label text via STATUS_LABELS. Supports small/medium size variants.",
+      "tags": ["component", "svelte5", "badge", "status"]
+    },
+    {
+      "id": "file:src/lib/components/UrlFieldInput.svelte",
+      "type": "file",
+      "name": "UrlFieldInput.svelte",
+      "filePath": "src/lib/components/UrlFieldInput.svelte",
+      "summary": "URL input field with an inline 'open in new tab' icon button that appears when the value is a valid http(s) URL. Uses a local $state copy synced from the parent prop via $effect to ensure Playwright fill() works correctly.",
+      "tags": ["component", "svelte5", "input", "url", "form"]
+    },
+    {
+      "id": "file:svelte.config.js",
+      "type": "config",
+      "name": "svelte.config.js",
+      "filePath": "svelte.config.js",
+      "summary": "SvelteKit configuration. Uses adapter-auto and vitePreprocess. Defines $lib and $components path aliases.",
+      "tags": ["config", "sveltekit", "build"]
+    },
+    {
+      "id": "file:vite.config.ts",
+      "type": "config",
+      "name": "vite.config.ts",
+      "filePath": "vite.config.ts",
+      "summary": "Vite config with SvelteKit plugin. Dev server on port 3030 (env: UI_PORT). Proxies /api to localhost:5030 (env: API_PORT) rewriting the prefix. Configures Vitest with happy-dom environment and browser conditions.",
+      "tags": ["config", "vite", "proxy", "test", "dev-server"]
+    },
+    {
+      "id": "file:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "Package manifest for job-tracker-svelte-ui. Key deps: svelte 5, @sveltejs/kit 2, tailwindcss 4, vitest 4, @testing-library/svelte 5. Scripts: dev, build, lint, check, test.",
+      "tags": ["config", "npm", "dependencies"]
+    }
+  ],
+  "edges": [
+    { "source": "file:src/routes/+layout.svelte", "target": "file:src/app.css", "type": "imports", "label": "imports app.css" },
+    { "source": "file:src/routes/+layout.svelte", "target": "file:src/routes/+page.svelte", "type": "renders", "label": "renders children (routes)" },
+    { "source": "file:src/routes/+layout.svelte", "target": "file:src/routes/applications/[id]/+page.svelte", "type": "renders", "label": "renders children (routes)" },
+    { "source": "file:src/routes/+layout.svelte", "target": "file:src/routes/applications/new/+page.svelte", "type": "renders", "label": "renders children (routes)" },
+    { "source": "file:src/routes/+layout.ts", "target": "file:src/routes/+layout.svelte", "type": "configures", "label": "ssr=false" },
+    { "source": "file:src/routes/+page.svelte", "target": "file:src/lib/stores/applications.svelte.ts", "type": "imports", "label": "uses applicationStore" },
+    { "source": "file:src/routes/+page.svelte", "target": "file:src/lib/components/ApplicationCard.svelte", "type": "imports", "label": "renders list" },
+    { "source": "file:src/routes/+page.svelte", "target": "file:src/lib/components/FilterBar.svelte", "type": "imports", "label": "renders filter bar" },
+    { "source": "file:src/routes/+page.svelte", "target": "file:src/lib/components/Pagination.svelte", "type": "imports", "label": "renders pagination" },
+    { "source": "file:src/routes/+page.svelte", "target": "file:src/lib/components/EmptyState.svelte", "type": "imports", "label": "renders empty state" },
+    { "source": "file:src/routes/+page.svelte", "target": "file:src/lib/components/ConfirmDialog.svelte", "type": "imports", "label": "delete confirmation" },
+    { "source": "file:src/routes/applications/[id]/+page.svelte", "target": "file:src/lib/components/ApplicationEdit.svelte", "type": "imports", "label": "delegates to ApplicationEdit" },
+    { "source": "file:src/routes/applications/new/+page.svelte", "target": "file:src/lib/components/ApplicationEdit.svelte", "type": "imports", "label": "delegates to ApplicationEdit (no id)" },
+    { "source": "file:src/lib/stores/applications.svelte.ts", "target": "file:src/lib/stores/api.ts", "type": "imports", "label": "calls api for CRUD" },
+    { "source": "file:src/lib/stores/applications.svelte.ts", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses Application, FilterState types" },
+    { "source": "file:src/lib/stores/api.ts", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses all domain types" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/stores/api.ts", "type": "imports", "label": "direct API calls for get/update/delete/stages/history" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/stores/applications.svelte.ts", "type": "imports", "label": "calls applicationStore.create" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses all domain types and constants" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/components/RatingInput.svelte", "type": "imports", "label": "skills match rating" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/components/UrlFieldInput.svelte", "type": "imports", "label": "URL fields" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/components/InterviewStageForm.svelte", "type": "imports", "label": "add/edit stage form" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/components/InterviewStageItem.svelte", "type": "imports", "label": "stage list items" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/components/ConfirmDialog.svelte", "type": "imports", "label": "discard/delete/stage confirm dialogs" },
+    { "source": "file:src/lib/components/ApplicationEdit.svelte", "target": "file:src/lib/components/HistoryPanel.svelte", "type": "imports", "label": "history slide-over" },
+    { "source": "file:src/lib/components/ApplicationCard.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses Application, CATEGORY_LABELS" },
+    { "source": "file:src/lib/components/ApplicationCard.svelte", "target": "file:src/lib/components/StatusBadge.svelte", "type": "imports", "label": "shows status badge" },
+    { "source": "file:src/lib/components/ApplicationCard.svelte", "target": "file:src/lib/components/RatingDisplay.svelte", "type": "imports", "label": "shows skills match stars" },
+    { "source": "file:src/lib/components/ApplicationDetail.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses Application and input types" },
+    { "source": "file:src/lib/components/ApplicationDetail.svelte", "target": "file:src/lib/components/RatingDisplay.svelte", "type": "imports", "label": "skills match display" },
+    { "source": "file:src/lib/components/ApplicationDetail.svelte", "target": "file:src/lib/components/InterviewStageList.svelte", "type": "imports", "label": "stage management" },
+    { "source": "file:src/lib/components/ApplicationDetail.svelte", "target": "file:src/lib/components/ApplicationForm.svelte", "type": "imports", "label": "inline edit form" },
+    { "source": "file:src/lib/components/ApplicationForm.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses Application, input types, constants" },
+    { "source": "file:src/lib/components/ApplicationForm.svelte", "target": "file:src/lib/components/RatingInput.svelte", "type": "imports", "label": "skills match rating" },
+    { "source": "file:src/lib/components/FilterBar.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses FilterState, status/category/source constants" },
+    { "source": "file:src/lib/components/HistoryPanel.svelte", "target": "file:src/lib/stores/api.ts", "type": "imports", "label": "calls getHistory and restoreToVersion" },
+    { "source": "file:src/lib/components/HistoryPanel.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses HistoryEntry type" },
+    { "source": "file:src/lib/components/HistoryPanel.svelte", "target": "file:src/lib/components/FieldDiff.svelte", "type": "imports", "label": "renders field changes" },
+    { "source": "file:src/lib/components/InterviewStageForm.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses InterviewStage and input types" },
+    { "source": "file:src/lib/components/InterviewStageForm.svelte", "target": "file:src/lib/components/RatingInput.svelte", "type": "imports", "label": "performance rating" },
+    { "source": "file:src/lib/components/InterviewStageItem.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses InterviewStage type" },
+    { "source": "file:src/lib/components/InterviewStageItem.svelte", "target": "file:src/lib/components/RatingDisplay.svelte", "type": "imports", "label": "performance rating stars" },
+    { "source": "file:src/lib/components/InterviewStageList.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses InterviewStage and input types" },
+    { "source": "file:src/lib/components/InterviewStageList.svelte", "target": "file:src/lib/components/InterviewStageItem.svelte", "type": "imports", "label": "renders stage rows" },
+    { "source": "file:src/lib/components/InterviewStageList.svelte", "target": "file:src/lib/components/InterviewStageForm.svelte", "type": "imports", "label": "add/edit form" },
+    { "source": "file:src/lib/components/StatusBadge.svelte", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "uses STATUS_LABELS, STATUS_COLORS" },
+    { "source": "file:src/lib/types/index.test.ts", "target": "file:src/lib/types/index.ts", "type": "imports", "label": "tests ALL_STATUSES, STATUS_LABELS, STATUS_COLORS" },
+    { "source": "file:src/lib/components/RatingInput.test.ts", "target": "file:src/lib/components/RatingInput.svelte", "type": "imports", "label": "tests RatingInput component" },
+    { "source": "file:vite.config.ts", "target": "file:svelte.config.js", "type": "configures", "label": "uses sveltekit() plugin" },
+    { "source": "file:src/app.html", "target": "file:src/routes/+layout.svelte", "type": "renders", "label": "mounts SvelteKit body" },
+    { "source": "file:vite.config.ts", "target": "file:package.json", "type": "configures", "label": "defined in package" }
+  ],
+  "layers": [
+    {
+      "id": "layer:entrypoints",
+      "name": "Entry Points & Shell",
+      "description": "HTML shell, global styles, root layout, and SvelteKit configuration that bootstrap the application.",
+      "nodeIds": [
+        "file:src/app.html",
+        "file:src/app.css",
+        "file:src/routes/+layout.ts",
+        "file:src/routes/+layout.svelte"
+      ]
+    },
+    {
+      "id": "layer:routes",
+      "name": "Route Pages",
+      "description": "SvelteKit +page.svelte files that correspond to URL routes: home list, application detail ([id]), and create new.",
+      "nodeIds": [
+        "file:src/routes/+page.svelte",
+        "file:src/routes/applications/[id]/+page.svelte",
+        "file:src/routes/applications/new/+page.svelte"
+      ]
+    },
+    {
+      "id": "layer:domain",
+      "name": "Domain Types & Constants",
+      "description": "TypeScript interfaces, union types, and display-helper constants that define the application's data model.",
+      "nodeIds": [
+        "file:src/lib/types/index.ts",
+        "file:src/lib/types/index.test.ts"
+      ]
+    },
+    {
+      "id": "layer:data",
+      "name": "Data Layer (Stores & API)",
+      "description": "The HTTP API client and the Svelte 5 runes-based reactive store that coordinate data fetching and mutations.",
+      "nodeIds": [
+        "file:src/lib/stores/api.ts",
+        "file:src/lib/stores/applications.svelte.ts"
+      ]
+    },
+    {
+      "id": "layer:feature-components",
+      "name": "Feature Components",
+      "description": "High-level components that implement major user-facing features: list card, detail panel, edit form, filter bar, history, and pagination.",
+      "nodeIds": [
+        "file:src/lib/components/ApplicationCard.svelte",
+        "file:src/lib/components/ApplicationDetail.svelte",
+        "file:src/lib/components/ApplicationEdit.svelte",
+        "file:src/lib/components/ApplicationForm.svelte",
+        "file:src/lib/components/FilterBar.svelte",
+        "file:src/lib/components/HistoryPanel.svelte",
+        "file:src/lib/components/Pagination.svelte"
+      ]
+    },
+    {
+      "id": "layer:interview-stage-components",
+      "name": "Interview Stage Components",
+      "description": "Components specifically for managing interview stages within an application: list container, individual item row, and add/edit form.",
+      "nodeIds": [
+        "file:src/lib/components/InterviewStageList.svelte",
+        "file:src/lib/components/InterviewStageItem.svelte",
+        "file:src/lib/components/InterviewStageForm.svelte"
+      ]
+    },
+    {
+      "id": "layer:primitive-components",
+      "name": "Primitive / UI Components",
+      "description": "Small, reusable leaf components with no business logic: rating input/display, status badge, URL field, confirm dialog, empty state, field diff.",
+      "nodeIds": [
+        "file:src/lib/components/RatingInput.svelte",
+        "file:src/lib/components/RatingDisplay.svelte",
+        "file:src/lib/components/RatingInput.test.ts",
+        "file:src/lib/components/StatusBadge.svelte",
+        "file:src/lib/components/UrlFieldInput.svelte",
+        "file:src/lib/components/ConfirmDialog.svelte",
+        "file:src/lib/components/EmptyState.svelte",
+        "file:src/lib/components/FieldDiff.svelte"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "Build Configuration",
+      "description": "Project config files: SvelteKit adapter config, Vite dev server and test config, and package.json.",
+      "nodeIds": [
+        "file:svelte.config.js",
+        "file:vite.config.ts",
+        "file:package.json"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "id": "tour:step-1",
+      "title": "HTML Shell & Global Styles",
+      "description": "Start at app.html, which is the single HTML page SvelteKit injects into. Then look at app.css to understand the Tailwind 4 setup and the custom design-system classes (.btn-primary, .input, .card) used throughout every component.",
+      "order": 1,
+      "nodeIds": ["file:src/app.html", "file:src/app.css"]
+    },
+    {
+      "id": "tour:step-2",
+      "title": "Domain Types — the data model",
+      "description": "Read src/lib/types/index.ts before anything else. It defines every interface (Application, InterviewStage, FilterState, HistoryEntry) and all enum unions (ApplicationStatus, CompanyCategory, JobSource) plus display helpers. Every other file imports from here.",
+      "order": 2,
+      "nodeIds": ["file:src/lib/types/index.ts"]
+    },
+    {
+      "id": "tour:step-3",
+      "title": "API Client",
+      "description": "src/lib/stores/api.ts is the HTTP boundary. It wraps fetch calls to /api (proxied to hono-api on port 5030). All CRUD for applications, interview stages, and history flows through this singleton. Note the 204 handling and error surfacing pattern.",
+      "order": 3,
+      "nodeIds": ["file:src/lib/stores/api.ts"]
+    },
+    {
+      "id": "tour:step-4",
+      "title": "Application Store — Svelte 5 runes",
+      "description": "applications.svelte.ts shows the Svelte 5 factory-function store pattern using $state, $derived, and exported getters. It owns the paginated list, loading/error state, and filter state. The singleton `applicationStore` is shared across the home page and ApplicationEdit.",
+      "order": 4,
+      "nodeIds": ["file:src/lib/stores/applications.svelte.ts"]
+    },
+    {
+      "id": "tour:step-5",
+      "title": "SvelteKit Routing & Layout",
+      "description": "src/routes/+layout.ts disables SSR (ssr=false) making this a pure SPA. +layout.svelte wraps all pages in the nav bar with the Svelte logo, app title, and dark-mode toggle (localStorage-backed with system-preference default).",
+      "order": 5,
+      "nodeIds": ["file:src/routes/+layout.ts", "file:src/routes/+layout.svelte"]
+    },
+    {
+      "id": "tour:step-6",
+      "title": "Home Page — List View",
+      "description": "src/routes/+page.svelte is the main list page. It uses $effect to reload when filters change, renders FilterBar, the ApplicationCard grid, Pagination, EmptyState, and a delete ConfirmDialog. Archive/restore is handled inline.",
+      "order": 6,
+      "nodeIds": ["file:src/routes/+page.svelte", "file:src/lib/components/FilterBar.svelte", "file:src/lib/components/Pagination.svelte"]
+    },
+    {
+      "id": "tour:step-7",
+      "title": "Application Card",
+      "description": "ApplicationCard.svelte is the list-item component. It displays a clickable card with company/position, StatusBadge, skill rating, interview stage progress, offer due-date urgency, and an overflow menu (Archive/Delete) that uses stopPropagation to prevent card click.",
+      "order": 7,
+      "nodeIds": ["file:src/lib/components/ApplicationCard.svelte", "file:src/lib/components/StatusBadge.svelte", "file:src/lib/components/RatingDisplay.svelte"]
+    },
+    {
+      "id": "tour:step-8",
+      "title": "Create / Edit Application",
+      "description": "ApplicationEdit.svelte is the most complex component. It handles both create mode (no id) and edit mode (id from route params). Key patterns: snapshot-based isDirty tracking, beforeNavigate + window.beforeunload guards, status-to-date enforcement, and inline interview stage management with local stages in create mode.",
+      "order": 8,
+      "nodeIds": ["file:src/routes/applications/new/+page.svelte", "file:src/routes/applications/[id]/+page.svelte", "file:src/lib/components/ApplicationEdit.svelte"]
+    },
+    {
+      "id": "tour:step-9",
+      "title": "Interview Stages",
+      "description": "Three components form the interview stage subsystem. InterviewStageList is the container (used in ApplicationDetail). InterviewStageItem renders one row with toggle-complete, edit, delete. InterviewStageForm handles add/edit. ApplicationEdit inlines these directly without the List wrapper.",
+      "order": 9,
+      "nodeIds": ["file:src/lib/components/InterviewStageList.svelte", "file:src/lib/components/InterviewStageItem.svelte", "file:src/lib/components/InterviewStageForm.svelte"]
+    },
+    {
+      "id": "tour:step-10",
+      "title": "History Panel & Field Diff",
+      "description": "HistoryPanel.svelte is a fixed right slide-over that loads change history via api.getHistory. Each entry expands to show FieldDiff (red strikethrough → green new values). Non-latest entries offer restore. Launched from ApplicationEdit via the History button.",
+      "order": 10,
+      "nodeIds": ["file:src/lib/components/HistoryPanel.svelte", "file:src/lib/components/FieldDiff.svelte"]
+    },
+    {
+      "id": "tour:step-11",
+      "title": "Primitive Components & Accessibility",
+      "description": "RatingInput implements an ARIA radiogroup with roving tabindex, hover preview, and keyboard activation — see its extensive test suite in RatingInput.test.ts. ConfirmDialog handles Escape/backdrop. UrlFieldInput adds an open-in-tab button for valid URLs.",
+      "order": 11,
+      "nodeIds": ["file:src/lib/components/RatingInput.svelte", "file:src/lib/components/RatingInput.test.ts", "file:src/lib/components/ConfirmDialog.svelte", "file:src/lib/components/UrlFieldInput.svelte"]
+    },
+    {
+      "id": "tour:step-12",
+      "title": "Build & Dev Config",
+      "description": "vite.config.ts configures the dev server (port 3030) and the /api proxy to hono-api (port 5030). svelte.config.js sets up the $lib alias and vitePreprocess. package.json shows the exact dependency versions.",
+      "order": 12,
+      "nodeIds": ["file:vite.config.ts", "file:svelte.config.js", "file:package.json"]
+    }
+  ]
+}

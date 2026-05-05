@@ -1,0 +1,515 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "job-tracker-vue-ui",
+    "languages": ["TypeScript", "Vue", "CSS"],
+    "frameworks": ["Vue 3", "Vite", "Pinia", "Vue Router", "Tailwind CSS", "Vitest", "Playwright"],
+    "description": "Vue 3 + TypeScript single-page application for tracking job applications, featuring event-sourced undo/redo history, Pinia state management with Immer patches, and Tailwind CSS dark-mode UI. Pairs with nuxt-api backend (port 5040).",
+    "analyzedAt": "2026-05-04T00:00:00.000Z",
+    "gitCommitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f"
+  },
+  "nodes": [
+    {
+      "id": "file:src/main.ts",
+      "type": "file",
+      "name": "main.ts",
+      "filePath": "src/main.ts",
+      "summary": "Application bootstrap: creates the Vue app instance, registers Pinia and Vue Router plugins, defines client-side routes (list, new, edit), enables Immer patch generation for undo/redo, and mounts to #app.",
+      "tags": ["entry-point", "config", "routing"]
+    },
+    {
+      "id": "file:src/App.vue",
+      "type": "file",
+      "name": "App.vue",
+      "filePath": "src/App.vue",
+      "summary": "Root application shell component. Renders a fixed header with Vue logo, app title, dark-mode toggle (via useDarkMode composable), and an Add Application button. Hosts <RouterView> for page content.",
+      "tags": ["entry-point", "ui", "layout"]
+    },
+    {
+      "id": "file:src/types/index.ts",
+      "type": "file",
+      "name": "types/index.ts",
+      "filePath": "src/types/index.ts",
+      "summary": "Barrel re-export of all shared domain types and constants from @shared/types (nuxt-api). Provides ApplicationStatus, CompanyCategory, JobSource, Application, InterviewStage, event-sourcing types (ImmerPatch, FieldChange, ApplicationEvent, ApplicationSnapshot), and lookup arrays APPLICATION_STATUSES, COMPANY_CATEGORIES, JOB_SOURCES.",
+      "tags": ["type-definition", "utility"]
+    },
+    {
+      "id": "file:src/services/api.ts",
+      "type": "file",
+      "name": "services/api.ts",
+      "filePath": "src/services/api.ts",
+      "summary": "HTTP client layer. Exports applicationService (list, get, create, update, delete, archive, restore, recreate), interviewStageService (create, update, delete), eventService (list, append, restore, getLatestSnapshot), and checkHealth. All requests proxy to /api (forwarded to nuxt-api on port 5040). Handles 204 No Content responses.",
+      "tags": ["service", "api-client"]
+    },
+    {
+      "id": "file:src/stores/applicationsList.ts",
+      "type": "file",
+      "name": "stores/applicationsList.ts",
+      "filePath": "src/stores/applicationsList.ts",
+      "summary": "Pinia setup store managing the paginated applications list. Holds applications array, total count, loading/error state, and FilterState. Provides fetchApplications, createApplication (also records creation event), updateApplication, deleteApplication, archiveApplication, restoreApplication, and pagination helpers (nextPage, prevPage, goToPage). Watches filters deeply to auto-refetch.",
+      "tags": ["service", "state", "pinia"]
+    },
+    {
+      "id": "file:src/stores/applicationDetail.ts",
+      "type": "file",
+      "name": "stores/applicationDetail.ts",
+      "filePath": "src/stores/applicationDetail.ts",
+      "summary": "Pinia setup store for a single application in edit mode. Uses Immer produceWithPatches to record before/after state diffs for every mutation (update, delete, archive, restore, addInterviewStage, updateInterviewStage, deleteInterviewStage, toggleStageCompletion). Calls eventService.append to persist each change as a server-side event, then delegates to historyStore.addCommit. Guards mutations with isUndoRedoInProgress to avoid double-recording during undo/redo.",
+      "tags": ["service", "state", "pinia", "event-sourcing"]
+    },
+    {
+      "id": "file:src/stores/history.ts",
+      "type": "file",
+      "name": "stores/history.ts",
+      "filePath": "src/stores/history.ts",
+      "summary": "Pinia setup store implementing per-application undo/redo via an event-sourcing commit log. Maintains commitsByApp (Map<appId, Commit[]>) and cursorByApp (Map<appId, number>). addCommit truncates redo stack. undo/redo apply Immer inversePatches/patches locally and sync diffs to the server via syncStateToServer (handles archive/restore toggling, field updates, and interview stage adds/updates/deletes). loadHistory fetches server events and rebuilds the local commit log.",
+      "tags": ["service", "state", "pinia", "event-sourcing"]
+    },
+    {
+      "id": "file:src/composables/useDarkMode.ts",
+      "type": "file",
+      "name": "composables/useDarkMode.ts",
+      "filePath": "src/composables/useDarkMode.ts",
+      "summary": "Composable that manages dark mode preference. Reads/writes localStorage key 'app-theme', falls back to system prefers-color-scheme media query, listens for system changes (unless user has explicitly set preference). Toggles 'dark' class on document.documentElement. Cleaned up on component unmount.",
+      "tags": ["service", "utility", "composable"]
+    },
+    {
+      "id": "file:src/utils/eventDescriptions.ts",
+      "type": "file",
+      "name": "utils/eventDescriptions.ts",
+      "filePath": "src/utils/eventDescriptions.ts",
+      "summary": "Pure utility functions for event sourcing. generateFieldChanges compares old/new Application states and returns FieldChange[] for changed keys. generateDescription produces human-readable strings for actions (create, update, delete, archive, restore, addStage, updateStage, deleteStage). Exports FIELD_LABELS mapping for display.",
+      "tags": ["utility", "event-sourcing"]
+    },
+    {
+      "id": "file:src/views/ApplicationList.vue",
+      "type": "file",
+      "name": "views/ApplicationList.vue",
+      "filePath": "src/views/ApplicationList.vue",
+      "summary": "Page view for the applications list route (/). Fetches applications on mount via useApplicationsListStore. Renders FilterBar, a list of ApplicationCard components, Pagination, EmptyState, and a ConfirmDialog for delete confirmation. Handles archive, restore, and delete actions delegating to the list store.",
+      "tags": ["ui", "routing", "view"]
+    },
+    {
+      "id": "file:src/views/ApplicationEdit.vue",
+      "type": "file",
+      "name": "views/ApplicationEdit.vue",
+      "filePath": "src/views/ApplicationEdit.vue",
+      "summary": "Page view for both create (/applications/new) and edit (/applications/:id) modes. Contains full application form with individual field refs, snapshot-based dirty tracking, validation, and save/discard/delete/archive/restore actions. In edit mode: integrates UndoRedoBar, HistoryPanel, keyboard shortcuts (Ctrl+Z/Y), and watches detailStore.application for undo/redo sync. Prevents navigation away with unsaved changes via onBeforeRouteLeave + skipNavGuard pattern.",
+      "tags": ["ui", "routing", "view"]
+    },
+    {
+      "id": "file:src/components/ApplicationCard.vue",
+      "type": "file",
+      "name": "components/ApplicationCard.vue",
+      "filePath": "src/components/ApplicationCard.vue",
+      "summary": "Card component displaying a single application in the list. Shows company name, position title, StatusBadge, date applied, company category, skills match (RatingDisplay), interview progress (N/M stages for interviewing status), and offer due date urgency indicator. Includes a dropdown action menu (archive/restore/delete) that stops click propagation.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/FilterBar.vue",
+      "type": "file",
+      "name": "components/FilterBar.vue",
+      "filePath": "src/components/FilterBar.vue",
+      "summary": "Filter toolbar for the applications list. Provides dropdowns for status, company category, job source, and minimum skills match. Sort by field/direction controls, include-archived checkbox, active filter count badge, and clear-filters button. Emits update:filters (partial FilterState) and clearFilters events.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/HistoryPanel.vue",
+      "type": "file",
+      "name": "components/HistoryPanel.vue",
+      "filePath": "src/components/HistoryPanel.vue",
+      "summary": "Fixed slide-in panel (right side) showing the chronological commit log for an application. Displays each commit with relative timestamp, highlights the current version, and allows expanding to see EventDiff. Provides 'Restore to this point' button (calls eventService.restore for server-side events). Loads history from historyStore on mount.",
+      "tags": ["ui", "component", "event-sourcing"]
+    },
+    {
+      "id": "file:src/components/UndoRedoBar.vue",
+      "type": "file",
+      "name": "components/UndoRedoBar.vue",
+      "filePath": "src/components/UndoRedoBar.vue",
+      "summary": "Compact toolbar with undo and redo buttons. Reads canUndo/canRedo from historyStore. Shows the current commit description as a label. Triggers historyStore.undo/redo on click.",
+      "tags": ["ui", "component", "event-sourcing"]
+    },
+    {
+      "id": "file:src/components/EventDiff.vue",
+      "type": "file",
+      "name": "components/EventDiff.vue",
+      "filePath": "src/components/EventDiff.vue",
+      "summary": "Presentational component rendering a FieldChange[] diff. Shows each changed field's label, old value (struck-through red), and new value (green). Handles null/undefined values gracefully.",
+      "tags": ["ui", "component", "event-sourcing"]
+    },
+    {
+      "id": "file:src/components/StatusBadge.vue",
+      "type": "file",
+      "name": "components/StatusBadge.vue",
+      "filePath": "src/components/StatusBadge.vue",
+      "summary": "Pill badge rendering an ApplicationStatus with color-coded styling. Supports 'small' and 'medium' sizes. Maps all 8 statuses (unsubmitted, applied, interviewing, given offer, accepted offer, rejected, declined offer, no offer) to color classes.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/RatingInput.vue",
+      "type": "file",
+      "name": "components/RatingInput.vue",
+      "filePath": "src/components/RatingInput.vue",
+      "summary": "Accessible 5-star rating input using v-model. Supports hover preview, click-to-clear (allowClear prop), keyboard navigation (Space/Enter), and aria-checked attributes. Used for skills match and performance rating fields.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/RatingDisplay.vue",
+      "type": "file",
+      "name": "components/RatingDisplay.vue",
+      "filePath": "src/components/RatingDisplay.vue",
+      "summary": "Read-only star rating display. Renders filled/outline stars up to configurable max (default 5). Optional numeric label. Used in ApplicationCard and InterviewStageItem.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/ConfirmDialog.vue",
+      "type": "file",
+      "name": "components/ConfirmDialog.vue",
+      "filePath": "src/components/ConfirmDialog.vue",
+      "summary": "Modal confirmation dialog using Vue Teleport (renders to body). Supports destructive styling (red warning icon). Closes on Escape key, backdrop click, or cancel button. Prevents body scroll while open. Emits confirm and cancel.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/EmptyState.vue",
+      "type": "file",
+      "name": "components/EmptyState.vue",
+      "filePath": "src/components/EmptyState.vue",
+      "summary": "Centered empty state display with icon slot, title, description, and optional action slot. Used when the applications list is empty.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/InterviewStageForm.vue",
+      "type": "file",
+      "name": "components/InterviewStageForm.vue",
+      "filePath": "src/components/InterviewStageForm.vue",
+      "summary": "Inline form for creating or editing an interview stage. Fields: name, order, isCompleted checkbox, completedDate (conditional), performance rating (RatingInput), and notes. Validates name (required, max 100 chars) and order (non-negative). Emits save with CreateInterviewStageInput | UpdateInterviewStageInput.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/InterviewStageItem.vue",
+      "type": "file",
+      "name": "components/InterviewStageItem.vue",
+      "filePath": "src/components/InterviewStageItem.vue",
+      "summary": "Read-only row for an interview stage in the list. Shows completion toggle (CheckCircle/ring), stage name, completed date, RatingDisplay for performance rating, and notes indicator. Expands inline to show notes on click. Edit and delete buttons emit events.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/Pagination.vue",
+      "type": "file",
+      "name": "components/Pagination.vue",
+      "filePath": "src/components/Pagination.vue",
+      "summary": "Pagination nav with smart page window: shows all pages up to 7, otherwise shows first/last with ellipsis and pages around current. Previous/next buttons. Emits pageChange with page number.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/components/UrlFieldInput.vue",
+      "type": "file",
+      "name": "components/UrlFieldInput.vue",
+      "filePath": "src/components/UrlFieldInput.vue",
+      "summary": "URL input field with an inline 'open in new tab' button that appears when the value starts with http:// or https://. Supports label, placeholder, and error display. Used for company URL, career page URL, and job posting URL fields.",
+      "tags": ["ui", "component"]
+    },
+    {
+      "id": "file:src/style.css",
+      "type": "file",
+      "name": "style.css",
+      "filePath": "src/style.css",
+      "summary": "Global CSS entry point importing Tailwind CSS. Defines component layer utilities (.btn, .btn-primary, .btn-secondary, .btn-danger, .card, .input, .label) used throughout the component tree.",
+      "tags": ["config", "ui"]
+    },
+    {
+      "id": "file:src/vite-env.d.ts",
+      "type": "file",
+      "name": "vite-env.d.ts",
+      "filePath": "src/vite-env.d.ts",
+      "summary": "Vite client type declaration file. References vite/client to enable import.meta.env types and asset module declarations.",
+      "tags": ["config", "type-definition"]
+    },
+    {
+      "id": "file:src/shims-vue-router.d.ts",
+      "type": "file",
+      "name": "shims-vue-router.d.ts",
+      "filePath": "src/shims-vue-router.d.ts",
+      "summary": "Vue Router module augmentation to add custom meta fields to route definitions.",
+      "tags": ["config", "type-definition"]
+    },
+    {
+      "id": "file:vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "vite.config.ts",
+      "summary": "Vite configuration. Registers @vitejs/plugin-vue. Configures path aliases: @ → src/, @shared → ../nuxt-api/shared/. Dev server on port 3020 with /api proxy to nuxt-api on port 5040. Vitest setup: jsdom environment, globals true, excludes e2e tests.",
+      "tags": ["config"]
+    },
+    {
+      "id": "file:tsconfig.json",
+      "type": "file",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript project configuration. References tsconfig.node.json for build tools. Extends @vue/tsconfig/tsconfig.dom.json for Vue/DOM types. Enables strict mode and paths aliases (@/*, @shared/*) matching vite.config.ts.",
+      "tags": ["config"]
+    },
+    {
+      "id": "file:src/components/RatingInput.test.ts",
+      "type": "file",
+      "name": "RatingInput.test.ts",
+      "filePath": "src/components/RatingInput.test.ts",
+      "summary": "Unit tests for RatingInput component using @testing-library/vue and Vitest.",
+      "tags": ["test"]
+    },
+    {
+      "id": "file:src/stores/__tests__/applicationDetail.test.ts",
+      "type": "file",
+      "name": "stores/__tests__/applicationDetail.test.ts",
+      "filePath": "src/stores/__tests__/applicationDetail.test.ts",
+      "summary": "Unit tests for applicationDetail Pinia store: verifies fetch, update, delete, archive, restore, and interview stage CRUD with mocked API services.",
+      "tags": ["test"]
+    },
+    {
+      "id": "file:src/stores/__tests__/history.test.ts",
+      "type": "file",
+      "name": "stores/__tests__/history.test.ts",
+      "filePath": "src/stores/__tests__/history.test.ts",
+      "summary": "Unit tests for history Pinia store: verifies addCommit, undo/redo cursor movement, canUndo/canRedo, loadHistory from server events, and clearHistory.",
+      "tags": ["test"]
+    },
+    {
+      "id": "file:src/utils/__tests__/eventDescriptions.test.ts",
+      "type": "file",
+      "name": "utils/__tests__/eventDescriptions.test.ts",
+      "filePath": "src/utils/__tests__/eventDescriptions.test.ts",
+      "summary": "Unit tests for generateFieldChanges and generateDescription utility functions.",
+      "tags": ["test"]
+    }
+  ],
+  "edges": [
+    { "source": "file:src/main.ts", "target": "file:src/App.vue", "type": "imports", "label": "root component" },
+    { "source": "file:src/main.ts", "target": "file:src/style.css", "type": "imports", "label": "global styles" },
+    { "source": "file:src/main.ts", "target": "file:src/views/ApplicationList.vue", "type": "configures", "label": "route /" },
+    { "source": "file:src/main.ts", "target": "file:src/views/ApplicationEdit.vue", "type": "configures", "label": "routes /applications/new and /applications/:id" },
+
+    { "source": "file:src/App.vue", "target": "file:src/composables/useDarkMode.ts", "type": "depends_on", "label": "useDarkMode()" },
+
+    { "source": "file:src/services/api.ts", "target": "file:src/types/index.ts", "type": "imports", "label": "domain types" },
+
+    { "source": "file:src/stores/applicationsList.ts", "target": "file:src/services/api.ts", "type": "depends_on", "label": "applicationService, eventService" },
+    { "source": "file:src/stores/applicationsList.ts", "target": "file:src/types/index.ts", "type": "imports", "label": "Application, FilterState, PaginatedResponse" },
+    { "source": "file:src/stores/applicationsList.ts", "target": "file:src/utils/eventDescriptions.ts", "type": "depends_on", "label": "generateDescription" },
+
+    { "source": "file:src/stores/applicationDetail.ts", "target": "file:src/services/api.ts", "type": "depends_on", "label": "applicationService, interviewStageService, eventService" },
+    { "source": "file:src/stores/applicationDetail.ts", "target": "file:src/types/index.ts", "type": "imports", "label": "Application, UpdateApplicationInput, etc." },
+    { "source": "file:src/stores/applicationDetail.ts", "target": "file:src/utils/eventDescriptions.ts", "type": "depends_on", "label": "generateFieldChanges, generateDescription" },
+    { "source": "file:src/stores/applicationDetail.ts", "target": "file:src/stores/history.ts", "type": "depends_on", "label": "useHistoryStore().addCommit" },
+
+    { "source": "file:src/stores/history.ts", "target": "file:src/services/api.ts", "type": "depends_on", "label": "applicationService, interviewStageService, eventService" },
+    { "source": "file:src/stores/history.ts", "target": "file:src/types/index.ts", "type": "imports", "label": "Application, InterviewStage, ImmerPatch, etc." },
+    { "source": "file:src/stores/history.ts", "target": "file:src/stores/applicationDetail.ts", "type": "depends_on", "label": "useApplicationDetailStore().application, isUndoRedoInProgress" },
+
+    { "source": "file:src/utils/eventDescriptions.ts", "target": "file:src/types/index.ts", "type": "imports", "label": "Application, FieldChange, APPLICATION_STATUSES" },
+
+    { "source": "file:src/views/ApplicationList.vue", "target": "file:src/stores/applicationsList.ts", "type": "depends_on", "label": "useApplicationsListStore" },
+    { "source": "file:src/views/ApplicationList.vue", "target": "file:src/components/ApplicationCard.vue", "type": "contains", "label": "v-for loop" },
+    { "source": "file:src/views/ApplicationList.vue", "target": "file:src/components/FilterBar.vue", "type": "contains", "label": "filter bar" },
+    { "source": "file:src/views/ApplicationList.vue", "target": "file:src/components/Pagination.vue", "type": "contains", "label": "pagination" },
+    { "source": "file:src/views/ApplicationList.vue", "target": "file:src/components/EmptyState.vue", "type": "contains", "label": "empty state" },
+    { "source": "file:src/views/ApplicationList.vue", "target": "file:src/components/ConfirmDialog.vue", "type": "contains", "label": "delete confirm dialog" },
+
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/stores/applicationDetail.ts", "type": "depends_on", "label": "useApplicationDetailStore" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/stores/applicationsList.ts", "type": "depends_on", "label": "useApplicationsListStore (create mode)" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/stores/history.ts", "type": "depends_on", "label": "useHistoryStore (undo/redo/load)" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/types/index.ts", "type": "imports", "label": "types and constants" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/components/RatingInput.vue", "type": "contains", "label": "skills match" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/components/UrlFieldInput.vue", "type": "contains", "label": "URL fields x3" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/components/InterviewStageForm.vue", "type": "contains", "label": "add/edit stage forms" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/components/InterviewStageItem.vue", "type": "contains", "label": "stage list items" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/components/ConfirmDialog.vue", "type": "contains", "label": "discard/delete/stage-delete dialogs" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/components/UndoRedoBar.vue", "type": "contains", "label": "undo/redo toolbar" },
+    { "source": "file:src/views/ApplicationEdit.vue", "target": "file:src/components/HistoryPanel.vue", "type": "contains", "label": "history slide-in panel" },
+
+    { "source": "file:src/components/ApplicationCard.vue", "target": "file:src/components/StatusBadge.vue", "type": "contains", "label": "status badge" },
+    { "source": "file:src/components/ApplicationCard.vue", "target": "file:src/components/RatingDisplay.vue", "type": "contains", "label": "skills match display" },
+    { "source": "file:src/components/ApplicationCard.vue", "target": "file:src/types/index.ts", "type": "imports", "label": "Application, COMPANY_CATEGORIES" },
+
+    { "source": "file:src/components/FilterBar.vue", "target": "file:src/types/index.ts", "type": "imports", "label": "FilterState, APPLICATION_STATUSES, etc." },
+
+    { "source": "file:src/components/HistoryPanel.vue", "target": "file:src/stores/history.ts", "type": "depends_on", "label": "useHistoryStore" },
+    { "source": "file:src/components/HistoryPanel.vue", "target": "file:src/components/EventDiff.vue", "type": "contains", "label": "change diff display" },
+    { "source": "file:src/components/HistoryPanel.vue", "target": "file:src/services/api.ts", "type": "depends_on", "label": "eventService.restore (dynamic import)" },
+    { "source": "file:src/components/HistoryPanel.vue", "target": "file:src/stores/applicationDetail.ts", "type": "depends_on", "label": "useApplicationDetailStore (dynamic import)" },
+
+    { "source": "file:src/components/UndoRedoBar.vue", "target": "file:src/stores/history.ts", "type": "depends_on", "label": "useHistoryStore" },
+
+    { "source": "file:src/components/InterviewStageForm.vue", "target": "file:src/components/RatingInput.vue", "type": "contains", "label": "performance rating" },
+    { "source": "file:src/components/InterviewStageForm.vue", "target": "file:src/types/index.ts", "type": "imports", "label": "InterviewStage, CreateInterviewStageInput, etc." },
+
+    { "source": "file:src/components/InterviewStageItem.vue", "target": "file:src/components/RatingDisplay.vue", "type": "contains", "label": "performance rating display" },
+    { "source": "file:src/components/InterviewStageItem.vue", "target": "file:src/types/index.ts", "type": "imports", "label": "InterviewStage" },
+
+    { "source": "file:src/components/StatusBadge.vue", "target": "file:src/types/index.ts", "type": "imports", "label": "ApplicationStatus" },
+    { "source": "file:src/components/EventDiff.vue", "target": "file:src/types/index.ts", "type": "imports", "label": "FieldChange" },
+
+    { "source": "file:vite.config.ts", "target": "file:src/main.ts", "type": "configures", "label": "app entry point" },
+    { "source": "file:vite.config.ts", "target": "file:src/vite-env.d.ts", "type": "configures", "label": "client type declarations" },
+    { "source": "file:tsconfig.json", "target": "file:src/shims-vue-router.d.ts", "type": "configures", "label": "module augmentation" },
+    { "source": "file:tsconfig.json", "target": "file:vite.config.ts", "type": "configures", "label": "tsconfig references vite config paths" },
+
+    { "source": "file:src/stores/__tests__/applicationDetail.test.ts", "target": "file:src/stores/applicationDetail.ts", "type": "tests", "label": "unit tests" },
+    { "source": "file:src/stores/__tests__/history.test.ts", "target": "file:src/stores/history.ts", "type": "tests", "label": "unit tests" },
+    { "source": "file:src/utils/__tests__/eventDescriptions.test.ts", "target": "file:src/utils/eventDescriptions.ts", "type": "tests", "label": "unit tests" },
+    { "source": "file:src/components/RatingInput.test.ts", "target": "file:src/components/RatingInput.vue", "type": "tests", "label": "component tests" }
+  ],
+  "layers": [
+    {
+      "id": "layer:config",
+      "name": "Config Layer",
+      "description": "Application bootstrap, plugin registration, routing, build configuration, and type declaration files.",
+      "nodeIds": [
+        "file:src/main.ts",
+        "file:src/App.vue",
+        "file:src/style.css",
+        "file:vite.config.ts",
+        "file:tsconfig.json",
+        "file:src/vite-env.d.ts",
+        "file:src/shims-vue-router.d.ts"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Service Layer",
+      "description": "Pinia stores for application state (list, detail, history), HTTP API client, and the dark-mode composable. This layer encapsulates all data-fetching, mutation, and event-sourcing logic.",
+      "nodeIds": [
+        "file:src/services/api.ts",
+        "file:src/stores/applicationsList.ts",
+        "file:src/stores/applicationDetail.ts",
+        "file:src/stores/history.ts",
+        "file:src/composables/useDarkMode.ts"
+      ]
+    },
+    {
+      "id": "layer:ui",
+      "name": "UI Layer",
+      "description": "Vue SFC views (page-level) and reusable components. Views map to router routes; components are composed within views and each other.",
+      "nodeIds": [
+        "file:src/views/ApplicationList.vue",
+        "file:src/views/ApplicationEdit.vue",
+        "file:src/components/ApplicationCard.vue",
+        "file:src/components/FilterBar.vue",
+        "file:src/components/HistoryPanel.vue",
+        "file:src/components/UndoRedoBar.vue",
+        "file:src/components/EventDiff.vue",
+        "file:src/components/StatusBadge.vue",
+        "file:src/components/RatingInput.vue",
+        "file:src/components/RatingDisplay.vue",
+        "file:src/components/ConfirmDialog.vue",
+        "file:src/components/EmptyState.vue",
+        "file:src/components/InterviewStageForm.vue",
+        "file:src/components/InterviewStageItem.vue",
+        "file:src/components/Pagination.vue",
+        "file:src/components/UrlFieldInput.vue"
+      ]
+    },
+    {
+      "id": "layer:utility",
+      "name": "Utility Layer",
+      "description": "Pure utility functions and type definitions shared across the app.",
+      "nodeIds": [
+        "file:src/utils/eventDescriptions.ts",
+        "file:src/types/index.ts"
+      ]
+    },
+    {
+      "id": "layer:test",
+      "name": "Test Layer",
+      "description": "Unit and component tests using Vitest and @testing-library/vue.",
+      "nodeIds": [
+        "file:src/components/RatingInput.test.ts",
+        "file:src/stores/__tests__/applicationDetail.test.ts",
+        "file:src/stores/__tests__/history.test.ts",
+        "file:src/utils/__tests__/eventDescriptions.test.ts"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Application Bootstrap",
+      "description": "Start at main.ts, which wires the whole app together: creates a Vue app, installs Pinia (state) and Vue Router (navigation), calls enablePatches() to turn on Immer patch tracking for undo/redo, and mounts to #app. The three routes — / (list), /applications/new, and /applications/:id — map to the two view components.",
+      "nodeIds": ["file:src/main.ts"]
+    },
+    {
+      "order": 2,
+      "title": "Domain Types (from nuxt-api shared)",
+      "description": "src/types/index.ts is a pure re-export barrel from @shared/types (the nuxt-api package). All domain types live there — Application, InterviewStage, ApplicationStatus, etc. — and event-sourcing types (ImmerPatch, FieldChange, ApplicationEvent, ApplicationSnapshot). Understanding these types is prerequisite to reading any other file.",
+      "nodeIds": ["file:src/types/index.ts"]
+    },
+    {
+      "order": 3,
+      "title": "HTTP API Client",
+      "description": "src/services/api.ts wraps all backend calls. It exports three service objects (applicationService, interviewStageService, eventService) and a checkHealth function. All requests go to /api which is proxied to the nuxt-api server on port 5040. It handles 204 No Content responses explicitly.",
+      "nodeIds": ["file:src/services/api.ts"]
+    },
+    {
+      "order": 4,
+      "title": "Applications List Store",
+      "description": "src/stores/applicationsList.ts is the Pinia store for the list page. It manages paginated data, filter state, and all CRUD operations visible from the list. A deep watch on filters auto-triggers fetchApplications() — so changing any filter immediately refreshes the list.",
+      "nodeIds": ["file:src/stores/applicationsList.ts"]
+    },
+    {
+      "order": 5,
+      "title": "Application Detail Store + Immer Event Sourcing",
+      "description": "src/stores/applicationDetail.ts is the heart of the edit flow. Every mutation uses Immer's produceWithPatches to capture before/after diffs as patch arrays. It then calls eventService.append to persist the event to the server and delegates to historyStore.addCommit to update the local undo stack. The isUndoRedoInProgress flag prevents double-recording during undo/redo replays.",
+      "nodeIds": ["file:src/stores/applicationDetail.ts"]
+    },
+    {
+      "order": 6,
+      "title": "History / Undo-Redo Store",
+      "description": "src/stores/history.ts implements per-application undo/redo using a cursor into a commit array. undo() applies inversePatches to roll back state and calls syncStateToServer() to push the rolled-back state to the API. redo() applies forward patches. loadHistory() seeds the local commit log from server events, enabling history to survive page reloads.",
+      "nodeIds": ["file:src/stores/history.ts"]
+    },
+    {
+      "order": 7,
+      "title": "Event Description Utilities",
+      "description": "src/utils/eventDescriptions.ts provides two pure functions: generateFieldChanges (compares old/new Application and returns FieldChange[] for a given key list) and generateDescription (produces human-readable event labels like 'Changed status to Interviewing'). These are used by both applicationDetail and applicationsList stores.",
+      "nodeIds": ["file:src/utils/eventDescriptions.ts"]
+    },
+    {
+      "order": 8,
+      "title": "Application List View",
+      "description": "src/views/ApplicationList.vue is the route / view. It composes FilterBar, ApplicationCard (in a v-for), Pagination, EmptyState, and a delete ConfirmDialog. It delegates all data and actions to useApplicationsListStore, keeping the view thin.",
+      "nodeIds": ["file:src/views/ApplicationList.vue", "file:src/components/FilterBar.vue", "file:src/components/ApplicationCard.vue", "file:src/components/Pagination.vue"]
+    },
+    {
+      "order": 9,
+      "title": "Application Edit View (Create + Edit)",
+      "description": "src/views/ApplicationEdit.vue handles both create and edit modes via the isEditMode computed (derived from props.id). It uses snapshot-based dirty tracking, a skipNavGuard ref to bypass the unsaved-changes guard after intentional navigation, and keyboard shortcuts (Ctrl+Z/Y) for undo/redo. In edit mode it shows UndoRedoBar and HistoryPanel.",
+      "nodeIds": ["file:src/views/ApplicationEdit.vue"]
+    },
+    {
+      "order": 10,
+      "title": "Event-Sourcing UI Components",
+      "description": "UndoRedoBar shows undo/redo buttons and the current action description. HistoryPanel is a slide-in panel listing all commits with relative timestamps; expanding a commit shows EventDiff (red strikethrough old value, green new value). HistoryPanel also supports server-side point-in-time restore via eventService.restore.",
+      "nodeIds": ["file:src/components/UndoRedoBar.vue", "file:src/components/HistoryPanel.vue", "file:src/components/EventDiff.vue"]
+    },
+    {
+      "order": 11,
+      "title": "Dark Mode Composable",
+      "description": "src/composables/useDarkMode.ts is the one composable in the project. It manages localStorage persistence, system prefers-color-scheme fallback, and live media-query updates. It's consumed only by App.vue for the header toggle button.",
+      "nodeIds": ["file:src/composables/useDarkMode.ts", "file:src/App.vue"]
+    },
+    {
+      "order": 12,
+      "title": "Shared Presentational Components",
+      "description": "StatusBadge maps ApplicationStatus values to color-coded pills. RatingInput is an accessible 5-star picker (v-model, keyboard nav). RatingDisplay is its read-only counterpart. ConfirmDialog is a teleported modal. EmptyState, UrlFieldInput, InterviewStageForm, InterviewStageItem, and Pagination round out the component library.",
+      "nodeIds": [
+        "file:src/components/StatusBadge.vue",
+        "file:src/components/RatingInput.vue",
+        "file:src/components/RatingDisplay.vue",
+        "file:src/components/ConfirmDialog.vue",
+        "file:src/components/EmptyState.vue",
+        "file:src/components/UrlFieldInput.vue",
+        "file:src/components/InterviewStageForm.vue",
+        "file:src/components/InterviewStageItem.vue"
+      ]
+    }
+  ]
+}

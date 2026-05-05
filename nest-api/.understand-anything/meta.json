@@ -1,0 +1,18 @@
+{
+  "version": "2.5.1",
+  "projectName": "nest-api",
+  "projectRoot": "/Users/greg/code/application-tracker/nest-api",
+  "description": "NestJS TypeScript REST API for the application tracker. Uses Drizzle ORM with PostgreSQL (react_nestjs schema), Fastify adapter, Zod validation, CSV import/export, and gRPC communication with nest-history-api for versioned application history. Serves tanstack-ui and react-ui frontends on port 5050.",
+  "generatedAt": "2026-05-04T00:00:00.000Z",
+  "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
+  "languages": ["TypeScript"],
+  "frameworks": ["NestJS", "Drizzle ORM", "Fastify", "Zod", "gRPC"],
+  "entryPoint": "src/main.ts",
+  "stats": {
+    "filesAnalyzed": 21,
+    "totalNodes": 21,
+    "totalEdges": 44,
+    "totalLayers": 8,
+    "tourSteps": 9
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "version": "2.5.1",
+  "projectName": "job-tracker-svelte-ui",
+  "projectDescription": "SvelteKit 5 SPA for tracking job applications. Uses Svelte 5 runes ($state, $derived, $effect), Tailwind CSS 4, and proxies API calls to hono-api on port 5030.",
+  "languages": ["TypeScript", "Svelte", "CSS", "HTML"],
+  "frameworks": ["SvelteKit", "Svelte 5", "Tailwind CSS 4", "Vitest", "Testing Library"],
+  "generatedAt": "2026-05-04T00:00:00.000Z",
+  "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
+  "entryPoint": "src/routes/+layout.svelte",
+  "stats": {
+    "filesAnalyzed": 32,
+    "totalNodes": 32,
+    "totalEdges": 51,
+    "totalLayers": 8,
+    "tourSteps": 12,
+    "nodeTypes": {
+      "file": 29,
+      "config": 3
+    },
+    "edgeTypes": {
+      "imports": 44,
+      "renders": 4,
+      "configures": 3
+    }
+  },
+  "layers": [
+    "Entry Points & Shell",
+    "Route Pages",
+    "Domain Types & Constants",
+    "Data Layer (Stores & API)",
+    "Feature Components",
+    "Interview Stage Components",
+    "Primitive / UI Components",
+    "Build Configuration"
+  ],
+  "outputPath": "/Users/greg/code/application-tracker/svelte-ui/.understand-anything/knowledge-graph.json"
+}

@@ -207,3 +207,7 @@ data/
 
 # AWS CDK synthesis output
 cdk.out/
+
+# understand-anything build artifacts
+.understand-anything/intermediate/
+.understand-anything/tmp/

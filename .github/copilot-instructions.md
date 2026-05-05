@@ -37,6 +37,7 @@
 When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (e.g., `pr-comments`, `ship-it`, `learn`, `playwright-cli`) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
 
 ## Cross-Cutting Patterns
+- **README TOC**: When adding a section or subsection to `README.md`, add a matching TOC entry. Anchor format: lowercase, spaces → `-`, drop special characters except hyphens. Subsections indent two spaces under their parent.
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
 - **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it in the editor or with CLI tools like `cat`, `sed`, or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).
 - **Shared tests**: See `tests/CLAUDE.md` for API/E2E lifecycle, `--runInBand`, cleanup, and Playwright/WebKit quirks.

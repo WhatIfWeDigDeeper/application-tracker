@@ -1,0 +1,1117 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/main/java/com/example/tracker/TrackerApplication.java",
+      "type": "file",
+      "name": "TrackerApplication",
+      "filePath": "src/main/java/com/example/tracker/TrackerApplication.java",
+      "summary": "Spring Boot application entry point. Contains the main() method annotated with @SpringBootApplication that bootstraps the Spring context via SpringApplication.run().",
+      "tags": [
+        "entry-point",
+        "spring-boot",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/config/JacksonConfig.java",
+      "type": "file",
+      "name": "JacksonConfig",
+      "filePath": "src/main/java/com/example/tracker/config/JacksonConfig.java",
+      "summary": "Spring @Configuration bean that defines a custom ObjectMapper. Registers JavaTimeModule, disables WRITE_DATES_AS_TIMESTAMPS so LocalDate/OffsetDateTime serialize as ISO strings, and uses LOWER_CAMEL_CASE naming.",
+      "tags": [
+        "config",
+        "jackson",
+        "serialization",
+        "spring"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/config/WebConfig.java",
+      "type": "file",
+      "name": "WebConfig",
+      "filePath": "src/main/java/com/example/tracker/config/WebConfig.java",
+      "summary": "Spring @Configuration implementing WebMvcConfigurer. Configures CORS for all /api/** endpoints, allowing the Angular frontend at http://localhost:3070 to call GET, POST, PATCH, PUT, DELETE, OPTIONS.",
+      "tags": [
+        "config",
+        "cors",
+        "spring-mvc",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "type": "file",
+      "name": "ApplicationController",
+      "filePath": "src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "summary": "REST controller mapped to /api/applications. Exposes endpoints: GET (list with filters/pagination), GET /{id}, POST (create), PATCH /{id} (update), DELETE /{id}, PATCH /{id}/archive, PATCH /{id}/restore, POST /{id}/interview-stages, PATCH /{id}/interview-stages/{stageId}, DELETE /{id}/interview-stages/{stageId}, GET /{id}/history, POST /{id}/history/{snapshotId}/restore, GET /export/csv, GET /sample-csv, POST /import/csv.",
+      "tags": [
+        "controller",
+        "rest",
+        "api",
+        "spring-mvc",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/controller/GlobalExceptionHandler.java",
+      "type": "file",
+      "name": "GlobalExceptionHandler",
+      "filePath": "src/main/java/com/example/tracker/controller/GlobalExceptionHandler.java",
+      "summary": "@RestControllerAdvice that centralizes error handling. Maps EntityNotFoundException\u2192404, MethodArgumentNotValidException\u2192400 with field errors, IllegalArgumentException\u2192400, HttpMessageNotReadableException\u2192400 with validation_error code, and RuntimeException\u2192500.",
+      "tags": [
+        "exception-handling",
+        "spring-mvc",
+        "rest",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "type": "service",
+      "name": "ApplicationService",
+      "filePath": "src/main/java/com/example/tracker/service/ApplicationService.java",
+      "summary": "@Service @Transactional class implementing all application business logic: CRUD, archive/restore, interview stage management, change history with JSON snapshots, CSV export and import (with per-row TransactionTemplate for batch isolation), and filtering via JPA Specifications. Automatically creates 6 default interview stages on transition to INTERVIEWING status.",
+      "tags": [
+        "service",
+        "business-logic",
+        "transactional",
+        "csv",
+        "history",
+        "spring",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/service/ApplicationSpecifications.java",
+      "type": "file",
+      "name": "ApplicationSpecifications",
+      "filePath": "src/main/java/com/example/tracker/service/ApplicationSpecifications.java",
+      "summary": "Utility class providing JPA Specification<Application> factory methods for multi-criteria filtering: hasStatus, hasCategory, hasJobSource, hasMinSkillsMatch, isArchived. Enums are parsed via fromValue() with graceful fallback on unknown values.",
+      "tags": [
+        "jpa",
+        "specification",
+        "filtering",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/ApplicationRequest.java",
+      "type": "file",
+      "name": "ApplicationRequest",
+      "filePath": "src/main/java/com/example/tracker/dto/ApplicationRequest.java",
+      "summary": "Java record DTO for creating/updating applications. Fields include companyName (@NotBlank @Size(max=200)), positionTitle, status (string), dateApplied, URL fields, companyCategory, skillsMatch (@Min(1) @Max(10)), jobSource, salary range, coverLetterRequired, offerDueDate, specialRequirements, notes.",
+      "tags": [
+        "dto",
+        "request",
+        "validation",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/ApplicationResponse.java",
+      "type": "file",
+      "name": "ApplicationResponse",
+      "filePath": "src/main/java/com/example/tracker/dto/ApplicationResponse.java",
+      "summary": "Java record DTO for API responses. Contains all application fields including id (UUID), isArchived, interviewStages (List<InterviewStageResponse>), createdAt and updatedAt (OffsetDateTime).",
+      "tags": [
+        "dto",
+        "response",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/HistoryDiff.java",
+      "type": "file",
+      "name": "HistoryDiff",
+      "filePath": "src/main/java/com/example/tracker/dto/HistoryDiff.java",
+      "summary": "Java record representing a single field-level diff between two application snapshots: field (camelCase key), label (human-readable), oldValue, newValue.",
+      "tags": [
+        "dto",
+        "history",
+        "diff",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/HistoryEntry.java",
+      "type": "file",
+      "name": "HistoryEntry",
+      "filePath": "src/main/java/com/example/tracker/dto/HistoryEntry.java",
+      "summary": "Java record representing one history entry (snapshot): id, sequence number, description string, list of HistoryDiff changes, and createdAt timestamp.",
+      "tags": [
+        "dto",
+        "history",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/ImportError.java",
+      "type": "file",
+      "name": "ImportError",
+      "filePath": "src/main/java/com/example/tracker/dto/ImportError.java",
+      "summary": "Java record DTO describing a single CSV import failure: row number and error message string.",
+      "tags": [
+        "dto",
+        "import",
+        "csv",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/ImportResult.java",
+      "type": "file",
+      "name": "ImportResult",
+      "filePath": "src/main/java/com/example/tracker/dto/ImportResult.java",
+      "summary": "Java record DTO summarizing a CSV import operation: number imported, number skipped (duplicate URLs), and list of ImportError objects for failed rows.",
+      "tags": [
+        "dto",
+        "import",
+        "csv",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/InterviewStageRequest.java",
+      "type": "file",
+      "name": "InterviewStageRequest",
+      "filePath": "src/main/java/com/example/tracker/dto/InterviewStageRequest.java",
+      "summary": "Java record DTO for creating/updating an interview stage: name (@NotBlank @Size(max=200)), order, isCompleted, completedDate (String, parsed to LocalDate), notes, performanceRating (@Min(1) @Max(5)).",
+      "tags": [
+        "dto",
+        "request",
+        "interview-stage",
+        "validation",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/InterviewStageResponse.java",
+      "type": "file",
+      "name": "InterviewStageResponse",
+      "filePath": "src/main/java/com/example/tracker/dto/InterviewStageResponse.java",
+      "summary": "Java record DTO for interview stage API responses: id, applicationId, name, order, isCompleted, completedDate (LocalDate), notes, performanceRating.",
+      "tags": [
+        "dto",
+        "response",
+        "interview-stage",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/dto/PaginatedResponse.java",
+      "type": "file",
+      "name": "PaginatedResponse",
+      "filePath": "src/main/java/com/example/tracker/dto/PaginatedResponse.java",
+      "summary": "Generic Java record DTO for paginated list responses: items (List<T>), page number, limit, and total element count.",
+      "tags": [
+        "dto",
+        "pagination",
+        "generic",
+        "java",
+        "record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "type": "file",
+      "name": "Application",
+      "filePath": "src/main/java/com/example/tracker/entity/Application.java",
+      "summary": "@Entity mapped to java_spring.applications table. UUID primary key with @GeneratedValue(UUID), custom PostgreSQL enum types via @Type for status/companyCategory/jobSource, @OneToMany cascade to InterviewStage ordered by stageOrder. @PrePersist/@PreUpdate manage createdAt/updatedAt timestamps.",
+      "tags": [
+        "entity",
+        "jpa",
+        "application",
+        "java",
+        "hibernate"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/ApplicationSnapshot.java",
+      "type": "file",
+      "name": "ApplicationSnapshot",
+      "filePath": "src/main/java/com/example/tracker/entity/ApplicationSnapshot.java",
+      "summary": "@Entity mapped to java_spring.application_snapshots. Stores point-in-time JSON snapshots of Application state using @JdbcTypeCode(SqlTypes.JSON) for the JSONB data column. Has sequenceNumber (integer) and description (VARCHAR 500).",
+      "tags": [
+        "entity",
+        "jpa",
+        "snapshot",
+        "history",
+        "jsonb",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/ApplicationStatus.java",
+      "type": "file",
+      "name": "ApplicationStatus",
+      "filePath": "src/main/java/com/example/tracker/entity/ApplicationStatus.java",
+      "summary": "Java enum for application lifecycle states: UNSUBMITTED, APPLIED, INTERVIEWING, GIVEN_OFFER, ACCEPTED_OFFER, DECLINED_OFFER, REJECTED, NO_OFFER. Each value maps to a lowercase/space PostgreSQL enum string via getValue() and fromValue().",
+      "tags": [
+        "enum",
+        "status",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/ApplicationStatusUserType.java",
+      "type": "file",
+      "name": "ApplicationStatusUserType",
+      "filePath": "src/main/java/com/example/tracker/entity/ApplicationStatusUserType.java",
+      "summary": "Hibernate UserType implementation for ApplicationStatus enum. Extends PostgreSQLEnumType, bridges Java enum \u2194 PostgreSQL VARCHAR via toDbValue()/fromDbValue() delegating to ApplicationStatus.getValue()/fromValue().",
+      "tags": [
+        "hibernate",
+        "usertype",
+        "enum",
+        "postgresql",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/CompanyCategory.java",
+      "type": "file",
+      "name": "CompanyCategory",
+      "filePath": "src/main/java/com/example/tracker/entity/CompanyCategory.java",
+      "summary": "Java enum for company industry categories (19 values): EDUCATION through OTHER. Each value maps to a lowercase/hyphenated PostgreSQL enum string (e.g., ENTERPRISE_SOFTWARE \u2192 'enterprise-software').",
+      "tags": [
+        "enum",
+        "category",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/CompanyCategoryUserType.java",
+      "type": "file",
+      "name": "CompanyCategoryUserType",
+      "filePath": "src/main/java/com/example/tracker/entity/CompanyCategoryUserType.java",
+      "summary": "Hibernate UserType for CompanyCategory enum. Extends PostgreSQLEnumType bridging Java enum \u2194 PostgreSQL VARCHAR.",
+      "tags": [
+        "hibernate",
+        "usertype",
+        "enum",
+        "postgresql",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/InterviewStage.java",
+      "type": "file",
+      "name": "InterviewStage",
+      "filePath": "src/main/java/com/example/tracker/entity/InterviewStage.java",
+      "summary": "@Entity mapped to java_spring.interview_stages. UUID primary key, @ManyToOne back-reference to Application (lazy), stageName VARCHAR(200), stageOrder int, isCompleted boolean, completedDate LocalDate, notes TEXT, performanceRating Integer (1-5), timestamps via @PrePersist/@PreUpdate.",
+      "tags": [
+        "entity",
+        "jpa",
+        "interview-stage",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/JobSource.java",
+      "type": "file",
+      "name": "JobSource",
+      "filePath": "src/main/java/com/example/tracker/entity/JobSource.java",
+      "summary": "Java enum for job discovery channels: RECRUITER, LINKEDIN, INDEED, FRIEND, COLLEAGUE, COMPANY_WEBSITE, OTHER. Hyphenated PostgreSQL values for COMPANY_WEBSITE ('company-website').",
+      "tags": [
+        "enum",
+        "job-source",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/JobSourceUserType.java",
+      "type": "file",
+      "name": "JobSourceUserType",
+      "filePath": "src/main/java/com/example/tracker/entity/JobSourceUserType.java",
+      "summary": "Hibernate UserType for JobSource enum. Extends PostgreSQLEnumType bridging Java enum \u2194 PostgreSQL VARCHAR.",
+      "tags": [
+        "hibernate",
+        "usertype",
+        "enum",
+        "postgresql",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/entity/PostgreSQLEnumType.java",
+      "type": "file",
+      "name": "PostgreSQLEnumType",
+      "filePath": "src/main/java/com/example/tracker/entity/PostgreSQLEnumType.java",
+      "summary": "Abstract generic Hibernate UserType<E> base class for mapping Java enums to PostgreSQL enum/VARCHAR columns. Implements nullSafeGet/nullSafeSet using Types.OTHER for PostgreSQL compatibility, plus equals, hashCode, deepCopy, assemble, disassemble. Subclasses provide toDbValue/fromDbValue.",
+      "tags": [
+        "hibernate",
+        "usertype",
+        "abstract",
+        "postgresql",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/repository/ApplicationRepository.java",
+      "type": "file",
+      "name": "ApplicationRepository",
+      "filePath": "src/main/java/com/example/tracker/repository/ApplicationRepository.java",
+      "summary": "Spring Data JPA repository for Application entity. Extends JpaRepository<Application, UUID> and JpaSpecificationExecutor<Application> for dynamic filtering. Adds existsByJobPostingUrl(String) for duplicate-URL detection during CSV import.",
+      "tags": [
+        "repository",
+        "spring-data",
+        "jpa",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/repository/ApplicationSnapshotRepository.java",
+      "type": "file",
+      "name": "ApplicationSnapshotRepository",
+      "filePath": "src/main/java/com/example/tracker/repository/ApplicationSnapshotRepository.java",
+      "summary": "Spring Data JPA repository for ApplicationSnapshot. Provides findByApplicationIdOrderBySequenceNumberDesc for history listing, a @Query JPQL method for max sequence number, and findFirstByApplicationIdAndSequenceNumberLessThan for computing diffs against the previous snapshot.",
+      "tags": [
+        "repository",
+        "spring-data",
+        "jpa",
+        "history",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/java/com/example/tracker/repository/InterviewStageRepository.java",
+      "type": "file",
+      "name": "InterviewStageRepository",
+      "filePath": "src/main/java/com/example/tracker/repository/InterviewStageRepository.java",
+      "summary": "Spring Data JPA repository for InterviewStage entity. Provides findByApplicationIdOrderByStageOrderAsc for ordered stage retrieval.",
+      "tags": [
+        "repository",
+        "spring-data",
+        "jpa",
+        "interview-stage",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/resources/application.properties",
+      "type": "config",
+      "name": "application.properties",
+      "filePath": "src/main/resources/application.properties",
+      "summary": "Spring Boot configuration. Server on port 8080, PostgreSQL datasource with java_spring schema, Hibernate DDL auto-validate (no auto-migration), Flyway configured for java_spring schema, open-in-view disabled, error messages included.",
+      "tags": [
+        "config",
+        "spring-boot",
+        "database",
+        "flyway",
+        "properties"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/resources/db/migration/V1__initial.sql",
+      "type": "schema",
+      "name": "V1__initial.sql",
+      "filePath": "src/main/resources/db/migration/V1__initial.sql",
+      "summary": "Flyway migration V1: creates java_spring schema, defines PostgreSQL enums (application_status, company_category, job_source), and tables applications, interview_stages, application_snapshots with UUID PKs, constraints, and performance indexes.",
+      "tags": [
+        "sql",
+        "migration",
+        "flyway",
+        "schema",
+        "postgresql"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/resources/db/migration/V2__increase_name_lengths.sql",
+      "type": "schema",
+      "name": "V2__increase_name_lengths.sql",
+      "filePath": "src/main/resources/db/migration/V2__increase_name_lengths.sql",
+      "summary": "Flyway migration V2: increases company_name and position_title column widths from VARCHAR(200) to VARCHAR(500).",
+      "tags": [
+        "sql",
+        "migration",
+        "flyway",
+        "alter-table",
+        "postgresql"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/main/resources/db/migration/V3__url_columns_to_text.sql",
+      "type": "schema",
+      "name": "V3__url_columns_to_text.sql",
+      "filePath": "src/main/resources/db/migration/V3__url_columns_to_text.sql",
+      "summary": "Flyway migration V3: changes company_url, job_posting_url, and company_career_url from VARCHAR(500) to TEXT to support long LinkedIn URLs.",
+      "tags": [
+        "sql",
+        "migration",
+        "flyway",
+        "alter-table",
+        "postgresql"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/test/java/com/example/tracker/controller/ApplicationControllerTest.java",
+      "type": "file",
+      "name": "ApplicationControllerTest",
+      "filePath": "src/test/java/com/example/tracker/controller/ApplicationControllerTest.java",
+      "summary": "@WebMvcTest slice for ApplicationController. Tests list returns 200 with items array, create returns 400 on missing required fields, and create returns 201 on valid body. Uses @MockitoBean for ApplicationService.",
+      "tags": [
+        "test",
+        "controller",
+        "mockito",
+        "spring-mvc",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/test/java/com/example/tracker/service/ApplicationServiceTest.java",
+      "type": "file",
+      "name": "ApplicationServiceTest",
+      "filePath": "src/test/java/com/example/tracker/service/ApplicationServiceTest.java",
+      "summary": "Unit tests for ApplicationService using Mockito. Tests that create() saves the application and creates a snapshot, and that update() from APPLIED to INTERVIEWING automatically creates 6 default interview stages.",
+      "tags": [
+        "test",
+        "service",
+        "mockito",
+        "unit-test",
+        "java"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:build.gradle.kts",
+      "type": "config",
+      "name": "build.gradle.kts",
+      "filePath": "build.gradle.kts",
+      "summary": "Gradle Kotlin build script. Configures Spring Boot 3.5.14 + Spring Dependency Management, Java 21 toolchain, PostgreSQL/JPA/Validation/Flyway/Test dependencies, Checkstyle 10.21.4, and OWASP dependency-check with NVD API key support. Parses .env file for bootRun.",
+      "tags": [
+        "build",
+        "gradle",
+        "java",
+        "spring-boot",
+        "dependency-check"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:settings.gradle.kts",
+      "type": "config",
+      "name": "settings.gradle.kts",
+      "filePath": "settings.gradle.kts",
+      "summary": "Gradle settings file. Sets root project name to 'tracker'.",
+      "tags": [
+        "build",
+        "gradle",
+        "config"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/main/java/com/example/tracker/TrackerApplication.java",
+      "target": "file:src/main/java/com/example/tracker/config/JacksonConfig.java",
+      "type": "imports",
+      "label": "Spring context auto-configuration"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/TrackerApplication.java",
+      "target": "file:src/main/java/com/example/tracker/config/WebConfig.java",
+      "type": "imports",
+      "label": "Spring context auto-configuration"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/TrackerApplication.java",
+      "target": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "type": "imports",
+      "label": "Spring context bootstrap"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "type": "uses",
+      "label": "delegates all business logic"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/dto/ApplicationRequest.java",
+      "type": "uses",
+      "label": "@RequestBody"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/dto/ApplicationResponse.java",
+      "type": "uses",
+      "label": "returns"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/dto/InterviewStageRequest.java",
+      "type": "uses",
+      "label": "@RequestBody"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/dto/InterviewStageResponse.java",
+      "type": "uses",
+      "label": "returns"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/dto/PaginatedResponse.java",
+      "type": "uses",
+      "label": "returns"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/dto/ImportResult.java",
+      "type": "uses",
+      "label": "returns"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/dto/HistoryEntry.java",
+      "type": "uses",
+      "label": "returns"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/repository/ApplicationRepository.java",
+      "type": "uses",
+      "label": "injects"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/repository/InterviewStageRepository.java",
+      "type": "uses",
+      "label": "injects"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/repository/ApplicationSnapshotRepository.java",
+      "type": "uses",
+      "label": "injects"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/service/ApplicationSpecifications.java",
+      "type": "uses",
+      "label": "uses for filtering"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "type": "uses",
+      "label": "creates/reads/updates/deletes"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/entity/InterviewStage.java",
+      "type": "uses",
+      "label": "creates/updates"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/entity/ApplicationSnapshot.java",
+      "type": "uses",
+      "label": "saves snapshots"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/entity/ApplicationStatus.java",
+      "type": "uses",
+      "label": "parses status"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/entity/CompanyCategory.java",
+      "type": "uses",
+      "label": "parses category"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/entity/JobSource.java",
+      "type": "uses",
+      "label": "parses job source"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/ApplicationRequest.java",
+      "type": "uses",
+      "label": "consumes"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/ApplicationResponse.java",
+      "type": "uses",
+      "label": "produces"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/HistoryDiff.java",
+      "type": "uses",
+      "label": "produces"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/HistoryEntry.java",
+      "type": "uses",
+      "label": "produces"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/ImportResult.java",
+      "type": "uses",
+      "label": "produces"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/ImportError.java",
+      "type": "uses",
+      "label": "produces"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/InterviewStageRequest.java",
+      "type": "uses",
+      "label": "consumes"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/InterviewStageResponse.java",
+      "type": "uses",
+      "label": "produces"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "target": "file:src/main/java/com/example/tracker/dto/PaginatedResponse.java",
+      "type": "uses",
+      "label": "produces"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/repository/ApplicationRepository.java",
+      "target": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "type": "uses",
+      "label": "repository for"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/repository/ApplicationSnapshotRepository.java",
+      "target": "file:src/main/java/com/example/tracker/entity/ApplicationSnapshot.java",
+      "type": "uses",
+      "label": "repository for"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/repository/InterviewStageRepository.java",
+      "target": "file:src/main/java/com/example/tracker/entity/InterviewStage.java",
+      "type": "uses",
+      "label": "repository for"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "target": "file:src/main/java/com/example/tracker/entity/ApplicationStatus.java",
+      "type": "uses",
+      "label": "@Type enum"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "target": "file:src/main/java/com/example/tracker/entity/CompanyCategory.java",
+      "type": "uses",
+      "label": "@Type enum"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "target": "file:src/main/java/com/example/tracker/entity/JobSource.java",
+      "type": "uses",
+      "label": "@Type enum"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "target": "file:src/main/java/com/example/tracker/entity/InterviewStage.java",
+      "type": "uses",
+      "label": "@OneToMany"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "target": "file:src/main/java/com/example/tracker/entity/ApplicationStatusUserType.java",
+      "type": "uses",
+      "label": "@Type"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "target": "file:src/main/java/com/example/tracker/entity/CompanyCategoryUserType.java",
+      "type": "uses",
+      "label": "@Type"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "target": "file:src/main/java/com/example/tracker/entity/JobSourceUserType.java",
+      "type": "uses",
+      "label": "@Type"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/ApplicationStatusUserType.java",
+      "target": "file:src/main/java/com/example/tracker/entity/PostgreSQLEnumType.java",
+      "type": "extends",
+      "label": "extends abstract base"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/ApplicationStatusUserType.java",
+      "target": "file:src/main/java/com/example/tracker/entity/ApplicationStatus.java",
+      "type": "uses",
+      "label": "converts"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/CompanyCategoryUserType.java",
+      "target": "file:src/main/java/com/example/tracker/entity/PostgreSQLEnumType.java",
+      "type": "extends",
+      "label": "extends abstract base"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/CompanyCategoryUserType.java",
+      "target": "file:src/main/java/com/example/tracker/entity/CompanyCategory.java",
+      "type": "uses",
+      "label": "converts"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/JobSourceUserType.java",
+      "target": "file:src/main/java/com/example/tracker/entity/PostgreSQLEnumType.java",
+      "type": "extends",
+      "label": "extends abstract base"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/JobSourceUserType.java",
+      "target": "file:src/main/java/com/example/tracker/entity/JobSource.java",
+      "type": "uses",
+      "label": "converts"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/entity/InterviewStage.java",
+      "target": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "type": "uses",
+      "label": "@ManyToOne"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationSpecifications.java",
+      "target": "file:src/main/java/com/example/tracker/entity/Application.java",
+      "type": "uses",
+      "label": "Specification<Application>"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationSpecifications.java",
+      "target": "file:src/main/java/com/example/tracker/entity/ApplicationStatus.java",
+      "type": "uses",
+      "label": "filters by"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationSpecifications.java",
+      "target": "file:src/main/java/com/example/tracker/entity/CompanyCategory.java",
+      "type": "uses",
+      "label": "filters by"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/service/ApplicationSpecifications.java",
+      "target": "file:src/main/java/com/example/tracker/entity/JobSource.java",
+      "type": "uses",
+      "label": "filters by"
+    },
+    {
+      "source": "file:src/test/java/com/example/tracker/controller/ApplicationControllerTest.java",
+      "target": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "type": "tests",
+      "label": "@WebMvcTest"
+    },
+    {
+      "source": "file:src/test/java/com/example/tracker/controller/ApplicationControllerTest.java",
+      "target": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "type": "uses",
+      "label": "@MockitoBean"
+    },
+    {
+      "source": "file:src/test/java/com/example/tracker/service/ApplicationServiceTest.java",
+      "target": "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+      "type": "tests",
+      "label": "unit tests"
+    },
+    {
+      "source": "file:src/test/java/com/example/tracker/service/ApplicationServiceTest.java",
+      "target": "file:src/main/java/com/example/tracker/repository/ApplicationRepository.java",
+      "type": "uses",
+      "label": "@Mock"
+    },
+    {
+      "source": "file:src/test/java/com/example/tracker/service/ApplicationServiceTest.java",
+      "target": "file:src/main/java/com/example/tracker/repository/InterviewStageRepository.java",
+      "type": "uses",
+      "label": "@Mock"
+    },
+    {
+      "source": "file:src/test/java/com/example/tracker/service/ApplicationServiceTest.java",
+      "target": "file:src/main/java/com/example/tracker/repository/ApplicationSnapshotRepository.java",
+      "type": "uses",
+      "label": "@Mock"
+    },
+    {
+      "source": "file:src/main/resources/db/migration/V1__initial.sql",
+      "target": "file:src/main/resources/application.properties",
+      "type": "uses",
+      "label": "Flyway auto-runs on startup"
+    },
+    {
+      "source": "file:src/main/resources/db/migration/V2__increase_name_lengths.sql",
+      "target": "file:src/main/resources/db/migration/V1__initial.sql",
+      "type": "uses",
+      "label": "subsequent migration"
+    },
+    {
+      "source": "file:src/main/resources/db/migration/V3__url_columns_to_text.sql",
+      "target": "file:src/main/resources/db/migration/V2__increase_name_lengths.sql",
+      "type": "uses",
+      "label": "subsequent migration"
+    },
+    {
+      "source": "file:build.gradle.kts",
+      "target": "file:settings.gradle.kts",
+      "type": "uses",
+      "label": "project config"
+    },
+    {
+      "source": "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+      "target": "file:src/main/java/com/example/tracker/controller/GlobalExceptionHandler.java",
+      "type": "uses",
+      "label": "@RestControllerAdvice intercepts exceptions from"
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:bootstrap",
+      "name": "Bootstrap & Configuration",
+      "description": "Application entry point and cross-cutting Spring configuration beans: the @SpringBootApplication bootstrap class, Jackson ObjectMapper customization (ISO dates, camelCase), CORS configuration for the Angular frontend, and Gradle build/settings files.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/TrackerApplication.java",
+        "file:src/main/java/com/example/tracker/config/JacksonConfig.java",
+        "file:src/main/java/com/example/tracker/config/WebConfig.java",
+        "file:src/main/resources/application.properties",
+        "file:build.gradle.kts",
+        "file:settings.gradle.kts"
+      ]
+    },
+    {
+      "id": "layer:api",
+      "name": "REST API Layer",
+      "description": "HTTP interface: the ApplicationController @RestController exposing all /api/applications endpoints (CRUD, archive/restore, interview stages, history, CSV import/export) and the GlobalExceptionHandler @RestControllerAdvice mapping exceptions to appropriate HTTP responses.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+        "file:src/main/java/com/example/tracker/controller/GlobalExceptionHandler.java"
+      ]
+    },
+    {
+      "id": "layer:dto",
+      "name": "Data Transfer Objects",
+      "description": "Java records used as request/response contracts between the HTTP layer and the service layer: ApplicationRequest/Response, InterviewStageRequest/Response, PaginatedResponse, HistoryEntry, HistoryDiff, ImportResult, ImportError.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/dto/ApplicationRequest.java",
+        "file:src/main/java/com/example/tracker/dto/ApplicationResponse.java",
+        "file:src/main/java/com/example/tracker/dto/InterviewStageRequest.java",
+        "file:src/main/java/com/example/tracker/dto/InterviewStageResponse.java",
+        "file:src/main/java/com/example/tracker/dto/PaginatedResponse.java",
+        "file:src/main/java/com/example/tracker/dto/HistoryEntry.java",
+        "file:src/main/java/com/example/tracker/dto/HistoryDiff.java",
+        "file:src/main/java/com/example/tracker/dto/ImportResult.java",
+        "file:src/main/java/com/example/tracker/dto/ImportError.java"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Service / Business Logic",
+      "description": "Core business logic: ApplicationService implements all CRUD, archive, interview-stage management, history snapshotting, CSV import/export, and dynamic filtering via JPA Specifications. ApplicationSpecifications provides composable Specification<Application> factories.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+        "file:src/main/java/com/example/tracker/service/ApplicationSpecifications.java"
+      ]
+    },
+    {
+      "id": "layer:domain",
+      "name": "Domain Entities & Enums",
+      "description": "JPA entity classes (Application, InterviewStage, ApplicationSnapshot) and domain enums (ApplicationStatus, CompanyCategory, JobSource) with their Hibernate UserType adapters (PostgreSQLEnumType base class plus three concrete subclasses) for mapping Java enums to PostgreSQL native enum columns.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/entity/Application.java",
+        "file:src/main/java/com/example/tracker/entity/InterviewStage.java",
+        "file:src/main/java/com/example/tracker/entity/ApplicationSnapshot.java",
+        "file:src/main/java/com/example/tracker/entity/ApplicationStatus.java",
+        "file:src/main/java/com/example/tracker/entity/CompanyCategory.java",
+        "file:src/main/java/com/example/tracker/entity/JobSource.java",
+        "file:src/main/java/com/example/tracker/entity/PostgreSQLEnumType.java",
+        "file:src/main/java/com/example/tracker/entity/ApplicationStatusUserType.java",
+        "file:src/main/java/com/example/tracker/entity/CompanyCategoryUserType.java",
+        "file:src/main/java/com/example/tracker/entity/JobSourceUserType.java"
+      ]
+    },
+    {
+      "id": "layer:persistence",
+      "name": "Repository / Persistence",
+      "description": "Spring Data JPA repositories: ApplicationRepository (with JpaSpecificationExecutor and duplicate-URL check), InterviewStageRepository (ordered by stageOrder), ApplicationSnapshotRepository (sequence-based history with max-sequence query and prev-snapshot lookup).",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/repository/ApplicationRepository.java",
+        "file:src/main/java/com/example/tracker/repository/InterviewStageRepository.java",
+        "file:src/main/java/com/example/tracker/repository/ApplicationSnapshotRepository.java"
+      ]
+    },
+    {
+      "id": "layer:database",
+      "name": "Database Migrations",
+      "description": "Flyway SQL migrations defining the java_spring PostgreSQL schema: V1 creates the schema, enums, and all three tables with indexes; V2 widens name columns to 500 chars; V3 changes URL columns to TEXT for LinkedIn URL support.",
+      "nodeIds": [
+        "file:src/main/resources/db/migration/V1__initial.sql",
+        "file:src/main/resources/db/migration/V2__increase_name_lengths.sql",
+        "file:src/main/resources/db/migration/V3__url_columns_to_text.sql"
+      ]
+    },
+    {
+      "id": "layer:tests",
+      "name": "Tests",
+      "description": "JUnit 5 test classes: ApplicationControllerTest uses @WebMvcTest slice + Mockito to verify HTTP contract (200 list, 400 validation, 201 create), and ApplicationServiceTest uses pure Mockito to verify snapshot creation and automatic default-stage creation on status transition.",
+      "nodeIds": [
+        "file:src/test/java/com/example/tracker/controller/ApplicationControllerTest.java",
+        "file:src/test/java/com/example/tracker/service/ApplicationServiceTest.java"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "id": "step:entrypoint",
+      "title": "Application Bootstrap",
+      "description": "Start here: TrackerApplication.java is the Spring Boot entry point. The single @SpringBootApplication annotation triggers component scanning for all beans in the com.example.tracker package. The Gradle build (build.gradle.kts) wires Java 21, Spring Boot 3.5.14, Hibernate 6, and Flyway.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/TrackerApplication.java",
+        "file:build.gradle.kts"
+      ],
+      "order": 1
+    },
+    {
+      "id": "step:config",
+      "title": "Cross-Cutting Configuration",
+      "description": "Two @Configuration beans shape global behavior: WebConfig registers CORS for the Angular frontend (localhost:3070), and JacksonConfig customizes the ObjectMapper to produce ISO date strings instead of arrays and use camelCase property names \u2014 critical for the TypeScript frontend.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/config/WebConfig.java",
+        "file:src/main/java/com/example/tracker/config/JacksonConfig.java",
+        "file:src/main/resources/application.properties"
+      ],
+      "order": 2
+    },
+    {
+      "id": "step:database",
+      "title": "Database Schema (Flyway Migrations)",
+      "description": "Flyway auto-runs migrations on startup. V1 creates the java_spring schema, three PostgreSQL native enum types (application_status, company_category, job_source), the applications, interview_stages, and application_snapshots tables with UUID PKs and covering indexes. V2 and V3 widen column sizes to handle long names and LinkedIn URLs.",
+      "nodeIds": [
+        "file:src/main/resources/db/migration/V1__initial.sql",
+        "file:src/main/resources/db/migration/V2__increase_name_lengths.sql",
+        "file:src/main/resources/db/migration/V3__url_columns_to_text.sql"
+      ],
+      "order": 3
+    },
+    {
+      "id": "step:domain",
+      "title": "Domain Entities & Enum Type System",
+      "description": "Application is the central JPA entity with a @OneToMany to InterviewStage and three PostgreSQL native enum fields. Because Hibernate's @Enumerated(STRING) doesn't work with hyphenated/spaced PostgreSQL enum values (e.g. 'enterprise-software'), the codebase uses a custom Hibernate UserType system: PostgreSQLEnumType<E> is the abstract base, and ApplicationStatusUserType, CompanyCategoryUserType, JobSourceUserType each extend it to convert between Java enums and their PostgreSQL string values. ApplicationSnapshot stores a JSONB blob of the full ApplicationResponse for history replay.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/entity/Application.java",
+        "file:src/main/java/com/example/tracker/entity/InterviewStage.java",
+        "file:src/main/java/com/example/tracker/entity/ApplicationSnapshot.java",
+        "file:src/main/java/com/example/tracker/entity/PostgreSQLEnumType.java",
+        "file:src/main/java/com/example/tracker/entity/ApplicationStatus.java",
+        "file:src/main/java/com/example/tracker/entity/ApplicationStatusUserType.java"
+      ],
+      "order": 4
+    },
+    {
+      "id": "step:repositories",
+      "title": "Spring Data JPA Repositories",
+      "description": "Three thin repository interfaces provide all data access. ApplicationRepository extends JpaSpecificationExecutor enabling dynamic multi-criteria filtering. ApplicationSnapshotRepository has a @Query for max sequence number and a derived method to fetch the previous snapshot \u2014 both used by the diff engine. InterviewStageRepository provides ordered stage retrieval.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/repository/ApplicationRepository.java",
+        "file:src/main/java/com/example/tracker/repository/ApplicationSnapshotRepository.java",
+        "file:src/main/java/com/example/tracker/repository/InterviewStageRepository.java"
+      ],
+      "order": 5
+    },
+    {
+      "id": "step:service",
+      "title": "Application Service (Core Business Logic)",
+      "description": "ApplicationService is the heart of the codebase. Notable patterns: (1) Every mutating operation calls captureSnapshot() which serializes the full ApplicationResponse to JSONB; (2) Transitioning to INTERVIEWING status with no existing stages auto-creates 6 default stages; (3) CSV import uses Propagation.NOT_SUPPORTED + TransactionTemplate per row to prevent a single bad row from rolling back the whole batch; (4) ApplicationSpecifications.java provides composable Specification<Application> factories composed with Specification.allOf() for filtering.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/service/ApplicationService.java",
+        "file:src/main/java/com/example/tracker/service/ApplicationSpecifications.java"
+      ],
+      "order": 6
+    },
+    {
+      "id": "step:dto",
+      "title": "Data Transfer Objects (Java Records)",
+      "description": "All API contracts use Java records \u2014 immutable, concise value types. ApplicationRequest has Bean Validation annotations (@NotBlank, @Size, @Min, @Max). ApplicationResponse embeds a list of InterviewStageResponse. PaginatedResponse<T> is a generic wrapper. HistoryEntry + HistoryDiff carry computed diffs. ImportResult/ImportError summarize CSV batch operations.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/dto/ApplicationRequest.java",
+        "file:src/main/java/com/example/tracker/dto/ApplicationResponse.java",
+        "file:src/main/java/com/example/tracker/dto/PaginatedResponse.java",
+        "file:src/main/java/com/example/tracker/dto/HistoryEntry.java",
+        "file:src/main/java/com/example/tracker/dto/HistoryDiff.java",
+        "file:src/main/java/com/example/tracker/dto/ImportResult.java"
+      ],
+      "order": 7
+    },
+    {
+      "id": "step:controller",
+      "title": "REST Controller & Exception Handler",
+      "description": "ApplicationController delegates everything to ApplicationService \u2014 it contains no business logic. GlobalExceptionHandler @RestControllerAdvice translates domain exceptions to HTTP: EntityNotFoundException\u2192404, MethodArgumentNotValidException\u2192400 field-error map, HttpMessageNotReadableException\u2192400 validation_error, RuntimeException\u2192500. The order of @ExceptionHandler methods matters \u2014 HttpMessageNotReadableException must appear before RuntimeException.",
+      "nodeIds": [
+        "file:src/main/java/com/example/tracker/controller/ApplicationController.java",
+        "file:src/main/java/com/example/tracker/controller/GlobalExceptionHandler.java"
+      ],
+      "order": 8
+    },
+    {
+      "id": "step:tests",
+      "title": "Tests",
+      "description": "ApplicationControllerTest uses @WebMvcTest (loads only the web layer) with @MockitoBean for the service \u2014 fast, no DB. ApplicationServiceTest uses pure Mockito with @ExtendWith(MockitoExtension.class), constructing ApplicationService directly with a real ObjectMapper to test JSON serialization. Key cases: snapshot creation on create(), and automatic default-stage insertion when transitioning to INTERVIEWING.",
+      "nodeIds": [
+        "file:src/test/java/com/example/tracker/controller/ApplicationControllerTest.java",
+        "file:src/test/java/com/example/tracker/service/ApplicationServiceTest.java"
+      ],
+      "order": 9
+    }
+  ]
+}

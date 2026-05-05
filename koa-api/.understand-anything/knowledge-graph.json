@@ -1,0 +1,696 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "koa-pg-api",
+    "languages": [
+      "TypeScript",
+      "SQL"
+    ],
+    "frameworks": [
+      "Koa",
+      "Zod"
+    ],
+    "description": "Koa.js REST API for the Job Application Tracker, using raw pg (PostgreSQL) for database access with schema isolation in the react_koa schema",
+    "analyzedAt": "2026-05-04T21:09:02.360118Z",
+    "gitCommitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f"
+  },
+  "nodes": [
+    {
+      "id": "file:src/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "src/index.ts",
+      "summary": "Application entry point. Creates and configures the Koa application: registers CORS, body parser, logger, and error handler middleware, mounts the applications and interview-stages routers, adds a /health endpoint, and starts the HTTP server on PORT (default 5010).",
+      "tags": [
+        "entrypoint",
+        "server",
+        "koa",
+        "middleware"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/db/client.ts",
+      "type": "file",
+      "name": "client.ts",
+      "filePath": "src/db/client.ts",
+      "summary": "PostgreSQL connection pool setup using the `pg` library. Exports a Pool instance configured for the react_koa schema, a `query` helper with timing logs, and a `withTransaction` helper that wraps operations in BEGIN/COMMIT/ROLLBACK.",
+      "tags": [
+        "database",
+        "postgresql",
+        "connection-pool",
+        "transactions"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/db/migrate.ts",
+      "type": "file",
+      "name": "migrate.ts",
+      "filePath": "src/db/migrate.ts",
+      "summary": "Database migration script. Reads schema.sql from disk and executes it against the PostgreSQL database to create tables, indexes, and triggers. Run as a standalone script via `npm run db:migrate`.",
+      "tags": [
+        "migration",
+        "database",
+        "script"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/db/schema.sql",
+      "type": "file",
+      "name": "schema.sql",
+      "filePath": "src/db/schema.sql",
+      "summary": "SQL DDL for the react_koa schema. Defines three enum types (application_status, company_category, job_source), three tables (applications, interview_stages, application_history), performance indexes, and an update_updated_at_column trigger function.",
+      "tags": [
+        "sql",
+        "schema",
+        "database",
+        "ddl"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/db/seed.ts",
+      "type": "file",
+      "name": "seed.ts",
+      "filePath": "src/db/seed.ts",
+      "summary": "Database seed script. Inserts five sample job applications with varied statuses and adds interview stages for applications in the interviewing/offer/no-offer states. Run standalone via `npm run db:seed`.",
+      "tags": [
+        "seed",
+        "database",
+        "script",
+        "fixtures"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/middleware/errorHandler.ts",
+      "type": "file",
+      "name": "errorHandler.ts",
+      "filePath": "src/middleware/errorHandler.ts",
+      "summary": "Koa error-handling middleware. Defines the `AppError` class (with code, statusCode, details) and the `errorHandler` middleware that catches AppError (structured response), ZodError (validation_error 400), and generic errors (500 internal_error).",
+      "tags": [
+        "middleware",
+        "error-handling",
+        "koa",
+        "zod"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/middleware/logger.ts",
+      "type": "file",
+      "name": "logger.ts",
+      "filePath": "src/middleware/logger.ts",
+      "summary": "Koa logging middleware. Measures request duration and logs `METHOD URL - STATUS - Nms` after each request completes.",
+      "tags": [
+        "middleware",
+        "logging",
+        "koa"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/applications.ts",
+      "type": "file",
+      "name": "applications.ts",
+      "filePath": "src/routes/applications.ts",
+      "summary": "Koa Router for /applications. Exposes: GET / (list with filters/pagination), POST / (create), GET /:id, PATCH /:id, DELETE /:id, POST /:id/archive, POST /:id/restore, GET /:id/history, POST /:id/history/restore. Delegates business logic to applicationService and history functions.",
+      "tags": [
+        "router",
+        "rest",
+        "applications",
+        "koa",
+        "crud"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/routes/interview-stages.ts",
+      "type": "file",
+      "name": "interview-stages.ts",
+      "filePath": "src/routes/interview-stages.ts",
+      "summary": "Koa Router for /applications/:id/interview-stages. Exposes: POST / (create stage), PATCH /:stageId (update stage), DELETE /:stageId (delete stage). Delegates to interviewStageService.",
+      "tags": [
+        "router",
+        "rest",
+        "interview-stages",
+        "koa",
+        "crud"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/services/applications.service.ts",
+      "type": "file",
+      "name": "applications.service.ts",
+      "filePath": "src/services/applications.service.ts",
+      "summary": "ApplicationService class implementing CRUD for job applications. Handles listApplications (filters, pagination, sort), getApplication (with eager-loaded stages), createApplication, updateApplication (dynamic field mapping, unsubmitted-status date clearing), deleteApplication, archiveApplication, restoreApplication. Records history on every mutation.",
+      "tags": [
+        "service",
+        "applications",
+        "crud",
+        "business-logic",
+        "history"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/services/history.service.ts",
+      "type": "file",
+      "name": "history.service.ts",
+      "filePath": "src/services/history.service.ts",
+      "summary": "History service for snapshot-based application audit trail. Exports: captureSnapshot, getNextSequence, recordHistory (inserts history row), listHistory (paginated, with field-diff computation), restoreToVersion (transactional restore of application + stages), computeFieldDiffs, buildDescription, and FIELD_LABELS.",
+      "tags": [
+        "service",
+        "history",
+        "audit-trail",
+        "snapshot",
+        "diff"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/services/stages.service.ts",
+      "type": "file",
+      "name": "stages.service.ts",
+      "filePath": "src/services/stages.service.ts",
+      "summary": "InterviewStageService class. Handles createStage (with application existence check, touch parent updated_at, record history), updateStage (dynamic update, touch parent, record history), deleteStage (capture history before delete, touch parent), and getStagesByApplicationId.",
+      "tags": [
+        "service",
+        "interview-stages",
+        "crud",
+        "business-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/types/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "src/types/index.ts",
+      "summary": "Central type definitions and Zod validation schemas. Defines enums (ApplicationStatus, CompanyCategory, JobSource), request schemas (CreateApplicationSchema, UpdateApplicationSchema, CreateInterviewStageSchema, UpdateInterviewStageSchema, ListApplicationsQuerySchema), domain interfaces (Application, InterviewStage, PaginatedApplications), history types (FieldChange, HistoryEntry, PaginatedHistory), and RestoreRequestSchema.",
+      "tags": [
+        "types",
+        "zod",
+        "validation",
+        "schemas",
+        "domain-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/types/index.test.ts",
+      "type": "file",
+      "name": "index.test.ts",
+      "filePath": "src/types/index.test.ts",
+      "summary": "Jest unit tests for type schemas. Tests ApplicationStatusSchema (valid/invalid values, enum ordering), CreateApplicationSchema (dateApplied optional for unsubmitted), and UpdateApplicationSchema (unsubmitted status acceptance).",
+      "tags": [
+        "tests",
+        "jest",
+        "validation",
+        "unit-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "npm package manifest for koa-pg-api. Defines scripts (dev, build, start, test, lint, format, db:migrate, db:seed), production dependencies (koa, @koa/router, @koa/cors, koa-bodyparser, pg, uuid, zod, dotenv), and devDependencies (TypeScript, ts-jest, jest, eslint, prettier, tsx, supertest).",
+      "tags": [
+        "config",
+        "npm",
+        "dependencies",
+        "scripts"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript compiler configuration. Targets ES2022/ESNext modules, strict mode enabled, outputs to dist/, includes src/**/* and excludes test files and dist.",
+      "tags": [
+        "config",
+        "typescript",
+        "compiler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:eslint.config.js",
+      "type": "config",
+      "name": "eslint.config.js",
+      "filePath": "eslint.config.js",
+      "summary": "ESLint flat configuration using typescript-eslint. Enables recommended JS and TS rules, enforces no-explicit-any and explicit-function-return-type, ignores dist and node_modules.",
+      "tags": [
+        "config",
+        "eslint",
+        "linting",
+        "typescript"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:jest.config.ts",
+      "type": "config",
+      "name": "jest.config.ts",
+      "filePath": "jest.config.ts",
+      "summary": "Jest test runner configuration. Sets node test environment and uses ts-jest for TypeScript transformation.",
+      "tags": [
+        "config",
+        "jest",
+        "testing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.auditconfig.json",
+      "type": "config",
+      "name": ".auditconfig.json",
+      "filePath": ".auditconfig.json",
+      "summary": "audit-ci configuration. Empty allowlist; blocks on high-severity vulnerabilities using auto package-manager detection.",
+      "tags": [
+        "config",
+        "security",
+        "audit"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/middleware/logger.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/middleware/errorHandler.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/routes/applications.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/routes/interview-stages.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/db/migrate.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/db/migrate.ts",
+      "target": "file:src/db/schema.sql",
+      "type": "reads_from",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/db/seed.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/middleware/errorHandler.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/applications.service.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/interview-stages.ts",
+      "target": "file:src/services/stages.service.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/interview-stages.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/middleware/errorHandler.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/middleware/errorHandler.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/types/index.test.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/types/index.test.ts",
+      "target": "file:src/types/index.ts",
+      "type": "tested_by",
+      "weight": 0.5
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:src/index.ts",
+      "type": "configures",
+      "weight": 0.6
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "file:src/index.ts",
+      "type": "configures",
+      "weight": 0.6
+    },
+    {
+      "source": "config:jest.config.ts",
+      "target": "file:src/types/index.test.ts",
+      "type": "configures",
+      "weight": 0.6
+    },
+    {
+      "source": "config:eslint.config.js",
+      "target": "file:src/index.ts",
+      "type": "configures",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/applications.service.ts",
+      "type": "calls",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "calls",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/routes/interview-stages.ts",
+      "target": "file:src/services/stages.service.ts",
+      "type": "calls",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "calls",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "calls",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "reads_from",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "reads_from",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "reads_from",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/db/schema.sql",
+      "type": "reads_from",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "file:src/db/schema.sql",
+      "type": "reads_from",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/db/schema.sql",
+      "type": "reads_from",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/types/index.ts",
+      "target": "file:src/db/schema.sql",
+      "type": "related",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/db/client.ts",
+      "target": "file:src/db/schema.sql",
+      "type": "reads_from",
+      "weight": 0.5
+    },
+    {
+      "source": "config:.auditconfig.json",
+      "target": "config:package.json",
+      "type": "configures",
+      "weight": 0.6
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:configuration",
+      "name": "Configuration",
+      "description": "Project configuration files: package manifest, TypeScript compiler settings, ESLint rules, Jest test runner config, and security audit configuration.",
+      "nodeIds": [
+        "config:package.json",
+        "config:tsconfig.json",
+        "config:eslint.config.js",
+        "config:jest.config.ts",
+        "config:.auditconfig.json"
+      ]
+    },
+    {
+      "id": "layer:database",
+      "name": "Database",
+      "description": "Database schema definition, connection pool, migration runner, and seed scripts. The schema.sql defines all tables, enums, indexes, and triggers in the react_koa PostgreSQL schema.",
+      "nodeIds": [
+        "file:src/db/schema.sql",
+        "file:src/db/client.ts",
+        "file:src/db/migrate.ts",
+        "file:src/db/seed.ts"
+      ]
+    },
+    {
+      "id": "layer:types-and-validation",
+      "name": "Types & Validation",
+      "description": "Shared TypeScript interfaces, Zod validation schemas, and domain model types used across the entire application. Single source of truth for request/response contracts.",
+      "nodeIds": [
+        "file:src/types/index.ts",
+        "file:src/types/index.test.ts"
+      ]
+    },
+    {
+      "id": "layer:middleware",
+      "name": "Middleware",
+      "description": "Koa middleware components: structured error handling with typed AppError class and Zod error mapping, plus request/response logging.",
+      "nodeIds": [
+        "file:src/middleware/errorHandler.ts",
+        "file:src/middleware/logger.ts"
+      ]
+    },
+    {
+      "id": "layer:services",
+      "name": "Services",
+      "description": "Business logic layer. ApplicationService manages CRUD with history recording. InterviewStageService manages stage lifecycle. HistoryService provides snapshot-based audit trail with field-diff computation and version restore.",
+      "nodeIds": [
+        "file:src/services/applications.service.ts",
+        "file:src/services/history.service.ts",
+        "file:src/services/stages.service.ts"
+      ]
+    },
+    {
+      "id": "layer:routes",
+      "name": "Routes",
+      "description": "HTTP routing layer built on @koa/router. Maps REST endpoints to service calls, handles request parsing with Zod schemas, and sets appropriate HTTP status codes.",
+      "nodeIds": [
+        "file:src/routes/applications.ts",
+        "file:src/routes/interview-stages.ts"
+      ]
+    },
+    {
+      "id": "layer:application-entry",
+      "name": "Application Entry",
+      "description": "Koa application bootstrap: assembles middleware stack and mounts routers. The single entry point that wires all layers together and starts the HTTP server.",
+      "nodeIds": [
+        "file:src/index.ts"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Project Configuration",
+      "description": "Start with `package.json` to understand what this project is: a Koa.js REST API for a job application tracker using raw PostgreSQL via `pg`. Note the scripts \u2014 `db:migrate` and `db:seed` for DB setup, `dev` for hot-reload with tsx, and `test` via Jest. `tsconfig.json` establishes strict TypeScript targeting ES2022 with ESNext modules.",
+      "nodeIds": [
+        "config:package.json",
+        "config:tsconfig.json"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Application Entry Point",
+      "description": "`src/index.ts` is where it all starts. It creates a Koa app, attaches four middleware (cors, bodyParser, logger, errorHandler), adds a `/health` endpoint, mounts the two routers, and starts listening on port 5010. Reading this file gives you the complete request pipeline at a glance.",
+      "nodeIds": [
+        "file:src/index.ts"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Database Schema & Connection",
+      "description": "`schema.sql` defines the entire data model: three PostgreSQL enum types, three tables (applications, interview_stages, application_history), eight performance indexes, and an auto-updating `updated_at` trigger. `client.ts` wraps a pg Pool configured to use the `react_koa` schema \u2014 every query goes through the exported `query()` helper or `withTransaction()` for multi-step operations.",
+      "nodeIds": [
+        "file:src/db/schema.sql",
+        "file:src/db/client.ts"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Types & Validation Schemas",
+      "description": "`src/types/index.ts` is the single source of truth for all domain types and validation. It defines Zod schemas for request bodies and query parameters (CreateApplicationSchema, UpdateApplicationSchema, ListApplicationsQuerySchema etc.) and TypeScript interfaces for the domain model (Application, InterviewStage, PaginatedApplications, HistoryEntry). All services and routes import from here.",
+      "nodeIds": [
+        "file:src/types/index.ts",
+        "file:src/types/index.test.ts"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Middleware Layer",
+      "description": "Two middleware functions handle cross-cutting concerns. `errorHandler.ts` defines the `AppError` class and catches all errors \u2014 mapping AppError to structured JSON, ZodError to 400 validation responses, and everything else to 500. `logger.ts` measures and logs request duration. Both are applied in `index.ts` before the routers.",
+      "nodeIds": [
+        "file:src/middleware/errorHandler.ts",
+        "file:src/middleware/logger.ts"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "History Service \u2014 Audit Trail",
+      "description": "`history.service.ts` is the most sophisticated module. It powers the snapshot-based audit trail: `captureSnapshot` fetches the full application state (including stages), `recordHistory` stores a numbered snapshot row, `listHistory` returns paginated entries with field-level diffs via `computeFieldDiffs`, and `restoreToVersion` transactionally restores both the application row and its stages to a past snapshot.",
+      "nodeIds": [
+        "file:src/services/history.service.ts"
+      ]
+    },
+    {
+      "order": 7,
+      "title": "Application & Stage Services",
+      "description": "`applications.service.ts` handles full CRUD with filtering, sorting, and pagination. Every mutation calls `recordHistory`. `stages.service.ts` manages interview stage lifecycle \u2014 create, update, delete \u2014 each touching the parent application's `updated_at` and recording a history event. Both services use dynamic SQL builders to support partial updates.",
+      "nodeIds": [
+        "file:src/services/applications.service.ts",
+        "file:src/services/stages.service.ts"
+      ]
+    },
+    {
+      "order": 8,
+      "title": "REST Routes",
+      "description": "`routes/applications.ts` exposes 9 endpoints under `/applications` including history listing and version restore. `routes/interview-stages.ts` exposes 3 endpoints under `/applications/:id/interview-stages`. Both use Zod `.parse()` on incoming data before handing off to services \u2014 validation failures are caught by errorHandler.",
+      "nodeIds": [
+        "file:src/routes/applications.ts",
+        "file:src/routes/interview-stages.ts"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "Database Migration & Seeding",
+      "description": "`migrate.ts` reads `schema.sql` and executes it as a standalone script \u2014 run once to set up the database. `seed.ts` inserts five sample applications with realistic statuses and interview stages for development. Both scripts connect using the same pool from `client.ts` and close the pool when done.",
+      "nodeIds": [
+        "file:src/db/migrate.ts",
+        "file:src/db/seed.ts"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,666 @@
+{
+  "nodes": [
+    {
+      "id": "src/main.tsx",
+      "type": "file",
+      "name": "main.tsx",
+      "filePath": "src/main.tsx",
+      "summary": "Application entry point. Mounts the React app with StrictMode and wires in the React Router v7 RouterProvider. Imports global CSS.",
+      "tags": ["entrypoint", "react", "router"]
+    },
+    {
+      "id": "src/App.tsx",
+      "type": "file",
+      "name": "App.tsx",
+      "filePath": "src/App.tsx",
+      "summary": "Root layout component. Renders the persistent Header and an Outlet for nested route content. Provides the shared page shell (dark background).",
+      "tags": ["layout", "react", "router"]
+    },
+    {
+      "id": "src/router.tsx",
+      "type": "file",
+      "name": "router.tsx",
+      "filePath": "src/router.tsx",
+      "summary": "Defines the React Router v7 browser router. Three routes: index (ListPage), /applications/new and /applications/:id (both lazy-load ApplicationEdit). Uses lazy imports for code splitting.",
+      "tags": ["routing", "react-router", "lazy-loading"]
+    },
+    {
+      "id": "src/index.css",
+      "type": "file",
+      "name": "index.css",
+      "filePath": "src/index.css",
+      "summary": "Global stylesheet. Imports Tailwind CSS 4 base styles and defines custom CSS variables for the primary color scale and other design tokens.",
+      "tags": ["styles", "tailwind", "css"]
+    },
+    {
+      "id": "src/types/application.ts",
+      "type": "file",
+      "name": "application.ts",
+      "filePath": "src/types/application.ts",
+      "summary": "Central TypeScript type definitions for the entire application. Defines ApplicationStatus, CompanyCategory, JobSource union types; Application, InterviewStage, and all Create/Update input interfaces; pagination, filter, sort, history, and error response types.",
+      "tags": ["types", "typescript", "domain-model", "application", "interview-stage", "history"]
+    },
+    {
+      "id": "src/services/api.ts",
+      "type": "file",
+      "name": "api.ts",
+      "filePath": "src/services/api.ts",
+      "summary": "HTTP API client layer. Wraps fetch() with a typed handleResponse helper and custom ApiError class. Exposes functions for all backend endpoints: applications CRUD, archive/restore, interview stages CRUD, history fetch and version restore. Uses VITE_API_URL env var with /api proxy fallback.",
+      "tags": ["api", "http", "fetch", "service", "applications", "interview-stages", "history"]
+    },
+    {
+      "id": "src/hooks/useApplications.ts",
+      "type": "file",
+      "name": "useApplications.ts",
+      "filePath": "src/hooks/useApplications.ts",
+      "summary": "Primary data management hook. Encapsulates applications list state (items, total, pagination, loading, error), selected application state, and all CRUD operations for both applications and interview stages. Tracks last-used params to support automatic list refresh after mutations.",
+      "tags": ["hook", "state-management", "applications", "interview-stages", "crud"]
+    },
+    {
+      "id": "src/hooks/useFilters.ts",
+      "type": "file",
+      "name": "useFilters.ts",
+      "filePath": "src/hooks/useFilters.ts",
+      "summary": "Filter state management hook. Manages FilterState (status array, companyCategory, jobSource, skillsMatchMin, includeArchived). Provides individual setter callbacks and a clearFilters reset. Computes hasActiveFilters and activeFilterCount derived values.",
+      "tags": ["hook", "filters", "state-management"]
+    },
+    {
+      "id": "src/hooks/useSorting.ts",
+      "type": "file",
+      "name": "useSorting.ts",
+      "filePath": "src/hooks/useSorting.ts",
+      "summary": "Sort state management hook. Manages SortState (sortBy: dateApplied|companyName|updatedAt, sortDir: asc|desc). Default sort is updatedAt desc. Provides setSortBy, setSortDir, and toggleSortDir.",
+      "tags": ["hook", "sorting", "state-management"]
+    },
+    {
+      "id": "src/lib/constants.ts",
+      "type": "file",
+      "name": "constants.ts",
+      "filePath": "src/lib/constants.ts",
+      "summary": "Application-wide constants. Defines APPLICATION_STATUSES, COMPANY_CATEGORIES, JOB_SOURCES label/value arrays for select options; STATUS_COLORS map for badge styling; DEFAULT_INTERVIEW_STAGES list for quick-add functionality.",
+      "tags": ["constants", "domain", "ui", "status-colors"]
+    },
+    {
+      "id": "src/lib/utils.ts",
+      "type": "file",
+      "name": "utils.ts",
+      "filePath": "src/lib/utils.ts",
+      "summary": "Pure utility functions: cn() for conditional class merging, formatDate() with locale-aware formatting, formatCurrency() and formatSalaryRange() for salary display, getDaysUntil() and isOverdue() for offer deadline tracking, getTodayDate() as ISO date helper.",
+      "tags": ["utils", "formatting", "dates", "currency", "classnames"]
+    },
+    {
+      "id": "src/lib/constants.test.ts",
+      "type": "file",
+      "name": "constants.test.ts",
+      "filePath": "src/lib/constants.test.ts",
+      "summary": "Vitest unit tests for APPLICATION_STATUSES and STATUS_COLORS constants. Verifies ordering, presence of all statuses, and color mappings.",
+      "tags": ["test", "vitest", "constants"]
+    },
+    {
+      "id": "src/lib/utils.test.ts",
+      "type": "file",
+      "name": "utils.test.ts",
+      "filePath": "src/lib/utils.test.ts",
+      "summary": "Vitest unit tests for utility functions in utils.ts. Tests formatting and date calculation logic.",
+      "tags": ["test", "vitest", "utils"]
+    },
+    {
+      "id": "src/pages/ListPage.tsx",
+      "type": "file",
+      "name": "ListPage.tsx",
+      "filePath": "src/pages/ListPage.tsx",
+      "summary": "Main list page. Coordinates useFilters and useSorting hooks, fetches applications with useEffect when filter/sort/page state changes, handles archive/restore/delete actions by calling api directly, and renders FilterBar + ApplicationList with pagination. Does not use useApplications hook - manages its own fetch state.",
+      "tags": ["page", "react", "applications", "pagination", "filtering", "sorting"]
+    },
+    {
+      "id": "src/components/applications/ApplicationCard.tsx",
+      "type": "file",
+      "name": "ApplicationCard.tsx",
+      "filePath": "src/components/applications/ApplicationCard.tsx",
+      "summary": "Card component for a single application in the list. Shows company, position, status badge, interview stage progress, offer deadline with overdue highlighting, category label, and a context menu (archive/delete). Links to the ApplicationEdit detail page.",
+      "tags": ["component", "application", "card", "list-item"]
+    },
+    {
+      "id": "src/components/applications/ApplicationDetail.tsx",
+      "type": "file",
+      "name": "ApplicationDetail.tsx",
+      "filePath": "src/components/applications/ApplicationDetail.tsx",
+      "summary": "Read-only detail view for a single application. Displays all fields (salary range, URLs, category, source, skills match, notes, dates), renders InterviewStageList for stage management, and provides action buttons (edit, archive/restore, delete, history).",
+      "tags": ["component", "application", "detail", "read-only"]
+    },
+    {
+      "id": "src/components/applications/ApplicationEdit.tsx",
+      "type": "file",
+      "name": "ApplicationEdit.tsx",
+      "filePath": "src/components/applications/ApplicationEdit.tsx",
+      "summary": "Combined create/edit page for an application (1082 lines). Loads existing application for edit mode via useApplications, renders ApplicationForm for field editing, manages interview stages inline via InterviewStageList, shows HistoryPanel as a slide-over panel, and handles save/delete/archive/restore navigation.",
+      "tags": ["component", "page", "application", "edit", "create", "form"]
+    },
+    {
+      "id": "src/components/applications/ApplicationForm.tsx",
+      "type": "file",
+      "name": "ApplicationForm.tsx",
+      "filePath": "src/components/applications/ApplicationForm.tsx",
+      "summary": "Controlled form component for application fields. Manages all form fields as local state, validates required fields, and emits CreateApplicationInput or UpdateApplicationInput on submit. Renders Input, Select, UrlFieldInput, Checkbox, and RatingInput primitives.",
+      "tags": ["component", "form", "application", "controlled-form"]
+    },
+    {
+      "id": "src/components/applications/ApplicationList.tsx",
+      "type": "file",
+      "name": "ApplicationList.tsx",
+      "filePath": "src/components/applications/ApplicationList.tsx",
+      "summary": "List container that maps Application[] to ApplicationCard components. Handles loading skeleton, empty state (with or without active filters), and renders Pagination when totalPages > 1.",
+      "tags": ["component", "list", "applications", "loading-state", "empty-state"]
+    },
+    {
+      "id": "src/components/applications/FieldDiff.tsx",
+      "type": "file",
+      "name": "FieldDiff.tsx",
+      "filePath": "src/components/applications/FieldDiff.tsx",
+      "summary": "Displays a visual diff of field changes in a history entry. Shows field label, old value (strikethrough red) and new value (green) for each FieldChange. Handles null, boolean, array, and object value formatting.",
+      "tags": ["component", "history", "diff", "display"]
+    },
+    {
+      "id": "src/components/applications/FilterBar.tsx",
+      "type": "file",
+      "name": "FilterBar.tsx",
+      "filePath": "src/components/applications/FilterBar.tsx",
+      "summary": "Filter and sort control bar. Renders Select dropdowns for status, category, source, and skills match; Checkbox for include-archived; a clear-filters Button with active count; and sort controls (field selector + direction toggle). Shows result count summary.",
+      "tags": ["component", "filter", "sort", "toolbar"]
+    },
+    {
+      "id": "src/components/applications/HistoryPanel.tsx",
+      "type": "file",
+      "name": "HistoryPanel.tsx",
+      "filePath": "src/components/applications/HistoryPanel.tsx",
+      "summary": "Slide-over panel showing application change history. Loads HistoryEntry list from the API, supports expanding entries to see FieldDiff, and allows restoring to a historical version. Closes on Escape key.",
+      "tags": ["component", "history", "panel", "slide-over", "restore"]
+    },
+    {
+      "id": "src/components/applications/index.ts",
+      "type": "file",
+      "name": "applications/index.ts",
+      "filePath": "src/components/applications/index.ts",
+      "summary": "Barrel export for the applications component group: ApplicationCard, ApplicationList, ApplicationForm, ApplicationDetail, ApplicationEdit, FilterBar.",
+      "tags": ["index", "barrel", "exports"]
+    },
+    {
+      "id": "src/components/common/Header.tsx",
+      "type": "file",
+      "name": "Header.tsx",
+      "filePath": "src/components/common/Header.tsx",
+      "summary": "App-wide navigation header. Shows the React logo, app title with stack label, dark/light theme toggle (persisted to localStorage), and an Add Application button that navigates to /applications/new.",
+      "tags": ["component", "navigation", "header", "dark-mode", "theme"]
+    },
+    {
+      "id": "src/components/common/index.ts",
+      "type": "file",
+      "name": "common/index.ts",
+      "filePath": "src/components/common/index.ts",
+      "summary": "Barrel export for common components: Header.",
+      "tags": ["index", "barrel", "exports"]
+    },
+    {
+      "id": "src/components/interviews/InlineInterviewStageForm.tsx",
+      "type": "file",
+      "name": "InlineInterviewStageForm.tsx",
+      "filePath": "src/components/interviews/InlineInterviewStageForm.tsx",
+      "summary": "Inline (non-modal) form for adding or editing an interview stage. Renders directly in the page flow with Input, Checkbox, RatingInput, and TextArea primitives. Used as an alternative to the modal InterviewStageForm.",
+      "tags": ["component", "form", "interview-stage", "inline"]
+    },
+    {
+      "id": "src/components/interviews/InterviewStageForm.tsx",
+      "type": "file",
+      "name": "InterviewStageForm.tsx",
+      "filePath": "src/components/interviews/InterviewStageForm.tsx",
+      "summary": "Modal form for adding or editing an interview stage. Wraps field inputs (name, completion toggle, completion date, performance rating, notes) in a Modal component. Handles create and edit modes.",
+      "tags": ["component", "form", "interview-stage", "modal"]
+    },
+    {
+      "id": "src/components/interviews/InterviewStageItem.tsx",
+      "type": "file",
+      "name": "InterviewStageItem.tsx",
+      "filePath": "src/components/interviews/InterviewStageItem.tsx",
+      "summary": "Single interview stage row. Shows completion checkbox, stage name (strikethrough when done), completion date, performance rating stars, notes indicator, and expand/collapse. Expanded view shows full notes and Edit/Remove buttons with delete confirmation dialog.",
+      "tags": ["component", "interview-stage", "list-item", "checkbox", "expandable"]
+    },
+    {
+      "id": "src/components/interviews/InterviewStageList.tsx",
+      "type": "file",
+      "name": "InterviewStageList.tsx",
+      "filePath": "src/components/interviews/InterviewStageList.tsx",
+      "summary": "Container for interview stage management. Shows progress bar (completed/total), sorted list of InterviewStageItem rows, an Add Default Stages button (when empty), Add Stage button, and an InterviewStageForm modal. Orchestrates add/update/remove and toggle-complete operations.",
+      "tags": ["component", "interview-stage", "list", "progress", "management"]
+    },
+    {
+      "id": "src/components/interviews/index.ts",
+      "type": "file",
+      "name": "interviews/index.ts",
+      "filePath": "src/components/interviews/index.ts",
+      "summary": "Barrel export for interview components: InterviewStageItem, InterviewStageForm, InterviewStageList, InlineInterviewStageForm.",
+      "tags": ["index", "barrel", "exports"]
+    },
+    {
+      "id": "src/components/ui/Badge.tsx",
+      "type": "file",
+      "name": "Badge.tsx",
+      "filePath": "src/components/ui/Badge.tsx",
+      "summary": "Status badge component. Renders a colored pill for an ApplicationStatus value using STATUS_COLORS and APPLICATION_STATUSES label lookup. Supports sm and md sizes.",
+      "tags": ["component", "ui", "badge", "status"]
+    },
+    {
+      "id": "src/components/ui/Button.tsx",
+      "type": "file",
+      "name": "Button.tsx",
+      "filePath": "src/components/ui/Button.tsx",
+      "summary": "Polymorphic button primitive using forwardRef. Four variants (primary, secondary, danger, ghost) and three sizes (sm, md, lg). Extends native button attributes with disabled/focus/transition styles.",
+      "tags": ["component", "ui", "button", "primitive"]
+    },
+    {
+      "id": "src/components/ui/Card.tsx",
+      "type": "file",
+      "name": "Card.tsx",
+      "filePath": "src/components/ui/Card.tsx",
+      "summary": "Card layout primitive with optional hover effect. Exports Card, CardHeader, CardContent, CardFooter sub-components for structured card layouts.",
+      "tags": ["component", "ui", "card", "layout", "primitive"]
+    },
+    {
+      "id": "src/components/ui/Checkbox.tsx",
+      "type": "file",
+      "name": "Checkbox.tsx",
+      "filePath": "src/components/ui/Checkbox.tsx",
+      "summary": "Styled checkbox input with optional label. Wraps native input[type=checkbox] with Tailwind styling and dark mode support.",
+      "tags": ["component", "ui", "checkbox", "form-input", "primitive"]
+    },
+    {
+      "id": "src/components/ui/EmptyState.tsx",
+      "type": "file",
+      "name": "EmptyState.tsx",
+      "filePath": "src/components/ui/EmptyState.tsx",
+      "summary": "Centered empty state display with icon, title, description, and optional action button. Used when lists have no items.",
+      "tags": ["component", "ui", "empty-state", "feedback"]
+    },
+    {
+      "id": "src/components/ui/Input.tsx",
+      "type": "file",
+      "name": "Input.tsx",
+      "filePath": "src/components/ui/Input.tsx",
+      "summary": "Form input primitives. Exports Input (text/date/number/email input with label, error, hint) and TextArea (multi-line input). Both support dark mode and error display.",
+      "tags": ["component", "ui", "input", "textarea", "form-input", "primitive"]
+    },
+    {
+      "id": "src/components/ui/Modal.tsx",
+      "type": "file",
+      "name": "Modal.tsx",
+      "filePath": "src/components/ui/Modal.tsx",
+      "summary": "Modal dialog components. Exports Modal (configurable overlay with title, close button, size variants sm/md/lg/xl) and ConfirmDialog (yes/no confirmation modal with destructive variant). Both handle Escape key and backdrop click.",
+      "tags": ["component", "ui", "modal", "dialog", "confirm", "primitive"]
+    },
+    {
+      "id": "src/components/ui/Pagination.tsx",
+      "type": "file",
+      "name": "Pagination.tsx",
+      "filePath": "src/components/ui/Pagination.tsx",
+      "summary": "Pagination control. Renders prev/next buttons and page number buttons with ellipsis for large page counts. Highlights current page and disables out-of-range navigation.",
+      "tags": ["component", "ui", "pagination", "navigation"]
+    },
+    {
+      "id": "src/components/ui/Rating.tsx",
+      "type": "file",
+      "name": "Rating.tsx",
+      "filePath": "src/components/ui/Rating.tsx",
+      "summary": "Rating components. Exports RatingDisplay (read-only star display with size variants) and RatingInput (interactive 5-star selector with hover states and clear/unset support).",
+      "tags": ["component", "ui", "rating", "stars", "form-input"]
+    },
+    {
+      "id": "src/components/ui/Select.tsx",
+      "type": "file",
+      "name": "Select.tsx",
+      "filePath": "src/components/ui/Select.tsx",
+      "summary": "Styled select dropdown primitive. Accepts options as {value, label}[] array with an optional placeholder option. Supports label, className overrides, and dark mode.",
+      "tags": ["component", "ui", "select", "dropdown", "form-input", "primitive"]
+    },
+    {
+      "id": "src/components/ui/UrlFieldInput.tsx",
+      "type": "file",
+      "name": "UrlFieldInput.tsx",
+      "filePath": "src/components/ui/UrlFieldInput.tsx",
+      "summary": "Specialized URL input with inline open-link button. Renders a text input for URL values with a button that opens the URL in a new tab, only shown when a valid URL is present.",
+      "tags": ["component", "ui", "url", "input", "form-input"]
+    },
+    {
+      "id": "src/components/ui/index.ts",
+      "type": "file",
+      "name": "ui/index.ts",
+      "filePath": "src/components/ui/index.ts",
+      "summary": "Barrel export for all UI primitives: Button, Badge, Card/CardHeader/CardContent/CardFooter, Input/TextArea, Select, Modal/ConfirmDialog, RatingDisplay/RatingInput, Checkbox, EmptyState, Pagination, UrlFieldInput.",
+      "tags": ["index", "barrel", "exports", "ui-library"]
+    },
+    {
+      "id": "src/vite-env.d.ts",
+      "type": "file",
+      "name": "vite-env.d.ts",
+      "filePath": "src/vite-env.d.ts",
+      "summary": "Vite client type declarations. Provides TypeScript types for Vite's import.meta.env and other Vite-specific globals used throughout the codebase.",
+      "tags": ["types", "vite", "typescript", "declarations"]
+    },
+    {
+      "id": "vite.config.ts",
+      "type": "config",
+      "name": "vite.config.ts",
+      "filePath": "vite.config.ts",
+      "summary": "Vite build configuration. Configures React plugin, @ path alias for src/, dev server on port 3010, and API proxy rewriting /api/* to http://localhost:5010/* (Koa API backend).",
+      "tags": ["config", "vite", "build", "proxy", "dev-server"]
+    },
+    {
+      "id": "tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript compiler configuration. Strict mode enabled, target ES2020, bundler module resolution, JSX react-jsx, @ path alias, no emit (Vite handles transpilation).",
+      "tags": ["config", "typescript", "strict"]
+    },
+    {
+      "id": "package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "npm package manifest. Declares React 19, React Router 7.13, Tailwind 4, Vite 7, TypeScript 5.9, Vitest 4, Testing Library as dependencies. Scripts: dev, build, lint, preview, test, test:watch.",
+      "tags": ["config", "npm", "dependencies"]
+    },
+    {
+      "id": "index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "index.html",
+      "summary": "Vite HTML entry point. Defines the root div mount target and loads src/main.tsx as an ES module script.",
+      "tags": ["entrypoint", "html", "vite"]
+    }
+  ],
+  "edges": [
+    { "source": "src/main.tsx", "target": "src/router.tsx", "type": "imports", "label": "imports router" },
+    { "source": "src/main.tsx", "target": "src/index.css", "type": "imports", "label": "imports styles" },
+    { "source": "src/main.tsx", "target": "index.html", "type": "references", "label": "mounts into root div" },
+    { "source": "src/router.tsx", "target": "src/App.tsx", "type": "imports", "label": "imports App as root layout" },
+    { "source": "src/router.tsx", "target": "src/pages/ListPage.tsx", "type": "imports", "label": "lazy imports ListPage" },
+    { "source": "src/router.tsx", "target": "src/components/applications/ApplicationEdit.tsx", "type": "imports", "label": "lazy imports ApplicationEdit" },
+    { "source": "src/App.tsx", "target": "src/components/common/Header.tsx", "type": "imports", "label": "renders Header" },
+    { "source": "src/pages/ListPage.tsx", "target": "src/hooks/useFilters.ts", "type": "imports", "label": "uses useFilters" },
+    { "source": "src/pages/ListPage.tsx", "target": "src/hooks/useSorting.ts", "type": "imports", "label": "uses useSorting" },
+    { "source": "src/pages/ListPage.tsx", "target": "src/services/api.ts", "type": "imports", "label": "calls api directly" },
+    { "source": "src/pages/ListPage.tsx", "target": "src/components/applications/ApplicationList.tsx", "type": "imports", "label": "renders ApplicationList" },
+    { "source": "src/pages/ListPage.tsx", "target": "src/components/applications/FilterBar.tsx", "type": "imports", "label": "renders FilterBar" },
+    { "source": "src/pages/ListPage.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/components/applications/ApplicationEdit.tsx", "target": "src/hooks/useApplications.ts", "type": "imports", "label": "uses useApplications" },
+    { "source": "src/components/applications/ApplicationEdit.tsx", "target": "src/components/applications/ApplicationForm.tsx", "type": "imports", "label": "renders ApplicationForm" },
+    { "source": "src/components/applications/ApplicationEdit.tsx", "target": "src/components/applications/ApplicationDetail.tsx", "type": "imports", "label": "renders ApplicationDetail" },
+    { "source": "src/components/applications/ApplicationEdit.tsx", "target": "src/components/applications/HistoryPanel.tsx", "type": "imports", "label": "renders HistoryPanel" },
+    { "source": "src/components/applications/ApplicationEdit.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses UI primitives" },
+    { "source": "src/components/applications/ApplicationEdit.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/components/applications/ApplicationDetail.tsx", "target": "src/components/interviews/InterviewStageList.tsx", "type": "imports", "label": "renders InterviewStageList" },
+    { "source": "src/components/applications/ApplicationDetail.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses UI primitives" },
+    { "source": "src/components/applications/ApplicationDetail.tsx", "target": "src/lib/constants.ts", "type": "imports", "label": "uses constants" },
+    { "source": "src/components/applications/ApplicationDetail.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses utils" },
+    { "source": "src/components/applications/ApplicationDetail.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/components/applications/ApplicationForm.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses UI primitives" },
+    { "source": "src/components/applications/ApplicationForm.tsx", "target": "src/lib/constants.ts", "type": "imports", "label": "uses constants" },
+    { "source": "src/components/applications/ApplicationForm.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses utils" },
+    { "source": "src/components/applications/ApplicationForm.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/components/applications/ApplicationList.tsx", "target": "src/components/applications/ApplicationCard.tsx", "type": "imports", "label": "renders ApplicationCard" },
+    { "source": "src/components/applications/ApplicationList.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses EmptyState, Pagination" },
+    { "source": "src/components/applications/ApplicationList.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/components/applications/ApplicationCard.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses Card, Badge, RatingDisplay, ConfirmDialog" },
+    { "source": "src/components/applications/ApplicationCard.tsx", "target": "src/lib/constants.ts", "type": "imports", "label": "uses COMPANY_CATEGORIES" },
+    { "source": "src/components/applications/ApplicationCard.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses formatDate, getDaysUntil, isOverdue, cn" },
+    { "source": "src/components/applications/ApplicationCard.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports Application type" },
+    { "source": "src/components/applications/FilterBar.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses Button, Select, Checkbox" },
+    { "source": "src/components/applications/FilterBar.tsx", "target": "src/lib/constants.ts", "type": "imports", "label": "uses status/category/source arrays" },
+    { "source": "src/components/applications/FilterBar.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports FilterState, SortState types" },
+    { "source": "src/components/applications/HistoryPanel.tsx", "target": "src/services/api.ts", "type": "imports", "label": "calls getHistory, restoreToVersion" },
+    { "source": "src/components/applications/HistoryPanel.tsx", "target": "src/components/applications/FieldDiff.tsx", "type": "imports", "label": "renders FieldDiff" },
+    { "source": "src/components/applications/HistoryPanel.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports HistoryEntry type" },
+    { "source": "src/components/applications/FieldDiff.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports FieldChange type" },
+    { "source": "src/components/applications/index.ts", "target": "src/components/applications/ApplicationCard.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/applications/index.ts", "target": "src/components/applications/ApplicationList.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/applications/index.ts", "target": "src/components/applications/ApplicationForm.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/applications/index.ts", "target": "src/components/applications/ApplicationDetail.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/applications/index.ts", "target": "src/components/applications/ApplicationEdit.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/applications/index.ts", "target": "src/components/applications/FilterBar.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/interviews/InterviewStageList.tsx", "target": "src/components/interviews/InterviewStageItem.tsx", "type": "imports", "label": "renders InterviewStageItem" },
+    { "source": "src/components/interviews/InterviewStageList.tsx", "target": "src/components/interviews/InterviewStageForm.tsx", "type": "imports", "label": "renders InterviewStageForm modal" },
+    { "source": "src/components/interviews/InterviewStageList.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses Button" },
+    { "source": "src/components/interviews/InterviewStageList.tsx", "target": "src/lib/constants.ts", "type": "imports", "label": "uses DEFAULT_INTERVIEW_STAGES" },
+    { "source": "src/components/interviews/InterviewStageList.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/components/interviews/InterviewStageItem.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses Button, RatingDisplay, Checkbox, ConfirmDialog" },
+    { "source": "src/components/interviews/InterviewStageItem.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses formatDate, getTodayDate, cn" },
+    { "source": "src/components/interviews/InterviewStageItem.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports InterviewStage type" },
+    { "source": "src/components/interviews/InterviewStageForm.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses Button, Input, TextArea, Checkbox, RatingInput, Modal" },
+    { "source": "src/components/interviews/InterviewStageForm.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses getTodayDate" },
+    { "source": "src/components/interviews/InterviewStageForm.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/components/interviews/InlineInterviewStageForm.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses Button, Input, TextArea, Checkbox, RatingInput" },
+    { "source": "src/components/interviews/InlineInterviewStageForm.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses getTodayDate" },
+    { "source": "src/components/interviews/InlineInterviewStageForm.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/components/interviews/index.ts", "target": "src/components/interviews/InterviewStageItem.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/interviews/index.ts", "target": "src/components/interviews/InterviewStageForm.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/interviews/index.ts", "target": "src/components/interviews/InterviewStageList.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/interviews/index.ts", "target": "src/components/interviews/InlineInterviewStageForm.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/Badge.tsx", "target": "src/lib/constants.ts", "type": "imports", "label": "uses STATUS_COLORS, APPLICATION_STATUSES" },
+    { "source": "src/components/ui/Badge.tsx", "target": "src/types/application.ts", "type": "imports", "label": "imports ApplicationStatus type" },
+    { "source": "src/components/ui/Badge.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/Button.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/Card.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/Checkbox.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/Input.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/Modal.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/Rating.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/Select.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/UrlFieldInput.tsx", "target": "src/lib/utils.ts", "type": "imports", "label": "uses cn" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Badge.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Button.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Card.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Checkbox.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/EmptyState.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Input.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Modal.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Pagination.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Rating.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/Select.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/components/ui/index.ts", "target": "src/components/ui/UrlFieldInput.tsx", "type": "imports", "label": "re-exports" },
+    { "source": "src/hooks/useApplications.ts", "target": "src/services/api.ts", "type": "imports", "label": "calls all api functions" },
+    { "source": "src/hooks/useApplications.ts", "target": "src/types/application.ts", "type": "imports", "label": "imports types" },
+    { "source": "src/hooks/useFilters.ts", "target": "src/types/application.ts", "type": "imports", "label": "imports FilterState, ApplicationStatus types" },
+    { "source": "src/hooks/useSorting.ts", "target": "src/types/application.ts", "type": "imports", "label": "imports SortState type" },
+    { "source": "src/lib/constants.ts", "target": "src/types/application.ts", "type": "imports", "label": "imports ApplicationStatus, CompanyCategory, JobSource types" },
+    { "source": "src/lib/constants.test.ts", "target": "src/lib/constants.ts", "type": "imports", "label": "tests constants" },
+    { "source": "src/lib/utils.test.ts", "target": "src/lib/utils.ts", "type": "imports", "label": "tests utils" },
+    { "source": "src/components/common/Header.tsx", "target": "src/components/ui/index.ts", "type": "imports", "label": "uses Button" },
+    { "source": "vite.config.ts", "target": "src/main.tsx", "type": "references", "label": "configures entry point" },
+    { "source": "src/components/common/index.ts", "target": "src/components/common/Header.tsx", "type": "imports", "label": "re-exports Header" },
+    { "source": "src/App.tsx", "target": "src/components/common/index.ts", "type": "imports", "label": "imports from common barrel" },
+    { "source": "tsconfig.json", "target": "src/main.tsx", "type": "references", "label": "includes src/ files" },
+    { "source": "src/vite-env.d.ts", "target": "vite.config.ts", "type": "references", "label": "provides types for vite env globals" },
+    { "source": "package.json", "target": "vite.config.ts", "type": "references", "label": "build scripts invoke vite" }
+  ],
+  "layers": [
+    {
+      "id": "layer-entrypoint",
+      "name": "Entry Points",
+      "description": "Application bootstrap files: the HTML shell, the main.tsx React mount, the CSS global styles, and the router configuration that defines all routes.",
+      "nodeIds": ["index.html", "src/main.tsx", "src/index.css", "src/router.tsx"]
+    },
+    {
+      "id": "layer-config",
+      "name": "Configuration",
+      "description": "Build, TypeScript, and package configuration files (vite.config.ts, tsconfig.json, package.json).",
+      "nodeIds": ["vite.config.ts", "tsconfig.json", "package.json"]
+    },
+    {
+      "id": "layer-types",
+      "name": "Domain Types",
+      "description": "Central TypeScript type definitions for the application domain — all entity types, API input/output shapes, UI state types. The single source of truth for the data model.",
+      "nodeIds": ["src/types/application.ts"]
+    },
+    {
+      "id": "layer-api",
+      "name": "API Service Layer",
+      "description": "HTTP client abstraction for the backend REST API. Encapsulates fetch() calls, error handling, and query string building behind typed function interfaces.",
+      "nodeIds": ["src/services/api.ts"]
+    },
+    {
+      "id": "layer-lib",
+      "name": "Utilities & Constants",
+      "description": "Pure utility functions (formatting, date math, classname merging) and application-wide constants (status lists, color maps, default values).",
+      "nodeIds": ["src/lib/utils.ts", "src/lib/constants.ts", "src/lib/constants.test.ts", "src/lib/utils.test.ts"]
+    },
+    {
+      "id": "layer-hooks",
+      "name": "Custom Hooks",
+      "description": "React custom hooks managing application state: useApplications for data fetching/mutation, useFilters for filter state, useSorting for sort state.",
+      "nodeIds": ["src/hooks/useApplications.ts", "src/hooks/useFilters.ts", "src/hooks/useSorting.ts"]
+    },
+    {
+      "id": "layer-ui-primitives",
+      "name": "UI Primitives",
+      "description": "Reusable, stateless UI building blocks (design system components): Button, Badge, Card, Input, Select, Modal, Rating, Checkbox, Pagination, EmptyState, UrlFieldInput. All consume only lib utilities.",
+      "nodeIds": [
+        "src/components/ui/index.ts",
+        "src/components/ui/Button.tsx",
+        "src/components/ui/Badge.tsx",
+        "src/components/ui/Card.tsx",
+        "src/components/ui/Checkbox.tsx",
+        "src/components/ui/EmptyState.tsx",
+        "src/components/ui/Input.tsx",
+        "src/components/ui/Modal.tsx",
+        "src/components/ui/Pagination.tsx",
+        "src/components/ui/Rating.tsx",
+        "src/components/ui/Select.tsx",
+        "src/components/ui/UrlFieldInput.tsx"
+      ]
+    },
+    {
+      "id": "layer-interview-components",
+      "name": "Interview Stage Components",
+      "description": "Feature components for managing interview pipeline stages within an application: list view with progress bar, individual stage items, add/edit forms (modal and inline variants).",
+      "nodeIds": [
+        "src/components/interviews/index.ts",
+        "src/components/interviews/InterviewStageList.tsx",
+        "src/components/interviews/InterviewStageItem.tsx",
+        "src/components/interviews/InterviewStageForm.tsx",
+        "src/components/interviews/InlineInterviewStageForm.tsx"
+      ]
+    },
+    {
+      "id": "layer-application-components",
+      "name": "Application Feature Components",
+      "description": "Feature components for managing job applications: card (list item), list container, detail view, create/edit form, filter/sort bar, history panel with field diff display.",
+      "nodeIds": [
+        "src/components/applications/index.ts",
+        "src/components/applications/ApplicationCard.tsx",
+        "src/components/applications/ApplicationList.tsx",
+        "src/components/applications/ApplicationDetail.tsx",
+        "src/components/applications/ApplicationForm.tsx",
+        "src/components/applications/ApplicationEdit.tsx",
+        "src/components/applications/FilterBar.tsx",
+        "src/components/applications/HistoryPanel.tsx",
+        "src/components/applications/FieldDiff.tsx"
+      ]
+    },
+    {
+      "id": "layer-common-components",
+      "name": "Common Components",
+      "description": "Shared layout components used across all pages: the persistent Header with navigation, dark mode toggle, and add-application button.",
+      "nodeIds": ["src/components/common/Header.tsx", "src/components/common/index.ts", "src/vite-env.d.ts"]
+    },
+    {
+      "id": "layer-layout",
+      "name": "Layout & App Shell",
+      "description": "Top-level layout component (App.tsx) that provides the page shell, renders the Header, and hosts the router Outlet.",
+      "nodeIds": ["src/App.tsx"]
+    },
+    {
+      "id": "layer-pages",
+      "name": "Pages",
+      "description": "Route-level page components. ListPage is the main application list view. ApplicationEdit (lazy-loaded) handles both create and edit workflows.",
+      "nodeIds": ["src/pages/ListPage.tsx"]
+    }
+  ],
+  "tour": [
+    {
+      "id": "tour-step-1",
+      "title": "Entry Point",
+      "description": "Start with src/main.tsx — the React app bootstrap. It mounts the app with React.StrictMode and connects the React Router v7 RouterProvider. Then check index.html to see the div#root mount target.",
+      "nodeIds": ["src/main.tsx", "index.html"],
+      "order": 1
+    },
+    {
+      "id": "tour-step-2",
+      "title": "Routing",
+      "description": "Open src/router.tsx to see how the app routes are defined. There are three routes: the root (/) renders ListPage, while /applications/new and /applications/:id both lazy-load ApplicationEdit. This code-splitting approach keeps the initial bundle lean.",
+      "nodeIds": ["src/router.tsx"],
+      "order": 2
+    },
+    {
+      "id": "tour-step-3",
+      "title": "Domain Types",
+      "description": "Read src/types/application.ts next — it's the central data model. Every entity (Application, InterviewStage, HistoryEntry), every union type (ApplicationStatus, CompanyCategory, JobSource), and every API input/output shape is defined here. Understanding this file unlocks the rest of the codebase.",
+      "nodeIds": ["src/types/application.ts"],
+      "order": 3
+    },
+    {
+      "id": "tour-step-4",
+      "title": "API Service Layer",
+      "description": "Examine src/services/api.ts to see how the frontend communicates with the backend. The ApiError class and handleResponse helper wrap all fetch calls. The proxy in vite.config.ts rewrites /api/* to the Koa backend on port 5010.",
+      "nodeIds": ["src/services/api.ts", "vite.config.ts"],
+      "order": 4
+    },
+    {
+      "id": "tour-step-5",
+      "title": "Custom Hooks",
+      "description": "Look at the three custom hooks. useApplications (src/hooks/useApplications.ts) is the primary state manager — it encapsulates the full application CRUD lifecycle, tracks lastParams for automatic list refresh, and manages selectedApplication. useFilters and useSorting are lightweight state containers for their respective UI controls.",
+      "nodeIds": ["src/hooks/useApplications.ts", "src/hooks/useFilters.ts", "src/hooks/useSorting.ts"],
+      "order": 5
+    },
+    {
+      "id": "tour-step-6",
+      "title": "Utilities & Constants",
+      "description": "src/lib/constants.ts defines all the label/value arrays for dropdowns and the STATUS_COLORS map used by Badge. src/lib/utils.ts has pure functions: cn() for Tailwind class merging, date formatters, salary formatters, and offer-deadline helpers. These are tested in the .test.ts siblings.",
+      "nodeIds": ["src/lib/constants.ts", "src/lib/utils.ts"],
+      "order": 6
+    },
+    {
+      "id": "tour-step-7",
+      "title": "UI Primitives",
+      "description": "The src/components/ui/ directory is the design system. Button, Card, Input, Select, Modal, Rating, Badge, Checkbox, Pagination, EmptyState, and UrlFieldInput are all small, self-contained primitives. Badge is unique in that it reads APPLICATION_STATUSES and STATUS_COLORS — it's domain-aware.",
+      "nodeIds": ["src/components/ui/Button.tsx", "src/components/ui/Badge.tsx", "src/components/ui/Modal.tsx", "src/components/ui/Rating.tsx"],
+      "order": 7
+    },
+    {
+      "id": "tour-step-8",
+      "title": "Main List Page",
+      "description": "src/pages/ListPage.tsx is the default view. It wires useFilters + useSorting to a useEffect that re-fetches applications whenever filter/sort/page state changes. It calls api directly rather than using useApplications, rendering FilterBar and ApplicationList.",
+      "nodeIds": ["src/pages/ListPage.tsx"],
+      "order": 8
+    },
+    {
+      "id": "tour-step-9",
+      "title": "Application Components",
+      "description": "ApplicationList maps Application[] to ApplicationCard components, handling empty state and pagination. ApplicationCard shows company, status badge, stage progress, and offer deadline with a context menu. ApplicationForm is the controlled form for creating/editing all application fields.",
+      "nodeIds": ["src/components/applications/ApplicationList.tsx", "src/components/applications/ApplicationCard.tsx", "src/components/applications/ApplicationForm.tsx"],
+      "order": 9
+    },
+    {
+      "id": "tour-step-10",
+      "title": "Application Edit Page",
+      "description": "ApplicationEdit (src/components/applications/ApplicationEdit.tsx) is the largest file (1082 lines). It handles both create and edit flows, uses useApplications for data, embeds ApplicationForm and ApplicationDetail, and triggers the HistoryPanel slide-over.",
+      "nodeIds": ["src/components/applications/ApplicationEdit.tsx", "src/components/applications/ApplicationDetail.tsx", "src/components/applications/HistoryPanel.tsx", "src/components/applications/FieldDiff.tsx"],
+      "order": 10
+    },
+    {
+      "id": "tour-step-11",
+      "title": "Interview Stage Management",
+      "description": "InterviewStageList (src/components/interviews/InterviewStageList.tsx) orchestrates the interview pipeline UI: a progress bar, sorted list of InterviewStageItem rows, and an Add Default Stages quick-action. InterviewStageForm is the modal editor; InlineInterviewStageForm is its inline alternative.",
+      "nodeIds": ["src/components/interviews/InterviewStageList.tsx", "src/components/interviews/InterviewStageItem.tsx", "src/components/interviews/InterviewStageForm.tsx"],
+      "order": 11
+    }
+  ]
+}

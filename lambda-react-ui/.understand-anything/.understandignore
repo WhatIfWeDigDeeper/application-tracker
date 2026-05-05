@@ -1,0 +1,13 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Syntax: same as .gitignore (globs, # comments, ! negation, trailing / for dirs)
+
+# Built-in defaults (always excluded unless negated):
+#   node_modules/, .git/, dist/, build/, *.lock, *.min.js, etc.
+
+# Exclude test results and assets
+test-results/
+src/assets/
+
+# Exclude test files (comment out to include)
+# *.test.*
+# *.spec.*
