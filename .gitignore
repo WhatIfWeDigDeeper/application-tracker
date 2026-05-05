@@ -209,5 +209,5 @@ data/
 cdk.out/
 
 # understand-anything build artifacts
-.understand-anything/intermediate/
-.understand-anything/tmp/
+**/.understand-anything/intermediate/
+**/.understand-anything/tmp/
