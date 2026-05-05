@@ -22,6 +22,7 @@ Monorepo with multiple frontend+backend implementation pairs sharing a single Po
 - **Agent Skills Policy**: When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (including `pr-comments`, `ship-it`, `learn`, `playwright-cli`, etc.) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Sync: `npx skills add -y whatifwedigdeeper/agent-skills` — repo-wide, diff before committing. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
 - **Skills directory layout**: `.agent/skills/` (singular) holds symlinks into `.agents/skills/` (plural, actual files); both gitignored. `.claude/skills/` mixes tracked project-local skills and gitignored symlinks to upstream skills. Reinstall from `skills-lock.json` with `npx skills add`.
 - **gitignore trailing slash doesn't match symlinks**: Patterns like `foo/` only match real directories — omit trailing slash for symlink entries.
+- **gitignore slash anchors pattern to root**: A pattern with an internal `/` (like `foo/bar/`) is anchored to the `.gitignore` root — use `**/foo/bar/` to match nested directories too.
 
 ## Per-Stack Guidance
 
@@ -158,6 +159,7 @@ Commands that require `dangerouslyDisableSandbox: true`:
 - `./gradlew` commands — sandbox has no Java Runtime; prepend `export JAVA_HOME=$(/usr/libexec/java_home)`
 
 Additional notes:
+- **Bash write loops silently fail in sandbox**: `for f in ...; do cp ...; done` loops writing to project subdirs silently no-op. Use `python3 -c "import shutil; shutil.copy2(src, dst)"` with `dangerouslyDisableSandbox: true` instead.
 - **Heredoc in sandbox**: `$(cat <<'EOF'...EOF)` in commit messages fails in sandbox — use plain quoted strings or write to `$TMPDIR/commit-msg.txt` and use `git commit -F`
 - **`uv sync`**: Requires sandbox override for network; `uv run python -m src` works in sandbox after initial sync
 - **`permissions.allow` vs `sandbox.network.allowedHosts`**: `WebFetch(*)` in permissions controls whether the tool can be called without prompting — it does NOT bypass sandbox network restrictions. External hosts also need `sandbox.network.allowedHosts` in `.claude/settings.json`; `github.com` and `registry.npmjs.org` are already added

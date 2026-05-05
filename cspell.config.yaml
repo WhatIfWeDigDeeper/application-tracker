@@ -66,6 +66,11 @@ words:
   - Unsubmitted
   - uvx
   - VARCHAR
+  - EBADPLATFORM
+  - libexec
+  - mktemp
+  - shutil
+  - subdirs
   - venv
   - Vinxi
   - vitest
