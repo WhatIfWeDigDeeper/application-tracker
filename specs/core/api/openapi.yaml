@@ -702,7 +702,7 @@ components:
           nullable: true
         specialRequirements:
           type: string
-          maxLength: 1000
+          maxLength: 5000
           nullable: true
         salaryMin:
           type: integer
@@ -845,7 +845,7 @@ components:
           type: boolean
         specialRequirements:
           type: string
-          maxLength: 1000
+          maxLength: 5000
         salaryMin:
           type: integer
           minimum: 0
@@ -899,7 +899,7 @@ components:
           nullable: true
         specialRequirements:
           type: string
-          maxLength: 1000
+          maxLength: 5000
           nullable: true
         salaryMin:
           type: integer

@@ -158,4 +158,18 @@ describe.each(getTargetStacks(ALL_STACKS))('Application CRUD ($name)', ({ baseUr
     const data: ListResponse = await res.json();
     expect(data.items.length).toBeLessThanOrEqual(2);
   });
+
+  // Locks the cross-stack contract for `specialRequirements` at maxLength: 5000.
+  // Implementations had drifted to 5000 while openapi.yaml still said 1000;
+  // the spec was raised to 5000 (it's freeform notes, not user-supplied query
+  // input). 4000 chars must be accepted by every stack.
+  it('POST /applications with 4000-char specialRequirements → 201', async () => {
+    const app = await createApp({
+      companyName: 'API: Long Special Requirements Corp',
+      positionTitle: 'Engineer',
+      specialRequirements: 'x'.repeat(4000),
+    });
+    createdIds.push(app.id);
+    expect(app.id).toBeTruthy();
+  });
 });
