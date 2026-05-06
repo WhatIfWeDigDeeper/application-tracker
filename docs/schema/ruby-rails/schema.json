@@ -2,6 +2,127 @@
   "name": "app_tracker",
   "tables": [
     {
+      "name": "ruby_rails.schema_migrations",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "version",
+          "type": "varchar",
+          "nullable": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "schema_migrations_pkey",
+          "def": "CREATE UNIQUE INDEX schema_migrations_pkey ON ruby_rails.schema_migrations USING btree (version)",
+          "table": "ruby_rails.schema_migrations",
+          "columns": [
+            "version"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "schema_migrations_version_not_null",
+          "type": "n",
+          "def": "NOT NULL version",
+          "table": "ruby_rails.schema_migrations",
+          "referenced_table": "",
+          "columns": [
+            "version"
+          ]
+        },
+        {
+          "name": "schema_migrations_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (version)",
+          "table": "ruby_rails.schema_migrations",
+          "referenced_table": "",
+          "columns": [
+            "version"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ruby_rails.internal_metadata",
+      "type": "BASE TABLE",
+      "columns": [
+        {
+          "name": "key",
+          "type": "varchar",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "varchar",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp(6) without time zone",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp(6) without time zone",
+          "nullable": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "internal_metadata_pkey",
+          "def": "CREATE UNIQUE INDEX internal_metadata_pkey ON ruby_rails.internal_metadata USING btree (key)",
+          "table": "ruby_rails.internal_metadata",
+          "columns": [
+            "key"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "internal_metadata_created_at_not_null",
+          "type": "n",
+          "def": "NOT NULL created_at",
+          "table": "ruby_rails.internal_metadata",
+          "referenced_table": "",
+          "columns": [
+            "created_at"
+          ]
+        },
+        {
+          "name": "internal_metadata_key_not_null",
+          "type": "n",
+          "def": "NOT NULL key",
+          "table": "ruby_rails.internal_metadata",
+          "referenced_table": "",
+          "columns": [
+            "key"
+          ]
+        },
+        {
+          "name": "internal_metadata_updated_at_not_null",
+          "type": "n",
+          "def": "NOT NULL updated_at",
+          "table": "ruby_rails.internal_metadata",
+          "referenced_table": "",
+          "columns": [
+            "updated_at"
+          ]
+        },
+        {
+          "name": "internal_metadata_pkey",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (key)",
+          "table": "ruby_rails.internal_metadata",
+          "referenced_table": "",
+          "columns": [
+            "key"
+          ]
+        }
+      ]
+    },
+    {
       "name": "ruby_rails.applications",
       "type": "BASE TABLE",
       "columns": [

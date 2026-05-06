@@ -206,7 +206,7 @@
         {
           "name": "applications_skills_match_check",
           "type": "CHECK",
-          "def": "CHECK (((skills_match \u003e= 1) AND (skills_match \u003c= 5)))",
+          "def": "CHECK (((skills_match >= 1) AND (skills_match <= 5)))",
           "table": "go_gin.applications",
           "referenced_table": "",
           "columns": [

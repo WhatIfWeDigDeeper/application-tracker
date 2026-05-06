@@ -17,6 +17,7 @@ words:
   - dquote
   - EPERM
   - fastapi
+  - fkey
   - flexbox
   - GHSA
   - githubcopilot
@@ -36,6 +37,7 @@ words:
   - mongosh
   - mypy
   - networkidle
+  - nextval
   - npmjs
   - Nuxt
   - oneline
@@ -44,10 +46,12 @@ words:
   - pgcrypto
   - PGPASSWORD
   - pids
+  - pkey
   - psql
   - Pydantic
   - pyproject
   - pytest
+  - regclass
   - RYUK
   - specifykit
   - speckit

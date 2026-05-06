@@ -367,7 +367,7 @@
         {
           "name": "applications_skills_match_check",
           "type": "CHECK",
-          "def": "CHECK (((skills_match \u003e= 1) AND (skills_match \u003c= 10)))",
+          "def": "CHECK (((skills_match >= 1) AND (skills_match <= 10)))",
           "table": "java_spring.applications",
           "referenced_table": "",
           "columns": [
@@ -528,7 +528,7 @@
         {
           "name": "interview_stages_performance_rating_check",
           "type": "CHECK",
-          "def": "CHECK (((performance_rating \u003e= 1) AND (performance_rating \u003c= 5)))",
+          "def": "CHECK (((performance_rating >= 1) AND (performance_rating <= 5)))",
           "table": "java_spring.interview_stages",
           "referenced_table": "",
           "columns": [
