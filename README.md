@@ -504,7 +504,7 @@ The **Claude Code Review** workflow (`claude-code-review`) is triggered manually
 
 ## Codebase Knowledge Graphs
 
-Each stack directory has a navigable knowledge graph produced by the [understand-anything](https://github.com/WhatIfWeDigDeeper/understand-anything) plugin. Graphs map files, functions, classes, and their relationships into architectural layers with a guided tour for onboarding.
+The 20 stack directories listed below each have a navigable knowledge graph produced by the [understand-anything](https://github.com/WhatIfWeDigDeeper/understand-anything) plugin. Graphs map files, functions, classes, and their relationships into architectural layers with a guided tour for onboarding. `angular-spring-ui/` is the one implementation stack not yet covered — its knowledge graph is deferred to a follow-up.
 
 | Stack | Directory |
 |-------|-----------|

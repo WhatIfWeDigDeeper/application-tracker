@@ -3,6 +3,3 @@
 
 # Exclude generated Prisma client
 node_modules/
-
-# Exclude test output dirs
-tests/

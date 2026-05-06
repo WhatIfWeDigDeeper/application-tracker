@@ -1,11 +1,11 @@
 # Spec 029 — Codebase Knowledge Graphs
 
-**Status:** Complete
+**Status:** Complete (20 of 21 stacks; `angular-spring-ui` deferred to a follow-up)
 **Branch:** feat/understand-codebase-graphs
 
 ## Goal
 
-Produce a navigable knowledge graph for every stack in this monorepo using the `understand-anything` plugin. Each stack gets its own `.understand-anything/knowledge-graph.json` (per-directory working unit).
+Produce a navigable knowledge graph for each implementation stack analyzed in this iteration, using the `understand-anything` plugin. Each analyzed stack gets its own `.understand-anything/knowledge-graph.json` (per-directory working unit). `angular-spring-ui` is intentionally deferred to a follow-up — see the Stacks table below.
 
 ## Strategy
 
