@@ -19,7 +19,7 @@ This document defines validation rules for domain entities, independent of any v
 |-------|-----|-----|---------------|
 | companyName | 1 | 200 | "Company name must be between 1 and 200 characters" |
 | positionTitle | 1 | 200 | "Position title must be between 1 and 200 characters" |
-| specialRequirements | - | 1000 | "Special requirements must not exceed 1000 characters" |
+| specialRequirements | - | 5000 | "Special requirements must not exceed 5000 characters" |
 | notes | - | 5000 | "Notes must not exceed 5000 characters" |
 
 ### URL Validation
