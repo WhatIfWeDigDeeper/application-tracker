@@ -534,8 +534,8 @@ The 20 stack directories listed below each have a navigable knowledge graph prod
 The dashboard requires the [understand-anything](https://github.com/WhatIfWeDigDeeper/understand-anything) plugin. Once installed, launch it for any analyzed stack:
 
 ```bash
-PLUGIN=/Users/<you>/.claude/plugins/cache/understand-anything/understand-anything/<version>
-cd $PLUGIN/packages/dashboard
+PLUGIN=~/.claude/plugins/cache/understand-anything/understand-anything/<version>
+cd "$PLUGIN/packages/dashboard"
 GRAPH_DIR=/path/to/application-tracker/<stack-dir> npx vite --host 127.0.0.1
 ```
 
@@ -543,14 +543,16 @@ The server prints a tokenized URL — open the full URL including `?token=<TOKEN
 
 ### Domain Analysis (Business Flows)
 
-Run `/understand-anything:understand-domain` in Claude Code from any stack directory to generate a `domain-graph.json` that maps business flows and their steps. Domain graphs are generated on demand and are not committed alongside the knowledge graphs.
+Run `/understand-anything:understand-domain` in Claude Code to generate a `domain-graph.json` that maps business flows and their steps. Domain graphs are generated on demand and are not committed alongside the knowledge graphs.
 
-For a single stack:
+Invoke it either from the repo root, passing the stack directory as an argument:
 
 ```
 /understand-anything:understand-domain lambda-api
 /understand-anything:understand-domain react-ui
 ```
+
+…or from inside a stack directory with no argument (it analyzes the current working directory).
 
 See [specs/029-understand-codebase-graphs/spec.md](specs/029-understand-codebase-graphs/spec.md) for full details.
 
