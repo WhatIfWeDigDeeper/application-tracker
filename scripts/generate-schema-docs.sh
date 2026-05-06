@@ -2,13 +2,22 @@
 set -euo pipefail
 
 # Generate database schema documentation using tbls
-# Requires: tbls, running PostgreSQL, valid DATABASE_URL
+# Requires: tbls, jq, running PostgreSQL, valid DATABASE_URL
 
 # Check tbls is installed
 if ! command -v tbls &>/dev/null; then
   echo "Error: tbls is not installed." >&2
   echo "Install it with: brew install tbls" >&2
   echo "See: https://github.com/k1LoW/tbls" >&2
+  exit 1
+fi
+
+# jq is required by the schema.json post-process; silently skipping it
+# (the previous behavior) leaves foreign-schema bleed in the JSON artifacts
+# and violates the script's per-stack guarantee.
+if ! command -v jq &>/dev/null; then
+  echo "Error: jq is not installed." >&2
+  echo "Install it with: brew install jq" >&2
   exit 1
 fi
 
@@ -127,10 +136,16 @@ for entry in "${SCHEMAS[@]}"; do
     ' "$readme"
   fi
 
-  if [[ -f "$schema_json" ]] && command -v jq &>/dev/null; then
+  if [[ -f "$schema_json" ]]; then
     tmp_json="$(mktemp)"
-    jq --arg own "${schema}." '.tables = (.tables | map(select(.name | startswith($own))))' \
-      "$schema_json" > "$tmp_json" && mv "$tmp_json" "$schema_json"
+    # Filter both .tables and .enums to own-schema entries only. Drop the
+    # .enums key entirely when no own-schema enums remain (e.g. ruby_rails
+    # uses VARCHAR + model-level inclusion validation, not Postgres enums).
+    jq --arg own "${schema}." '
+      .tables = (.tables | map(select(.name | startswith($own))))
+      | .enums = ((.enums // []) | map(select(.name | startswith($own))))
+      | if (.enums | length) == 0 then del(.enums) else . end
+    ' "$schema_json" > "$tmp_json" && mv "$tmp_json" "$schema_json"
   fi
 
   for other in "${others[@]}"; do
