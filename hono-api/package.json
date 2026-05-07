@@ -14,11 +14,11 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@hono/node-server": "2.0.0",
+    "@hono/node-server": "2.0.1",
     "@hono/zod-validator": "^0.7.6",
     "dotenv": "^17.3.1",
     "drizzle-orm": "0.45.2",
-    "hono": "4.12.15",
+    "hono": "4.12.18",
     "postgres": "3.4.8",
     "uuid": "^14.0.0",
     "zod": "^4.3.6"
