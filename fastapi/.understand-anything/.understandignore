@@ -1,0 +1,7 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Built-in defaults (always excluded): node_modules/, .git/, dist/, build/, *.lock
+
+# Exclude Python virtual env and cache
+.venv/
+__pycache__/
+*.pyc

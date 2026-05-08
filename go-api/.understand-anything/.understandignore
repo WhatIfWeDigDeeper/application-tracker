@@ -1,0 +1,5 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Built-in defaults (always excluded): node_modules/, .git/, dist/, build/, *.lock
+
+# Exclude generated sqlc code (auto-generated, not hand-authored)
+# sql/db/  # uncomment if sqlc output is too noisy

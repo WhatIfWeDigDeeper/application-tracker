@@ -1,0 +1,522 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/main.ts",
+      "type": "file",
+      "name": "main.ts",
+      "filePath": "src/main.ts",
+      "summary": "Application bootstrap entry point. Calls bootstrapApplication with AppComponent and appConfig to launch the Angular standalone app.",
+      "tags": ["entry-point", "bootstrap", "angular", "typescript"]
+    },
+    {
+      "id": "file:src/app/app.config.ts",
+      "type": "file",
+      "name": "app.config.ts",
+      "filePath": "src/app/app.config.ts",
+      "summary": "Root application configuration. Provides Zone.js change detection with event coalescing, the Angular router, and HttpClient for HTTP communication.",
+      "tags": ["config", "angular", "providers", "http", "router", "typescript"]
+    },
+    {
+      "id": "file:src/app/app.routes.ts",
+      "type": "file",
+      "name": "app.routes.ts",
+      "filePath": "src/app/app.routes.ts",
+      "summary": "Defines lazy-loaded routes: list view at '/', detail/new at 'applications/:id' and 'applications/new' (both guarded by unsavedChangesGuard), and a wildcard redirect.",
+      "tags": ["routing", "angular", "lazy-loading", "typescript"]
+    },
+    {
+      "id": "file:src/app/app.component.ts",
+      "type": "file",
+      "name": "app.component.ts",
+      "filePath": "src/app/app.component.ts",
+      "summary": "Root shell component. Renders HeaderComponent and a <router-outlet> inside a max-width container. Standalone, imports RouterOutlet and HeaderComponent.",
+      "tags": ["component", "angular", "shell", "standalone", "typescript"]
+    },
+    {
+      "id": "file:src/app/core/models/application.model.ts",
+      "type": "file",
+      "name": "application.model.ts",
+      "filePath": "src/app/core/models/application.model.ts",
+      "summary": "Central domain model file. Defines TypeScript types (ApplicationStatus, CompanyCategory, JobSource), interfaces (Application, InterviewStage, HistoryEntry, PaginatedResponse, FilterParams, ImportResult), and display-label constant arrays with STATUS_COLORS.",
+      "tags": ["model", "domain", "types", "typescript", "constants"]
+    },
+    {
+      "id": "file:src/app/core/services/application.service.ts",
+      "type": "service",
+      "name": "application.service.ts",
+      "filePath": "src/app/core/services/application.service.ts",
+      "summary": "Injectable Angular service providing the full CRUD API for job applications. Maps raw API responses (Go Gin field names) to domain model types. Methods: list, get, create, update, delete, archive, restore, getHistory, restoreHistory, addStage, updateStage, removeStage, importCSV, exportCSV, getTemplate.",
+      "tags": ["service", "http", "api", "angular", "injectable", "typescript", "rxjs"]
+    },
+    {
+      "id": "file:src/app/core/guards/unsaved-changes.guard.ts",
+      "type": "file",
+      "name": "unsaved-changes.guard.ts",
+      "filePath": "src/app/core/guards/unsaved-changes.guard.ts",
+      "summary": "CanDeactivate route guard that checks a component's isDirty signal. Prompts users via window.confirm before leaving a route with unsaved changes.",
+      "tags": ["guard", "routing", "angular", "typescript", "ux"]
+    },
+    {
+      "id": "file:src/app/features/application-list/application-list.component.ts",
+      "type": "file",
+      "name": "application-list.component.ts",
+      "filePath": "src/app/features/application-list/application-list.component.ts",
+      "summary": "Feature component showing the paginated, filterable list of job applications. Manages filter state (status, category, source, archived), sort order, pagination, action menus (archive/restore/delete), and integrates CsvImport, CsvExport, and ConfirmDialog sub-components. Uses Angular signals throughout.",
+      "tags": ["component", "feature", "angular", "standalone", "signals", "pagination", "filtering", "typescript"]
+    },
+    {
+      "id": "file:src/app/features/application-list/application-list.component.html",
+      "type": "file",
+      "name": "application-list.component.html",
+      "filePath": "src/app/features/application-list/application-list.component.html",
+      "summary": "Template for the application list. Contains filter bar, sortable table, action menus, pagination controls, and conditional CSV import panel.",
+      "tags": ["template", "html", "angular", "component"]
+    },
+    {
+      "id": "file:src/app/features/application-detail/application-detail.component.ts",
+      "type": "file",
+      "name": "application-detail.component.ts",
+      "filePath": "src/app/features/application-detail/application-detail.component.ts",
+      "summary": "Feature component for creating or editing a single job application. Handles form state with snapshot-based dirty tracking, inline validation, interview stage CRUD, history panel toggle, archive/restore, and discard/delete confirmation dialogs. Implements HasUnsavedChanges for route guard integration.",
+      "tags": ["component", "feature", "angular", "standalone", "signals", "form", "validation", "typescript"]
+    },
+    {
+      "id": "file:src/app/features/application-detail/application-detail.component.html",
+      "type": "file",
+      "name": "application-detail.component.html",
+      "filePath": "src/app/features/application-detail/application-detail.component.html",
+      "summary": "Template for the application detail/edit form. Renders all form fields, interview stage list with inline editing, history panel trigger, and conditional confirmation dialogs.",
+      "tags": ["template", "html", "angular", "component", "form"]
+    },
+    {
+      "id": "file:src/app/features/history-panel/history-panel.component.ts",
+      "type": "file",
+      "name": "history-panel.component.ts",
+      "filePath": "src/app/features/history-panel/history-panel.component.ts",
+      "summary": "Slide-in history panel component. Loads and displays the audit history of a given application using applicationId @Input. Supports accordion expand/collapse for each entry's field changes, and a 'Restore to this point' action via ApplicationService.restoreHistory. Emits closed and restored events.",
+      "tags": ["component", "feature", "angular", "standalone", "history", "signals", "typescript"]
+    },
+    {
+      "id": "file:src/app/features/csv/csv-import.component.ts",
+      "type": "file",
+      "name": "csv-import.component.ts",
+      "filePath": "src/app/features/csv/csv-import.component.ts",
+      "summary": "Standalone component for uploading and importing a CSV file of job applications. Shows import progress, result summary (imported/skipped/errors), and emits closeImport and importSuccess events.",
+      "tags": ["component", "feature", "angular", "standalone", "csv", "typescript"]
+    },
+    {
+      "id": "file:src/app/features/csv/csv-export.component.ts",
+      "type": "file",
+      "name": "csv-export.component.ts",
+      "filePath": "src/app/features/csv/csv-export.component.ts",
+      "summary": "Minimal standalone component with two anchor links for downloading the CSV export and the CSV template from the API.",
+      "tags": ["component", "feature", "angular", "standalone", "csv", "typescript"]
+    },
+    {
+      "id": "file:src/app/shared/components/confirm-dialog/confirm-dialog.component.ts",
+      "type": "file",
+      "name": "confirm-dialog.component.ts",
+      "filePath": "src/app/shared/components/confirm-dialog/confirm-dialog.component.ts",
+      "summary": "Reusable modal confirmation dialog. Accepts title, message, confirmLabel, confirmDanger @Inputs. Emits confirmed and cancelled @Outputs. Uses role='dialog' for accessible E2E selectors.",
+      "tags": ["component", "shared", "angular", "standalone", "modal", "typescript"]
+    },
+    {
+      "id": "file:src/app/shared/components/header/header.component.ts",
+      "type": "file",
+      "name": "header.component.ts",
+      "filePath": "src/app/shared/components/header/header.component.ts",
+      "summary": "Application header component with brand link and dark/light mode toggle. Persists theme preference to localStorage and applies 'dark' class to document root.",
+      "tags": ["component", "shared", "angular", "standalone", "dark-mode", "typescript"]
+    },
+    {
+      "id": "file:src/app/shared/components/inline-edit/inline-edit.component.ts",
+      "type": "file",
+      "name": "inline-edit.component.ts",
+      "filePath": "src/app/shared/components/inline-edit/inline-edit.component.ts",
+      "summary": "Reusable inline-edit component. Displays a value as text; on click switches to an input field. Saves on Enter/blur; cancels on Escape. Emits saved event with the trimmed new value.",
+      "tags": ["component", "shared", "angular", "standalone", "ux", "typescript"]
+    },
+    {
+      "id": "file:src/app/shared/components/resizable-textarea/resizable-textarea.component.ts",
+      "type": "file",
+      "name": "resizable-textarea.component.ts",
+      "filePath": "src/app/shared/components/resizable-textarea/resizable-textarea.component.ts",
+      "summary": "Textarea component that auto-expands its height to fit content. Accepts value, id, placeholder, rows @Inputs. Emits valueChange. Uses ViewChild to access the native element for resize calculations.",
+      "tags": ["component", "shared", "angular", "standalone", "textarea", "typescript"]
+    },
+    {
+      "id": "file:src/app/shared/pipes/relative-date.pipe.ts",
+      "type": "file",
+      "name": "relative-date.pipe.ts",
+      "filePath": "src/app/shared/pipes/relative-date.pipe.ts",
+      "summary": "Angular pipe that formats ISO date strings as human-readable relative time (e.g. '3 days ago', 'just now'). Used in history entries and application list timestamps.",
+      "tags": ["pipe", "shared", "angular", "standalone", "date", "typescript"]
+    },
+    {
+      "id": "file:src/styles.css",
+      "type": "file",
+      "name": "styles.css",
+      "filePath": "src/styles.css",
+      "summary": "Global stylesheet. Imports Tailwind CSS base and utilities via @import 'tailwindcss'. Applied project-wide.",
+      "tags": ["css", "tailwind", "styles"]
+    },
+    {
+      "id": "file:src/index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "src/index.html",
+      "summary": "HTML shell page. Mounts the Angular app via <app-root> selector. References favicon, sets viewport meta.",
+      "tags": ["html", "entry-point", "angular"]
+    },
+    {
+      "id": "file:Dockerfile",
+      "type": "config",
+      "name": "Dockerfile",
+      "filePath": "Dockerfile",
+      "summary": "Multi-stage Docker build. Stage 1: node:22-alpine builds the Angular app with npm run build. Stage 2: nginx:alpine serves the built browser bundle from /usr/share/nginx/html on port 3060.",
+      "tags": ["docker", "deployment", "nginx", "config"]
+    },
+    {
+      "id": "file:nginx.conf",
+      "type": "config",
+      "name": "nginx.conf",
+      "filePath": "nginx.conf",
+      "summary": "nginx configuration for the containerized deployment. Serves the SPA on port 3060 with SPA fallback (try_files to index.html). Proxies /api/ requests to the go-api container on port 5070.",
+      "tags": ["nginx", "proxy", "deployment", "config"]
+    },
+    {
+      "id": "file:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript compiler configuration. Targets ES2022 with strict mode, noImplicitOverride, strictTemplates (Angular). Uses 'bundler' module resolution. Enables experimentalDecorators.",
+      "tags": ["typescript", "config", "compiler"]
+    },
+    {
+      "id": "file:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "npm package manifest for angular-ui. Angular 21.2.x, RxJS 7.8.x, Tailwind CSS 4.x, Jest 30 with jest-preset-angular, Testing Library. Dev server on port 3060.",
+      "tags": ["config", "npm", "dependencies", "angular"]
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/main.ts",
+      "target": "file:src/app/app.config.ts",
+      "type": "imports",
+      "label": "imports appConfig"
+    },
+    {
+      "source": "file:src/main.ts",
+      "target": "file:src/app/app.component.ts",
+      "type": "imports",
+      "label": "imports AppComponent"
+    },
+    {
+      "source": "file:src/app/app.config.ts",
+      "target": "file:src/app/app.routes.ts",
+      "type": "imports",
+      "label": "imports routes"
+    },
+    {
+      "source": "file:src/app/app.routes.ts",
+      "target": "file:src/app/core/guards/unsaved-changes.guard.ts",
+      "type": "imports",
+      "label": "imports unsavedChangesGuard"
+    },
+    {
+      "source": "file:src/app/app.routes.ts",
+      "target": "file:src/app/features/application-list/application-list.component.ts",
+      "type": "lazy-loads",
+      "label": "lazy-loads at /"
+    },
+    {
+      "source": "file:src/app/app.routes.ts",
+      "target": "file:src/app/features/application-detail/application-detail.component.ts",
+      "type": "lazy-loads",
+      "label": "lazy-loads at applications/:id"
+    },
+    {
+      "source": "file:src/app/app.component.ts",
+      "target": "file:src/app/shared/components/header/header.component.ts",
+      "type": "imports",
+      "label": "imports HeaderComponent"
+    },
+    {
+      "source": "file:src/app/features/application-list/application-list.component.ts",
+      "target": "file:src/app/core/services/application.service.ts",
+      "type": "imports",
+      "label": "injects ApplicationService"
+    },
+    {
+      "source": "file:src/app/features/application-list/application-list.component.ts",
+      "target": "file:src/app/core/models/application.model.ts",
+      "type": "imports",
+      "label": "imports Application, FilterParams, constants"
+    },
+    {
+      "source": "file:src/app/features/application-list/application-list.component.ts",
+      "target": "file:src/app/shared/pipes/relative-date.pipe.ts",
+      "type": "imports",
+      "label": "imports RelativeDatePipe"
+    },
+    {
+      "source": "file:src/app/features/application-list/application-list.component.ts",
+      "target": "file:src/app/features/csv/csv-import.component.ts",
+      "type": "imports",
+      "label": "imports CsvImportComponent"
+    },
+    {
+      "source": "file:src/app/features/application-list/application-list.component.ts",
+      "target": "file:src/app/features/csv/csv-export.component.ts",
+      "type": "imports",
+      "label": "imports CsvExportComponent"
+    },
+    {
+      "source": "file:src/app/features/application-list/application-list.component.ts",
+      "target": "file:src/app/shared/components/confirm-dialog/confirm-dialog.component.ts",
+      "type": "imports",
+      "label": "imports ConfirmDialogComponent"
+    },
+    {
+      "source": "file:src/app/features/application-list/application-list.component.ts",
+      "target": "file:src/app/features/application-list/application-list.component.html",
+      "type": "uses",
+      "label": "templateUrl"
+    },
+    {
+      "source": "file:src/app/features/application-detail/application-detail.component.ts",
+      "target": "file:src/app/core/services/application.service.ts",
+      "type": "imports",
+      "label": "injects ApplicationService"
+    },
+    {
+      "source": "file:src/app/features/application-detail/application-detail.component.ts",
+      "target": "file:src/app/core/models/application.model.ts",
+      "type": "imports",
+      "label": "imports Application, InterviewStage, constants"
+    },
+    {
+      "source": "file:src/app/features/application-detail/application-detail.component.ts",
+      "target": "file:src/app/features/history-panel/history-panel.component.ts",
+      "type": "imports",
+      "label": "imports HistoryPanelComponent"
+    },
+    {
+      "source": "file:src/app/features/application-detail/application-detail.component.ts",
+      "target": "file:src/app/shared/components/confirm-dialog/confirm-dialog.component.ts",
+      "type": "imports",
+      "label": "imports ConfirmDialogComponent"
+    },
+    {
+      "source": "file:src/app/features/application-detail/application-detail.component.ts",
+      "target": "file:src/app/features/application-detail/application-detail.component.html",
+      "type": "uses",
+      "label": "templateUrl"
+    },
+    {
+      "source": "file:src/app/features/history-panel/history-panel.component.ts",
+      "target": "file:src/app/core/services/application.service.ts",
+      "type": "imports",
+      "label": "injects ApplicationService"
+    },
+    {
+      "source": "file:src/app/features/history-panel/history-panel.component.ts",
+      "target": "file:src/app/core/models/application.model.ts",
+      "type": "imports",
+      "label": "imports HistoryEntry"
+    },
+    {
+      "source": "file:src/app/features/history-panel/history-panel.component.ts",
+      "target": "file:src/app/shared/pipes/relative-date.pipe.ts",
+      "type": "imports",
+      "label": "imports RelativeDatePipe"
+    },
+    {
+      "source": "file:src/app/features/csv/csv-import.component.ts",
+      "target": "file:src/app/core/services/application.service.ts",
+      "type": "imports",
+      "label": "injects ApplicationService"
+    },
+    {
+      "source": "file:src/app/features/csv/csv-import.component.ts",
+      "target": "file:src/app/core/models/application.model.ts",
+      "type": "imports",
+      "label": "imports ImportResult"
+    },
+    {
+      "source": "file:src/app/core/services/application.service.ts",
+      "target": "file:src/app/core/models/application.model.ts",
+      "type": "imports",
+      "label": "imports Application, PaginatedResponse, etc."
+    },
+    {
+      "source": "file:src/app/core/guards/unsaved-changes.guard.ts",
+      "target": "file:src/app/features/application-detail/application-detail.component.ts",
+      "type": "guards",
+      "label": "canDeactivate checks isDirty"
+    },
+    {
+      "source": "file:Dockerfile",
+      "target": "file:nginx.conf",
+      "type": "uses",
+      "label": "COPYs nginx.conf into image"
+    },
+    {
+      "source": "file:src/main.ts",
+      "target": "file:src/index.html",
+      "type": "uses",
+      "label": "bootstrapped into app-root"
+    },
+    {
+      "source": "file:src/styles.css",
+      "target": "file:src/index.html",
+      "type": "uses",
+      "label": "global styles"
+    },
+    {
+      "source": "file:tsconfig.json",
+      "target": "file:package.json",
+      "type": "uses",
+      "label": "TypeScript compiler config for Angular build"
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:bootstrap",
+      "name": "Bootstrap & Configuration",
+      "description": "Entry point files that wire up the application: main.ts bootstraps Angular, app.config.ts provides global services (router, HttpClient, zone), app.routes.ts defines the routing table, and the shell app.component.ts holds the router outlet.",
+      "nodeIds": [
+        "file:src/main.ts",
+        "file:src/app/app.config.ts",
+        "file:src/app/app.routes.ts",
+        "file:src/app/app.component.ts",
+        "file:src/index.html"
+      ]
+    },
+    {
+      "id": "layer:domain",
+      "name": "Domain Model & Service",
+      "description": "Core business logic layer: application.model.ts defines all domain types and constants; application.service.ts is the single HTTP adapter that maps raw API responses to domain types and exposes Observable-based methods for all CRUD operations.",
+      "nodeIds": [
+        "file:src/app/core/models/application.model.ts",
+        "file:src/app/core/services/application.service.ts",
+        "file:src/app/core/guards/unsaved-changes.guard.ts"
+      ]
+    },
+    {
+      "id": "layer:features",
+      "name": "Feature Components",
+      "description": "Page-level smart components that compose the UI: ApplicationListComponent (paginated/filtered list), ApplicationDetailComponent (create/edit form with interview stages), HistoryPanelComponent (audit history slide-in), and CSV import/export components.",
+      "nodeIds": [
+        "file:src/app/features/application-list/application-list.component.ts",
+        "file:src/app/features/application-list/application-list.component.html",
+        "file:src/app/features/application-detail/application-detail.component.ts",
+        "file:src/app/features/application-detail/application-detail.component.html",
+        "file:src/app/features/history-panel/history-panel.component.ts",
+        "file:src/app/features/csv/csv-import.component.ts",
+        "file:src/app/features/csv/csv-export.component.ts"
+      ]
+    },
+    {
+      "id": "layer:shared",
+      "name": "Shared UI Primitives",
+      "description": "Reusable presentation components and pipes shared across features: ConfirmDialogComponent (modal), HeaderComponent (app header + dark mode), InlineEditComponent, ResizableTextareaComponent, and RelativeDatePipe.",
+      "nodeIds": [
+        "file:src/app/shared/components/confirm-dialog/confirm-dialog.component.ts",
+        "file:src/app/shared/components/header/header.component.ts",
+        "file:src/app/shared/components/inline-edit/inline-edit.component.ts",
+        "file:src/app/shared/components/resizable-textarea/resizable-textarea.component.ts",
+        "file:src/app/shared/pipes/relative-date.pipe.ts"
+      ]
+    },
+    {
+      "id": "layer:infrastructure",
+      "name": "Build & Deployment Infrastructure",
+      "description": "Configuration and infrastructure files: Dockerfile for multi-stage build, nginx.conf for SPA serving and API proxying, tsconfig.json for TypeScript compilation, and package.json for dependency management.",
+      "nodeIds": [
+        "file:Dockerfile",
+        "file:nginx.conf",
+        "file:tsconfig.json",
+        "file:package.json",
+        "file:src/styles.css"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Entry Point: Bootstrap",
+      "description": "Start with src/main.ts — the single line that launches the Angular application using bootstrapApplication. It wires AppComponent to appConfig, establishing the standalone-components architecture (no NgModules).",
+      "nodeIds": ["file:src/main.ts"]
+    },
+    {
+      "order": 2,
+      "title": "Application Configuration",
+      "description": "app.config.ts provides all root-level Angular services: Zone.js with event coalescing for efficient change detection, the Angular Router, and HttpClient. This is the DI root for the entire app.",
+      "nodeIds": ["file:src/app/app.config.ts"]
+    },
+    {
+      "order": 3,
+      "title": "Routing",
+      "description": "app.routes.ts defines the route tree with lazy-loaded feature components. The list view loads at '/', the detail/create form at 'applications/:id' and 'applications/new', both protected by unsavedChangesGuard. A wildcard redirects all unknown paths to the list.",
+      "nodeIds": ["file:src/app/app.routes.ts", "file:src/app/core/guards/unsaved-changes.guard.ts"]
+    },
+    {
+      "order": 4,
+      "title": "Domain Model",
+      "description": "application.model.ts is the single source of truth for all domain types. Study ApplicationStatus, CompanyCategory, JobSource union types; the Application and InterviewStage interfaces; PaginatedResponse, FilterParams, HistoryEntry; and the display-label constant arrays used throughout the UI.",
+      "nodeIds": ["file:src/app/core/models/application.model.ts"]
+    },
+    {
+      "order": 5,
+      "title": "HTTP Service",
+      "description": "application.service.ts is the entire API layer. It maps raw Go Gin response shapes (stageName→name, stageOrder→order, diffs→changes) to clean domain types before returning Observables. All 14 methods go through this single service, making it the only file that 'knows' about the backend field names.",
+      "nodeIds": ["file:src/app/core/services/application.service.ts"]
+    },
+    {
+      "order": 6,
+      "title": "Application List Feature",
+      "description": "ApplicationListComponent is the main screen. It uses Angular signals for all reactive state (applications, filters, pagination, loading, menu). Filter changes and sort clicks each call loadApplications(), which merges filter signal state into HttpParams. The three-dot action menu uses viewport-relative positioning to avoid layout clipping.",
+      "nodeIds": ["file:src/app/features/application-list/application-list.component.ts", "file:src/app/features/application-list/application-list.component.html"]
+    },
+    {
+      "order": 7,
+      "title": "Application Detail Feature",
+      "description": "ApplicationDetailComponent handles both create ('applications/new') and edit ('applications/:id') flows. Dirty tracking uses JSON.stringify snapshot comparison. The form validates on submit with pure function validate(). Interview stages support full CRUD — locally buffered for new records, immediately persisted for existing ones.",
+      "nodeIds": ["file:src/app/features/application-detail/application-detail.component.ts", "file:src/app/features/application-detail/application-detail.component.html"]
+    },
+    {
+      "order": 8,
+      "title": "History Panel",
+      "description": "HistoryPanelComponent is a slide-in panel that loads the audit trail for an application via getHistory(). Each entry shows field-level diffs (old/new values) in an accordion. Non-current entries have a 'Restore to this point' button that calls restoreHistory() and emits a restored event for the parent to reload.",
+      "nodeIds": ["file:src/app/features/history-panel/history-panel.component.ts"]
+    },
+    {
+      "order": 9,
+      "title": "CSV Import & Export",
+      "description": "CsvImportComponent handles multipart file upload to /api/applications/import and shows import results (imported/skipped/errors). CsvExportComponent is a thin wrapper providing direct download links for the export endpoint and sample template — no JavaScript required for the download itself.",
+      "nodeIds": ["file:src/app/features/csv/csv-import.component.ts", "file:src/app/features/csv/csv-export.component.ts"]
+    },
+    {
+      "order": 10,
+      "title": "Shared UI Primitives",
+      "description": "The shared layer provides four reusable building blocks: ConfirmDialogComponent (modal with danger variant), HeaderComponent (brand + dark mode toggle with localStorage persistence), InlineEditComponent (click-to-edit text), ResizableTextareaComponent (auto-expanding textarea), and RelativeDatePipe (human-readable relative timestamps).",
+      "nodeIds": [
+        "file:src/app/shared/components/confirm-dialog/confirm-dialog.component.ts",
+        "file:src/app/shared/components/header/header.component.ts",
+        "file:src/app/shared/components/inline-edit/inline-edit.component.ts",
+        "file:src/app/shared/components/resizable-textarea/resizable-textarea.component.ts",
+        "file:src/app/shared/pipes/relative-date.pipe.ts"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "Build & Deployment",
+      "description": "The Dockerfile uses a two-stage build: Node 22 Alpine compiles the Angular app with ng build, then the static browser bundle is served by nginx:alpine. The nginx.conf provides SPA fallback routing and proxies /api/ to the go-api container on port 5070.",
+      "nodeIds": ["file:Dockerfile", "file:nginx.conf"]
+    }
+  ]
+}

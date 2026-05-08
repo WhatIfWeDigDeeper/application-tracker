@@ -1,0 +1,36 @@
+{
+  "projectName": "yoga-api",
+  "projectDescription": "GraphQL Yoga API for Application Tracker — a dual REST+GraphQL server built with GraphQL Yoga 5, Pothos code-first schema builder, and Prisma ORM with PostgreSQL. Manages job applications, interview stages, and application history with CSV import/export support. Paired with react-apollo-ui. Runs on port 5080 (graphql_yoga schema).",
+  "generatedAt": "2026-05-04T00:00:00.000Z",
+  "gitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f",
+  "pluginVersion": "2.5.1",
+  "entryPoint": "src/index.ts",
+  "languages": ["TypeScript", "SQL", "Prisma Schema"],
+  "frameworks": ["GraphQL Yoga", "Pothos", "Prisma ORM", "Node.js HTTP", "Vitest"],
+  "totalFiles": 23,
+  "totalNodes": 22,
+  "totalEdges": 36,
+  "totalLayers": 5,
+  "tourSteps": 8,
+  "nodeTypes": {
+    "service": 5,
+    "config": 7,
+    "file": 9,
+    "schema": 1
+  },
+  "edgeTypes": {
+    "imports": 34,
+    "uses": 2
+  },
+  "layers": [
+    "Infrastructure & Configuration",
+    "Business Logic Services",
+    "GraphQL Schema Layer",
+    "HTTP Server & API Gateway",
+    "Tests"
+  ],
+  "warnings": [
+    "Config/migration files (package.json, tsconfig.json, vitest.config.ts, eslint.config.js, prisma.config.ts, migration SQL files) have no code-level import edges — expected for tooling config nodes",
+    "22 nodes defaulted to complexity 'moderate' from merge script (all were explicitly set in final graph)"
+  ]
+}

@@ -1,0 +1,8 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Built-in defaults (always excluded): node_modules/, .git/, dist/, build/, *.lock
+
+# Exclude env files with secrets
+.env
+
+# Exclude generated CDK output
+cdk.out/

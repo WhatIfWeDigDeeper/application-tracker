@@ -1,0 +1,9 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Built-in defaults (always excluded): node_modules/, .git/, dist/, build/, *.lock
+
+# Exclude test output and assets
+test-results/
+playwright-report/
+playwright-report-vue-specific/
+public/
+*.tsbuildinfo

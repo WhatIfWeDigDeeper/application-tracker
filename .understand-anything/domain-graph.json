@@ -1,0 +1,856 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "application-tracker",
+    "languages": ["TypeScript", "JavaScript", "Python", "Go", "Java", "Ruby"],
+    "frameworks": ["Angular", "React", "Vue", "Svelte", "Next.js", "TanStack", "FastAPI", "Express", "Hono", "Koa", "NestJS", "Gin", "Spring Boot", "Rails", "GraphQL Yoga"],
+    "description": "A monorepo job application tracker with 20+ full-stack implementations sharing one PostgreSQL database. Core business purpose: track job applications through the hiring pipeline, manage interview stages, and audit changes over time.",
+    "analyzedAt": "2026-05-05T00:00:00.000Z",
+    "gitCommitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f"
+  },
+  "nodes": [
+    {
+      "id": "domain:application-management",
+      "type": "domain",
+      "name": "Application Management",
+      "summary": "The core business domain covering the full lifecycle of a job application record. Handles creation, retrieval, update, deletion, and soft archiving/restoring of applications with rich metadata including company info, salary range, job source, and status progression.",
+      "tags": ["applications", "crud", "core", "lifecycle", "archive"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["Application", "ApplicationStatus", "CompanyCategory", "JobSource"],
+        "businessRules": [
+          "Applications default to 'unsubmitted' status when no dateApplied is provided",
+          "Archived applications are soft-deleted (isArchived flag) and can be restored",
+          "All applications are sorted by updatedAt descending by default",
+          "Duplicate detection uses job posting URL or (companyName, positionTitle) pair"
+        ],
+        "crossDomainInteractions": [
+          "Triggers history snapshots on every mutating operation (History Tracking domain)",
+          "Owns the parent record for all interview stages (Interview Stage domain)",
+          "Provides application data for CSV import/export (Data Portability domain)"
+        ]
+      }
+    },
+    {
+      "id": "domain:interview-stage-management",
+      "type": "domain",
+      "name": "Interview Stage Management",
+      "summary": "Manages the ordered pipeline of interview stages within a job application. Each stage tracks the type of interview, scheduling details, outcome, and completion status. Stage CRUD operations always touch the parent application's updatedAt timestamp to keep the list sort order accurate.",
+      "tags": ["interview-stages", "pipeline", "crud", "ordering"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["InterviewStage", "Application"],
+        "businessRules": [
+          "A stage must belong to an existing application (verified before insert)",
+          "Deleting or updating a stage bumps the parent application's updatedAt",
+          "Stages are ordered by an explicit 'order' field managed by the client",
+          "Completion of a stage auto-records the completion date"
+        ],
+        "crossDomainInteractions": [
+          "Every stage mutation records a history snapshot (History Tracking domain)",
+          "Stages are embedded in Application responses (Application Management domain)"
+        ]
+      }
+    },
+    {
+      "id": "domain:history-tracking",
+      "type": "domain",
+      "name": "History Tracking",
+      "summary": "Maintains a full audit trail of changes to job applications. Implementations range from simple snapshot storage (most stacks), to event-sourcing with Immer patches (NestJS/Nuxt), to version restore from historical snapshots (Go, Lambda/DynamoDB). All stacks record who changed what, with field-level diffs viewable in the history panel.",
+      "tags": ["history", "audit", "snapshots", "versioning", "event-sourcing"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["ApplicationHistory", "HistorySnapshot", "FieldDiff", "Event"],
+        "businessRules": [
+          "A snapshot is taken automatically after every create, update, archive, restore, and stage mutation",
+          "History entries are returned newest-first with pagination",
+          "Version restore rebuilds application state from a target snapshot or event sequence",
+          "Event-sourced stacks replay forward patches from the nearest snapshot to the target sequence"
+        ],
+        "crossDomainInteractions": [
+          "Receives snapshot triggers from Application Management and Interview Stage domains",
+          "NestJS stack exposes history via a separate gRPC microservice consumed by the UI"
+        ]
+      }
+    },
+    {
+      "id": "domain:data-portability",
+      "type": "domain",
+      "name": "Data Portability",
+      "summary": "Enables bulk import and export of job application data via CSV files. Import parses and validates rows, deduplicates by job posting URL or compound key, and upserts applications. Export serializes the full application list to a downloadable CSV. A sample template endpoint helps users format their CSV correctly.",
+      "tags": ["csv", "import", "export", "bulk", "serialization"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["CsvRow", "ImportResult", "ApplicationCsv"],
+        "businessRules": [
+          "Multi-line quoted CSV fields are supported (character-by-character parser, not line-split)",
+          "Duplicate rows are detected by jobPostingUrl, falling back to (companyName, positionTitle)",
+          "Each CSV row is individually validated; errors are reported per-row without aborting the import",
+          "Export fetches all applications via the paginated list endpoint in a loop"
+        ],
+        "crossDomainInteractions": [
+          "Import invokes Application Management create/update flows for each valid row",
+          "Export consumes the Application Management list query"
+        ]
+      }
+    },
+    {
+      "id": "domain:platform-infrastructure",
+      "type": "domain",
+      "name": "Platform Infrastructure",
+      "summary": "Cross-cutting infrastructure concerns shared across all stacks: database connectivity and schema migrations, health check endpoints for monitoring, CORS middleware, error handling, and cloud deployment (AWS Lambda + DynamoDB for the serverless stack, CDK for IaC). Provides the runtime foundation for all business domains.",
+      "tags": ["infrastructure", "database", "migrations", "health", "cors", "deployment"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["DatabasePool", "Migration", "HealthCheck", "CdkStack"],
+        "businessRules": [
+          "All schemas use IF NOT EXISTS guards — the shared app_tracker database may have pre-existing state",
+          "Each stack isolates its data in a named PostgreSQL schema (e.g. express_prisma, go_gin, python_fastapi)",
+          "Health endpoints return {status: ok, timestamp} and are used by load balancers",
+          "DynamoDB stack uses GSI1/GSI2 for status/archived filtering without full table scans"
+        ],
+        "crossDomainInteractions": [
+          "Provides the database connection pool consumed by all service layers",
+          "Migration runner executes before application startup in every stack"
+        ]
+      }
+    },
+    {
+      "id": "flow:create-application",
+      "type": "flow",
+      "name": "Create Application",
+      "summary": "User submits a new job application. The API validates the input, enforces the unsubmitted/dateApplied coupling, persists the record, records an initial history snapshot, and returns the created application with a 201 response.",
+      "tags": ["applications", "create", "validation", "history"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/applications",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:list-and-filter-applications",
+      "type": "flow",
+      "name": "List and Filter Applications",
+      "summary": "User views the paginated application list, optionally filtering by status, company category, job source, skills match, and archived flag, with configurable sort order. Returns a paginated response with items, page, limit, and total counts.",
+      "tags": ["applications", "list", "pagination", "filtering", "sorting"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /api/applications",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:update-application",
+      "type": "flow",
+      "name": "Update Application",
+      "summary": "User edits an existing application's fields. The API validates the partial update payload, applies changes, records a diff-based history snapshot capturing before/after field values, and returns the updated application.",
+      "tags": ["applications", "update", "partial-update", "history", "diff"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "PATCH /api/applications/:id",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:archive-restore-application",
+      "type": "flow",
+      "name": "Archive and Restore Application",
+      "summary": "User soft-deletes an application by archiving it (sets isArchived=true), hiding it from the default list view. A separate restore flow reverses this. Both operations record history snapshots and return the updated application.",
+      "tags": ["applications", "archive", "restore", "soft-delete"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "POST /api/applications/:id/archive",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:delete-application",
+      "type": "flow",
+      "name": "Delete Application",
+      "summary": "User permanently deletes a job application. The API removes the record and cascades the deletion to all child interview stages and history entries. Returns 204 No Content on success.",
+      "tags": ["applications", "delete", "cascade"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "DELETE /api/applications/:id",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:manage-interview-stages",
+      "type": "flow",
+      "name": "Manage Interview Stages",
+      "summary": "User adds, edits, or removes interview stages within an application. Each operation verifies the parent application exists, performs the stage mutation, bumps the parent's updatedAt, and records a history snapshot.",
+      "tags": ["interview-stages", "crud", "pipeline", "history"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/applications/:id/interview-stages",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:view-application-history",
+      "type": "flow",
+      "name": "View Application History",
+      "summary": "User opens the history panel to see a paginated, newest-first list of all changes to an application, including field-level before/after diffs for each recorded snapshot.",
+      "tags": ["history", "audit", "diffs", "pagination"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /api/applications/:id/history",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:restore-application-version",
+      "type": "flow",
+      "name": "Restore Application to Historical Version",
+      "summary": "User selects a past snapshot and restores the application to that state. The API replays history from the nearest snapshot to the target version, rebuilds the application and stage records atomically, and records a restore event in history.",
+      "tags": ["history", "restore", "versioning", "time-travel", "snapshot"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/applications/:id/history/restore",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:csv-import",
+      "type": "flow",
+      "name": "CSV Import",
+      "summary": "User uploads a CSV file containing job application rows. The API parses the file (handling quoted multi-line fields), validates each row against the application schema, deduplicates, and upserts valid rows, returning a summary of imported, skipped, and errored rows.",
+      "tags": ["csv", "import", "bulk", "validation", "deduplication"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/applications/import",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:csv-export",
+      "type": "flow",
+      "name": "CSV Export",
+      "summary": "User downloads all their job applications as a CSV file. The API iterates through paginated application results and streams them to a CSV-formatted response, including all core fields.",
+      "tags": ["csv", "export", "bulk", "serialization"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "GET /api/applications/export",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:database-migration",
+      "type": "flow",
+      "name": "Database Schema Migration",
+      "summary": "On server startup, each stack runs its migration tooling (Flyway, Prisma Migrate, Drizzle, golang-migrate, or a custom runner) to create or update the stack's PostgreSQL schema. Migrations use IF NOT EXISTS guards to be idempotent.",
+      "tags": ["migration", "database", "infrastructure", "startup"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "Server startup (automatic)",
+        "entryType": "event"
+      }
+    },
+    {
+      "id": "step:create-application:validate-input",
+      "type": "step",
+      "name": "Validate Input",
+      "summary": "Parse and validate the incoming JSON body against the CreateApplicationSchema (Zod, Pydantic, or Bean Validation). Reject with 400 if required fields are missing or values are out of range.",
+      "tags": ["validation", "zod", "pydantic", "input"],
+      "complexity": "simple",
+      "filePath": "src/types/api.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:create-application:enforce-status-date-coupling",
+      "type": "step",
+      "name": "Enforce Status/Date Coupling",
+      "summary": "If dateApplied is absent, force the status to 'unsubmitted'. This invariant is enforced in service code across all stacks to prevent applications being marked as submitted without a recorded apply date.",
+      "tags": ["business-rule", "validation", "status", "date"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:create-application:persist-record",
+      "type": "step",
+      "name": "Persist Application Record",
+      "summary": "Insert the new application row into the database with a UUID primary key and current timestamps for createdAt/updatedAt. Includes all metadata fields (salary, company info, skills match, notes).",
+      "tags": ["database", "insert", "postgresql"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:create-application:record-history-snapshot",
+      "type": "step",
+      "name": "Record Initial History Snapshot",
+      "summary": "After successful insert, capture a full JSON snapshot of the new application into the history/audit table. Records the action description 'Application created' and initializes the history sequence counter.",
+      "tags": ["history", "snapshot", "audit"],
+      "complexity": "simple",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:create-application:return-201-response",
+      "type": "step",
+      "name": "Return 201 Created Response",
+      "summary": "Serialize the created application (including its empty interview stages array) and return it with HTTP 201. Response shape is consistent across all stacks: id, companyName, positionTitle, status, createdAt, updatedAt, interviewStages.",
+      "tags": ["http", "response", "serialization"],
+      "complexity": "simple",
+      "filePath": "src/routes/applications.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:list-and-filter-applications:parse-query-params",
+      "type": "step",
+      "name": "Parse and Validate Query Parameters",
+      "summary": "Extract and coerce filter parameters from the query string: status (multi-value), companyCategory, jobSource, skillsMatch, isArchived, sort, page, limit. Apply defaults for missing params.",
+      "tags": ["validation", "query-params", "filtering"],
+      "complexity": "simple",
+      "filePath": "server/api/applications/index.get.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:list-and-filter-applications:build-filter-query",
+      "type": "step",
+      "name": "Build Dynamic Filter Query",
+      "summary": "Construct the database query with WHERE clauses for each active filter. Uses parameterized queries in all stacks (Drizzle, Prisma, Knex, asyncpg, sqlc, pgx) to avoid SQL injection. Handles multi-value status arrays with IN clauses.",
+      "tags": ["database", "query", "filtering", "sql"],
+      "complexity": "moderate",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:list-and-filter-applications:apply-pagination",
+      "type": "step",
+      "name": "Apply Pagination",
+      "summary": "Execute COUNT(*) for total and SELECT with LIMIT/OFFSET for the page slice. Return paginated envelope: {items, total, page, limit}.",
+      "tags": ["pagination", "database", "count"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:list-and-filter-applications:eager-load-stages",
+      "type": "step",
+      "name": "Eager-Load Interview Stages",
+      "summary": "Fetch interview stages for all applications in the result page using a single JOIN or secondary query. Nest the stages array within each application object before returning.",
+      "tags": ["database", "join", "interview-stages", "eager-loading"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:list-and-filter-applications:return-paginated-response",
+      "type": "step",
+      "name": "Return Paginated Response",
+      "summary": "Serialize the application list and return the paginated envelope with HTTP 200. All stacks return the same shape: {items: Application[], total: number, page: number, limit: number}.",
+      "tags": ["http", "response", "serialization", "pagination"],
+      "complexity": "simple",
+      "filePath": "src/routes/applications.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:update-application:validate-partial-body",
+      "type": "step",
+      "name": "Validate Partial Update Body",
+      "summary": "Parse the PATCH request body against the UpdateApplicationSchema (all fields optional). Reject with 400 if any provided field fails type or range validation.",
+      "tags": ["validation", "partial-update", "zod"],
+      "complexity": "simple",
+      "filePath": "src/types/api.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:update-application:lookup-existing-record",
+      "type": "step",
+      "name": "Lookup Existing Record",
+      "summary": "Fetch the current application by ID. Return 404 if not found. The fetched record is used both to verify existence and to compute field-level diffs for the history entry.",
+      "tags": ["database", "lookup", "404"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:update-application:apply-changes",
+      "type": "step",
+      "name": "Apply Field Changes",
+      "summary": "Merge the partial update payload onto the existing record and persist the updated row with a new updatedAt timestamp. Only provided fields are written; absent fields remain unchanged.",
+      "tags": ["database", "update", "partial-update"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:update-application:compute-field-diffs",
+      "type": "step",
+      "name": "Compute Field-Level Diffs",
+      "summary": "Compare before and after snapshots to produce a list of changed fields with old and new values. Used to populate the history entry's changes array, making the history panel informative.",
+      "tags": ["diff", "history", "audit", "field-comparison"],
+      "complexity": "moderate",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:update-application:record-history-snapshot",
+      "type": "step",
+      "name": "Record History Snapshot",
+      "summary": "Persist a history/snapshot record capturing the full application state after the update, along with the field-level diff and an action description. Increments the history sequence counter atomically.",
+      "tags": ["history", "snapshot", "audit", "sequence"],
+      "complexity": "simple",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:update-application:return-updated-application",
+      "type": "step",
+      "name": "Return Updated Application",
+      "summary": "Serialize and return the updated application with HTTP 200, including its current interview stages.",
+      "tags": ["http", "response", "serialization"],
+      "complexity": "simple",
+      "filePath": "src/routes/applications.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:archive-restore-application:validate-application-exists",
+      "type": "step",
+      "name": "Validate Application Exists",
+      "summary": "Fetch the application by ID. Return 404 if not found. Also validates the current archive state (archive on already-archived or restore on active may be no-ops depending on the stack).",
+      "tags": ["validation", "lookup", "404"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:archive-restore-application:toggle-archived-flag",
+      "type": "step",
+      "name": "Toggle Archived Flag",
+      "summary": "Set isArchived=true (archive) or isArchived=false (restore) and update the updatedAt timestamp. Single UPDATE statement targeting the specific application row.",
+      "tags": ["database", "update", "archive", "soft-delete"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:archive-restore-application:record-archive-history",
+      "type": "step",
+      "name": "Record Archive/Restore History",
+      "summary": "Capture a history snapshot labelled 'Application archived' or 'Application restored' so the audit trail reflects the lifecycle event.",
+      "tags": ["history", "audit", "snapshot"],
+      "complexity": "simple",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:archive-restore-application:return-updated-application",
+      "type": "step",
+      "name": "Return Updated Application",
+      "summary": "Return the application with its new isArchived state and HTTP 200, so the UI can immediately reflect the change.",
+      "tags": ["http", "response"],
+      "complexity": "simple",
+      "filePath": "src/routes/applications.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:delete-application:validate-application-exists",
+      "type": "step",
+      "name": "Validate Application Exists",
+      "summary": "Fetch the application by ID and return 404 if not found, before attempting deletion.",
+      "tags": ["validation", "lookup", "404"],
+      "complexity": "simple",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:delete-application:cascade-delete-children",
+      "type": "step",
+      "name": "Cascade Delete Child Records",
+      "summary": "Remove all related interview stages and history entries before deleting the application row. Most relational stacks use ON DELETE CASCADE in the schema; DynamoDB performs explicit batch deletes by querying on the partition key.",
+      "tags": ["database", "cascade", "delete", "transaction"],
+      "complexity": "moderate",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:delete-application:return-204",
+      "type": "step",
+      "name": "Return 204 No Content",
+      "summary": "After successful deletion, return HTTP 204 with no body. Callers must check for 204 before parsing JSON to avoid parse errors.",
+      "tags": ["http", "response", "204"],
+      "complexity": "simple",
+      "filePath": "src/routes/applications.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:manage-interview-stages:validate-parent-application",
+      "type": "step",
+      "name": "Validate Parent Application Exists",
+      "summary": "Before any stage mutation, verify the parent application exists by ID. Return 404 if not found. This prevents orphaned stage records.",
+      "tags": ["validation", "lookup", "404", "parent-record"],
+      "complexity": "simple",
+      "filePath": "src/services/stages.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:manage-interview-stages:validate-stage-input",
+      "type": "step",
+      "name": "Validate Stage Input",
+      "summary": "Parse the request body against the CreateInterviewStageSchema or UpdateInterviewStageSchema. Validates name, order, type, scheduledDate, notes, and completed fields.",
+      "tags": ["validation", "schema", "interview-stages"],
+      "complexity": "simple",
+      "filePath": "src/types/api.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:manage-interview-stages:persist-stage-change",
+      "type": "step",
+      "name": "Persist Stage Change",
+      "summary": "Execute the INSERT (create), UPDATE (edit), or DELETE (remove) on the interview_stages table. Completion auto-dates are applied when the completed flag is toggled.",
+      "tags": ["database", "crud", "interview-stages"],
+      "complexity": "simple",
+      "filePath": "src/services/stages.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:manage-interview-stages:bump-parent-updated-at",
+      "type": "step",
+      "name": "Bump Parent Application updatedAt",
+      "summary": "Update the parent application's updatedAt timestamp after any stage change. This keeps the application at the top of the default sort order when its pipeline is actively being worked.",
+      "tags": ["database", "timestamp", "parent-record", "sort-order"],
+      "complexity": "simple",
+      "filePath": "src/services/stages.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:manage-interview-stages:record-stage-history",
+      "type": "step",
+      "name": "Record Stage History Snapshot",
+      "summary": "Capture a history entry describing the stage operation ('Stage added', 'Stage updated', 'Stage removed') on the parent application's history timeline.",
+      "tags": ["history", "audit", "snapshot", "interview-stages"],
+      "complexity": "simple",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:manage-interview-stages:return-response",
+      "type": "step",
+      "name": "Return Stage Response",
+      "summary": "Return the created or updated stage with HTTP 201/200, or 204 on deletion. The response includes all stage fields so the UI can update its local state.",
+      "tags": ["http", "response", "serialization"],
+      "complexity": "simple",
+      "filePath": "src/routes/applications.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:view-application-history:validate-application-exists",
+      "type": "step",
+      "name": "Validate Application Exists",
+      "summary": "Look up the application by ID before fetching its history. Return 404 if not found.",
+      "tags": ["validation", "lookup", "404"],
+      "complexity": "simple",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:view-application-history:query-history-entries",
+      "type": "step",
+      "name": "Query History Entries",
+      "summary": "Fetch history snapshots for the application, newest-first, with optional pagination (page/limit). Returns raw snapshot rows from the application_history table or equivalent.",
+      "tags": ["database", "query", "history", "pagination"],
+      "complexity": "simple",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:view-application-history:compute-field-diffs",
+      "type": "step",
+      "name": "Compute Field Diffs Per Entry",
+      "summary": "For each history entry, compare the current snapshot to the prior one to produce the field-level changes list. Some stacks store diffs at write time; others compute them on read from adjacent snapshots.",
+      "tags": ["diff", "computation", "history", "field-comparison"],
+      "complexity": "moderate",
+      "filePath": "internal/service/history.go",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:view-application-history:return-history-list",
+      "type": "step",
+      "name": "Return History List",
+      "summary": "Serialize and return the paginated history entries with action descriptions, timestamps, and per-field change arrays for rendering in the history panel.",
+      "tags": ["http", "response", "serialization", "history"],
+      "complexity": "simple",
+      "filePath": "internal/handler/history.go",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:restore-application-version:validate-target-sequence",
+      "type": "step",
+      "name": "Validate Target Sequence or Snapshot ID",
+      "summary": "Parse and validate the restore target from the request body: either a snapshot ID or a target event sequence number. Return 400 for invalid input, 404 if the target does not exist.",
+      "tags": ["validation", "input", "sequence", "snapshot"],
+      "complexity": "simple",
+      "filePath": "server/api/applications/[id]/events/restore.post.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:restore-application-version:find-nearest-snapshot",
+      "type": "step",
+      "name": "Find Nearest Snapshot",
+      "summary": "Locate the most recent snapshot at or before the target sequence. This is the starting point for replay, minimizing the number of forward patches that must be applied.",
+      "tags": ["database", "snapshot", "lookup", "event-sourcing"],
+      "complexity": "moderate",
+      "filePath": "server/api/applications/[id]/snapshots/latest.get.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:restore-application-version:replay-events",
+      "type": "step",
+      "name": "Replay Events to Target",
+      "summary": "Apply forward Immer patches from the nearest snapshot up to the target sequence number to reconstruct the application state at that point in time.",
+      "tags": ["event-sourcing", "immer", "patches", "replay", "time-travel"],
+      "complexity": "complex",
+      "filePath": "server/services/event.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:restore-application-version:overwrite-current-state",
+      "type": "step",
+      "name": "Overwrite Current Application State",
+      "summary": "Atomically replace the current application and stage records with the reconstructed historical state. Rebuilds GSI keys (DynamoDB) or updates the relational row in a transaction.",
+      "tags": ["database", "transaction", "restore", "atomic"],
+      "complexity": "complex",
+      "filePath": "src/services/application.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:restore-application-version:record-restore-event",
+      "type": "step",
+      "name": "Record Restore History Event",
+      "summary": "Append a new history entry or event describing the version restore, so the audit trail shows when and to what point a rollback occurred.",
+      "tags": ["history", "audit", "restore", "event"],
+      "complexity": "simple",
+      "filePath": "src/services/history.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:restore-application-version:return-restored-application",
+      "type": "step",
+      "name": "Return Restored Application",
+      "summary": "Serialize and return the fully restored application state so the UI can immediately reflect the historical version.",
+      "tags": ["http", "response", "serialization"],
+      "complexity": "simple",
+      "filePath": "src/routes/applications.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-import:receive-file-upload",
+      "type": "step",
+      "name": "Receive File Upload",
+      "summary": "Accept the CSV file via multipart/form-data POST. Extract the file buffer from the request for parsing.",
+      "tags": ["http", "file-upload", "multipart"],
+      "complexity": "simple",
+      "filePath": "internal/handler/csv.go",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-import:parse-csv-content",
+      "type": "step",
+      "name": "Parse CSV Content",
+      "summary": "Run the character-by-character CSV parser that correctly handles quoted fields containing embedded newlines, commas, and escaped double-quotes. Produces a row array of string maps keyed by header name.",
+      "tags": ["csv", "parsing", "quoted-fields", "multi-line"],
+      "complexity": "complex",
+      "filePath": "src/services/csv.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-import:validate-each-row",
+      "type": "step",
+      "name": "Validate Each Row",
+      "summary": "Apply the application creation schema to each parsed row, collecting per-row validation errors. Invalid rows are skipped with an error message rather than aborting the entire import.",
+      "tags": ["validation", "per-row", "error-collection"],
+      "complexity": "moderate",
+      "filePath": "src/services/csv.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-import:deduplicate-rows",
+      "type": "step",
+      "name": "Deduplicate Rows",
+      "summary": "Check each valid row against existing applications using jobPostingUrl (primary) or the (companyName, positionTitle) compound key (fallback). Matching rows are treated as updates; new rows are inserts.",
+      "tags": ["deduplication", "upsert", "duplicate-detection"],
+      "complexity": "moderate",
+      "filePath": "internal/service/csv.go",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-import:upsert-applications",
+      "type": "step",
+      "name": "Upsert Applications",
+      "summary": "Create or update each deduplicated row through the standard application service layer, applying the same business rules (status/date coupling, etc.) as the direct API.",
+      "tags": ["database", "upsert", "create", "update", "business-rules"],
+      "complexity": "moderate",
+      "filePath": "src/services/csv.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-import:return-import-summary",
+      "type": "step",
+      "name": "Return Import Summary",
+      "summary": "Return a JSON summary with counts of imported, skipped (duplicates), and errored rows, plus per-row error details so the user can correct and re-import failed entries.",
+      "tags": ["http", "response", "summary", "errors"],
+      "complexity": "simple",
+      "filePath": "src/routes/applications.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-export:fetch-all-applications",
+      "type": "step",
+      "name": "Fetch All Applications via Pagination Loop",
+      "summary": "Repeatedly call the list service with increasing page offsets until all applications are fetched. No UI filters applied — export always returns the full dataset.",
+      "tags": ["database", "pagination", "bulk-fetch"],
+      "complexity": "simple",
+      "filePath": "src/services/csv.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-export:serialize-to-csv",
+      "type": "step",
+      "name": "Serialize Applications to CSV",
+      "summary": "Convert each application record to a CSV row using the defined column order. Quote string fields containing commas or newlines. Prepend the header row.",
+      "tags": ["serialization", "csv", "formatting"],
+      "complexity": "simple",
+      "filePath": "src/services/csv.service.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:csv-export:stream-csv-response",
+      "type": "step",
+      "name": "Stream CSV Response",
+      "summary": "Return the CSV content with Content-Type: text/csv and Content-Disposition: attachment headers so the browser triggers a file download.",
+      "tags": ["http", "streaming", "download", "headers"],
+      "complexity": "simple",
+      "filePath": "internal/handler/csv.go",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:database-migration:detect-pending-migrations",
+      "type": "step",
+      "name": "Detect Pending Migrations",
+      "summary": "Check the schema_migrations tracking table (or ORM equivalent) to identify which migration files have not yet been applied to the target schema.",
+      "tags": ["migration", "tracking", "database"],
+      "complexity": "simple",
+      "filePath": "migrations/run.py",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:database-migration:create-schema",
+      "type": "step",
+      "name": "Create Schema if Not Exists",
+      "summary": "Issue CREATE SCHEMA IF NOT EXISTS <stack_schema> to isolate this stack's tables from other implementations sharing the same PostgreSQL database.",
+      "tags": ["database", "schema", "isolation", "idempotent"],
+      "complexity": "simple",
+      "filePath": "migrations/run.py",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:database-migration:apply-sql-files",
+      "type": "step",
+      "name": "Apply SQL Migration Files",
+      "summary": "Execute each pending SQL migration file in order, creating tables, enums, indexes, and constraints. Record applied migration names in the tracking table.",
+      "tags": ["database", "ddl", "sql", "apply"],
+      "complexity": "moderate",
+      "filePath": "internal/migrations/001_initial.up.sql",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:database-migration:verify-connectivity",
+      "type": "step",
+      "name": "Verify Database Connectivity",
+      "summary": "After migrations complete, perform a health ping to confirm the connection pool is live before accepting HTTP traffic.",
+      "tags": ["database", "health", "connectivity", "startup"],
+      "complexity": "simple",
+      "filePath": "cmd/server/main.go",
+      "lineRange": [0, 0]
+    }
+  ],
+  "edges": [
+    { "source": "domain:application-management", "target": "flow:create-application", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:application-management", "target": "flow:list-and-filter-applications", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:application-management", "target": "flow:update-application", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:application-management", "target": "flow:archive-restore-application", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:application-management", "target": "flow:delete-application", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:interview-stage-management", "target": "flow:manage-interview-stages", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:history-tracking", "target": "flow:view-application-history", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:history-tracking", "target": "flow:restore-application-version", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-portability", "target": "flow:csv-import", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-portability", "target": "flow:csv-export", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:platform-infrastructure", "target": "flow:database-migration", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:create-application", "target": "step:create-application:validate-input", "type": "flow_step", "direction": "forward", "weight": 0.2 },
+    { "source": "flow:create-application", "target": "step:create-application:enforce-status-date-coupling", "type": "flow_step", "direction": "forward", "weight": 0.4 },
+    { "source": "flow:create-application", "target": "step:create-application:persist-record", "type": "flow_step", "direction": "forward", "weight": 0.6 },
+    { "source": "flow:create-application", "target": "step:create-application:record-history-snapshot", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:create-application", "target": "step:create-application:return-201-response", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:list-and-filter-applications", "target": "step:list-and-filter-applications:parse-query-params", "type": "flow_step", "direction": "forward", "weight": 0.2 },
+    { "source": "flow:list-and-filter-applications", "target": "step:list-and-filter-applications:build-filter-query", "type": "flow_step", "direction": "forward", "weight": 0.4 },
+    { "source": "flow:list-and-filter-applications", "target": "step:list-and-filter-applications:apply-pagination", "type": "flow_step", "direction": "forward", "weight": 0.6 },
+    { "source": "flow:list-and-filter-applications", "target": "step:list-and-filter-applications:eager-load-stages", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:list-and-filter-applications", "target": "step:list-and-filter-applications:return-paginated-response", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:update-application", "target": "step:update-application:validate-partial-body", "type": "flow_step", "direction": "forward", "weight": 0.2 },
+    { "source": "flow:update-application", "target": "step:update-application:lookup-existing-record", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:update-application", "target": "step:update-application:apply-changes", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:update-application", "target": "step:update-application:compute-field-diffs", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:update-application", "target": "step:update-application:record-history-snapshot", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:update-application", "target": "step:update-application:return-updated-application", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:archive-restore-application", "target": "step:archive-restore-application:validate-application-exists", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:archive-restore-application", "target": "step:archive-restore-application:toggle-archived-flag", "type": "flow_step", "direction": "forward", "weight": 0.6 },
+    { "source": "flow:archive-restore-application", "target": "step:archive-restore-application:record-archive-history", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:archive-restore-application", "target": "step:archive-restore-application:return-updated-application", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:delete-application", "target": "step:delete-application:validate-application-exists", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:delete-application", "target": "step:delete-application:cascade-delete-children", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:delete-application", "target": "step:delete-application:return-204", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:manage-interview-stages", "target": "step:manage-interview-stages:validate-parent-application", "type": "flow_step", "direction": "forward", "weight": 0.2 },
+    { "source": "flow:manage-interview-stages", "target": "step:manage-interview-stages:validate-stage-input", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:manage-interview-stages", "target": "step:manage-interview-stages:persist-stage-change", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:manage-interview-stages", "target": "step:manage-interview-stages:bump-parent-updated-at", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:manage-interview-stages", "target": "step:manage-interview-stages:record-stage-history", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:manage-interview-stages", "target": "step:manage-interview-stages:return-response", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:view-application-history", "target": "step:view-application-history:validate-application-exists", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:view-application-history", "target": "step:view-application-history:query-history-entries", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:view-application-history", "target": "step:view-application-history:compute-field-diffs", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:view-application-history", "target": "step:view-application-history:return-history-list", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:restore-application-version", "target": "step:restore-application-version:validate-target-sequence", "type": "flow_step", "direction": "forward", "weight": 0.2 },
+    { "source": "flow:restore-application-version", "target": "step:restore-application-version:find-nearest-snapshot", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:restore-application-version", "target": "step:restore-application-version:replay-events", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:restore-application-version", "target": "step:restore-application-version:overwrite-current-state", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:restore-application-version", "target": "step:restore-application-version:record-restore-event", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:restore-application-version", "target": "step:restore-application-version:return-restored-application", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:csv-import", "target": "step:csv-import:receive-file-upload", "type": "flow_step", "direction": "forward", "weight": 0.2 },
+    { "source": "flow:csv-import", "target": "step:csv-import:parse-csv-content", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:csv-import", "target": "step:csv-import:validate-each-row", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:csv-import", "target": "step:csv-import:deduplicate-rows", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:csv-import", "target": "step:csv-import:upsert-applications", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:csv-import", "target": "step:csv-import:return-import-summary", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:csv-export", "target": "step:csv-export:fetch-all-applications", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:csv-export", "target": "step:csv-export:serialize-to-csv", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:csv-export", "target": "step:csv-export:stream-csv-response", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "flow:database-migration", "target": "step:database-migration:detect-pending-migrations", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:database-migration", "target": "step:database-migration:create-schema", "type": "flow_step", "direction": "forward", "weight": 0.4 },
+    { "source": "flow:database-migration", "target": "step:database-migration:apply-sql-files", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:database-migration", "target": "step:database-migration:verify-connectivity", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+
+    { "source": "domain:application-management", "target": "domain:history-tracking", "type": "cross_domain", "direction": "forward", "description": "Every application create, update, archive, and restore triggers a history snapshot in the History Tracking domain", "weight": 0.8 },
+    { "source": "domain:interview-stage-management", "target": "domain:history-tracking", "type": "cross_domain", "direction": "forward", "description": "Every stage add, update, and delete records a history entry on the parent application's audit timeline", "weight": 0.7 },
+    { "source": "domain:interview-stage-management", "target": "domain:application-management", "type": "cross_domain", "direction": "forward", "description": "Interview stages are child records of applications; stage mutations validate and update the parent application", "weight": 0.9 },
+    { "source": "domain:data-portability", "target": "domain:application-management", "type": "cross_domain", "direction": "forward", "description": "CSV import delegates to application create/update service methods; CSV export consumes the application list query", "weight": 0.8 },
+    { "source": "domain:platform-infrastructure", "target": "domain:application-management", "type": "cross_domain", "direction": "forward", "description": "Database schema migrations create and maintain the tables and enums that Application Management reads and writes", "weight": 0.6 },
+    { "source": "domain:platform-infrastructure", "target": "domain:history-tracking", "type": "cross_domain", "direction": "forward", "description": "The application_history and events tables created by migrations underpin the History Tracking domain", "weight": 0.6 }
+  ],
+  "layers": [],
+  "tour": []
+}

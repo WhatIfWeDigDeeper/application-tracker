@@ -1,0 +1,857 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "application-tracker-api",
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "SQL"
+    ],
+    "frameworks": [
+      "Express",
+      "Prisma",
+      "Zod",
+      "Jest"
+    ],
+    "description": "Express REST API for Application Tracker with Prisma ORM and PostgreSQL. Provides CRUD operations for job applications, interview stages, and application history with snapshot-based restore capabilities.",
+    "analyzedAt": "2026-05-04T00:00:00.000Z",
+    "gitCommitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f"
+  },
+  "nodes": [
+    {
+      "id": "file:src/index.ts",
+      "type": "file",
+      "name": "src/index.ts",
+      "filePath": "src/index.ts",
+      "summary": "Application entry point. Bootstraps the Express server on port 5000, registers CORS, JSON body parsing, request logger middleware, the /applications router, and the global error handler. Also exposes a /health endpoint.",
+      "tags": [
+        "entry-point",
+        "express",
+        "server",
+        "bootstrap"
+      ]
+    },
+    {
+      "id": "file:src/types/index.ts",
+      "type": "file",
+      "name": "src/types/index.ts",
+      "filePath": "src/types/index.ts",
+      "summary": "Central Zod schema definitions and TypeScript type exports for the API. Defines ApplicationStatus, CompanyCategory, and JobSource enums, plus request DTOs for creating/updating applications and interview stages, list query parameters, and history/restore schemas.",
+      "tags": [
+        "types",
+        "zod",
+        "validation",
+        "dto",
+        "schemas"
+      ]
+    },
+    {
+      "id": "file:src/db/client.ts",
+      "type": "file",
+      "name": "src/db/client.ts",
+      "filePath": "src/db/client.ts",
+      "summary": "Initializes and exports the singleton Prisma client configured with the PrismaPg adapter (pg Pool). Reads DATABASE_URL from environment, targeting the express_prisma schema. Uses global singleton pattern to prevent connection pool exhaustion in hot-reload dev mode.",
+      "tags": [
+        "database",
+        "prisma",
+        "singleton",
+        "postgresql",
+        "connection"
+      ]
+    },
+    {
+      "id": "file:src/db/seed.ts",
+      "type": "file",
+      "name": "src/db/seed.ts",
+      "filePath": "src/db/seed.ts",
+      "summary": "Database seeding script. Clears existing applications and stages, then inserts two sample applications (Acme Corp, Tech Startup) with associated interview stages for development/testing.",
+      "tags": [
+        "seed",
+        "database",
+        "development",
+        "script"
+      ]
+    },
+    {
+      "id": "file:src/lib/logger.ts",
+      "type": "file",
+      "name": "src/lib/logger.ts",
+      "filePath": "src/lib/logger.ts",
+      "summary": "Minimal logger utility wrapping console.log/warn/error with info/warn/error methods. Provides a consistent logger interface across the codebase.",
+      "tags": [
+        "logger",
+        "utility",
+        "logging"
+      ]
+    },
+    {
+      "id": "file:src/middleware/errorHandler.ts",
+      "type": "file",
+      "name": "src/middleware/errorHandler.ts",
+      "filePath": "src/middleware/errorHandler.ts",
+      "summary": "Global Express error-handling middleware and AppError class. Handles AppError (domain errors with HTTP status codes), ZodError (validation failures returning 400 with field-level details), and generic 500 internal errors. Exports ErrorResponse interface.",
+      "tags": [
+        "middleware",
+        "error-handling",
+        "express",
+        "validation"
+      ]
+    },
+    {
+      "id": "file:src/middleware/logger.ts",
+      "type": "file",
+      "name": "src/middleware/logger.ts",
+      "filePath": "src/middleware/logger.ts",
+      "summary": "Express request logger middleware. Attaches a finish listener to track request duration and logs method, path, status code, and elapsed milliseconds for each completed request.",
+      "tags": [
+        "middleware",
+        "logging",
+        "request",
+        "express"
+      ]
+    },
+    {
+      "id": "file:src/routes/applications.ts",
+      "type": "file",
+      "name": "src/routes/applications.ts",
+      "filePath": "src/routes/applications.ts",
+      "summary": "Express router for the /applications resource. Defines CRUD routes (GET list, POST create, GET by id, PATCH update, DELETE), archive/restore actions, history listing, and history restore endpoints. Validates requests using Zod schemas and delegates to applicationService and historyService.",
+      "tags": [
+        "routes",
+        "express",
+        "applications",
+        "rest-api",
+        "crud"
+      ]
+    },
+    {
+      "id": "file:src/routes/interview-stages.ts",
+      "type": "file",
+      "name": "src/routes/interview-stages.ts",
+      "filePath": "src/routes/interview-stages.ts",
+      "summary": "Express router (mergeParams) for interview stages nested under /applications/:id/interview-stages. Provides POST (create), PATCH (update by stageId), and DELETE endpoints. Delegates to interviewStageService.",
+      "tags": [
+        "routes",
+        "express",
+        "interview-stages",
+        "rest-api",
+        "nested"
+      ]
+    },
+    {
+      "id": "file:src/services/applications.service.ts",
+      "type": "file",
+      "name": "src/services/applications.service.ts",
+      "filePath": "src/services/applications.service.ts",
+      "summary": "ApplicationService class encapsulating business logic for job application CRUD. Handles paginated list with multi-value filters, date string to ISO datetime conversion, unsubmitted-status/dateApplied coupling logic, archive/restore, and triggers history recording on mutations.",
+      "tags": [
+        "service",
+        "business-logic",
+        "applications",
+        "prisma",
+        "pagination"
+      ]
+    },
+    {
+      "id": "file:src/services/history.service.ts",
+      "type": "file",
+      "name": "src/services/history.service.ts",
+      "filePath": "src/services/history.service.ts",
+      "summary": "History service implementing snapshot-based audit trail. Records full application snapshots on each mutation, computes field-level diffs between snapshots for the history list, and supports transactional restore to any prior version by replaying a snapshot. Exports FIELD_LABELS, recordHistory, listHistory, restoreToVersion, computeFieldDiffs, and buildDescription.",
+      "tags": [
+        "service",
+        "history",
+        "audit-trail",
+        "snapshot",
+        "restore",
+        "prisma"
+      ]
+    },
+    {
+      "id": "file:src/services/stages.service.ts",
+      "type": "file",
+      "name": "src/services/stages.service.ts",
+      "filePath": "src/services/stages.service.ts",
+      "summary": "InterviewStageService class managing interview stage lifecycle. Auto-increments stage order, validates parent application existence, handles date string conversion, and records history events (stage_add, stage_update, stage_delete) for each mutation.",
+      "tags": [
+        "service",
+        "interview-stages",
+        "business-logic",
+        "prisma",
+        "ordering"
+      ]
+    },
+    {
+      "id": "file:prisma/schema.prisma",
+      "type": "schema",
+      "name": "prisma/schema.prisma",
+      "filePath": "prisma/schema.prisma",
+      "summary": "Prisma schema defining three models in the express_prisma PostgreSQL schema: Application (job applications with status, salary, archive flags), ApplicationHistory (snapshot-based audit trail with JSON snapshot column), and InterviewStage (ordered interview rounds linked to applications). Includes legacy enums for ApplicationStatus, CompanyCategory, and JobSource.",
+      "tags": [
+        "prisma",
+        "schema",
+        "database",
+        "models",
+        "postgresql"
+      ]
+    },
+    {
+      "id": "file:prisma/migrations/0_init/migration.sql",
+      "type": "file",
+      "name": "prisma/migrations/0_init/migration.sql",
+      "filePath": "prisma/migrations/0_init/migration.sql",
+      "summary": "Initial database migration creating the express_prisma schema, Application, ApplicationHistory, and InterviewStage tables with their indexes.",
+      "tags": [
+        "migration",
+        "sql",
+        "database",
+        "initial"
+      ]
+    },
+    {
+      "id": "file:prisma/migrations/20260122202547_add_schema_prefix/migration.sql",
+      "type": "file",
+      "name": "prisma/migrations/20260122202547_add_schema_prefix/migration.sql",
+      "filePath": "prisma/migrations/20260122202547_add_schema_prefix/migration.sql",
+      "summary": "Migration adding schema prefix to existing tables/indexes to align with multi-schema PostgreSQL setup.",
+      "tags": [
+        "migration",
+        "sql",
+        "database",
+        "schema"
+      ]
+    },
+    {
+      "id": "file:tests/contract/applications.contract.test.ts",
+      "type": "file",
+      "name": "tests/contract/applications.contract.test.ts",
+      "filePath": "tests/contract/applications.contract.test.ts",
+      "summary": "Contract tests for the /applications endpoints verifying response shape (paginated list with items/page/limit/total) and HTTP status codes for list, create, and validation failure scenarios.",
+      "tags": [
+        "test",
+        "contract",
+        "applications",
+        "jest"
+      ]
+    },
+    {
+      "id": "file:tests/contract/health.contract.test.ts",
+      "type": "file",
+      "name": "tests/contract/health.contract.test.ts",
+      "filePath": "tests/contract/health.contract.test.ts",
+      "summary": "Contract test for the /health endpoint verifying 200 status and {status: 'ok'} response body.",
+      "tags": [
+        "test",
+        "contract",
+        "health",
+        "jest"
+      ]
+    },
+    {
+      "id": "file:tests/contract/stages.contract.test.ts",
+      "type": "file",
+      "name": "tests/contract/stages.contract.test.ts",
+      "filePath": "tests/contract/stages.contract.test.ts",
+      "summary": "Contract tests for interview stage endpoints (POST create, PATCH update) verifying status codes. Tests use placeholder assertions pending full route implementation.",
+      "tags": [
+        "test",
+        "contract",
+        "interview-stages",
+        "jest"
+      ]
+    },
+    {
+      "id": "file:tests/integration/applications.integration.test.ts",
+      "type": "file",
+      "name": "tests/integration/applications.integration.test.ts",
+      "filePath": "tests/integration/applications.integration.test.ts",
+      "summary": "Integration test placeholder for the full application workflow. Currently a stub with a TODO for Prisma-backed setup.",
+      "tags": [
+        "test",
+        "integration",
+        "placeholder",
+        "jest"
+      ]
+    },
+    {
+      "id": "file:tests/integration/stages.integration.test.ts",
+      "type": "file",
+      "name": "tests/integration/stages.integration.test.ts",
+      "filePath": "tests/integration/stages.integration.test.ts",
+      "summary": "Integration test placeholder for interview stages workflow.",
+      "tags": [
+        "test",
+        "integration",
+        "placeholder",
+        "jest"
+      ]
+    },
+    {
+      "id": "file:tests/unit/applications.service.test.ts",
+      "type": "file",
+      "name": "tests/unit/applications.service.test.ts",
+      "filePath": "tests/unit/applications.service.test.ts",
+      "summary": "Unit tests for ApplicationService verifying the unsubmitted-status/dateApplied coupling logic. Tests createApplication (defaults to unsubmitted with null dateApplied) and updateApplication (clears dateApplied when status switches to unsubmitted, preserves it otherwise). Uses Jest mocks for Prisma client and history service.",
+      "tags": [
+        "test",
+        "unit",
+        "applications-service",
+        "jest",
+        "mock"
+      ]
+    },
+    {
+      "id": "file:tests/utils/server.ts",
+      "type": "file",
+      "name": "tests/utils/server.ts",
+      "filePath": "tests/utils/server.ts",
+      "summary": "Test utility creating a lightweight Express app with stub routes (GET /health, GET /applications, POST /applications) for contract testing without a real database. Exports createTestApp() and getRequest() helpers.",
+      "tags": [
+        "test",
+        "utility",
+        "express",
+        "stub",
+        "supertest"
+      ]
+    },
+    {
+      "id": "file:Dockerfile",
+      "type": "file",
+      "name": "Dockerfile",
+      "filePath": "Dockerfile",
+      "summary": "Multi-stage Docker build: deps stage installs npm packages, builder stage compiles TypeScript and generates Prisma client, runner stage creates a minimal production image running Prisma migrations then seeding before starting the Node.js server on port 5000.",
+      "tags": [
+        "docker",
+        "infrastructure",
+        "multi-stage",
+        "deployment"
+      ]
+    },
+    {
+      "id": "file:scripts/load-test.k6.js",
+      "type": "file",
+      "name": "scripts/load-test.k6.js",
+      "filePath": "scripts/load-test.k6.js",
+      "summary": "k6 load test script exercising the health check, list applications, and create application endpoints. Configured with ramp-up/sustain/ramp-down stages at 10 VUs, with p95 GET ≤200ms, p95 POST ≤500ms, p99 ≤1000ms, and error rate <1% thresholds.",
+      "tags": [
+        "performance",
+        "load-test",
+        "k6",
+        "script"
+      ]
+    },
+    {
+      "id": "file:scripts/local-setup.sh",
+      "type": "file",
+      "name": "scripts/local-setup.sh",
+      "filePath": "scripts/local-setup.sh",
+      "summary": "Shell script for local development environment setup.",
+      "tags": [
+        "script",
+        "setup",
+        "development"
+      ]
+    },
+    {
+      "id": "file:jest.config.ts",
+      "type": "config",
+      "name": "jest.config.ts",
+      "filePath": "jest.config.ts",
+      "summary": "Jest configuration using ts-jest preset. Matches all tests/**.test.ts files, maps .js imports back to source for ESM compatibility, and enforces 50% coverage thresholds on branches/functions/lines/statements.",
+      "tags": [
+        "config",
+        "jest",
+        "testing",
+        "coverage"
+      ]
+    },
+    {
+      "id": "file:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript configuration targeting ES2020 with strict mode, esModuleInterop, and declaration maps. Compiles src/ to dist/, excludes node_modules and tests.",
+      "tags": [
+        "config",
+        "typescript",
+        "build"
+      ]
+    },
+    {
+      "id": "file:eslint.config.js",
+      "type": "config",
+      "name": "eslint.config.js",
+      "filePath": "eslint.config.js",
+      "summary": "ESLint flat config using TypeScript-ESLint for linting src/ and tests/.",
+      "tags": [
+        "config",
+        "eslint",
+        "linting"
+      ]
+    },
+    {
+      "id": "file:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "NPM package manifest for the Express API. Defines scripts for dev (tsx watch), build (tsc), test (jest), lint (eslint), Prisma commands, seeding, and k6 performance testing. Lists Express 5, Prisma 7, Zod 4, pg as runtime deps and Jest, ts-jest, supertest as dev deps.",
+      "tags": [
+        "config",
+        "npm",
+        "manifest",
+        "dependencies"
+      ]
+    },
+    {
+      "id": "file:prisma.config.ts",
+      "type": "config",
+      "name": "prisma.config.ts",
+      "filePath": "prisma.config.ts",
+      "summary": "Prisma configuration file pointing to the schema and migration directories.",
+      "tags": [
+        "config",
+        "prisma",
+        "database"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/middleware/logger.ts",
+      "type": "imports",
+      "label": "uses requestLogger middleware"
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/lib/logger.ts",
+      "type": "imports",
+      "label": "uses logger for server startup"
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/middleware/errorHandler.ts",
+      "type": "imports",
+      "label": "registers global error handler"
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/routes/applications.ts",
+      "type": "imports",
+      "label": "mounts /applications router"
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/applications.service.ts",
+      "type": "imports",
+      "label": "delegates CRUD to applicationService"
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "imports",
+      "label": "calls listHistory and restoreToVersion"
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/routes/interview-stages.ts",
+      "type": "imports",
+      "label": "mounts nested interview stages router"
+    },
+    {
+      "source": "file:src/routes/applications.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "label": "validates with Zod schemas"
+    },
+    {
+      "source": "file:src/routes/interview-stages.ts",
+      "target": "file:src/services/stages.service.ts",
+      "type": "imports",
+      "label": "delegates to interviewStageService"
+    },
+    {
+      "source": "file:src/routes/interview-stages.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "label": "validates with Zod schemas"
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "label": "uses prisma client for DB access"
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "label": "uses input type definitions"
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/middleware/errorHandler.ts",
+      "type": "imports",
+      "label": "throws AppError for not-found"
+    },
+    {
+      "source": "file:src/services/applications.service.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "imports",
+      "label": "records history after mutations"
+    },
+    {
+      "source": "file:src/services/history.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "label": "uses prisma client for snapshot storage"
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "label": "uses prisma client for stage CRUD"
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/types/index.ts",
+      "type": "imports",
+      "label": "uses input type definitions"
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/middleware/errorHandler.ts",
+      "type": "imports",
+      "label": "throws AppError for not-found"
+    },
+    {
+      "source": "file:src/services/stages.service.ts",
+      "target": "file:src/services/history.service.ts",
+      "type": "imports",
+      "label": "records stage history events"
+    },
+    {
+      "source": "file:src/middleware/errorHandler.ts",
+      "target": "file:src/lib/logger.ts",
+      "type": "imports",
+      "label": "logs errors"
+    },
+    {
+      "source": "file:src/middleware/logger.ts",
+      "target": "file:src/lib/logger.ts",
+      "type": "imports",
+      "label": "uses logger for request logging"
+    },
+    {
+      "source": "file:src/db/seed.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "label": "seeds via prisma client"
+    },
+    {
+      "source": "file:src/db/seed.ts",
+      "target": "file:src/lib/logger.ts",
+      "type": "imports",
+      "label": "logs seed progress"
+    },
+    {
+      "source": "file:tests/contract/applications.contract.test.ts",
+      "target": "file:tests/utils/server.ts",
+      "type": "imports",
+      "label": "uses test app and request helper"
+    },
+    {
+      "source": "file:tests/contract/health.contract.test.ts",
+      "target": "file:tests/utils/server.ts",
+      "type": "imports",
+      "label": "uses test app and request helper"
+    },
+    {
+      "source": "file:tests/contract/stages.contract.test.ts",
+      "target": "file:tests/utils/server.ts",
+      "type": "imports",
+      "label": "uses test app and request helper"
+    },
+    {
+      "source": "file:tests/unit/applications.service.test.ts",
+      "target": "file:src/services/applications.service.ts",
+      "type": "imports",
+      "label": "tests ApplicationService"
+    },
+    {
+      "source": "file:tests/unit/applications.service.test.ts",
+      "target": "file:src/db/client.ts",
+      "type": "imports",
+      "label": "mocks prisma client"
+    },
+    {
+      "source": "file:tests/utils/server.ts",
+      "target": "file:src/middleware/logger.ts",
+      "type": "imports",
+      "label": "uses requestLogger in test app"
+    },
+    {
+      "source": "file:tests/utils/server.ts",
+      "target": "file:src/middleware/errorHandler.ts",
+      "type": "imports",
+      "label": "uses errorHandler in test app"
+    },
+    {
+      "source": "file:prisma/schema.prisma",
+      "target": "file:src/db/client.ts",
+      "type": "defines",
+      "label": "schema defines models consumed by client"
+    },
+    {
+      "source": "file:prisma/migrations/0_init/migration.sql",
+      "target": "file:prisma/schema.prisma",
+      "type": "implements",
+      "label": "initial migration implements schema"
+    },
+    {
+      "source": "file:prisma/migrations/20260122202547_add_schema_prefix/migration.sql",
+      "target": "file:prisma/schema.prisma",
+      "type": "implements",
+      "label": "schema prefix migration"
+    },
+    {
+      "source": "file:Dockerfile",
+      "target": "file:src/index.ts",
+      "type": "references",
+      "label": "builds and runs the app"
+    },
+    {
+      "source": "file:Dockerfile",
+      "target": "file:prisma/schema.prisma",
+      "type": "references",
+      "label": "generates Prisma client and runs migrations"
+    },
+    {
+      "source": "file:scripts/load-test.k6.js",
+      "target": "file:src/index.ts",
+      "type": "references",
+      "label": "exercises live API endpoints"
+    },
+    {
+      "source": "file:jest.config.ts",
+      "target": "file:src/services/applications.service.ts",
+      "type": "references",
+      "label": "coverage collection target"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:src/index.ts",
+      "type": "references",
+      "label": "main entry point"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:jest.config.ts",
+      "type": "references",
+      "label": "test script uses jest config"
+    },
+    {
+      "source": "file:tsconfig.json",
+      "target": "file:src/index.ts",
+      "type": "references",
+      "label": "TypeScript compilation root for src/"
+    },
+    {
+      "source": "file:eslint.config.js",
+      "target": "file:src/index.ts",
+      "type": "references",
+      "label": "lint target src/ and tests/"
+    },
+    {
+      "source": "file:prisma.config.ts",
+      "target": "file:prisma/schema.prisma",
+      "type": "references",
+      "label": "points to prisma schema"
+    },
+    {
+      "source": "file:tests/integration/applications.integration.test.ts",
+      "target": "file:src/services/applications.service.ts",
+      "type": "references",
+      "label": "integration placeholder for application service"
+    },
+    {
+      "source": "file:tests/integration/stages.integration.test.ts",
+      "target": "file:src/services/stages.service.ts",
+      "type": "references",
+      "label": "integration placeholder for stages service"
+    },
+    {
+      "source": "file:scripts/local-setup.sh",
+      "target": "file:src/index.ts",
+      "type": "references",
+      "label": "sets up local environment for running the API"
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:entry-and-infrastructure",
+      "name": "Entry & Infrastructure",
+      "description": "Application bootstrap, Docker packaging, database migrations, and tooling configuration files.",
+      "nodeIds": [
+        "file:src/index.ts",
+        "file:Dockerfile",
+        "file:prisma/migrations/0_init/migration.sql",
+        "file:prisma/migrations/20260122202547_add_schema_prefix/migration.sql",
+        "file:scripts/local-setup.sh",
+        "file:package.json",
+        "file:tsconfig.json",
+        "file:eslint.config.js",
+        "file:jest.config.ts",
+        "file:prisma.config.ts"
+      ]
+    },
+    {
+      "id": "layer:data-and-schema",
+      "name": "Data & Schema",
+      "description": "Prisma schema definition, database client initialization, and the seed script for populating development data.",
+      "nodeIds": [
+        "file:prisma/schema.prisma",
+        "file:src/db/client.ts",
+        "file:src/db/seed.ts"
+      ]
+    },
+    {
+      "id": "layer:types-and-validation",
+      "name": "Types & Validation",
+      "description": "Centralized Zod schemas and TypeScript type exports used by routes and services for input validation and type safety.",
+      "nodeIds": [
+        "file:src/types/index.ts"
+      ]
+    },
+    {
+      "id": "layer:utilities-and-middleware",
+      "name": "Utilities & Middleware",
+      "description": "Shared utilities (logger) and Express middleware (request logger, error handler) used across the application.",
+      "nodeIds": [
+        "file:src/lib/logger.ts",
+        "file:src/middleware/errorHandler.ts",
+        "file:src/middleware/logger.ts"
+      ]
+    },
+    {
+      "id": "layer:services",
+      "name": "Service Layer",
+      "description": "Business logic layer with ApplicationService, InterviewStageService, and HistoryService encapsulating all data access and domain rules.",
+      "nodeIds": [
+        "file:src/services/applications.service.ts",
+        "file:src/services/history.service.ts",
+        "file:src/services/stages.service.ts"
+      ]
+    },
+    {
+      "id": "layer:routes",
+      "name": "Route Layer",
+      "description": "Express routers translating HTTP requests into service calls. Applications router handles the main resource; interview-stages router is nested under applications.",
+      "nodeIds": [
+        "file:src/routes/applications.ts",
+        "file:src/routes/interview-stages.ts"
+      ]
+    },
+    {
+      "id": "layer:tests-and-performance",
+      "name": "Tests & Performance",
+      "description": "All test suites (contract, integration, unit) plus the k6 load test script and test utilities for building stub Express apps.",
+      "nodeIds": [
+        "file:tests/contract/applications.contract.test.ts",
+        "file:tests/contract/health.contract.test.ts",
+        "file:tests/contract/stages.contract.test.ts",
+        "file:tests/integration/applications.integration.test.ts",
+        "file:tests/integration/stages.integration.test.ts",
+        "file:tests/unit/applications.service.test.ts",
+        "file:tests/utils/server.ts",
+        "file:scripts/load-test.k6.js"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Entry Point: Server Bootstrap",
+      "description": "Start here to understand how the API server is assembled. src/index.ts initialises Express, registers middleware in the correct order (CORS, JSON, requestLogger), mounts the /applications router, and attaches the error handler last.",
+      "nodeIds": [
+        "file:src/index.ts"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Data Schema: Prisma Models",
+      "description": "The Prisma schema is the source of truth for the database structure. Three models — Application, ApplicationHistory, and InterviewStage — live in the express_prisma PostgreSQL schema. ApplicationHistory stores full JSON snapshots enabling version restore.",
+      "nodeIds": [
+        "file:prisma/schema.prisma"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Types & Validation: Zod Schemas",
+      "description": "All request validation is defined in src/types/index.ts using Zod. The schemas enforce status enum values, salary ranges, URL formats, and date strings. UpdateApplicationSchema extends CreateApplicationSchema with archive/offer fields.",
+      "nodeIds": [
+        "file:src/types/index.ts"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Database Client: Prisma + pg Pool",
+      "description": "src/db/client.ts configures the Prisma client with the PrismaPg adapter backed by a pg connection pool. The global singleton pattern prevents multiple pool instances during tsx hot-reload in development.",
+      "nodeIds": [
+        "file:src/db/client.ts"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Core Service: Application Business Logic",
+      "description": "ApplicationService is the heart of the API. It handles paginated filtering with comma-separated multi-value params, enforces the unsubmitted-status/dateApplied coupling (null dateApplied when status is unsubmitted), and triggers history recording after every mutation.",
+      "nodeIds": [
+        "file:src/services/applications.service.ts"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "History Service: Snapshot & Restore",
+      "description": "history.service.ts implements a snapshot-based audit trail. After each mutation, captureSnapshot serializes the full application state to JSON. listHistory computes field-level diffs between adjacent snapshots. restoreToVersion wraps the restore in a database transaction to atomically replace application fields and interview stages.",
+      "nodeIds": [
+        "file:src/services/history.service.ts"
+      ]
+    },
+    {
+      "order": 7,
+      "title": "Interview Stages Service",
+      "description": "InterviewStageService manages ordered interview rounds. It auto-assigns the next order value, verifies parent application existence, converts date strings, and records history events for stage additions, updates, and deletions.",
+      "nodeIds": [
+        "file:src/services/stages.service.ts"
+      ]
+    },
+    {
+      "order": 8,
+      "title": "Routes: Applications & Interview Stages",
+      "description": "The applications router exposes the full REST surface: list with filters, CRUD, archive/restore, history listing, and history restore. The interview-stages router is nested using mergeParams so it inherits the :id parameter from the parent.",
+      "nodeIds": [
+        "file:src/routes/applications.ts",
+        "file:src/routes/interview-stages.ts"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "Error Handling & Middleware",
+      "description": "AppError carries an HTTP status code and optional field-level details. The errorHandler translates AppError and ZodError to structured JSON responses; all other errors become generic 500s. The requestLogger middleware measures and logs per-request duration.",
+      "nodeIds": [
+        "file:src/middleware/errorHandler.ts",
+        "file:src/middleware/logger.ts"
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Tests: Contract, Unit & Performance",
+      "description": "Contract tests use a stub Express app (tests/utils/server.ts) to verify response shapes without a database. Unit tests mock Prisma and the history service to isolate ApplicationService business logic. The k6 load test exercises the live API with performance thresholds.",
+      "nodeIds": [
+        "file:tests/utils/server.ts",
+        "file:tests/unit/applications.service.test.ts",
+        "file:scripts/load-test.k6.js"
+      ]
+    }
+  ]
+}

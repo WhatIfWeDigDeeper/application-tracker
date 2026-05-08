@@ -1,0 +1,928 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "go-api",
+    "languages": [
+      "Go",
+      "SQL"
+    ],
+    "frameworks": [
+      "Gin",
+      "pgx",
+      "sqlc",
+      "golang-migrate"
+    ],
+    "description": "Go REST API using Gin framework, pgx for PostgreSQL (go_gin schema), and sqlc for type-safe query generation. Runs on port 5070.",
+    "analyzedAt": "2026-05-05T01:26:52Z",
+    "gitCommitHash": "e5054096efec8165e7d4cfe11fc103f77ad2d98f"
+  },
+  "nodes": [
+    {
+      "id": "file:cmd/server/main.go",
+      "type": "file",
+      "name": "cmd/server/main.go",
+      "filePath": "cmd/server/main.go",
+      "summary": "Application entry point. Loads config, runs embedded SQL migrations via golang-migrate/iofs, creates a pgxpool connection pool, constructs a Gin engine with Logger and Recovery middleware, registers all routes, and starts the HTTP server on the configured port (default 5070).",
+      "tags": [
+        "entrypoint",
+        "server",
+        "gin",
+        "migration",
+        "main"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:cmd/migrate/main.go",
+      "type": "file",
+      "name": "cmd/migrate/main.go",
+      "filePath": "cmd/migrate/main.go",
+      "summary": "Standalone CLI command for running database migrations from the filesystem (file:// source). Reads DATABASE_URL and MIGRATIONS_PATH from the environment, applies pending migrations, and reports the current version. Used outside the main server lifecycle.",
+      "tags": [
+        "migration",
+        "cli",
+        "main",
+        "database"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/config/config.go",
+      "type": "file",
+      "name": "internal/config/config.go",
+      "filePath": "internal/config/config.go",
+      "summary": "Loads application configuration from environment variables (DATABASE_URL, PORT, CORS_ORIGIN). Attempts to load a .env file, falling back to the monorepo root .env. Automatically appends search_path=go_gin to the database URL if not already present. Returns a Config struct with defaults: port 5070, CORS origin http://localhost:3060.",
+      "tags": [
+        "config",
+        "environment",
+        "dotenv",
+        "postgres",
+        "cors"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/db/models.go",
+      "type": "file",
+      "name": "internal/db/models.go",
+      "filePath": "internal/db/models.go",
+      "summary": "Defines Go structs for the three database entities: Application (from go_gin.applications), InterviewStage (from go_gin.interview_stages), and ApplicationSnapshot (from go_gin.application_snapshots). Uses pgtype for nullable PostgreSQL fields. Also defines helper nullable types: NullString, NullInt4, NullDate.",
+      "tags": [
+        "model",
+        "database",
+        "struct",
+        "pgtype"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/db/pool.go",
+      "type": "file",
+      "name": "internal/db/pool.go",
+      "filePath": "internal/db/pool.go",
+      "summary": "Creates and configures a pgxpool.Pool with a maximum of 10 connections. Parses the database URL and returns the pool for use throughout the application.",
+      "tags": [
+        "database",
+        "pool",
+        "pgx",
+        "connection"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/db/query.sql.go",
+      "type": "file",
+      "name": "internal/db/query.sql.go",
+      "filePath": "internal/db/query.sql.go",
+      "summary": "Hand-written data access layer (sqlc-style). Contains all SQL query functions for applications (List, Count, Get, Create, Update, Delete, Archive, Unarchive), interview stages (Get, Create, Update, Delete), and snapshots (Create, Get, GetAll, GetNext). Implements a querier interface supporting both pool and transaction usage. Dynamic sort column injection uses an allowlist to prevent SQL injection.",
+      "tags": [
+        "database",
+        "query",
+        "sql",
+        "pgx",
+        "dao",
+        "transaction"
+      ],
+      "complexity": "high"
+    },
+    {
+      "id": "file:internal/handler/router.go",
+      "type": "file",
+      "name": "internal/handler/router.go",
+      "filePath": "internal/handler/router.go",
+      "summary": "Registers all HTTP routes on the Gin engine. Sets up CORS middleware (Allow-Origin, Methods, Headers, OPTIONS preflight). Groups routes under /applications: CSV import/export/sample-csv (placed before /:id to avoid routing conflicts), CRUD operations, archive/restore, history, and interview stage management endpoints.",
+      "tags": [
+        "router",
+        "gin",
+        "cors",
+        "middleware",
+        "http",
+        "routes"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/handler/applications.go",
+      "type": "file",
+      "name": "internal/handler/applications.go",
+      "filePath": "internal/handler/applications.go",
+      "summary": "HTTP handlers for application CRUD and archive operations: listApplications (GET /applications with filtering, sorting, pagination), getApplication (GET /:id), createApplication (POST), updateApplication (PATCH /:id), deleteApplication (DELETE /:id), archiveApplication (POST /:id/archive), unarchiveApplication (POST /:id/restore). Maps camelCase query params to snake_case DB columns.",
+      "tags": [
+        "handler",
+        "http",
+        "gin",
+        "crud",
+        "application",
+        "archive"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:internal/handler/stages.go",
+      "type": "file",
+      "name": "internal/handler/stages.go",
+      "filePath": "internal/handler/stages.go",
+      "summary": "HTTP handlers for interview stage management: addStage (POST /applications/:id/interview-stages), updateStage (PATCH /:id/interview-stages/:stageId), removeStage (DELETE /:id/interview-stages/:stageId). Delegates to service layer; returns the full ApplicationResponse after each mutation.",
+      "tags": [
+        "handler",
+        "http",
+        "gin",
+        "stages",
+        "interview"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/handler/history.go",
+      "type": "file",
+      "name": "internal/handler/history.go",
+      "filePath": "internal/handler/history.go",
+      "summary": "HTTP handlers for application history: listHistory (GET /applications/:id/history) returns all snapshots with field-level diffs; restoreHistory (POST /applications/:id/history/:historyId/restore) reverts the application to a prior snapshot state within a transaction.",
+      "tags": [
+        "handler",
+        "http",
+        "gin",
+        "history",
+        "snapshot",
+        "restore"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/handler/csv.go",
+      "type": "file",
+      "name": "internal/handler/csv.go",
+      "filePath": "internal/handler/csv.go",
+      "summary": "HTTP handlers for CSV operations: importCSV (POST /applications/import, multipart/form-data file upload), exportCSV (GET /applications/export, streams CSV attachment), sampleCSV (GET /applications/sample-csv, returns template CSV). Delegates parsing/generation to service layer.",
+      "tags": [
+        "handler",
+        "http",
+        "gin",
+        "csv",
+        "import",
+        "export"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/service/applications.go",
+      "type": "file",
+      "name": "internal/service/applications.go",
+      "filePath": "internal/service/applications.go",
+      "summary": "Core application business logic. Defines ApplicationInput (create/update payload), ApplicationResponse (API output), InterviewStageResponse, and ListParams. Implements ListApplications (with pagination and filter), GetApplication, CreateApplication (with validation, snapshot creation), UpdateApplication (falls back to existing values for empty fields), DeleteApplication, ArchiveApplication, and UnarchiveApplication. Includes conversion helpers between pgtype and Go types.",
+      "tags": [
+        "service",
+        "business-logic",
+        "application",
+        "validation",
+        "snapshot",
+        "pagination"
+      ],
+      "complexity": "high"
+    },
+    {
+      "id": "file:internal/service/stages.go",
+      "type": "file",
+      "name": "internal/service/stages.go",
+      "filePath": "internal/service/stages.go",
+      "summary": "Interview stage service logic. Defines StageInput (JSON: name/order keys). Implements AddStage (verifies application exists, creates stage, takes snapshot), UpdateStage, RemoveStage (checks RowsAffected for ErrStageNotFound). Each mutation triggers a snapshot and returns the full ApplicationResponse.",
+      "tags": [
+        "service",
+        "stages",
+        "interview",
+        "snapshot"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:internal/service/history.go",
+      "type": "file",
+      "name": "internal/service/history.go",
+      "filePath": "internal/service/history.go",
+      "summary": "History and versioning service. CreateSnapshot serializes the full application+stages state to JSONB. GetHistory returns all snapshots in DESC order with field-level diffs computed via reflect.DeepEqual. RestoreToVersion runs a transaction to revert application fields and replace all interview stages, then creates a new restore snapshot.",
+      "tags": [
+        "service",
+        "history",
+        "snapshot",
+        "versioning",
+        "diff",
+        "transaction"
+      ],
+      "complexity": "high"
+    },
+    {
+      "id": "file:internal/service/csv.go",
+      "type": "file",
+      "name": "internal/service/csv.go",
+      "filePath": "internal/service/csv.go",
+      "summary": "CSV import/export service. ImportCSV parses CSV using encoding/csv, validates required columns, detects duplicates by jobPostingUrl or (companyName, positionTitle) pair (both intra-file and against existing DB records), creates applications, and optionally archives them. ExportCSV serializes all applications to CSV. GetTemplate returns a sample CSV with headers and one example row.",
+      "tags": [
+        "service",
+        "csv",
+        "import",
+        "export",
+        "duplicate-detection"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:internal/migrations/embed.go",
+      "type": "file",
+      "name": "internal/migrations/embed.go",
+      "filePath": "internal/migrations/embed.go",
+      "summary": "Uses Go's embed directive to bundle all *.sql migration files from the internal/migrations directory into the compiled binary. Exposes the FS variable used by golang-migrate's iofs source driver at server startup.",
+      "tags": [
+        "migration",
+        "embed",
+        "go-embed"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/migrations/001_initial.up.sql",
+      "type": "file",
+      "name": "internal/migrations/001_initial.up.sql",
+      "filePath": "internal/migrations/001_initial.up.sql",
+      "summary": "Initial database schema for the go_gin schema. Creates PostgreSQL enums (application_status, company_category, job_source, skills_match, performance_rating) and three tables: applications (UUID PK, full job application tracking fields), interview_stages (FK to applications with CASCADE delete), and application_snapshots (JSONB snapshot_data for version history).",
+      "tags": [
+        "migration",
+        "sql",
+        "schema",
+        "database",
+        "ddl"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:internal/migrations/002_drop_enums.up.sql",
+      "type": "file",
+      "name": "internal/migrations/002_drop_enums.up.sql",
+      "filePath": "internal/migrations/002_drop_enums.up.sql",
+      "summary": "Alters enum-typed columns in go_gin.applications and interview_stages to TEXT type, then drops the custom enum types. This migration switches from PostgreSQL enum constraints to application-level validation for flexibility.",
+      "tags": [
+        "migration",
+        "sql",
+        "schema",
+        "enum",
+        "alter"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/migrations/003_align_with_nestjs.up.sql",
+      "type": "file",
+      "name": "internal/migrations/003_align_with_nestjs.up.sql",
+      "filePath": "internal/migrations/003_align_with_nestjs.up.sql",
+      "summary": "Alignment migration adding missing columns to match the NestJS schema: salary_min, salary_max, cover_letter_required, offer_due_date, special_requirements, and company_career_url to the applications table.",
+      "tags": [
+        "migration",
+        "sql",
+        "schema",
+        "alter",
+        "alignment"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/migrations/004_align_job_source_with_nestjs.up.sql",
+      "type": "file",
+      "name": "internal/migrations/004_align_job_source_with_nestjs.up.sql",
+      "filePath": "internal/migrations/004_align_job_source_with_nestjs.up.sql",
+      "summary": "Updates job_source values in existing data from underscore format to hyphenated format (e.g., company_website -> company-website) to align with the NestJS API's value format.",
+      "tags": [
+        "migration",
+        "sql",
+        "data-migration",
+        "job-source"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:internal/migrations/005_align_status_with_nestjs.up.sql",
+      "type": "file",
+      "name": "internal/migrations/005_align_status_with_nestjs.up.sql",
+      "filePath": "internal/migrations/005_align_status_with_nestjs.up.sql",
+      "summary": "Updates status values in existing data from underscore format to hyphenated format (e.g., phone_screen -> phone-screen, in_progress -> in-progress) to align with the cross-stack application status convention.",
+      "tags": [
+        "migration",
+        "sql",
+        "data-migration",
+        "status"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:sql/queries/applications.sql",
+      "type": "file",
+      "name": "sql/queries/applications.sql",
+      "filePath": "sql/queries/applications.sql",
+      "summary": "Source SQL query definitions for application CRUD operations used by sqlc code generation. Defines named queries for listing, counting, getting, creating, updating, deleting, archiving, and unarchiving applications in the go_gin schema.",
+      "tags": [
+        "sql",
+        "queries",
+        "sqlc",
+        "application"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:sql/queries/history.sql",
+      "type": "file",
+      "name": "sql/queries/history.sql",
+      "filePath": "sql/queries/history.sql",
+      "summary": "Source SQL query definitions for snapshot/history operations used by sqlc. Defines named queries for creating snapshots, listing snapshots by application, fetching a specific snapshot, and computing the next sequence number.",
+      "tags": [
+        "sql",
+        "queries",
+        "sqlc",
+        "history",
+        "snapshot"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:sql/queries/stages.sql",
+      "type": "file",
+      "name": "sql/queries/stages.sql",
+      "filePath": "sql/queries/stages.sql",
+      "summary": "Source SQL query definitions for interview stage operations used by sqlc. Defines named queries for listing stages by application, creating, updating, and deleting stages.",
+      "tags": [
+        "sql",
+        "queries",
+        "sqlc",
+        "stages"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:sqlc.yaml",
+      "type": "config",
+      "name": "sqlc.yaml",
+      "filePath": "sqlc.yaml",
+      "summary": "sqlc code generation configuration. Points to sql/queries/ for query files, migrations/ for schema, and generates Go code into internal/db using the pgx/v5 SQL package with camelCase JSON tags.",
+      "tags": [
+        "config",
+        "sqlc",
+        "codegen"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:.golangci.yml",
+      "type": "config",
+      "name": ".golangci.yml",
+      "filePath": ".golangci.yml",
+      "summary": "GolangCI-Lint configuration defining linter rules and exclusions for the go-api package.",
+      "tags": [
+        "config",
+        "lint",
+        "golangci"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:Dockerfile",
+      "type": "config",
+      "name": "Dockerfile",
+      "filePath": "Dockerfile",
+      "summary": "Multi-stage Docker build for the Go API. Builder stage compiles the server binary using golang:1.24-alpine. Runtime stage uses alpine:latest with ca-certificates, copies only the binary for a minimal production image.",
+      "tags": [
+        "docker",
+        "build",
+        "deployment",
+        "container"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:go.mod",
+      "type": "config",
+      "name": "go.mod",
+      "filePath": "go.mod",
+      "summary": "Go module definition. Module path: github.com/user/application-tracker/go-api, Go 1.26.2. Direct dependencies: gin v1.10.1, golang-migrate v4.18.3, pgx/v5 v5.9.2, godotenv v1.5.1, testify v1.11.1, testcontainers-go v0.36.0.",
+      "tags": [
+        "go",
+        "module",
+        "dependencies"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:CLAUDE.md",
+      "type": "document",
+      "name": "CLAUDE.md",
+      "filePath": "CLAUDE.md",
+      "summary": "Stack-specific notes for the Go Gin API. Documents port assignments (go-api: 5070, angular-ui: 3060), DB schema (go_gin), StageInput JSON key conventions (name/order not stageName/stageOrder), validation approach (service layer not binding tags), angular-ui proxy config, and server startup procedures for E2E testing.",
+      "tags": [
+        "documentation",
+        "claude",
+        "developer-guide"
+      ],
+      "complexity": "low"
+    },
+    {
+      "id": "file:tests/helper_test.go",
+      "type": "file",
+      "name": "tests/helper_test.go",
+      "filePath": "tests/helper_test.go",
+      "summary": "Test infrastructure. setupTestDB starts a PostgreSQL 18 container via testcontainers-go, creates a connection pool, and runs SQL migrations from the migrations/ directory. Handles Docker unavailability gracefully with t.Skip. runMigrations applies each .sql file in order using the test pool directly.",
+      "tags": [
+        "test",
+        "integration",
+        "testcontainers",
+        "docker",
+        "postgres"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/applications_test.go",
+      "type": "file",
+      "name": "tests/applications_test.go",
+      "filePath": "tests/applications_test.go",
+      "summary": "Integration tests for application CRUD endpoints: TestCreateApplication, list, get, update, delete, archive/restore. Uses HTTP calls against a real database via testcontainers. Defines helper functions createApp and deleteApp.",
+      "tags": [
+        "test",
+        "integration",
+        "application",
+        "http",
+        "crud"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/stages_test.go",
+      "type": "file",
+      "name": "tests/stages_test.go",
+      "filePath": "tests/stages_test.go",
+      "summary": "Integration tests for interview stage management: add, update, and remove stages via HTTP. Verifies stage appears in ApplicationResponse.interviewStages after mutations.",
+      "tags": [
+        "test",
+        "integration",
+        "stages",
+        "http"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/history_test.go",
+      "type": "file",
+      "name": "tests/history_test.go",
+      "filePath": "tests/history_test.go",
+      "summary": "Integration tests for application history and version restore: verifies snapshots are created on CRUD operations, history entries contain correct diffs, and restore reverts application state.",
+      "tags": [
+        "test",
+        "integration",
+        "history",
+        "snapshot",
+        "restore"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/csv_test.go",
+      "type": "file",
+      "name": "tests/csv_test.go",
+      "filePath": "tests/csv_test.go",
+      "summary": "Integration tests for CSV import and export: uploads a CSV file via multipart form, verifies rows are imported, checks duplicate detection, and validates the export endpoint returns valid CSV data.",
+      "tags": [
+        "test",
+        "integration",
+        "csv",
+        "import",
+        "export"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/server_test.go",
+      "type": "file",
+      "name": "tests/server_test.go",
+      "filePath": "tests/server_test.go",
+      "summary": "Integration test bootstrap for the HTTP server. Starts the actual Gin server in a test goroutine using a test database, providing a baseURL for all other test files in the tests package.",
+      "tags": [
+        "test",
+        "server",
+        "gin",
+        "http",
+        "integration"
+      ],
+      "complexity": "low"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:cmd/server/main.go",
+      "target": "file:internal/config/config.go",
+      "type": "imports",
+      "label": "config.Load()"
+    },
+    {
+      "source": "file:cmd/server/main.go",
+      "target": "file:internal/db/pool.go",
+      "type": "imports",
+      "label": "db.New()"
+    },
+    {
+      "source": "file:cmd/server/main.go",
+      "target": "file:internal/handler/router.go",
+      "type": "imports",
+      "label": "handler.RegisterRoutes()"
+    },
+    {
+      "source": "file:cmd/server/main.go",
+      "target": "file:internal/migrations/embed.go",
+      "type": "imports",
+      "label": "embeddedMigrations.FS"
+    },
+    {
+      "source": "file:internal/db/query.sql.go",
+      "target": "file:internal/db/models.go",
+      "type": "imports",
+      "label": "Application, InterviewStage, ApplicationSnapshot types"
+    },
+    {
+      "source": "file:internal/handler/router.go",
+      "target": "file:internal/handler/applications.go",
+      "type": "imports",
+      "label": "listApplications, getApplication, createApplication, updateApplication, deleteApplication, archiveApplication, unarchiveApplication"
+    },
+    {
+      "source": "file:internal/handler/router.go",
+      "target": "file:internal/handler/stages.go",
+      "type": "imports",
+      "label": "addStage, updateStage, removeStage"
+    },
+    {
+      "source": "file:internal/handler/router.go",
+      "target": "file:internal/handler/history.go",
+      "type": "imports",
+      "label": "listHistory, restoreHistory"
+    },
+    {
+      "source": "file:internal/handler/router.go",
+      "target": "file:internal/handler/csv.go",
+      "type": "imports",
+      "label": "importCSV, exportCSV, sampleCSV"
+    },
+    {
+      "source": "file:internal/handler/applications.go",
+      "target": "file:internal/service/applications.go",
+      "type": "imports",
+      "label": "service.ListApplications, GetApplication, CreateApplication, UpdateApplication, DeleteApplication, ArchiveApplication, UnarchiveApplication"
+    },
+    {
+      "source": "file:internal/handler/stages.go",
+      "target": "file:internal/service/stages.go",
+      "type": "imports",
+      "label": "service.AddStage, UpdateStage, RemoveStage"
+    },
+    {
+      "source": "file:internal/handler/history.go",
+      "target": "file:internal/service/history.go",
+      "type": "imports",
+      "label": "service.GetHistory, RestoreToVersion"
+    },
+    {
+      "source": "file:internal/handler/csv.go",
+      "target": "file:internal/service/csv.go",
+      "type": "imports",
+      "label": "service.ImportCSV, ExportCSV, GetTemplate"
+    },
+    {
+      "source": "file:internal/service/applications.go",
+      "target": "file:internal/db/query.sql.go",
+      "type": "imports",
+      "label": "db.ListApplications, GetApplication, CreateApplication, UpdateApplication, DeleteApplication, ArchiveApplication, UnarchiveApplication, GetStagesByApplicationID"
+    },
+    {
+      "source": "file:internal/service/stages.go",
+      "target": "file:internal/db/query.sql.go",
+      "type": "imports",
+      "label": "db.GetApplication, CreateStage, UpdateStage, DeleteStage"
+    },
+    {
+      "source": "file:internal/service/history.go",
+      "target": "file:internal/db/query.sql.go",
+      "type": "imports",
+      "label": "db.GetSnapshotsByApplicationID, CreateSnapshot, GetSnapshot, GetNextSequenceNumber, UpdateApplication, GetStagesByApplicationID, DeleteStage, CreateStage"
+    },
+    {
+      "source": "file:internal/service/csv.go",
+      "target": "file:internal/db/query.sql.go",
+      "type": "imports",
+      "label": "db.GetAllApplications"
+    },
+    {
+      "source": "file:internal/service/csv.go",
+      "target": "file:internal/service/applications.go",
+      "type": "imports",
+      "label": "CreateApplication, ArchiveApplication, ApplicationInput, applyStatusDateConstraint"
+    },
+    {
+      "source": "file:internal/service/stages.go",
+      "target": "file:internal/service/applications.go",
+      "type": "imports",
+      "label": "getApplicationWithStages, toNullableText, parseUUID, ApplicationResponse"
+    },
+    {
+      "source": "file:internal/service/history.go",
+      "target": "file:internal/service/applications.go",
+      "type": "imports",
+      "label": "getApplicationWithStages, ApplicationResponse, InterviewStageResponse, toNullableDate, toNullableText, toNullableInt4, uuidToString, parseUUID"
+    },
+    {
+      "source": "file:internal/migrations/embed.go",
+      "target": "file:internal/migrations/001_initial.up.sql",
+      "type": "embeds",
+      "label": "go:embed *.sql"
+    },
+    {
+      "source": "file:internal/migrations/embed.go",
+      "target": "file:internal/migrations/002_drop_enums.up.sql",
+      "type": "embeds",
+      "label": "go:embed *.sql"
+    },
+    {
+      "source": "file:internal/migrations/embed.go",
+      "target": "file:internal/migrations/003_align_with_nestjs.up.sql",
+      "type": "embeds",
+      "label": "go:embed *.sql"
+    },
+    {
+      "source": "file:internal/migrations/embed.go",
+      "target": "file:internal/migrations/004_align_job_source_with_nestjs.up.sql",
+      "type": "embeds",
+      "label": "go:embed *.sql"
+    },
+    {
+      "source": "file:internal/migrations/embed.go",
+      "target": "file:internal/migrations/005_align_status_with_nestjs.up.sql",
+      "type": "embeds",
+      "label": "go:embed *.sql"
+    },
+    {
+      "source": "file:sqlc.yaml",
+      "target": "file:sql/queries/applications.sql",
+      "type": "references",
+      "label": "sqlc input"
+    },
+    {
+      "source": "file:sqlc.yaml",
+      "target": "file:sql/queries/history.sql",
+      "type": "references",
+      "label": "sqlc input"
+    },
+    {
+      "source": "file:sqlc.yaml",
+      "target": "file:sql/queries/stages.sql",
+      "type": "references",
+      "label": "sqlc input"
+    },
+    {
+      "source": "file:sqlc.yaml",
+      "target": "file:internal/db/query.sql.go",
+      "type": "generates",
+      "label": "sqlc output"
+    },
+    {
+      "source": "file:tests/helper_test.go",
+      "target": "file:internal/db/pool.go",
+      "type": "imports",
+      "label": "db.New()"
+    },
+    {
+      "source": "file:tests/server_test.go",
+      "target": "file:internal/handler/router.go",
+      "type": "imports",
+      "label": "handler.RegisterRoutes()"
+    },
+    {
+      "source": "file:tests/applications_test.go",
+      "target": "file:tests/helper_test.go",
+      "type": "imports",
+      "label": "setupTestDB, createApp, deleteApp helpers"
+    },
+    {
+      "source": "file:tests/stages_test.go",
+      "target": "file:tests/helper_test.go",
+      "type": "imports",
+      "label": "setupTestDB helpers"
+    },
+    {
+      "source": "file:tests/history_test.go",
+      "target": "file:tests/helper_test.go",
+      "type": "imports",
+      "label": "setupTestDB helpers"
+    },
+    {
+      "source": "file:tests/csv_test.go",
+      "target": "file:tests/helper_test.go",
+      "type": "imports",
+      "label": "setupTestDB helpers"
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:entrypoint",
+      "name": "Entrypoint",
+      "description": "Application bootstrap \u2014 wires together config, database, migrations, and HTTP engine, then starts the server. Also includes the standalone migrate CLI.",
+      "nodeIds": [
+        "file:cmd/server/main.go",
+        "file:cmd/migrate/main.go"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "Configuration",
+      "description": "Environment loading, defaults, and project metadata. Includes go.mod for dependency declarations and Dockerfile for container deployment.",
+      "nodeIds": [
+        "file:internal/config/config.go",
+        "file:go.mod",
+        "file:Dockerfile",
+        "file:sqlc.yaml",
+        "file:.golangci.yml"
+      ]
+    },
+    {
+      "id": "layer:api",
+      "name": "API Layer",
+      "description": "HTTP routing and handler functions. Translates HTTP requests into service calls and formats service results as JSON responses. Handles CORS, parameter parsing, error status codes.",
+      "nodeIds": [
+        "file:internal/handler/router.go",
+        "file:internal/handler/applications.go",
+        "file:internal/handler/stages.go",
+        "file:internal/handler/history.go",
+        "file:internal/handler/csv.go"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Service Layer",
+      "description": "Business logic: validation, type conversion, snapshot lifecycle, pagination, duplicate detection. Composes database operations and enforces domain rules.",
+      "nodeIds": [
+        "file:internal/service/applications.go",
+        "file:internal/service/stages.go",
+        "file:internal/service/history.go",
+        "file:internal/service/csv.go"
+      ]
+    },
+    {
+      "id": "layer:data",
+      "name": "Data Layer",
+      "description": "Database models, connection pool, and SQL query functions. Implements the querier interface for transaction support. Includes all SQL source files and the embedded migration filesystem.",
+      "nodeIds": [
+        "file:internal/db/models.go",
+        "file:internal/db/pool.go",
+        "file:internal/db/query.sql.go",
+        "file:internal/migrations/embed.go",
+        "file:internal/migrations/001_initial.up.sql",
+        "file:internal/migrations/002_drop_enums.up.sql",
+        "file:internal/migrations/003_align_with_nestjs.up.sql",
+        "file:internal/migrations/004_align_job_source_with_nestjs.up.sql",
+        "file:internal/migrations/005_align_status_with_nestjs.up.sql",
+        "file:sql/queries/applications.sql",
+        "file:sql/queries/history.sql",
+        "file:sql/queries/stages.sql"
+      ]
+    },
+    {
+      "id": "layer:test",
+      "name": "Test Layer",
+      "description": "Integration tests using testcontainers-go for real PostgreSQL. Tests cover full HTTP API lifecycle: CRUD, stages, history/restore, and CSV import/export.",
+      "nodeIds": [
+        "file:tests/helper_test.go",
+        "file:tests/applications_test.go",
+        "file:tests/stages_test.go",
+        "file:tests/history_test.go",
+        "file:tests/csv_test.go",
+        "file:tests/server_test.go"
+      ]
+    },
+    {
+      "id": "layer:docs",
+      "name": "Documentation",
+      "description": "Developer-facing documentation for the stack.",
+      "nodeIds": [
+        "file:CLAUDE.md"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "id": "tour:entrypoint",
+      "title": "Start Here: Server Bootstrap",
+      "description": "The Go API starts in cmd/server/main.go. It loads config, runs embedded SQL migrations automatically at startup using golang-migrate with an iofs source, creates a pgxpool connection pool (max 10 conns), sets up a Gin engine with Logger + Recovery middleware, and calls handler.RegisterRoutes() before listening on port 5070.",
+      "order": 1,
+      "nodeIds": [
+        "file:cmd/server/main.go",
+        "file:internal/config/config.go"
+      ]
+    },
+    {
+      "id": "tour:routing",
+      "title": "Route Registration and CORS",
+      "description": "internal/handler/router.go registers every endpoint under a /applications group. It also sets up inline CORS middleware to allow the Angular UI (port 3060) to call the API. Note: CSV routes (import, export, sample-csv) are registered before /:id to prevent Gin from treating 'import' as an application UUID.",
+      "order": 2,
+      "nodeIds": [
+        "file:internal/handler/router.go"
+      ]
+    },
+    {
+      "id": "tour:handlers",
+      "title": "HTTP Handlers",
+      "description": "Four handler files map HTTP verbs to service calls. applications.go handles full CRUD plus archive/restore. stages.go handles interview stage mutations. history.go handles snapshot listing and version restore. csv.go handles multipart file upload for import and streaming CSV for export. Each handler parses request context, calls the service layer, and returns appropriate status codes.",
+      "order": 3,
+      "nodeIds": [
+        "file:internal/handler/applications.go",
+        "file:internal/handler/stages.go",
+        "file:internal/handler/history.go",
+        "file:internal/handler/csv.go"
+      ]
+    },
+    {
+      "id": "tour:service",
+      "title": "Business Logic (Service Layer)",
+      "description": "The service layer enforces domain rules before touching the database. applications.go defines ApplicationInput, ApplicationResponse, and helper type converters (pgtype <-> Go). It applies the status/dateApplied constraint (unsubmitted clears the date). stages.go uses name/order JSON keys (not stageName/stageOrder). history.go creates JSONB snapshots on every mutation and computes field-level diffs via reflect.DeepEqual for history entries. csv.go handles duplicate detection by jobPostingUrl or (companyName, positionTitle) pair.",
+      "order": 4,
+      "nodeIds": [
+        "file:internal/service/applications.go",
+        "file:internal/service/stages.go",
+        "file:internal/service/history.go",
+        "file:internal/service/csv.go"
+      ]
+    },
+    {
+      "id": "tour:data",
+      "title": "Data Access Layer",
+      "description": "The db package contains hand-written sqlc-style query functions. models.go defines the three entities (Application, InterviewStage, ApplicationSnapshot) with pgtype fields. query.sql.go implements all queries using a querier interface (satisfied by both *pgxpool.Pool and pgx.Tx), enabling history restore to run inside a transaction. Dynamic sort columns use an allowlist map to prevent SQL injection. pool.go creates the connection pool.",
+      "order": 5,
+      "nodeIds": [
+        "file:internal/db/models.go",
+        "file:internal/db/query.sql.go",
+        "file:internal/db/pool.go"
+      ]
+    },
+    {
+      "id": "tour:migrations",
+      "title": "Database Migrations",
+      "description": "Migrations live in internal/migrations/ and are embedded into the binary via Go's embed directive (embed.go). The server runs them automatically on startup via golang-migrate. The schema evolution: 001 creates tables with PostgreSQL enums; 002 drops enums in favor of TEXT + application-level validation; 003-005 add columns and standardize values to align with the NestJS stack. A separate cmd/migrate tool can run migrations from the filesystem for CI/CD pipelines.",
+      "order": 6,
+      "nodeIds": [
+        "file:internal/migrations/embed.go",
+        "file:internal/migrations/001_initial.up.sql",
+        "file:internal/migrations/002_drop_enums.up.sql",
+        "file:internal/migrations/003_align_with_nestjs.up.sql",
+        "file:internal/migrations/004_align_job_source_with_nestjs.up.sql",
+        "file:internal/migrations/005_align_status_with_nestjs.up.sql"
+      ]
+    },
+    {
+      "id": "tour:sqlc",
+      "title": "sqlc Code Generation",
+      "description": "sql/queries/ contains the canonical SQL query definitions (applications.sql, history.sql, stages.sql). sqlc.yaml configures code generation targeting internal/db with pgx/v5 and camelCase JSON tags. In practice the generated code was hand-written since sqlc was not available in the environment \u2014 the sql/queries/*.sql files serve as the source of truth for query intent.",
+      "order": 7,
+      "nodeIds": [
+        "file:sqlc.yaml",
+        "file:sql/queries/applications.sql",
+        "file:sql/queries/history.sql",
+        "file:sql/queries/stages.sql",
+        "file:internal/db/query.sql.go"
+      ]
+    },
+    {
+      "id": "tour:tests",
+      "title": "Integration Tests",
+      "description": "All tests are real integration tests using testcontainers-go to spin up a PostgreSQL 18 container. helper_test.go sets up the DB and runs migrations. server_test.go starts the actual Gin HTTP server. The other test files make real HTTP calls to test the full stack end-to-end. Tests skip gracefully when Docker is unavailable.",
+      "order": 8,
+      "nodeIds": [
+        "file:tests/helper_test.go",
+        "file:tests/server_test.go",
+        "file:tests/applications_test.go",
+        "file:tests/stages_test.go",
+        "file:tests/history_test.go",
+        "file:tests/csv_test.go"
+      ]
+    }
+  ]
+}

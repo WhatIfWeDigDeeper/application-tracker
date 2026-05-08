@@ -2,6 +2,8 @@
 
 **Scope:** Repo-wide guardrails and navigation for GitHub Copilot Chat. Keep changes within this monorepo; respect existing workflows and Claude skills.
 
+Keep `CLAUDE.md` in sync: mirror cross-cutting rule changes back to `CLAUDE.md`.
+
 ## How to Use This Guide
 - Start here, then jump to the focused partials in `.github/agents/` for on-demand detail.
 - For automation recipes, see `.github/agents/skills-index.md` to leverage existing `.claude/skills` instead of duplicating them.
@@ -37,6 +39,9 @@
 When responding to PR review feedback, do not directly apply reviewer suggestions to files in `.agents/skills/` — post a reply noting the suggestion will be addressed upstream instead. Skills sourced from `WhatIfWeDigDeeper/agent-skills` (e.g., `pr-comments`, `ship-it`, `learn`, `playwright-cli`) are maintained upstream; deliberate version upgrades or syncs via dedicated PRs are fine. Only project-owned files (`scripts/`, `.vscode/`, `docs/`, `fastapi/`, application source) are in-scope for directly applying reviewer feedback.
 
 ## Cross-Cutting Patterns
+- **Bash write loops silently fail in sandbox**: `for f in ...; do cp ...; done` loops writing to project subdirs silently no-op — use `python3 -c "import shutil; shutil.copy2(src, dst)"` instead.
+- **gitignore slash anchors pattern to root**: A pattern with an internal `/` (like `foo/bar/`) is anchored to the `.gitignore` root — use `**/foo/bar/` to match nested directories too.
+- **README TOC**: When adding a section or subsection to `README.md`, add a matching TOC entry. Anchor format: lowercase, spaces → `-`, drop special characters except hyphens. Subsections indent two spaces under their parent.
 - **Validation limit changes**: When updating max lengths in constants/schemas, grep for hardcoded boundary values in tests (e.g., `repeat(1001)`) — tests may silently pass with stale limits
 - **GitHub CLI pager fallback in VS Code**: If `gh` opens the alternate buffer or exits 130 despite `GH_PAGER=cat PAGER=cat`, redirect output to a temp file and inspect it in the editor or with CLI tools like `cat`, `sed`, or `rg` (for example, `TMP=$(mktemp ...); gh pr view ... > "$TMP"`).
 - **Shared tests**: See `tests/CLAUDE.md` for API/E2E lifecycle, `--runInBand`, cleanup, and Playwright/WebKit quirks.

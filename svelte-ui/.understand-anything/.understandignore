@@ -1,0 +1,6 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Built-in defaults (always excluded): node_modules/, .git/, dist/, build/, *.lock
+
+# Exclude SvelteKit generated dir and static assets
+.svelte-kit/
+static/
