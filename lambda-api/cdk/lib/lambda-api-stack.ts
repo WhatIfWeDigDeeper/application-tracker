@@ -39,6 +39,8 @@ export class LambdaApiStack extends cdk.Stack {
 
     this.fn = new nodejs.NodejsFunction(this, 'ApiHandler', {
       entry: path.join(__dirname, '../../src/handler.ts'),
+      projectRoot: path.join(__dirname, '../..'),
+      depsLockFilePath: path.join(__dirname, '../../package-lock.json'),
       handler: 'handler',
       runtime: lambda.Runtime.NODEJS_22_X,
       bundling: {
