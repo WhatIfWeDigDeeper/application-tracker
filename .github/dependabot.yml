@@ -24,7 +24,20 @@ updates:
       semver-patch-days: 2
 
   - package-ecosystem: "uv"
-    directory: "/"
+    directory: "/fastapi"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "*"
+        update-types: [
+          "version-update:semver-major",
+          "version-update:semver-minor"
+        ]
+    cooldown:
+      semver-patch-days: 2
+
+  - package-ecosystem: "gomod"
+    directory: "/go-api"
     schedule:
       interval: "weekly"
     ignore:
