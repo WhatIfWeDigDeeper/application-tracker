@@ -4,6 +4,7 @@
     "dev": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",
+      "skillPath": ".claude/skills/dev/SKILL.md",
       "computedHash": "da14d3749ab3f65b479db8b056ab64cd262ce15d07dd642f7d3263ad10708c1b"
     },
     "js-deps": {
@@ -16,7 +17,7 @@
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/learn/SKILL.md",
-      "computedHash": "b9be87c3f44b61fca9d8cb9b92011f250be41cf3d72c4399f6185e2f872cda46"
+      "computedHash": "461f789b654ecfdcca4e429b4f6e4046d57aaaf36fa512b56333740231d61c86"
     },
     "mermaid-diagrams": {
       "source": "softaworks/agent-toolkit",
@@ -27,19 +28,19 @@
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/peer-review/SKILL.md",
-      "computedHash": "6b299ec6aa4e3145f0484eb62ad314cdd848f2a40aff4ee4f28ea8bea92e6776"
+      "computedHash": "16b4095a0648d11f252f3bdfe1deebe4cd793d3be5dd88af79c729d794f4883f"
     },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",
       "skillPath": "skills/playwright-cli/SKILL.md",
-      "computedHash": "17b68556620db6799a69ce72946b42eea69547856486847d42d004237f07256d"
+      "computedHash": "84495cfda62b6c012afc4cc34a0c35bfc7923ba35983b8c04ce4cace0f35a5d8"
     },
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/pr-comments/SKILL.md",
-      "computedHash": "3ea0aeabe13c62ec32535c2609ec969a219c6f51d089964b7860514fa8170784"
+      "computedHash": "77da4739cac7c26b7ded5ff71ee5005b10dec96d5bb3b642e69620d7c9df8e72"
     },
     "pr-human-guide": {
       "source": "whatifwedigdeeper/agent-skills",
