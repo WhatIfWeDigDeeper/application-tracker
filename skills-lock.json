@@ -1,12 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "dev": {
-      "source": "microsoft/playwright-cli",
-      "sourceType": "github",
-      "skillPath": ".claude/skills/dev/SKILL.md",
-      "computedHash": "da14d3749ab3f65b479db8b056ab64cd262ce15d07dd642f7d3263ad10708c1b"
-    },
     "js-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",

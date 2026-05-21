@@ -178,7 +178,6 @@ Thumbs.db
 # Externally-sourced skills (tracked via skills-lock.json, re-install with: npx skills add)
 .agent/skills/
 .agents/skills/
-.claude/skills/dev
 .claude/skills/js-deps
 .claude/skills/learn
 .claude/skills/mermaid-diagrams
