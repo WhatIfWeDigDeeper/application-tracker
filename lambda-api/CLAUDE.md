@@ -35,3 +35,4 @@
 - **`cdk.out/` must be gitignored**: CDK writes synthesized CloudFormation templates to `cdk.out/` at synth/test time — add it to `.gitignore`
 - **`aws-cdk` CLI version vs `aws-cdk-lib` version**: these are on separate version tracks within the 2.x major; a mismatch in minor/patch is normal and not a problem
 - **`HttpApi`**: use `aws-cdk-lib/aws-apigatewayv2` and `aws-cdk-lib/aws-apigatewayv2-integrations` — no alpha packages needed
+- **`brace-expansion` DoS (`GHSA-jxxr-4gwj-5jf2`) is allowlisted in `cdk/.auditconfig.json`**: `aws-cdk-lib` *bundles* `brace-expansion@5.0.5` (vulnerable; needs ≥ 5.0.6). npm `overrides` cannot reach bundled deps (see root CLAUDE.md), and no `aws-cdk-lib` release through 2.256.1 ships the patched version — so the parent-bump escape hatch is unavailable. Re-check on every `aws-cdk-lib` upgrade and remove the allowlist entry once a release bundles `brace-expansion@5.0.6+`.
