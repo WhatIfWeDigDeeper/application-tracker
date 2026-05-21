@@ -292,7 +292,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "25.3.5",
     "eslint": "10.0.3",
-    "ts-proto": "2.7.0",
+    "ts-proto": "2.7.7",
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.1"
   },
