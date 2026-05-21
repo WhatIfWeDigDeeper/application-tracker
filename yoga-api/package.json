@@ -49,6 +49,7 @@
     "@hono/node-server": ">=1.19.10",
     "lodash": "4.17.23",
     "chevrotain": ">=11.0.0",
-    "vite": "7.3.2"
+    "vite": "7.3.2",
+    "fast-uri": "3.1.2"
   }
 }

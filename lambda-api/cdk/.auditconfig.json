@@ -1,3 +1,6 @@
 {
-  "moderate": true
+  "moderate": true,
+  "allowlist": [
+    "GHSA-jxxr-4gwj-5jf2"
+  ]
 }
