@@ -5,7 +5,7 @@ description = "Application Tracker API - FastAPI + asyncpg"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi==0.129.0",
-    "uvicorn[standard]==0.34.2",
+    "uvicorn[standard]==0.34.3",
     "asyncpg==0.31.0",
     "pydantic==2.12.5",
     "python-dotenv==1.2.2",
