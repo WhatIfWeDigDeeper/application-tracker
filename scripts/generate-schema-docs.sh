@@ -2,13 +2,22 @@
 set -euo pipefail
 
 # Generate database schema documentation using tbls
-# Requires: tbls, running PostgreSQL, valid DATABASE_URL
+# Requires: tbls, jq, running PostgreSQL, valid DATABASE_URL
 
 # Check tbls is installed
 if ! command -v tbls &>/dev/null; then
   echo "Error: tbls is not installed." >&2
   echo "Install it with: brew install tbls" >&2
   echo "See: https://github.com/k1LoW/tbls" >&2
+  exit 1
+fi
+
+# jq is required by the schema.json post-process; silently skipping it
+# (the previous behavior) leaves foreign-schema bleed in the JSON artifacts
+# and violates the script's per-stack guarantee.
+if ! command -v jq &>/dev/null; then
+  echo "Error: jq is not installed." >&2
+  echo "Install it with: brew install jq" >&2
   exit 1
 fi
 
@@ -65,20 +74,84 @@ for entry in "${SCHEMAS[@]}"; do
   schema="${entry%%:*}"
   dir="${entry##*:}"
   echo "Generating docs for ${schema}..."
+  # Clear before tbls writes — otherwise stale .md files (tables dropped from
+  # the DB, prior schema renames) survive forever and the Mermaid column-swap
+  # toggles their content on every run.
+  rm -rf -- "${DOC_DIR:?}/${dir:?}"
   tbls doc "${DB_URL}" "${DOC_DIR}/${dir}" \
     --include "${schema}.*" \
     --er-format mermaid \
     --force
 done
 
-# Post-process: swap column order in Mermaid ERDs from "type name" to "name type"
+# Post-process: swap column order in Mermaid ERDs from "type name" to "name type".
+# Scoped to per-schema dirs that tbls regenerates this run — applying the swap to
+# .md files outside SCHEMAS (e.g. lambda-api's hand-written DynamoDB docs) would
+# corrupt them. The swap regex unconditionally flips column positions, so the
+# script must be invoked at most once per `tbls doc` regeneration.
 echo "Swapping column order in Mermaid diagrams..."
-perl -i -0777 -pe '
-  s/(```mermaid.*?```)/
-    my $block = $1;
-    $block =~ s{^(\s+)(\w\S*)\s+(\w\S*)(\s+FK)?$}{$1 . $3 . " " . $2 . ($4 || "")}mge;
-    $block;
-  /gse
-' "${DOC_DIR}"/**/*.md
+for entry in "${SCHEMAS[@]}"; do
+  dir="${entry##*:}"
+  perl -i -0777 -pe '
+    s/(```mermaid.*?```)/
+      my $block = $1;
+      $block =~ s{^(\s+)(\w\S*)\s+(\w\S*)(\s+FK)?$}{$1 . $3 . " " . $2 . ($4 || "")}mge;
+      $block;
+    /gse
+  ' "${DOC_DIR}/${dir}"/*.md
+done
+
+# Post-process: strip foreign-schema content that tbls leaks past --include.
+# tbls's --include filters tables but not pg_type enums; it also treats the dot
+# in "<schema>.*" as a regex (matching any char), so schemas whose names share a
+# prefix (react_nestjs vs react_nestjs_history) bleed tables/entities into each
+# other's docs. We post-process per-schema READMEs, schema.json files, and
+# delete leaked per-table .md files.
+echo "Filtering foreign-schema content from per-stack docs..."
+for entry in "${SCHEMAS[@]}"; do
+  schema="${entry%%:*}"
+  dir="${entry##*:}"
+  readme="${DOC_DIR}/${dir}/README.md"
+  schema_json="${DOC_DIR}/${dir}/schema.json"
+
+  # Collect every other schema's name; used to delete leaked per-table .md files.
+  others=()
+  for other_entry in "${SCHEMAS[@]}"; do
+    other="${other_entry%%:*}"
+    [[ "$other" != "$schema" ]] && others+=("$other")
+  done
+
+  if [[ -f "$readme" ]]; then
+    OWN_SCHEMA="$schema" perl -i -0777 -pe '
+      my $own = $ENV{OWN_SCHEMA};
+      # Drop markdown table rows whose first cell starts with a foreign schema.
+      # Matches both Enums rows ("| schema.Foo |") and Tables rows ("| [schema.foo](link) |").
+      s/^(\| \[?(\w+)\.[^\n]*\n)/$2 eq $own ? $1 : ""/gme;
+      # Drop Mermaid entity blocks "<schema>.<entity>" { ... } whose schema is foreign.
+      s/^("(\w+)\.[^"]+" \{[^}]*\}\n)/$2 eq $own ? $1 : ""/gmse;
+      # Drop Mermaid relation lines where either side references a foreign schema.
+      s/^("(\w+)\.[^"]+" \}[^"\n]*"(\w+)\.[^"]+"[^\n]*\n)/($2 eq $own && $3 eq $own) ? $1 : ""/gme;
+      # Drop ## Enums section if no own-schema rows remain (header + empty table only).
+      s/^## Enums\n\n\| Name \| Values \|\n\| ---- \| ------- \|\n\n+(?=## |\z)//gm;
+    ' "$readme"
+  fi
+
+  if [[ -f "$schema_json" ]]; then
+    tmp_json="$(mktemp)"
+    # Filter both .tables and .enums to own-schema entries only. Drop the
+    # .enums key entirely when no own-schema enums remain (e.g. ruby_rails
+    # uses VARCHAR + model-level inclusion validation, not Postgres enums).
+    jq --arg own "${schema}." '
+      .tables = (.tables | map(select(.name | startswith($own))))
+      | .enums = ((.enums // []) | map(select(.name | startswith($own))))
+      | if (.enums | length) == 0 then del(.enums) else . end
+    ' "$schema_json" > "$tmp_json" && mv "$tmp_json" "$schema_json"
+  fi
+
+  for other in "${others[@]}"; do
+    # Bash 3 lacks nullglob; rm -f silently no-ops when the glob has no matches.
+    rm -f "${DOC_DIR}/${dir}/${other}."*.md
+  done
+done
 
 echo "Done. Schema docs written to ${DOC_DIR}/"
