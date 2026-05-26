@@ -8,7 +8,11 @@ Shared API and E2E tests run against multiple stacks.
 - Shared API Jest tests mutate one schema per stack. Keep `--runInBand` in commands that run `tests/api`, including `scripts/run-api-tests.sh` and direct `test:api:<stack>` scripts.
 - `run-api-tests.sh all` continues on failure and reports every failed stack.
 - Go API and Spring API require all non-optional fields in PATCH requests. Include `companyName` + `positionTitle` for application PATCH, and `name` + `order` for interview stage PATCH.
-- Update stack flags in `tests/api/helpers.ts` when adding a stack: `validatesDates`, `hasInterviewStageDates`, and similar contract capability flags.
+- Update stack flags in `tests/api/helpers.ts` when adding a stack: `validatesDates`, `hasInterviewStageDates`, `expectedAllowedOrigin`, and similar contract capability flags.
+
+### Cross-stack contract gaps (deliberately not enforced)
+
+- **Stage UUID stability across history restore is not part of the cross-stack contract.** Only `rails-api` preserves stage IDs across snapshot restore (its `ApplicationRestoreService` does `destroy_all` + recreate-with-original-UUID). Other stacks may legitimately mint new stage IDs on restore, treating restored stages as new entities. Clients that need stable stage IDs across restore should query the history endpoint, not depend on stage IDs surviving. Do not add a shared `tests/api/` assertion for stage-ID preservation.
 
 ## E2E Tests
 

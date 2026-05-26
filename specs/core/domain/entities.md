@@ -26,7 +26,7 @@ A record representing a single job application submitted by the user.
 | skillsMatch | integer | no | - | 1-5 scale |
 | jobSource | JobSource | no | - | See [enums.md](enums.md) |
 | coverLetterRequired | boolean | no | - | true/false |
-| specialRequirements | string | no | - | Max 1000 characters |
+| specialRequirements | string | no | - | Max 5000 characters |
 | salaryMin | integer | no | - | Positive number |
 | salaryMax | integer | no | - | Positive number, >= salaryMin |
 | notes | string | no | - | Max 5000 characters |
