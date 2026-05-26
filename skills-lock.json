@@ -1,22 +1,17 @@
 {
   "version": 1,
   "skills": {
-    "dev": {
-      "source": "microsoft/playwright-cli",
-      "sourceType": "github",
-      "computedHash": "da14d3749ab3f65b479db8b056ab64cd262ce15d07dd642f7d3263ad10708c1b"
-    },
     "js-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/js-deps/SKILL.md",
-      "computedHash": "2274cd9b24d26eba6f6510f04f68edae91aacc143a1bb17ef6bdae5356465b80"
+      "computedHash": "31e56f282aed1b15e1819e8e80810d3c0b187d76286e31b50047968f28a7e1fd"
     },
     "learn": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/learn/SKILL.md",
-      "computedHash": "9e9ee3231ed08080eb8647489ad35bc76309f5541f7c25bb470e3b65617d2a96"
+      "computedHash": "461f789b654ecfdcca4e429b4f6e4046d57aaaf36fa512b56333740231d61c86"
     },
     "mermaid-diagrams": {
       "source": "softaworks/agent-toolkit",
@@ -27,37 +22,37 @@
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/peer-review/SKILL.md",
-      "computedHash": "593645f61fd1eb047e4f37b06162a97c77e968e3297db5f1030ebf79f7743b6c"
+      "computedHash": "16b4095a0648d11f252f3bdfe1deebe4cd793d3be5dd88af79c729d794f4883f"
     },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",
       "skillPath": "skills/playwright-cli/SKILL.md",
-      "computedHash": "17b68556620db6799a69ce72946b42eea69547856486847d42d004237f07256d"
+      "computedHash": "84495cfda62b6c012afc4cc34a0c35bfc7923ba35983b8c04ce4cace0f35a5d8"
     },
     "pr-comments": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/pr-comments/SKILL.md",
-      "computedHash": "69aaae9f1d6991b18c496eaa0d19f5e95dc84dfa73363d58d65242008f5e23fb"
+      "computedHash": "77da4739cac7c26b7ded5ff71ee5005b10dec96d5bb3b642e69620d7c9df8e72"
     },
     "pr-human-guide": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/pr-human-guide/SKILL.md",
-      "computedHash": "0b3bf8f379e1dbbf231ec75b7dee66152487e5290c01ae8c4d4ea6b81bb6cbce"
+      "computedHash": "dafcbfe5c6dcdafe81ebb75c1e187da983d5a91d3ff1a116cfffcef5772e08e1"
     },
     "ship-it": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/ship-it/SKILL.md",
-      "computedHash": "4ce0fb985ff02f4f8b93e5b441c0eb49f48477c3b3f111fb59bede6ab34a876e"
+      "computedHash": "63b352135a9f9334a6be672224861507c2275cce5dd6374b18ec0613b500ca95"
     },
     "uv-deps": {
       "source": "whatifwedigdeeper/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/uv-deps/SKILL.md",
-      "computedHash": "991a9c57a5c429d82aa301429dcbffea2aac38c5241803d9db2b2805297e2fe0"
+      "computedHash": "a9ce4eb2ab089be65a4dc2d417a48c5a54db8dca99bdab46dbe2b429bc4534cd"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",

@@ -9,6 +9,7 @@ words:
   - beforeunload
   - bufbuild
   - choco
+  - cooldown
   - debugpy
   - dedup
   - Dedup
@@ -21,6 +22,7 @@ words:
   - GHSA
   - githubcopilot
   - golangci
+  - gomod
   - gopath
   - GOPATH
   - gotest

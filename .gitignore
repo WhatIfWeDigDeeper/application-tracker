@@ -173,6 +173,7 @@ Thumbs.db
 # Claude settings
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+.claude/worktrees/
 
 # Externally-sourced skills (tracked via skills-lock.json, re-install with: npx skills add)
 .agent/skills/
