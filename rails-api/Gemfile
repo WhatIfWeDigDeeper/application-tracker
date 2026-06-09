@@ -4,7 +4,7 @@ ruby ">= 3.3.0"
 
 gem "bootsnap", "1.19.0", require: false
 gem "pg", "1.6.2"
-gem "puma", "7.1.0"
+gem "puma", "7.2.1"
 gem "rack-cors", "3.0.0"
 gem "rails", "8.0.4.1"
 
