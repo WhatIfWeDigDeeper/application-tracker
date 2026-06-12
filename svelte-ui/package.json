@@ -14,13 +14,13 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "svelte": "5.53.12"
+    "svelte": "5.56.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@sveltejs/adapter-auto": "^7.0.1",
-    "@sveltejs/kit": "2.57.1",
-    "@sveltejs/vite-plugin-svelte": "^6.2.4",
+    "@sveltejs/kit": "2.65.0",
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/postcss": "4.2.1",
     "@testing-library/svelte": "^5.3.1",
@@ -37,8 +37,8 @@
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.1",
-    "vite": "7.3.2",
-    "vitest": "^4.0.18"
+    "vite": "8.0.16",
+    "vitest": "^4.1.8"
   },
   "overrides": {
     "cookie": "^0.7.2"
