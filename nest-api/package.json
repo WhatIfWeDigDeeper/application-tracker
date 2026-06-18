@@ -20,7 +20,7 @@
     "@nestjs/common": "11.1.19",
     "@nestjs/core": "11.1.19",
     "@nestjs/microservices": "11.1.19",
-    "@nestjs/platform-fastify": "11.1.19",
+    "@nestjs/platform-fastify": "11.1.24",
     "dotenv": "17.3.1",
     "drizzle-orm": "0.45.2",
     "papaparse": "5.5.3",
