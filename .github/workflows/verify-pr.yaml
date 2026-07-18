@@ -85,7 +85,7 @@ jobs:
 
       - name: Set up Go
         if: steps.docs-check.outputs.only_changed == 'false'
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: go-api/go.mod
           cache-dependency-path: go-api/go.sum
