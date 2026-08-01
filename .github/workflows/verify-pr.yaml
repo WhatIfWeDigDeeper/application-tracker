@@ -78,7 +78,7 @@ jobs:
 
       - name: Set up Java 21
         if: steps.docs-check.outputs.only_changed == 'false'
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v5.6.0
         with:
           java-version: '21'
           distribution: 'temurin'
